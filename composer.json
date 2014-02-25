@@ -1,0 +1,25 @@
+{
+	"name": "thefox/phpchat2",
+	"description": "Simple Chat written in PHP.",
+	"license": "GPLv3",
+	"authors": [
+		{
+			"name": "Christian Mayer",
+			"email": "thefox21at@gmail.com",
+			"homepage": "http://fox21.at"
+		}
+	],
+	"require": {
+		"php": ">=5.3",
+		"symfony/yaml": "2.3.10",
+		"monolog/monolog": "1.7.0",
+		"ulrichsg/getopt-php": "1.1.0",
+		"rhumsaa/uuid": "2.5.0",
+		"kevinlebrun/colors.php": "0.3.0"
+	},
+	"autoload": {
+		"psr-0": {
+			"TheFox": "src"
+		}
+	}
+}
