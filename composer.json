@@ -1,6 +1,6 @@
 {
 	"name": "thefox/phpchat2",
-	"description": "Simple Chat written in PHP.",
+	"description": "A decentralized, peer-to-peer, encrypted chat in PHP.",
 	"license": "GPLv3",
 	"authors": [
 		{
