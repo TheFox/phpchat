@@ -2,6 +2,8 @@
 
 namespace TheFox\Ipc;
 
+use Exception;
+
 class StreamHandler extends AbstractHandler{
 	
 	public function __construct($ip = '', $port = 0){
@@ -33,9 +35,9 @@ class StreamHandler extends AbstractHandler{
 	}
 	
 	public function listen(){
-		print __CLASS__.'->'.__FUNCTION__."\n";
+		#print __CLASS__.'->'.__FUNCTION__."\n";
 		
-		$socket = stream_socket_server('tcp://'.$this->getIp().':'.$this->getPort(), $errno, $errstr);
+		$socket = @stream_socket_server('tcp://'.$this->getIp().':'.$this->getPort(), $errno, $errstr);
 		$this->setSocket($socket);
 		
 		if($socket){
@@ -45,8 +47,9 @@ class StreamHandler extends AbstractHandler{
 			return true;
 		}
 		else{
-			print __CLASS__.'->'.__FUNCTION__.': '.$errno.', '.$errstr."\n";
-			return false;
+			#print __CLASS__.'->'.__FUNCTION__.': '.$errno.', '.$errstr."\n";
+			#return false;
+			throw new Exception($errstr, $errno);
 		}
 	}
 	
@@ -62,11 +65,6 @@ class StreamHandler extends AbstractHandler{
 			foreach($this->getClients() as $client){
 				$readSockets[] = $client['socket'];
 			}
-			
-			if(count($readSockets) >= 2){
-				#print __CLASS__.'->'.__FUNCTION__.': isListening: '.count($readSockets)."\n";
-			}
-			
 		}
 		elseif($this->isConnected()){
 			#print __CLASS__.'->'.__FUNCTION__.': isConnected'."\n";
@@ -82,7 +80,9 @@ class StreamHandler extends AbstractHandler{
 						// Server
 						print __CLASS__.'->'.__FUNCTION__.': accept'."\n";
 						$socket = @stream_socket_accept($this->getSocket(), 2);
-						$this->clientAdd($socket);
+						$client = $this->clientAdd($socket);
+						
+						$this->sendId($client['id']);
 					}
 					else{
 						// Client
@@ -113,7 +113,7 @@ class StreamHandler extends AbstractHandler{
 	public function socketDataSend($socket, $data){
 		$rv = stream_socket_sendto($socket, $data);
 		
-		print __CLASS__.'->'.__FUNCTION__.': '.$rv."\n";
+		print __CLASS__.'->'.__FUNCTION__.': '.$rv.', "'.substr($data, 0, -1).'"'."\n";
 	}
 	
 	public function socketDataRecv($socket){
