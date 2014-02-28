@@ -27,27 +27,57 @@ abstract class AbstractHandler{
 	abstract public function socketDataRecv($socket);
 	
 	
-	public function send($data){
-		if($this->isListening()){
-			$client = $this->client[$clientId];
-			$this->socketDataSend($client['socket'], $data.$this->getSendDelimiter());
+	public function send($data, $clientId = null){
+		print __CLASS__.'->'.__FUNCTION__.': '.$data."\n";
+		
+		if($this->isListening()){ // Server
+			if($clientId !== null && isset($this->clients[$clientId])){
+				$client = $this->clients[$clientId];
+				$this->socketDataSend($client['socket'], $data.$this->getSendDelimiter());
+			}
 		}
-		elseif($this->isConnected()){
-			$this->socketDataSend($this->getSocket(), $data);
+		elseif($this->isConnected()){ // Client
+			$this->socketDataSend($this->getSocket(), $data.$this->getSendDelimiter());
 		}
 	}
 	
-	public function sendByClientId($clientId, $data){
-		if(isset($this->clients[$clientId])){
-			$client = $this->clients[$clientId];
-			
-			$this->socketDataSend($client['socket'], $data.$this->getSendDelimiter());
+	public function sendId($clientId = null){
+		$this->send('ID', $clientId);
+	}
+	
+	public function sendIdOk($clientId = null){
+		$this->send('ID_OK', $clientId);
+	}
+	
+	public function sendFunctionExec($name, $args = array(), $rid = 0, $clientId = null){
+		$argsOut = array();
+		foreach($args as $arg){
+			$argsOut[] = serialize($arg);
 		}
+		
+		$json = array(
+			'name' => $name,
+			'rid' => $rid,
+			'args' => $argsOut,
+		);
+		$jsonStr = json_encode($json);
+		
+		$this->send('FUNCTION_EXEC '.$jsonStr, $clientId);
+	}
+	
+	public function sendFunctionRetn($value, $rid = 0, $clientId = null){
+		$json = array(
+			'value' => serialize($value),
+			'rid' => $rid,
+		);
+		$jsonStr = json_encode($json);
+		
+		$this->send('FUNCTION_RETN '.$jsonStr, $clientId);
 	}
 	
 	public function recv($socket, $data){
 		$dataLen = strlen($data);
-		print __CLASS__.'->'.__FUNCTION__.': data: '.(int)($data === false).', '.(int)feof($socket).', '.$dataLen.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': data: '.(int)($data === false).', '.(int)feof($socket).', '.$dataLen.''."\n";
 		
 		if($this->isListening()){
 			$client = $this->clientFindBySocket($socket);
@@ -63,13 +93,13 @@ abstract class AbstractHandler{
 				
 				$delimiterPos = strpos($data, $this->getSendDelimiter());
 				if($delimiterPos === false){
-					print "data1.1: '$data'\n";
+					#print "data1.1: '$data'\n";
 					$this->recvBuffer[$this->recvBufferId] .= $data;
 					$data = '';
 				}
 				else{
 					$msg = substr($data, 0, $delimiterPos);
-					print "data1.2: '$msg'\n";
+					#print "data1.2: '$msg'\n";
 					
 					$this->recvBuffer[$this->recvBufferId] = $msg;
 					$this->recvBufferId++;
@@ -173,6 +203,8 @@ abstract class AbstractHandler{
 			#'sendBufferId' => 0,
 			#'sendBuffer' => array(),
 		);
+		
+		return $this->clients[$this->clientsId];
 	}
 	
 	public function clientHandleRevcData($client, $data){
@@ -181,23 +213,26 @@ abstract class AbstractHandler{
 			$this->hasData(true);
 			
 			do{
+				$clientId = $client['id'];
+				$recvBufferId = $this->clients[$clientId]['recvBufferId'];
+				
 				if(!isset($client['recvBuffer'][$client['recvBufferId']])){
-					$this->clients[$client['id']]['recvBuffer'][$client['recvBufferId']] = '';
+					$this->clients[$clientId]['recvBuffer'][$recvBufferId] = '';
 				}
 				
 				$delimiterPos = strpos($data, $this->getSendDelimiter());
 				if($delimiterPos === false){
-					print "data2.1: ".$client['id'].", '$data'\n";
+					#print "data2.1: ".$clientId.", '$data'\n";
 					
-					$this->clients[$client['id']]['recvBuffer'][$client['recvBufferId']] .= $data;
+					$this->clients[$clientId]['recvBuffer'][$recvBufferId] .= $data;
 					$data = '';
 				}
 				else{
 					$msg = substr($data, 0, $delimiterPos);
-					print "data2.2: ".$client['id'].", '$msg'\n";
+					#print "data2.2: ".$clientId.", '$msg'\n";
 					
-					$this->clients[$client['id']]['recvBuffer'][$client['recvBufferId']] = $msg;
-					$this->clients[$client['id']]['recvBufferId']++;
+					$this->clients[$clientId]['recvBuffer'][$recvBufferId] = $msg;
+					$this->clients[$clientId]['recvBufferId']++;
 					
 					$data = substr($data, $delimiterPos + 1);
 				}
