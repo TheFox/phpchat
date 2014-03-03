@@ -18,6 +18,7 @@ abstract class AbstractHandler{
 	
 	private $recvBufferId = 0;
 	private $recvBuffer = array();
+	private $recvBufferTmp = '';
 	
 	
 	abstract public function connect();
@@ -33,11 +34,11 @@ abstract class AbstractHandler{
 		if($this->isListening()){ // Server
 			if($clientId !== null && isset($this->clients[$clientId])){
 				$client = $this->clients[$clientId];
-				$this->socketDataSend($client['socket'], $data.$this->getSendDelimiter());
+				$this->socketDataSend($client['socket'], base64_encode($data).$this->getSendDelimiter());
 			}
 		}
 		elseif($this->isConnected()){ // Client
-			$this->socketDataSend($this->getSocket(), $data.$this->getSendDelimiter());
+			$this->socketDataSend($this->getSocket(), base64_encode($data).$this->getSendDelimiter());
 		}
 	}
 	
@@ -87,22 +88,20 @@ abstract class AbstractHandler{
 			$this->hasData(true);
 			
 			do{
-				if(!isset($this->recvBuffer[$this->recvBufferId])){
-					$this->recvBuffer[$this->recvBufferId] = '';
-				}
-				
 				$delimiterPos = strpos($data, $this->getSendDelimiter());
 				if($delimiterPos === false){
 					#print "data1.1: '$data'\n";
-					$this->recvBuffer[$this->recvBufferId] .= $data;
+					#$this->recvBuffer[$this->recvBufferId] .= $data;
+					$this->recvBufferTmp .= $data;
 					$data = '';
 				}
 				else{
-					$msg = substr($data, 0, $delimiterPos);
+					$msg = $this->recvBufferTmp.substr($data, 0, $delimiterPos);
+					$this->recvBufferTmp = '';
 					#print "data1.2: '$msg'\n";
 					
-					$this->recvBuffer[$this->recvBufferId] = $msg;
 					$this->recvBufferId++;
+					$this->recvBuffer[$this->recvBufferId] = base64_decode($msg);
 					
 					$data = substr($data, $delimiterPos + 1);
 				}
@@ -200,6 +199,7 @@ abstract class AbstractHandler{
 			'socket' => $socket,
 			'recvBufferId' => 0,
 			'recvBuffer' => array(),
+			'recvBufferTmp' => '',
 			#'sendBufferId' => 0,
 			#'sendBuffer' => array(),
 		);
@@ -214,25 +214,21 @@ abstract class AbstractHandler{
 			
 			do{
 				$clientId = $client['id'];
-				$recvBufferId = $this->clients[$clientId]['recvBufferId'];
-				
-				if(!isset($client['recvBuffer'][$client['recvBufferId']])){
-					$this->clients[$clientId]['recvBuffer'][$recvBufferId] = '';
-				}
 				
 				$delimiterPos = strpos($data, $this->getSendDelimiter());
 				if($delimiterPos === false){
 					#print "data2.1: ".$clientId.", '$data'\n";
 					
-					$this->clients[$clientId]['recvBuffer'][$recvBufferId] .= $data;
+					$this->clients[$clientId]['recvBufferTmp'] .= $data;
 					$data = '';
 				}
 				else{
-					$msg = substr($data, 0, $delimiterPos);
+					$msg = $this->clients[$clientId]['recvBufferTmp'].substr($data, 0, $delimiterPos);
+					$this->clients[$clientId]['recvBufferTmp'] = '';
 					#print "data2.2: ".$clientId.", '$msg'\n";
 					
-					$this->clients[$clientId]['recvBuffer'][$recvBufferId] = $msg;
 					$this->clients[$clientId]['recvBufferId']++;
+					$this->clients[$clientId]['recvBuffer'][$this->clients[$clientId]['recvBufferId']] = base64_decode($msg);
 					
 					$data = substr($data, $delimiterPos + 1);
 				}
