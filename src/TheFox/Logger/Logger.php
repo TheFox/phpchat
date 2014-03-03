@@ -2,6 +2,8 @@
 
 namespace TheFox\Logger;
 
+use DateTime;
+
 class Logger{
 	
 	const DEBUG 		= 100;
@@ -31,7 +33,7 @@ class Logger{
 		if(@date_default_timezone_get() == 'UTC') date_default_timezone_set('UTC');
 		
 		$this->setName($name);
-		$this->handlers = new StackableArray();
+		$this->handlers = array();
 	}
 	
 	public function setName($name){
