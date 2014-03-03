@@ -13,7 +13,7 @@ class Connection{
 	private $execId = 0;
 	
 	public function __construct(){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 	}
 	
 	public function isServer($isServer = null){
@@ -25,7 +25,7 @@ class Connection{
 	}
 	
 	public function setHandler(AbstractHandler $handler){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		$this->handler = $handler;
 	}
@@ -55,20 +55,20 @@ class Connection{
 		
 		if(is_object($function['objc'])){
 			if(is_string($function['func'])){
-				print __CLASS__.'->'.__FUNCTION__.': exec '. get_class($function['objc']) .'->'.$function['func'].'()'."\n";
+				#print __CLASS__.'->'.__FUNCTION__.': exec '. get_class($function['objc']) .'->'.$function['func'].'()'."\n";
 				return call_user_func_array(array($function['objc'], $function['func']), $args);
 			}
 		}
 		elseif(is_string($function['func'])){
-			print __CLASS__.'->'.__FUNCTION__.': exec '.$function['func'].'()'."\n";
+			#print __CLASS__.'->'.__FUNCTION__.': exec '.$function['func'].'()'."\n";
 			return call_user_func_array($function['func'], $args);
 		}
 		elseif($function['func'] === null){
-			print __CLASS__.'->'.__FUNCTION__.': exec '.$name.''."\n";
+			#print __CLASS__.'->'.__FUNCTION__.': exec '.$name.''."\n";
 			return call_user_func_array($name, $args);
 		}
 		else{
-			print __CLASS__.'->'.__FUNCTION__.': exec anon '.$name.''."\n";
+			#print __CLASS__.'->'.__FUNCTION__.': exec anon '.$name.''."\n";
 			return call_user_func_array($function['func'], $args);
 		}
 	}
@@ -86,12 +86,9 @@ class Connection{
 		if($this->isServer()){
 			try{
 				$this->handler->listen();
-				
 				return true;
 			}
 			catch(Exception $e){
-				print __CLASS__.'->'.__FUNCTION__.': '.$e->getMessage()."\n";
-				
 				return false;
 			}
 		}
@@ -137,24 +134,16 @@ class Connection{
 	
 	public function run(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		if($this->handler === null){
 			throw new Exception('Handler not set. Use setHandler().');
 		}
 		
-		$rv = false;
-		$rv = true;
-		
 		$this->handler->run();
 		
 		if($this->isServer()){
-			#print __CLASS__.'->'.__FUNCTION__.': is server'."\n";
-			
 			foreach($this->handler->recvBuffer() as $client){
-				print __CLASS__.'->'.__FUNCTION__.': client '.$client['id']."\n";
-				
+				#print __CLASS__.'->'.__FUNCTION__.': client '.$client['id']."\n";
 				foreach($client['recvBuffer'] as $msg){
-					#print "data: ".$client['id'].", '".$msg."'\n";
 					$this->msgHandle($msg, $client['id']);
 				}
 			}
@@ -162,7 +151,6 @@ class Connection{
 		else{
 			$rv = $this->handler->isConnected();
 			foreach($this->handler->recvBuffer() as $msg){
-				#print "data: '".$msg."'\n";
 				$this->msgHandle($msg);
 			}
 		}
@@ -172,7 +160,7 @@ class Connection{
 	}
 	
 	public function loop(){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		while($this->run()){
 			usleep(100000);

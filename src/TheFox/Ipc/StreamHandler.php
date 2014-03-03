@@ -7,7 +7,7 @@ use Exception;
 class StreamHandler extends AbstractHandler{
 	
 	public function __construct($ip = '', $port = 0){
-		print __CLASS__.'->'.__FUNCTION__."\n";
+		#print __CLASS__.'->'.__FUNCTION__."\n";
 		
 		if($ip && $port){
 			$this->setIp($ip);
@@ -16,19 +16,19 @@ class StreamHandler extends AbstractHandler{
 	}
 	
 	public function connect(){
-		print __CLASS__.'->'.__FUNCTION__."\n";
+		#print __CLASS__.'->'.__FUNCTION__."\n";
 		
 		$socket = @stream_socket_client('tcp://'.$this->getIp().':'.$this->getPort(), $errno, $errstr, 2);
 		$this->setSocket($socket);
 		
 		if($socket !== false){
-			print __CLASS__.'->'.__FUNCTION__.': ok'."\n";
+			#print __CLASS__.'->'.__FUNCTION__.': ok'."\n";
 			
 			$this->isConnected(true);
 			return true;
 		}
 		else{
-			print __CLASS__.'->'.__FUNCTION__.': '.$errno.', '.$errstr."\n";
+			#print __CLASS__.'->'.__FUNCTION__.': '.$errno.', '.$errstr."\n";
 			return false;
 		}
 		
@@ -41,7 +41,7 @@ class StreamHandler extends AbstractHandler{
 		$this->setSocket($socket);
 		
 		if($socket){
-			print __CLASS__.'->'.__FUNCTION__.': ok '.$this->getSocket()."\n";
+			#print __CLASS__.'->'.__FUNCTION__.': ok '.$this->getSocket()."\n";
 			
 			$this->isListening(true);
 			return true;
@@ -78,7 +78,7 @@ class StreamHandler extends AbstractHandler{
 				foreach($readSockets as $socket){
 					if($this->isListening() && $socket == $this->getSocket()){
 						// Server
-						print __CLASS__.'->'.__FUNCTION__.': accept'."\n";
+						#print __CLASS__.'->'.__FUNCTION__.': accept'."\n";
 						$socket = @stream_socket_accept($this->getSocket(), 2);
 						$client = $this->clientAdd($socket);
 						
@@ -87,7 +87,7 @@ class StreamHandler extends AbstractHandler{
 					else{
 						// Client
 						if(feof($socket)){
-							print __CLASS__.'->'.__FUNCTION__.': feof'."\n";
+							#print __CLASS__.'->'.__FUNCTION__.': feof'."\n";
 							if($this->isListening()){
 								$client = $this->clientFindBySocket($socket);
 								stream_socket_shutdown($client['socket'], STREAM_SHUT_RDWR);
@@ -99,7 +99,7 @@ class StreamHandler extends AbstractHandler{
 							}
 						}
 						else{
-							print __CLASS__.'->'.__FUNCTION__.': recvfrom'."\n";
+							#print __CLASS__.'->'.__FUNCTION__.': recvfrom'."\n";
 							$this->socketDataRecv($socket);
 						}
 						
@@ -113,14 +113,14 @@ class StreamHandler extends AbstractHandler{
 	public function socketDataSend($socket, $data){
 		$rv = stream_socket_sendto($socket, $data);
 		
-		print __CLASS__.'->'.__FUNCTION__.': '.$rv.', "'.substr($data, 0, -1).'"'."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': '.$rv.', "'.substr($data, 0, -1).'"'."\n";
 	}
 	
 	public function socketDataRecv($socket){
 		$data = stream_socket_recvfrom($socket, 1500);
 		$this->recv($socket, $data);
 		
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 	}
 	
 }

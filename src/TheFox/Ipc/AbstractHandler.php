@@ -28,7 +28,7 @@ abstract class AbstractHandler{
 	
 	
 	public function send($data, $clientId = null){
-		print __CLASS__.'->'.__FUNCTION__.': '.$data."\n";
+		print __CLASS__.'->'.__FUNCTION__.': "'.$data.'"'."\n";
 		
 		if($this->isListening()){ // Server
 			if($clientId !== null && isset($this->clients[$clientId])){
@@ -77,7 +77,7 @@ abstract class AbstractHandler{
 	
 	public function recv($socket, $data){
 		$dataLen = strlen($data);
-		#print __CLASS__.'->'.__FUNCTION__.': data: '.(int)($data === false).', '.(int)feof($socket).', '.$dataLen.''."\n";
+		print __CLASS__.'->'.__FUNCTION__.': '.$dataLen.''."\n";
 		
 		if($this->isListening()){
 			$client = $this->clientFindBySocket($socket);
