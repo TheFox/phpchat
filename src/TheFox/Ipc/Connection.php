@@ -7,10 +7,14 @@ use OutOfBoundsException;
 
 class Connection{
 	
+	const LOOP_USLEEP = 100000;
+	const EXEC_SYNC_TIMEOUT = 5;
+	
 	private $isServer = false;
 	private $handler = null;
 	private $functions = array();
-	private $execId = 0;
+	private $execsId = 0;
+	private $execs = array();
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -49,9 +53,7 @@ class Connection{
 		}
 		
 		$function = $this->functions[$name];
-		#ve($function);
-		array_unshift($args, $this);
-		#ve($args);
+		#array_unshift($args, $this);
 		
 		if(is_object($function['objc'])){
 			if(is_string($function['func'])){
@@ -73,9 +75,62 @@ class Connection{
 		}
 	}
 	
-	public function exec($name, $args = array()){
-		$this->execId++;
-		$this->handler->sendFunctionExec($name, $args, $this->execId);
+	private function execAdd($name, $args = array(), $retnFunc = null, $timeout = null, $type = null){
+		$this->execsId++;
+		
+		$this->execs[$this->execsId] = array(
+			'id' => $this->execsId,
+			'name' => $name,
+			'execRetn' => $retnFunc,
+			'hasReturned' => false,
+			'timeout' => $timeout,
+			'value' => null,
+			'type' => $type, // [a]sync, [s]ync
+		);
+		
+		return $this->execsId;
+	}
+	
+	public function exec($name, $args = array(), $retnFunc = null){
+		$this->execAsync($name, $args, $retnFunc);
+	}
+	
+	public function execAsync($name, $args = array(), $retnFunc = null){
+		$execsId = $this->execAdd($name, $args, $retnFunc, null, 'a');
+		
+		$this->handler->sendFunctionExec($name, $args, $execsId);
+	}
+	
+	public function execSync($name, $args = array(), $timeout = null){
+		if($timeout === null){
+			$timeout = static::EXEC_SYNC_TIMEOUT;
+		}
+		
+		$execsId = $this->execAdd($name, $args, null, $timeout, 's');
+		$this->handler->sendFunctionExec($name, $args, $execsId);
+		
+		$start = time();
+		while( time() - $timeout <= $start && !$this->execs[$execsId]['hasReturned'] ){
+			$this->run();
+			usleep(static::LOOP_USLEEP);
+		}
+		
+		$value = $this->execs[$execsId]['value'];
+		unset($this->execs[$execsId]);
+		#print "remove B $execsId\n";
+		
+		return $value;
+	}
+	
+	public function wait(){
+		$break = false;
+		do{
+			$this->run();
+			
+			$break = !count($this->execs);
+			
+			usleep(static::LOOP_USLEEP);
+		}while(!$break);
 	}
 	
 	public function connect(){
@@ -93,10 +148,7 @@ class Connection{
 			}
 		}
 		else{
-			if($rv = $this->handler->connect()){
-				$this->handler->send('ID');
-			}
-			return $rv;
+			return $this->handler->connect();
 		}
 	}
 	
@@ -117,8 +169,8 @@ class Connection{
 			}
 			
 			try{
-				$rv = $this->functionExec($json['name'], $args);
-				ve($rv);
+				$value = $this->functionExec($json['name'], $args);
+				$this->handler->sendFunctionRetn($value, $json['rid'], $clientId);
 			}
 			catch(Exception $e){
 				print __CLASS__.'->'.__FUNCTION__.': '.$e->getMessage().''."\n";
@@ -128,7 +180,25 @@ class Connection{
 			$data = substr($msg, 14);
 			$json = json_decode($data, true);
 			
-			ve($json);
+			#print "value: '". $json['value'] ."'\n";
+			$value = unserialize($json['value']);
+			#print "value: '". \TheFox\Utilities\Hex::dataEncode($value) ."'\n";
+			$rid = (int)$json['rid'];
+			
+			if(array_key_exists($rid, $this->execs)){
+				$this->execs[$rid]['value'] = $value;
+				$this->execs[$rid]['hasReturned'] = true;
+				
+				if($this->execs[$rid]['execRetn']){
+					$func = $this->execs[$rid]['execRetn'];
+					$func($value);
+				}
+				
+				if($this->execs[$rid]['type'] == 'a'){
+					#print "remove A $rid\n";
+					unset($this->execs[$rid]);
+				}
+			}
 		}
 	}
 	
@@ -149,21 +219,18 @@ class Connection{
 			}
 		}
 		else{
-			$rv = $this->handler->isConnected();
 			foreach($this->handler->recvBuffer() as $msg){
 				$this->msgHandle($msg);
 			}
 		}
-		
-		
-		return $rv;
 	}
 	
 	public function loop(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
-		while($this->run()){
-			usleep(100000);
+		while(true){
+			$this->run();
+			usleep(static::LOOP_USLEEP);
 		}
 	}
 	
