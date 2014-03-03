@@ -3,8 +3,10 @@
 namespace TheFox\PhpChat;
 
 use Exception;
+
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler;
+use TheFox\Network\BsdSocket;
 
 class Server{
 	
@@ -21,8 +23,8 @@ class Server{
 	private $clients;
 	private $clientsBySocket;
 	
-	private $actionClientsPing;
-	private $actionConnect;
+	#private $actionClientsPing;
+	#private $actionConnect;
 	
 	private $ssl;
 	private $isListening;
@@ -31,18 +33,18 @@ class Server{
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
-		$this->log = new Logger($name);
+		$this->log = new Logger('server');
 		$this->log->pushHandler(new StreamHandler('php://stdout', Logger::ERROR));
 		$this->log->pushHandler(new StreamHandler('log/server.log', Logger::DEBUG));
 		
 		$this->log->info('start');
 		
 		$this->clientsId = 0;
-		$this->clients = new array();
-		$this->clientsBySocket = new array();
+		$this->clients = array();
+		$this->clientsBySocket = array();
 		
-		$this->actionClientsPing = false;
-		$this->actionConnect = new array();
+		#$this->actionClientsPing = false;
+		#$this->actionConnect = array();
 		
 		$this->ssl = null;
 		$this->isListening = false;
@@ -56,34 +58,48 @@ class Server{
 		$this->port = $port;
 	}
 	
-	public function runInit(){
+	public function sslInit($keyPrvPath, $keyPrvPass){
 		$this->log->debug('ssl: loading keys');
-		if(file_exists($this->settings['phpchat']['node']['ssl_key_prv_path'])){
-			$this->ssl = openssl_pkey_get_private(file_get_contents($this->settings['phpchat']['node']['ssl_key_prv_path']), $this->settings['phpchat']['node']['ssl_key_prv_pass']);
-		}
-		$this->log->debug('ssl: '.($this->ssl ? 'ok' : 'N/A'));
 		
+		$this->ssl = openssl_pkey_get_private(file_get_contents($keyPrvPath), $keyPrvPass);
+		
+		$this->log->debug('ssl: '.($this->ssl ? 'ok' : 'N/A'));
+	}
+	
+	public function runInit(){
 		if($this->addr && $this->port){
 			$this->log->notice('listen on '.$this->addr.':'.$this->port);
 			
-			$serverSocket = Socket::create();
+			$this->socket = new BsdSocket();
 			
-			if( $serverSocket && $ret = Socket::bind($serverSocket, $this->addr, $this->port) ){ 
-				if( $ret = Socket::listen($serverSocket) ){
-					$this->isListening = true;
-					$this->socket = $serverSocket;
+			$bind = false;
+			try{
+				$bind = $this->socket->bind($this->addr, $this->port);
+			}
+			catch(Exception $e){
+				$this->log->error($e->getMessage());
+			}
+			
+			if($bind){
+				try{
+					if($this->socket->listen()){
+						$this->isListening = true;
+					}
+				}
+				catch(Exception $e){
+					$this->log->error($e->getMessage());
 				}
 			}
 			
 		}
 	}
 	
-	public function runClients(){
+	/*public function runClients(){
 		#$this->log->debug('clients: '.count($this->clients));
 		
 		$read = array();
 		if($this->isListening){
-			$read[] = $this->socket;
+			$read[] = $this->socket->getHandle();
 		}
 		$write = NULL; $except = NULL;
 		foreach($this->clients as $clientId => $client){
@@ -99,11 +115,6 @@ class Server{
 				$this->clientRemove($client);
 				continue;
 			}
-			/*if($client->getIsOnlyPingPinged()){
-				$this->log->debug('remove client PING: '.$client->getId());
-				$this->clientRemove($client);
-				continue;
-			}*/
 			if($client->getIsOnlyNodeFindFound()){
 				$this->log->debug('remove client FIND: '.$client->getId().' ('.(int)$client->getIsNetworkBootstrap().')');
 				$this->clientRemove($client);
@@ -126,7 +137,7 @@ class Server{
 		
 		if($socketsChanged){
 			foreach($read as $readableSocket){
-				if($this->isListening && $readableSocket == $this->socket){
+				if($this->isListening && $readableSocket == $this->socket->getHandle()){
 					
 					// Server
 					$socket = Socket::accept($readableSocket);
@@ -285,7 +296,8 @@ class Server{
 	public function runShutdown(){
 		$this->log->info('close socket');
 		#Socket::close($serverSocket);
-		Socket::close($this->socket);
+		#Socket::close($this->socket);
+		$this->socket->close();
 		
 		$this->clientsSendQuit();
 		
@@ -372,7 +384,7 @@ class Server{
 			
 			$this->log->debug('client action, talk response');
 			
-			$action = new array();
+			$action = array();
 			$action['name'] = 'talkResponse';
 			$action['exec'] = false;
 			$action['timeCreated'] = time();
@@ -391,7 +403,7 @@ class Server{
 			
 			$this->log->debug('client action, talk msg');
 			
-			$action = new array();
+			$action = array();
 			$action['name'] = 'talkMsg';
 			$action['exec'] = false;
 			$action['timeCreated'] = time();
@@ -410,7 +422,7 @@ class Server{
 			
 			$this->log->debug('client action, talk close');
 			
-			$action = new array();
+			$action = array();
 			$action['name'] = 'talkClose';
 			$action['exec'] = false;
 			$action['timeCreated'] = time();
@@ -448,10 +460,10 @@ class Server{
 		#$this->log->debug('action connect: '.$ip.':'.$port.', '.(int)$isChannel);
 		
 		if(!is_object($followupActions)){
-			$followupActions = new array();
+			$followupActions = array();
 		}
 		
-		$action = new array();
+		$action = array();
 		$action['ip'] = $ip;
 		$action['port'] = $port;
 		$action['isChannel'] = $isChannel;
@@ -483,5 +495,5 @@ class Server{
 			$this->settings['tmp']['console']->setChannelServerClientId($clientId);
 		}
 	}
-	
+	*/
 }
