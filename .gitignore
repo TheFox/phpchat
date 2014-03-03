@@ -1,3 +1,6 @@
 vendor
 *.lock
 test*.php
+log
+id_rsa*
+settings.yml
