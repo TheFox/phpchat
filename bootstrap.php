@@ -1,6 +1,9 @@
 <?php
 
 error_reporting(E_ALL | E_STRICT);
+
+if(@date_default_timezone_get() == 'UTC') date_default_timezone_set('UTC');
+
 ini_set('display_errors', true);
 ini_set('memory_limit', '128M');
 
@@ -56,3 +59,121 @@ if(!file_exists(__DIR__.'/vendor')){
 require_once __DIR__.'/vendor/autoload.php';
 require_once __DIR__.'/functions.php';
 
+use Rhumsaa\Uuid\Uuid;
+use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
+
+use TheFox\Logger\Logger;
+use TheFox\Logger\StreamHandler;
+use TheFox\Phpchat\Settings;
+
+
+if(!file_exists(__DIR__.'/log')){
+	mkdir(__DIR__.'/log');
+	chmod(__DIR__.'/log', 0700);
+}
+
+$log = new Logger('main');
+$log->pushHandler(new StreamHandler('php://stdout', Logger::INFO));
+$log->pushHandler(new StreamHandler('log/bootstrap.log', Logger::DEBUG));
+
+$settings = new Settings(__DIR__.'/settings.yml');
+
+if( isset($settings->data['datadir']) && !file_exists($settings->data['datadir'])){
+	$log->info('create datadir: '.$settings->data['datadir']);
+	mkdir($settings->data['datadir']);
+	chmod($settings->data['datadir'], 0700);
+}
+
+if(!$settings->data['node']['uuid']){
+	$uuid = '';
+	try{
+		$uuid = (string)Uuid::uuid4();
+		$log->info('uuid: '.$uuid);
+	}
+	catch(UnsatisfiedDependencyException $e){
+		$log->critical('uuid4: '.$e->getMessage());
+		exit(1);
+	}
+	
+	if($uuid){
+		$settings->data['node']['uuid'] = $uuid;
+		$settings->setDataChanged(true);
+	}
+}
+
+if(!$settings->data['node']['ssl_key_prv_pass']){
+	$ssl_key_prv_pass = '';
+	try{
+		$log->info('ssl: generate private key password');
+		$ssl_key_prv_pass = (string)Uuid::uuid4();
+	}
+	catch(UnsatisfiedDependencyException $e){
+		$log->critical('uuid4: '.$e->getMessage());
+		exit(1);
+	}
+	
+	$settings->data['node']['ssl_key_prv_pass'] = hash('sha512', mt_rand(0, 999999).'_'.time().'_'.$ssl_key_prv_pass);
+	$settings->setDataChanged(true);
+}
+
+if(!file_exists($settings->data['node']['ssl_key_prv_path'])){
+	$log->info('ssl: key pair generation.  this may take a while...');
+	
+	$keyPrv = null;
+	$keyPub = null;
+	
+	$sslConfig = array(
+		'digest_alg' => 'sha512',
+		'private_key_bits' => 4096,
+		'private_key_type' => OPENSSL_KEYTYPE_RSA,
+	);
+	
+	// Create the private and public key
+	$ssl = openssl_pkey_new($sslConfig);
+	if($ssl){
+		openssl_pkey_export($ssl, $keyPrv);
+		
+		openssl_pkey_export_to_file($ssl, $settings->data['node']['ssl_key_prv_path'], $settings->data['node']['ssl_key_prv_pass']);
+		
+		if($keyPrv){
+			$keyPub = openssl_pkey_get_details($ssl);
+			if($keyPub && isset($keyPub['key'])){
+				$keyPub = $keyPub['key'];
+				
+				openssl_public_encrypt('test my keys', $encrypted, $keyPub);
+				openssl_private_decrypt($encrypted, $decrypted, $ssl);
+				
+				if($decrypted == 'test my keys'){
+					$log->info('ssl: test keys ok');
+					file_put_contents($settings->data['node']['ssl_key_pub_path'], $keyPub);
+				}
+				else{
+					$log->critical('ssl: test keys failed');
+					exit(1);
+				}
+			}
+			else{
+				$log->critical('ssl: public key generation failed: '.openssl_error_string());
+				exit(1);
+			}
+		}
+		else{
+			$log->critical('ssl: private key generation failed');
+			exit(1);
+		}
+	}
+	else{
+		$log->critical('ssl: key generation failed: '.openssl_error_string());
+		exit(1);
+	}
+	
+	if(file_exists($settings->data['node']['ssl_key_prv_path'])){
+		chmod($settings->data['node']['ssl_key_prv_path'], 0400);
+	}
+	
+	openssl_pkey_free($ssl);
+	
+	$log->info('ssl: key pair generation done');
+}
+
+$settings->save();
