@@ -81,8 +81,6 @@ class StreamHandler extends AbstractHandler{
 						#print __CLASS__.'->'.__FUNCTION__.': accept'."\n";
 						$socket = @stream_socket_accept($this->getSocket(), 2);
 						$client = $this->clientAdd($socket);
-						
-						$this->sendId($client['id']);
 					}
 					else{
 						// Client
