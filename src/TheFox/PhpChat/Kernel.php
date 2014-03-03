@@ -16,8 +16,10 @@ class Kernel extends Thread{
 		$this->log = new Logger('kernel');
 		$this->log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::ERROR));
 		$this->log->pushHandler(new LoggerStreamHandler('log/kernel.log', Logger::DEBUG));
-		
-		$settings = new Settings(__DIR__.'/settings.yml');
+	}
+	
+	public function setSettings($settings){
+		$this->settings = $settings;
 	}
 	
 	public function run(){
