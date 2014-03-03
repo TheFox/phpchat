@@ -6,5 +6,4 @@ use TheFox\PhpChat\Kernel;
 
 
 $kernel = new Kernel();
-$kernel->setSettings($settings);
 $kernel->run();
