@@ -6,29 +6,22 @@ use Exception;
 
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler;
-use TheFox\Network\BsdSocket;
+use TheFox\Network\Socket;
 
 class Server{
-	
-	#const NODES_PING_NUM = 20;
-	#const NODES_FIND_NUM = 8;
-	const CLIENT_TTL = 300;
 	
 	private $log;
 	
 	private $ip;
 	private $port;
 	
-	private $clientsId;
-	private $clients;
-	private $clientsBySocket;
+	private $clientsId = 0;
+	private $clients = array();
 	
-	#private $actionClientsPing;
-	#private $actionConnect;
-	
-	private $ssl;
-	private $isListening;
-	private $socket;
+	private $sslKeyPrvPath = null;
+	private $sslKeyPrvPass = null;
+	private $isListening = false;
+	private $socket = null;
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -38,13 +31,6 @@ class Server{
 		$this->log->pushHandler(new StreamHandler('log/server.log', Logger::DEBUG));
 		
 		$this->log->info('start');
-		
-		$this->clientsId = 0;
-		$this->clients = array();
-		$this->clientsBySocket = array();
-		
-		$this->ssl = null;
-		$this->isListening = false;
 	}
 	
 	public function setIp($ip){
@@ -55,23 +41,20 @@ class Server{
 		$this->port = $port;
 	}
 	
-	public function sslInit($keyPrvPath, $keyPrvPass){
-		$this->log->debug('ssl: loading keys');
-		
-		$this->ssl = openssl_pkey_get_private(file_get_contents($keyPrvPath), $keyPrvPass);
-		
-		$this->log->debug('ssl: '.($this->ssl ? 'ok' : 'N/A'));
+	public function setSslPrv($sslKeyPrvPath, $sslKeyPrvPass){
+		$this->sslKeyPrvPath = $sslKeyPrvPath;
+		$this->sslKeyPrvPass = $sslKeyPrvPass;
 	}
 	
 	public function init(){
-		if($this->addr && $this->port){
-			$this->log->notice('listen on '.$this->addr.':'.$this->port);
+		if($this->ip && $this->port){
+			$this->log->notice('listen on '.$this->ip.':'.$this->port);
 			
-			$this->socket = new BsdSocket();
+			$this->socket = new Socket();
 			
 			$bind = false;
 			try{
-				$bind = $this->socket->bind($this->addr, $this->port);
+				$bind = $this->socket->bind($this->ip, $this->port);
 			}
 			catch(Exception $e){
 				$this->log->error($e->getMessage());
@@ -80,6 +63,7 @@ class Server{
 			if($bind){
 				try{
 					if($this->socket->listen()){
+						$this->log->notice('listen ok');
 						$this->isListening = true;
 					}
 				}
@@ -90,5 +74,81 @@ class Server{
 			
 		}
 	}
+	
+	public function run(){
+		
+		$readHandles = array();
+		$writeHandles = NULL; $exceptHandles = NULL;
+		
+		if($this->isListening){
+			$readHandles[] = $this->socket->getHandle();
+		}
+		foreach($this->clients as $clientId => $client){
+			$readHandles[] = $client->getSocket()->getHandle();
+		}
+		$readHandlesNum = count($readHandles);
+		
+		$handlesChanged = $this->socket->select($readHandles, $writeHandles, $exceptHandles);
+		$this->log->debug('collect readable sockets: '.$handlesChanged.'/'.$readHandlesNum);
+		
+		if($handlesChanged){
+			foreach($readHandles as $readableHandle){
+				if($this->isListening && $readableHandle == $this->socket->getHandle()){
+					$this->log->debug('server handle: '.$readableHandle);
+					
+					// Server
+					$socket = $this->socket->accept();
+					if($socket){
+						
+						$client = new Client();
+						$client->setSocket($socket);
+						$client->setSslPrv($this->sslKeyPrvPath, $this->sslKeyPrvPass);
+						
+						$this->clientAdd($client);
+						
+						ve($client);
+						
+						$this->log->debug('new client: '.$client->getId().', '.$client->getIpPort());
+					}
+				}
+				else{
+					$this->log->debug('client handle: '.$readableHandle);
+					
+					// Client
+					$client = $this->clientGetByHandle($readableHandle);
+					if($client){
+						$this->log->debug('old client: '.$client->getId().', '.$client->getIpPort());
+						$client->dataRecv();
+					}
+				}
+			}
+		}
+	}
+	
+	public function shutdown(){
+		$this->log->info('shutdown');
+		
+		$this->socket->close();
+	}
+	
+	public function clientAdd(Client $client){
+		$this->clientsId++;
+		
+		$client->setId($this->clientsId);
+		
+		$this->clients[$this->clientsId] = $client;
+	}
+	
+	public function clientGetByHandle($handle){
+		foreach($this->clients as $clientId => $client){
+			if($client->getSocket()->getHandle() == $handle){
+				return $client;
+			}
+		}
+		
+		return null;
+	}
+	
+	#public function settingsSet
 	
 }

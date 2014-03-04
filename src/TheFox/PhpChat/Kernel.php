@@ -22,10 +22,10 @@ class Kernel extends Thread{
 		$this->setSettings($settings);
 		
 		$this->server = new Server();
-		$this->server->sslInit($this->settings->data['node']['ssl_key_prv_path'], $this->settings->data['node']['ssl_key_prv_pass']);
+		$this->server->setSslPrv($this->settings->data['node']['sslKeyPrvPath'], $this->settings->data['node']['sslKeyPrvPass']);
 		$this->server->setIp($settings->data['node']['ip']);
 		$this->server->setPort($settings->data['node']['port']);
-		$this->server->runInit();
+		$this->server->init();
 		
 		#ve($this->server);
 	}
@@ -34,9 +34,16 @@ class Kernel extends Thread{
 		$this->settings = $settings;
 	}
 	
+	public function localNodeSetIp($ip){
+		$settings->data['node']['ip'] = $ip;
+	}
+	
 	public function run(){
 		while(!$this->getExit()){
 			#print __CLASS__.'->'.__FUNCTION__.''."\n";
+			
+			$this->server->run();
+			
 			sleep(1);
 		}
 		
@@ -44,7 +51,10 @@ class Kernel extends Thread{
 	}
 	
 	public function shutdown(){
+		$this->log->info('shutdown');
 		
+		$this->server->shutdown();
+		$this->settings->save();
 	}
 	
 }

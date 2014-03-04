@@ -60,7 +60,15 @@ class StreamSocket extends AbstractSocket{
 		$ip = 'N/A';
 		$port = -1;
 		$name = stream_socket_get_name($this->getHandle(), true);
-		print __CLASS__.'->'.__FUNCTION__.': '.$name."\n";
+		$pos = strpos($name, ':');
+		if($pos === false){
+			$ip = $name;
+		}
+		else{
+			$ip = substr($name, 0, $pos);
+			$port = substr($name, $pos + 1);
+		}
+		#print __CLASS__.'->'.__FUNCTION__.': '.$name.', "'.$ip.'", "'.$port.'"'."\n";
 	}
 	
 	public function lastError(){
@@ -76,13 +84,14 @@ class StreamSocket extends AbstractSocket{
 	}
 	
 	public function read(){
-		
+		return stream_socket_recvfrom($this->getHandle(), 2048);
 	}
 	
 	public function write($data){
 		$rv = stream_socket_sendto($this->getHandle(), $data);
 		
 		print __CLASS__.'->'.__FUNCTION__.': '.$rv.', "'.substr($data, 0, -1).'"'."\n";
+		return $rv;
 	}
 	
 	public function shutdown(){
