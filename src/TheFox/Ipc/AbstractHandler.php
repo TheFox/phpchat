@@ -14,7 +14,6 @@ abstract class AbstractHandler{
 	
 	private $clientsId = 0;
 	private $clients = array();
-	private $clientsByHandles = array();
 	
 	private $recvBufferId = 0;
 	private $recvBuffer = array();
@@ -237,7 +236,7 @@ abstract class AbstractHandler{
 		}
 	}
 	
-	public function clientFindByHandle($handle){
+	public function clientGetByHandle($handle){
 		foreach($this->clients as $clientId => $client){
 			if($client['handle'] == $handle){
 				return $client;

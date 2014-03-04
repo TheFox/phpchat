@@ -76,9 +76,11 @@ class StreamHandler extends AbstractHandler{
 						if(feof($readableHandle)){
 							#print __CLASS__.'->'.__FUNCTION__.': feof'."\n";
 							if($this->isListening()){
-								$client = $this->clientFindByHandle($readableHandle);
-								stream_socket_shutdown($client['handle'], STREAM_SHUT_RDWR);
-								$this->clientRemove($client);
+								$client = $this->clientGetByHandle($readableHandle);
+								if($client){
+									stream_socket_shutdown($client['handle'], STREAM_SHUT_RDWR);
+									$this->clientRemove($client);
+								}
 							}
 							else{
 								stream_socket_shutdown($this->getHandle(), STREAM_SHUT_RDWR);
