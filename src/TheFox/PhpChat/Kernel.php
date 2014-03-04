@@ -23,7 +23,7 @@ class Kernel extends Thread{
 		
 		$this->server = new Server();
 		$this->server->sslInit($this->settings->data['node']['ssl_key_prv_path'], $this->settings->data['node']['ssl_key_prv_pass']);
-		$this->server->setAddr($settings->data['node']['addr']);
+		$this->server->setIp($settings->data['node']['ip']);
 		$this->server->setPort($settings->data['node']['port']);
 		$this->server->runInit();
 		

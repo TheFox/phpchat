@@ -101,22 +101,22 @@ if(!$settings->data['node']['uuid']){
 	}
 }
 
-if(!$settings->data['node']['ssl_key_prv_pass']){
-	$ssl_key_prv_pass = '';
+if(!$settings->data['node']['sslKeyPrvPass']){
+	$sslKeyPrvPass = '';
 	try{
 		$log->info('ssl: generate private key password');
-		$ssl_key_prv_pass = (string)Uuid::uuid4();
+		$sslKeyPrvPass = (string)Uuid::uuid4();
 	}
 	catch(UnsatisfiedDependencyException $e){
 		$log->critical('uuid4: '.$e->getMessage());
 		exit(1);
 	}
 	
-	$settings->data['node']['ssl_key_prv_pass'] = hash('sha512', mt_rand(0, 999999).'_'.time().'_'.$ssl_key_prv_pass);
+	$settings->data['node']['sslKeyPrvPass'] = hash('sha512', mt_rand(0, 999999).'_'.time().'_'.$sslKeyPrvPass);
 	$settings->setDataChanged(true);
 }
 
-if(!file_exists($settings->data['node']['ssl_key_prv_path'])){
+if(!file_exists($settings->data['node']['sslKeyPrvPath'])){
 	$log->info('ssl: key pair generation.  this may take a while...');
 	
 	$keyPrv = null;
@@ -133,7 +133,7 @@ if(!file_exists($settings->data['node']['ssl_key_prv_path'])){
 	if($ssl){
 		openssl_pkey_export($ssl, $keyPrv);
 		
-		openssl_pkey_export_to_file($ssl, $settings->data['node']['ssl_key_prv_path'], $settings->data['node']['ssl_key_prv_pass']);
+		openssl_pkey_export_to_file($ssl, $settings->data['node']['sslKeyPrvPath'], $settings->data['node']['sslKeyPrvPass']);
 		
 		if($keyPrv){
 			$keyPub = openssl_pkey_get_details($ssl);
@@ -167,8 +167,8 @@ if(!file_exists($settings->data['node']['ssl_key_prv_path'])){
 		exit(1);
 	}
 	
-	if(file_exists($settings->data['node']['ssl_key_prv_path'])){
-		chmod($settings->data['node']['ssl_key_prv_path'], 0400);
+	if(file_exists($settings->data['node']['sslKeyPrvPath'])){
+		chmod($settings->data['node']['sslKeyPrvPath'], 0400);
 	}
 	
 	openssl_pkey_free($ssl);

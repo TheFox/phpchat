@@ -22,14 +22,14 @@ class Settings extends YamlStorage{
 		
 		$this->data['node'] = array();
 		$this->data['node']['timeCreated'] = 0;
-		$this->data['node']['addr'] = '0.0.0.0';
-		$this->data['node']['addr_pub'] = null;
+		$this->data['node']['ip'] = '0.0.0.0';
+		$this->data['node']['ipPub'] = null;
 		$this->data['node']['port'] = 25000;
 		$this->data['node']['uuid'] = '';
 		
-		$this->data['node']['ssl_key_prv_pass'] = '';
-		$this->data['node']['ssl_key_prv_path'] = 'id_rsa.prv';
-		$this->data['node']['ssl_key_pub_path'] = 'id_rsa.pub';
+		$this->data['node']['sslKeyPrvPass'] = '';
+		$this->data['node']['sslKeyPrvPath'] = 'id_rsa.prv';
+		$this->data['node']['sslKeyPubPath'] = 'id_rsa.pub';
 		
 		$this->data['nodes'] = array();
 		$this->data['nodes']['timeLastCheck'] = 0;

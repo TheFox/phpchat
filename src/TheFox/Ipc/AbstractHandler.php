@@ -87,22 +87,22 @@ abstract class AbstractHandler{
 			$this->hasData(true);
 			
 			do{
-				$delimiterPos = strpos($data, $this->getSendSeparator());
-				if($delimiterPos === false){
+				$separatorPos = strpos($data, $this->getSendSeparator());
+				if($separatorPos === false){
 					#print "data1.1: '$data'\n";
 					#$this->recvBuffer[$this->recvBufferId] .= $data;
 					$this->recvBufferTmp .= $data;
 					$data = '';
 				}
 				else{
-					$msg = $this->recvBufferTmp.substr($data, 0, $delimiterPos);
+					$msg = $this->recvBufferTmp.substr($data, 0, $separatorPos);
 					$this->recvBufferTmp = '';
 					#print "data1.2: '$msg'\n";
 					
 					$this->recvBufferId++;
 					$this->recvBuffer[$this->recvBufferId] = base64_decode($msg);
 					
-					$data = substr($data, $delimiterPos + 1);
+					$data = substr($data, $separatorPos + 1);
 				}
 				
 			}while($data);
@@ -214,22 +214,22 @@ abstract class AbstractHandler{
 			do{
 				$clientId = $client['id'];
 				
-				$delimiterPos = strpos($data, $this->getSendSeparator());
-				if($delimiterPos === false){
+				$separatorPos = strpos($data, $this->getSendSeparator());
+				if($separatorPos === false){
 					#print "data2.1: ".$clientId.", '$data'\n";
 					
 					$this->clients[$clientId]['recvBufferTmp'] .= $data;
 					$data = '';
 				}
 				else{
-					$msg = $this->clients[$clientId]['recvBufferTmp'].substr($data, 0, $delimiterPos);
+					$msg = $this->clients[$clientId]['recvBufferTmp'].substr($data, 0, $separatorPos);
 					$this->clients[$clientId]['recvBufferTmp'] = '';
 					#print "data2.2: ".$clientId.", '$msg'\n";
 					
 					$this->clients[$clientId]['recvBufferId']++;
 					$this->clients[$clientId]['recvBuffer'][$this->clients[$clientId]['recvBufferId']] = base64_decode($msg);
 					
-					$data = substr($data, $delimiterPos + 1);
+					$data = substr($data, $separatorPos + 1);
 				}
 				
 			}while($data);

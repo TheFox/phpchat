@@ -16,7 +16,7 @@ class Server{
 	
 	private $log;
 	
-	private $addr;
+	private $ip;
 	private $port;
 	
 	private $clientsId;
@@ -47,8 +47,8 @@ class Server{
 		$this->isListening = false;
 	}
 	
-	public function setAddr($addr){
-		$this->addr = $addr;
+	public function setIp($ip){
+		$this->ip = $ip;
 	}
 	
 	public function setPort($port){
