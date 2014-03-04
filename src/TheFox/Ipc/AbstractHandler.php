@@ -34,11 +34,11 @@ abstract class AbstractHandler{
 		if($this->isListening()){ // Server
 			if($clientId !== null && isset($this->clients[$clientId])){
 				$client = $this->clients[$clientId];
-				$this->handleDataSend($client['handle'], base64_encode($data).$this->getSendDelimiter());
+				$this->handleDataSend($client['handle'], base64_encode($data).$this->getSendSeparator());
 			}
 		}
 		elseif($this->isConnected()){ // Client
-			$this->handleDataSend($this->getHandle(), base64_encode($data).$this->getSendDelimiter());
+			$this->handleDataSend($this->getHandle(), base64_encode($data).$this->getSendSeparator());
 		}
 	}
 	
@@ -88,7 +88,7 @@ abstract class AbstractHandler{
 			$this->hasData(true);
 			
 			do{
-				$delimiterPos = strpos($data, $this->getSendDelimiter());
+				$delimiterPos = strpos($data, $this->getSendSeparator());
 				if($delimiterPos === false){
 					#print "data1.1: '$data'\n";
 					#$this->recvBuffer[$this->recvBufferId] .= $data;
@@ -184,7 +184,7 @@ abstract class AbstractHandler{
 		return $this->hasData;
 	}
 	
-	public function getSendDelimiter(){
+	private function getSendSeparator(){
 		return "\n";
 	}
 	
@@ -215,7 +215,7 @@ abstract class AbstractHandler{
 			do{
 				$clientId = $client['id'];
 				
-				$delimiterPos = strpos($data, $this->getSendDelimiter());
+				$delimiterPos = strpos($data, $this->getSendSeparator());
 				if($delimiterPos === false){
 					#print "data2.1: ".$clientId.", '$data'\n";
 					
