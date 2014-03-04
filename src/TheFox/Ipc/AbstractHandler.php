@@ -6,7 +6,7 @@ abstract class AbstractHandler{
 	
 	private $ip;
 	private $port;
-	private $socket;
+	private $handle;
 	
 	private $isConnected = null;
 	private $isListening = null;
@@ -14,7 +14,7 @@ abstract class AbstractHandler{
 	
 	private $clientsId = 0;
 	private $clients = array();
-	private $clientsBySockets = array();
+	private $clientsByHandles = array();
 	
 	private $recvBufferId = 0;
 	private $recvBuffer = array();
@@ -24,8 +24,8 @@ abstract class AbstractHandler{
 	abstract public function connect();
 	abstract public function listen();
 	abstract public function run();
-	abstract public function socketDataSend($socket, $data);
-	abstract public function socketDataRecv($socket);
+	abstract public function handleDataSend($handle, $data);
+	abstract public function handleDataRecv($handle);
 	
 	
 	public function send($data, $clientId = null){
@@ -34,11 +34,11 @@ abstract class AbstractHandler{
 		if($this->isListening()){ // Server
 			if($clientId !== null && isset($this->clients[$clientId])){
 				$client = $this->clients[$clientId];
-				$this->socketDataSend($client['socket'], base64_encode($data).$this->getSendDelimiter());
+				$this->handleDataSend($client['handle'], base64_encode($data).$this->getSendDelimiter());
 			}
 		}
 		elseif($this->isConnected()){ // Client
-			$this->socketDataSend($this->getSocket(), base64_encode($data).$this->getSendDelimiter());
+			$this->handleDataSend($this->getHandle(), base64_encode($data).$this->getSendDelimiter());
 		}
 	}
 	
@@ -76,12 +76,12 @@ abstract class AbstractHandler{
 		$this->send('FUNCTION_RETN '.$jsonStr, $clientId);
 	}
 	
-	public function recv($socket, $data){
+	public function recv($handle, $data){
 		$dataLen = strlen($data);
 		print __CLASS__.'->'.__FUNCTION__.': '.$dataLen.''."\n";
 		
 		if($this->isListening()){
-			$client = $this->clientFindBySocket($socket);
+			$client = $this->clientFindByHandle($handle);
 			$this->clientHandleRevcData($client, $data);
 		}
 		elseif($this->isConnected()){
@@ -154,12 +154,12 @@ abstract class AbstractHandler{
 		return $this->port;
 	}
 	
-	public function setSocket($socket){
-		$this->socket = $socket;
+	public function setHandle($handle){
+		$this->handle = $handle;
 	}
 	
-	public function getSocket(){
-		return $this->socket;
+	public function getHandle(){
+		return $this->handle;
 	}
 	
 	public function isConnected($isConnected = null){
@@ -192,11 +192,11 @@ abstract class AbstractHandler{
 		return $this->clients;
 	}
 	
-	public function clientAdd($socket){
+	public function clientAdd($handle){
 		$this->clientsId++;
 		$this->clients[$this->clientsId] = array(
 			'id' => $this->clientsId,
-			'socket' => $socket,
+			'handle' => $handle,
 			'recvBufferId' => 0,
 			'recvBuffer' => array(),
 			'recvBufferTmp' => '',
@@ -237,9 +237,9 @@ abstract class AbstractHandler{
 		}
 	}
 	
-	public function clientFindBySocket($socket){
+	public function clientFindByHandle($handle){
 		foreach($this->clients as $clientId => $client){
-			if($client['socket'] == $socket){
+			if($client['handle'] == $handle){
 				return $client;
 			}
 		}

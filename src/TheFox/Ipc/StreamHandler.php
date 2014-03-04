@@ -2,7 +2,7 @@
 
 namespace TheFox\Ipc;
 
-use Exception;
+use RuntimeException;
 
 class StreamHandler extends AbstractHandler{
 	
@@ -18,87 +18,76 @@ class StreamHandler extends AbstractHandler{
 	public function connect(){
 		#print __CLASS__.'->'.__FUNCTION__."\n";
 		
-		$socket = @stream_socket_client('tcp://'.$this->getIp().':'.$this->getPort(), $errno, $errstr, 2);
-		$this->setSocket($socket);
-		
-		if($socket !== false){
-			#print __CLASS__.'->'.__FUNCTION__.': ok'."\n";
-			
+		$handle = @stream_socket_client('tcp://'.$this->getIp().':'.$this->getPort(), $errno, $errstr, 2);
+		if($handle !== false){
+			$this->setHandle($handle);
 			$this->isConnected(true);
 			return true;
 		}
 		else{
-			#print __CLASS__.'->'.__FUNCTION__.': '.$errno.', '.$errstr."\n";
-			return false;
+			throw new RuntimeException($errstr, $errno);
 		}
-		
 	}
 	
 	public function listen(){
 		#print __CLASS__.'->'.__FUNCTION__."\n";
 		
-		$socket = @stream_socket_server('tcp://'.$this->getIp().':'.$this->getPort(), $errno, $errstr);
-		$this->setSocket($socket);
-		
-		if($socket){
-			#print __CLASS__.'->'.__FUNCTION__.': ok '.$this->getSocket()."\n";
-			
+		$handle = @stream_socket_server('tcp://'.$this->getIp().':'.$this->getPort(), $errno, $errstr);
+		if($handle !== false){
+			$this->setHandle($handle);
 			$this->isListening(true);
 			return true;
 		}
 		else{
-			#print __CLASS__.'->'.__FUNCTION__.': '.$errno.', '.$errstr."\n";
-			#return false;
-			throw new Exception($errstr, $errno);
+			throw new RuntimeException($errstr, $errno);
 		}
 	}
 	
 	public function run(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
-		$readSockets = array();
-		$writeSockets = null;
-		$exceptSockets = null;
+		$readHandles = array();
+		$writeHandles = null; $exceptHandles = null;
 		
 		if($this->isListening()){
-			$readSockets[] = $this->getSocket();
+			$readHandles[] = $this->getHandle();
 			foreach($this->getClients() as $client){
-				$readSockets[] = $client['socket'];
+				$readHandles[] = $client['handle'];
 			}
 		}
 		elseif($this->isConnected()){
 			#print __CLASS__.'->'.__FUNCTION__.': isConnected'."\n";
 			
-			$readSockets[] = $this->getSocket();
+			$readHandles[] = $this->getHandle();
 		}
 		
-		if(count($readSockets)){
-			$socketsChangedNum = stream_select($readSockets, $writeSockets, $exceptSockets, 0);
-			if($socketsChangedNum){
-				foreach($readSockets as $socket){
-					if($this->isListening() && $socket == $this->getSocket()){
+		if(count($readHandles)){
+			$handlesChangedNum = stream_select($readHandles, $writeHandles, $exceptHandles, 0);
+			if($handlesChangedNum){
+				foreach($readHandles as $readableHandle){
+					if($this->isListening() && $readableHandle == $this->getHandle()){
 						// Server
 						#print __CLASS__.'->'.__FUNCTION__.': accept'."\n";
-						$socket = @stream_socket_accept($this->getSocket(), 2);
-						$client = $this->clientAdd($socket);
+						$handle = @stream_socket_accept($this->getHandle(), 2);
+						$client = $this->clientAdd($handle);
 					}
 					else{
 						// Client
-						if(feof($socket)){
+						if(feof($readableHandle)){
 							#print __CLASS__.'->'.__FUNCTION__.': feof'."\n";
 							if($this->isListening()){
-								$client = $this->clientFindBySocket($socket);
-								stream_socket_shutdown($client['socket'], STREAM_SHUT_RDWR);
+								$client = $this->clientFindByHandle($readableHandle);
+								stream_socket_shutdown($client['handle'], STREAM_SHUT_RDWR);
 								$this->clientRemove($client);
 							}
 							else{
-								stream_socket_shutdown($this->getSocket(), STREAM_SHUT_RDWR);
+								stream_socket_shutdown($this->getHandle(), STREAM_SHUT_RDWR);
 								$this->isConnected(false);
 							}
 						}
 						else{
 							#print __CLASS__.'->'.__FUNCTION__.': recvfrom'."\n";
-							$this->socketDataRecv($socket);
+							$this->handleDataRecv($readableHandle);
 						}
 						
 					}
@@ -108,15 +97,15 @@ class StreamHandler extends AbstractHandler{
 		
 	}
 	
-	public function socketDataSend($socket, $data){
-		$rv = stream_socket_sendto($socket, $data);
+	public function handleDataSend($handle, $data){
+		$rv = stream_socket_sendto($handle, $data);
 		
 		#print __CLASS__.'->'.__FUNCTION__.': '.$rv.', "'.substr($data, 0, -1).'"'."\n";
 	}
 	
-	public function socketDataRecv($socket){
-		$data = stream_socket_recvfrom($socket, 1500);
-		$this->recv($socket, $data);
+	public function handleDataRecv($handle){
+		$data = stream_socket_recvfrom($handle, 1500);
+		$this->recv($handle, $data);
 		
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 	}
