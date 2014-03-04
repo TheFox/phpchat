@@ -6,6 +6,13 @@ use RuntimeException;
 
 class BsdSocket extends AbstractSocket{
 	
+	public function __construct(){
+		$handle = $this->create();
+		if($handle){
+			$this->setHandle($handle);
+		}
+	}
+	
 	public function create(){
 		$socket = null;
 		
@@ -47,8 +54,8 @@ class BsdSocket extends AbstractSocket{
 		return $socket;
 	}
 	
-	public function bind($addr, $port){
-		return socket_bind($this->getHandle(), $addr, $port);
+	public function bind($ip, $port){
+		return socket_bind($this->getHandle(), $ip, $port);
 	}
 	
 	public function listen(){
@@ -60,11 +67,18 @@ class BsdSocket extends AbstractSocket{
 	}
 	
 	public function accept(){
-		return socket_accept($this->getHandle());
+		$socket = null;
+		$handle = socket_accept($this->getHandle());
+		if($handle !== false){
+			$class = __CLASS__;
+			$socket = new $class();
+			$socket->setHandle($handle);
+		}
+		return $socket;
 	}
 	
-	public function select(&$read, &$write, &$except){
-		return socket_select($read, $write, $except, 0);
+	public function select(&$readHandles, &$writeHandles, &$exceptHandles){
+		return socket_select($readHandles, $writeHandles, $exceptHandles, 0);
 	}
 	
 	public function getPeerName(&$ip, &$port){
