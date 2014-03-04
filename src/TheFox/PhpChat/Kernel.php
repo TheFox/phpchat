@@ -6,36 +6,49 @@ use TheFox\Ipc\Connection;
 use TheFox\Ipc\StreamHandler;
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler as LoggerStreamHandler;
+use TheFox\Dht\Kademlia\Node;
 
 class Kernel extends Thread{
 	
+	const LOOP_USLEEP = 100000;
+	
 	private $log;
 	private $settings;
+	private $localNode;
 	private $server;
+	private $table;
 	
 	public function __construct(){
 		$this->log = new Logger('kernel');
 		$this->log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::ERROR));
 		$this->log->pushHandler(new LoggerStreamHandler('log/kernel.log', Logger::DEBUG));
 		
-		$settings = new Settings(getcwd().'/settings.yml');
-		$this->setSettings($settings);
+		$this->settings = new Settings(getcwd().'/settings.yml');
+		
+		$this->localNode = new Node();
 		
 		$this->server = new Server();
-		$this->server->setSslPrv($this->settings->data['node']['sslKeyPrvPath'], $this->settings->data['node']['sslKeyPrvPass']);
+		$this->server->setKernel($this);
 		$this->server->setIp($settings->data['node']['ip']);
 		$this->server->setPort($settings->data['node']['port']);
+		$this->server->setSslPrv($this->settings->data['node']['sslKeyPrvPath'], $this->settings->data['node']['sslKeyPrvPass']);
 		$this->server->init();
+		
+		$this->table = new Table($this->settings->data['datadir'].'/table.yml');
 		
 		#ve($this->server);
 	}
 	
-	public function setSettings($settings){
-		$this->settings = $settings;
+	public function getLocalNode(){
+		return $this->localNode;
 	}
 	
-	public function localNodeSetIp($ip){
-		$settings->data['node']['ip'] = $ip;
+	public function setSettingsNodeIpPub($ipPub){
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		if($ipPub != '127.0.0.1'){
+			$this->settings->data['node']['ipPub'] = $ipPub;
+			$this->settings->setDataChanged(true);
+		}
 	}
 	
 	public function run(){
@@ -44,7 +57,7 @@ class Kernel extends Thread{
 			
 			$this->server->run();
 			
-			sleep(1);
+			usleep(static::LOOP_USLEEP);
 		}
 		
 		$this->shutdown();

@@ -48,7 +48,6 @@ class StreamSocket extends AbstractSocket{
 			$socket = new $class();
 			$socket->setHandle($handle);
 		}
-		ve($socket);
 		return $socket;
 	}
 	

@@ -7,13 +7,16 @@ use Exception;
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler;
 use TheFox\Network\Socket;
+use TheFox\Dht\Kademlia\Node;
 
 class Server{
 	
-	private $log;
+	private $log = null;
 	
-	private $ip;
-	private $port;
+	private $kernel = null;
+	private $localNode = null;
+	private $ip = '';
+	private $port = 0;
 	
 	private $clientsId = 0;
 	private $clients = array();
@@ -33,6 +36,25 @@ class Server{
 		$this->log->info('start');
 	}
 	
+	public function setKernel($kernel){
+		$this->kernel = $kernel;
+	}
+	
+	public function getKernel(){
+		return $this->kernel;
+	}
+	
+	/*public function setLocalNode(Node $localNode){
+		$this->localNode = $localNode;
+	}*/
+	
+	public function getLocalNode(){
+		if($this->getKernel()){
+			return $this->getKernel()->getLocalNode();
+		}
+		return null;
+	}
+	
 	public function setIp($ip){
 		$this->ip = $ip;
 	}
@@ -44,6 +66,14 @@ class Server{
 	public function setSslPrv($sslKeyPrvPath, $sslKeyPrvPass){
 		$this->sslKeyPrvPath = $sslKeyPrvPath;
 		$this->sslKeyPrvPass = $sslKeyPrvPass;
+	}
+	
+	public function setSettingsNodeIpPub($ipPub){
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+		if($this->getKernel()){
+			$this->getKernel()->setSettingsNodeIpPub($ipPub);
+		}
 	}
 	
 	public function init(){
@@ -89,13 +119,11 @@ class Server{
 		$readHandlesNum = count($readHandles);
 		
 		$handlesChanged = $this->socket->select($readHandles, $writeHandles, $exceptHandles);
-		$this->log->debug('collect readable sockets: '.$handlesChanged.'/'.$readHandlesNum);
+		#$this->log->debug('collect readable sockets: '.$handlesChanged.'/'.$readHandlesNum);
 		
 		if($handlesChanged){
 			foreach($readHandles as $readableHandle){
 				if($this->isListening && $readableHandle == $this->socket->getHandle()){
-					$this->log->debug('server handle: '.$readableHandle);
-					
 					// Server
 					$socket = $this->socket->accept();
 					if($socket){
@@ -106,19 +134,24 @@ class Server{
 						
 						$this->clientAdd($client);
 						
-						ve($client);
-						
 						$this->log->debug('new client: '.$client->getId().', '.$client->getIpPort());
 					}
 				}
 				else{
-					$this->log->debug('client handle: '.$readableHandle);
-					
 					// Client
 					$client = $this->clientGetByHandle($readableHandle);
 					if($client){
-						$this->log->debug('old client: '.$client->getId().', '.$client->getIpPort());
-						$client->dataRecv();
+						if(feof($client->getSocket()->getHandle())){
+							$this->clientRemove($client);
+						}
+						else{
+							$this->log->debug('old client: '.$client->getId().', '.$client->getIpPort());
+							$client->dataRecv();
+							
+							if($client->getStatus('hasShutdown')){
+								$this->clientRemove($client);
+							}
+						}
 					}
 				}
 			}
@@ -135,6 +168,7 @@ class Server{
 		$this->clientsId++;
 		
 		$client->setId($this->clientsId);
+		$client->setServer($this);
 		
 		$this->clients[$this->clientsId] = $client;
 	}
@@ -149,6 +183,15 @@ class Server{
 		return null;
 	}
 	
-	#public function settingsSet
+	public function clientRemove(Client $client){
+		$this->log->debug('client remove: '.$client->getId());
+		
+		$client->shutdown();
+		
+		$clientsId = $client->getId();
+		unset($this->clients[$clientsId]);
+	}
+	
+	
 	
 }

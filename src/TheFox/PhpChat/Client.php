@@ -8,6 +8,7 @@ use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
 
 use TheFox\Utilities\Hex;
 use TheFox\Network\AbstractSocket;
+use TheFox\Dht\Kademlia\Node;
 
 class Client{
 	
@@ -16,13 +17,22 @@ class Client{
 	private $id = 0;
 	private $status = array();
 	
+	private $server = null;
 	private $socket = null;
 	private $ip = '';
 	private $port = 0;
 	
 	private $recvBufferTmp = '';
 	
-	public function __construct(){}
+	public function __construct(){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+		$this->status['hasShutdown'] = false;
+	}
+	
+	public function __destruct(){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+	}
 	
 	public function setId($id){
 		$this->id = $id;
@@ -30,6 +40,25 @@ class Client{
 	
 	public function getId(){
 		return $this->id;
+	}
+	
+	public function getStatus($name){
+		if(array_key_exists($name, $this->status)){
+			return $this->status[$name];
+		}
+		return null;
+	}
+	
+	public function setStatus($name, $value){
+		$this->status[$name] = $value;
+	}
+	
+	public function setServer(Server $server){
+		$this->server = $server;
+	}
+	
+	public function getServer(){
+		return $this->server;
 	}
 	
 	public function setSocket(AbstractSocket $socket){
@@ -76,6 +105,29 @@ class Client{
 		$this->ssl = openssl_pkey_get_private(file_get_contents($sslKeyPrvPath), $sslKeyPrvPass);
 	}
 	
+	public function setSettingsNodeIpPub($ipPub){
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+		if($this->getServer()){
+			$this->getServer()->kernelSettingsNodeIpPubSet($ipPub);
+		}
+	}
+	
+	public function getLocalNode(){
+		if($this->getServer()){
+			return $this->getServer()->getLocalNode();
+		}
+		return null;
+	}
+	
+	public function getLocalNodeId(){
+		if($this->getLocalNode()){
+			#return $this->getLocalNode()->getIdHexStr();
+		}
+		
+		return 'xyz';
+	}
+	
 	public function dataRecv(){
 		$data = $this->getSocket()->read();
 		
@@ -93,13 +145,24 @@ class Client{
 	
 	private function msgHandle($msgRaw){
 		$msgRaw = base64_decode($msgRaw);
-		$msg = json_decode($msg, true);
+		$msg = json_decode($msgRaw, true);
 		
 		print __CLASS__.'->'.__FUNCTION__.': '.$msgRaw."\n";
-		ve($msg);
+		#ve($msg);
 		
-		if($msg['name'] == 'hello'){
-			
+		$msgName = $msg['name'];
+		$msgData = array();
+		if(array_key_exists('data', $msg)){
+			$msgData = $msg['data'];
+		}
+		
+		if($msgName == 'hello'){
+			if(array_key_exists('ip', $msgData)){
+				$this->setSettingsNodeIpPub($msgData['ip']);
+			}
+		}
+		elseif($msgName == 'quit'){
+			$this->shutdown();
 		}
 	}
 	
@@ -117,10 +180,23 @@ class Client{
 	
 	private function sendId(){
 		$data = array(
-			'id' => 'x',
+			'id' => $this->getLocalNodeId(),
 			'port' => 25000,
 		);
-		$this->dataSend('id', $data);
+		$this->dataSend($this->msgCreate('id', $data));
+	}
+	
+	public function shutdown(){
+		if(!$this->getStatus('hasShutdown')){
+			$this->setStatus('hasShutdown', true);
+			
+			$this->getSocket()->shutdown();
+			$this->getSocket()->close();
+			
+			if($this->ssl){
+				openssl_free_key($this->ssl);
+			}
+		}
 	}
 	
 }
