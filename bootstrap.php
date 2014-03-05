@@ -84,19 +84,19 @@ if( isset($settings->data['datadir']) && !file_exists($settings->data['datadir']
 	chmod($settings->data['datadir'], 0700);
 }
 
-if(!$settings->data['node']['uuid']){
-	$uuid = '';
+if(!$settings->data['node']['id']){
+	$nodeId = '';
 	try{
-		$uuid = (string)Uuid::uuid4();
-		$log->info('uuid: '.$uuid);
+		$nodeId = (string)Uuid::uuid4();
+		$log->info('node id: '.$nodeId);
 	}
 	catch(UnsatisfiedDependencyException $e){
 		$log->critical('uuid4: '.$e->getMessage());
 		exit(1);
 	}
 	
-	if($uuid){
-		$settings->data['node']['uuid'] = $uuid;
+	if($nodeId){
+		$settings->data['node']['id'] = $nodeId;
 		$settings->setDataChanged(true);
 	}
 }

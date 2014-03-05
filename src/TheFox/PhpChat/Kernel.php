@@ -6,6 +6,7 @@ use TheFox\Ipc\Connection;
 use TheFox\Ipc\StreamHandler;
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler as LoggerStreamHandler;
+use TheFox\Dht\Kademlia\Table;
 use TheFox\Dht\Kademlia\Node;
 
 class Kernel extends Thread{
@@ -26,17 +27,23 @@ class Kernel extends Thread{
 		$this->settings = new Settings(getcwd().'/settings.yml');
 		
 		$this->localNode = new Node();
+		$this->localNode->setIdHexStr($this->settings->data['node']['id']);
+		$this->localNode->setPort($this->settings->data['node']['port']);
+		#ve($this->localNode);
+		ve($this->localNode->getIdHexStr());
 		
 		$this->server = new Server();
 		$this->server->setKernel($this);
-		$this->server->setIp($settings->data['node']['ip']);
-		$this->server->setPort($settings->data['node']['port']);
+		$this->server->setIp($this->settings->data['node']['ip']);
+		$this->server->setPort($this->settings->data['node']['port']);
 		$this->server->setSslPrv($this->settings->data['node']['sslKeyPrvPath'], $this->settings->data['node']['sslKeyPrvPass']);
 		$this->server->init();
 		
 		$this->table = new Table($this->settings->data['datadir'].'/table.yml');
 		
 		#ve($this->server);
+		$this->shutdown();
+		
 	}
 	
 	public function getLocalNode(){
@@ -67,6 +74,7 @@ class Kernel extends Thread{
 		$this->log->info('shutdown');
 		
 		$this->server->shutdown();
+		$this->table->save();
 		$this->settings->save();
 	}
 	
