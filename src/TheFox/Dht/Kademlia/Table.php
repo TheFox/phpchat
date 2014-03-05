@@ -8,42 +8,27 @@ use TheFox\Yaml\YamlStorage;
 
 class Table extends YamlStorage{
 	
-	private $nodeLocal;
-	private $bucketsId;
-	private $buckets;
-	private $bucketsByMask;
+	private $buckets = array();
+	private $bucketsByMask = array();
+	private $nodeLocal = null;
 	
-	public function __construct($datadirBasePath, Node $nodeLocal){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+	public function __construct($filePath = null){
+		parent::__construct($filePath);
 		
-		$this->setDatadirBasePath($datadirBasePath);
-		if($this->getDatadirBasePath()){
-			$this->setFilePath($this->getDatadirBasePath().'/table.yml');
-		}
-		$this->setNodeLocal($nodeLocal);
-		
-		
-		$this->data['timeCreated'] = time();
-		$this->data['bucketsId'] = 1000;
-		$this->buckets = new StackableArray();
-		$this->bucketsByMask = new StackableArray();
-		$this->load();
+		$this->data['bucketsId'] = 0;
 	}
 	
 	public function save(){
-		#print "".__CLASS__."->".__FUNCTION__.": begin\n";
-		$this->data['buckets'] = new StackableArray();
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
-		$buckets = $this['buckets'];
-		foreach($buckets as $id => $bucket){
+		$this->data['buckets'] = array();
+		
+		foreach($this->buckets as $bucketId => $bucket){
+			$this->data['buckets'][$bucketId] = array(
+				'path' => $bucket->getFilePath(),
+			);
+			
 			$bucket->save();
-			
-			$bucketAr = new StackableArray();
-			$bucketAr['id'] 		= $bucket->getId();
-			$bucketAr['path'] 		= $bucket->getFilePath();
-			$bucketAr['mask'] 		= $bucket->getMask();
-			
-			$this->data['buckets'][$id] = $bucketAr;
 		}
 		
 		$rv = parent::save();
@@ -56,16 +41,13 @@ class Table extends YamlStorage{
 		if(parent::load()){
 			
 			if(isset($this->data['buckets']) && $this->data['buckets']){
-				foreach($this->data['buckets'] as $id => $bucket){
-					if(file_exists($bucket['path'])){
-						$bucketObj = new Bucket($id, $bucket['mask']);
-						$bucketObj->setFilePath($bucket['path']);
-						$bucketObj->setNodeLocal($this->getNodeLocal());
-						$bucketObj->load();
-						
-						$this->buckets[$id] = $bucketObj;
-						$this->bucketsByMask[$bucket['mask']] = $bucketObj;
-					}
+				foreach($this->data['buckets'] as $bucketId => $bucketAr){
+					$bucket = new Bucket($bucketAr['path']);
+					$bucket->setDatadirBasePath($this->getDatadirBasePath());
+					$bucket->load();
+					
+					$this->buckets[$bucketId] = $bucket;
+					$this->bucketsByMask[$bucket->getMask()] = $bucket;
 				}
 			}
 			
@@ -80,7 +62,7 @@ class Table extends YamlStorage{
 	}
 	
 	public function bucketsIdInc(){
-		$this->data['bucketsId'] = (int)$this->data['bucketsId'] + 1;
+		$this->data['bucketsId']++;
 		
 		$this->setDataChanged();
 	}
@@ -95,11 +77,11 @@ class Table extends YamlStorage{
 		$this->setDataChanged();
 	}
 	
-	public function setNodeLocal(Node $node){
+	public function setLocalNode(Node $node){
 		$this->nodeLocal = $node;
 	}
 	
-	public function getNodeLocal(){
+	public function getLocalNode(){
 		return $this->nodeLocal;
 	}
 	
@@ -112,7 +94,7 @@ class Table extends YamlStorage{
 			}
 		}
 		
-		return new StackableArray($nodes);
+		return $nodes;
 	}
 	
 	public function getNodesNum(){
@@ -124,7 +106,7 @@ class Table extends YamlStorage{
 		
 		foreach($this->buckets as $bucketId => $bucket){
 			foreach($bucket->getNodes() as $cnodeId => $cnode){
-				$nodes[$this->getNodeLocal()->distanceHexStr($cnode)] = $cnode;
+				$nodes[$this->getLocalNode()->distanceHexStr($cnode)] = $cnode;
 				ksort($nodes, SORT_STRING);
 				$nodes = array_slice($nodes, 0, $num);
 			}
@@ -178,8 +160,8 @@ class Table extends YamlStorage{
 		
 		$rv = $node;
 		
-		if( !$this->getNodeLocal()->isEqual($node) ){
-			$distance = $this->getNodeLocal()->distance($node);
+		if( !$this->getLocalNode()->isEqual($node) ){
+			$distance = $this->getLocalNode()->distance($node);
 			
 			$onode = $this->nodeFindInBuckets($node);
 			if($onode){
@@ -196,7 +178,7 @@ class Table extends YamlStorage{
 			}
 			else{
 				$idLenBits = Node::ID_LEN_BITS - 1;
-				$mbase = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+				$mbase = array_fill(0, Node::ID_LEN, 0);
 				
 				while(true){
 					
@@ -225,7 +207,7 @@ class Table extends YamlStorage{
 							
 							$bucketsUsed = array();
 							foreach($bucket->getNodes() as $bnodeIndex => $bnode){
-								$bdistance = $this->getNodeLocal()->distance($bnode);
+								$bdistance = $this->getLocalNode()->distance($bnode);
 								
 								$idPos = 0;
 								$bmask = 0;
@@ -255,7 +237,7 @@ class Table extends YamlStorage{
 									if($this->getDatadirBasePath()){
 										$nbucket->setFilePath($this->getDatadirBasePath().'/bucket_'.$bmaskName.'.yml');
 									}
-									$nbucket->setNodeLocal($this->getNodeLocal());
+									$nbucket->setLocalNode($this->getLocalNode());
 									$nbucket->nodeAdd($bnode);
 									
 									$this->bucketAdd($nbucket);
@@ -290,7 +272,7 @@ class Table extends YamlStorage{
 						if($this->getDatadirBasePath()){
 							$bucket->setFilePath($this->getDatadirBasePath().'/bucket_'.$maskName.'.yml');
 						}
-						$bucket->setNodeLocal($this->getNodeLocal());
+						$bucket->setLocalNode($this->getLocalNode());
 						$bucket->nodeAdd($node);
 						#$bucket->save();
 						

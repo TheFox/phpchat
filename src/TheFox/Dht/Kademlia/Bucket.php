@@ -7,42 +7,32 @@ use TheFox\Yaml\YamlStorage;
 class Bucket extends YamlStorage{
 	
 	const SIZE_MAX = 20;
-	#const NODE_TTL = 900; # 15 minutes
 	
-	private $id;
-	private $nodeLocal;
-	private $nodesId;
-	private $nodes;
+	private $nodesId = 0;
+	private $nodes = array();
+	private $localNode = null;
 	
-	public function __construct($id = 0, $mask = ''){
+	public function __construct($filePath = null){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		parent::__construct($filePath);
 		
-		$this->setId($id);
-		$this->data['timeCreated'] = time();
-		$this->data['sizeMax'] = Bucket::SIZE_MAX;
-		$this->setMask($mask);
+		$this->data['id'] = 0;
+		$this->data['mask'] = '';
 		$this->data['isFull'] = false;
-		$this->nodesId = 0;
-		$this->nodes = new StackableArray();
+		$this->data['sizeMax'] = static::SIZE_MAX;
+		$this->data['timeCreated'] = time();
 	}
 	
 	public function save(){
-		#print "".__CLASS__."->".__FUNCTION__.": begin\n";
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
-		$this->data['nodes'] = new StackableArray();
+		$this->data['nodes'] = array();
 		
 		foreach($this->nodes as $nodeId => $node){
-			$nodeAr = new StackableArray();
-			$nodeAr['type']				= $node->getType();
-			$nodeAr['id']				= $node->getIdHexStr();
-			$nodeAr['ip']				= $node->getIp();
-			$nodeAr['port']				= $node->getPort();
-			$nodeAr['sslKeyPub']		= base64_encode($node->getSslKeyPub());
-			$nodeAr['sslKeyPubFingerprint']		= $node->getSslKeyPubFingerprint();
-			$nodeAr['timeCreated']		= $node->getTimeCreated();
-			$nodeAr['timeLastSeen']		= $node->getTimeLastSeen();
-			
-			$this->data['nodes'][] = $nodeAr;
+			$this->data['nodes'][$nodeId] = array(
+				'path' => $node->getFilePath(),
+			);
+			$node->save();
 		}
 		
 		$rv = parent::save();
@@ -52,30 +42,17 @@ class Bucket extends YamlStorage{
 	}
 	
 	public function load(){
-		#print "".__CLASS__."->".__FUNCTION__.": begin\n";
-		
 		if(parent::load()){
 			
-			if(isset($this->data['nodes']) && $this->data['nodes']){
+			if(array_key_exists('nodes', $this->data) && $this->data['nodes']){
 				foreach($this->data['nodes'] as $nodeId => $nodeAr){
 					$this->nodesId = $nodeId;
 					
-					$nodeObj = new Node();
-					$nodeObj->setType($nodeAr['type']);
-					$nodeObj->setIdHexStr($nodeAr['id']);
-					$nodeObj->setIp($nodeAr['ip']);
-					$nodeObj->setPort($nodeAr['port']);
-					if(isset($nodeAr['sslKeyPub']) && $nodeAr['sslKeyPub']){
-						$nodeObj->setSslKeyPub(base64_decode($nodeAr['sslKeyPub']));
-					}
-					elseif(isset($nodeAr['sslKeyPubFingerprint'])){
-						$nodeObj->setSslKeyPubFingerprint($nodeAr['sslKeyPubFingerprint']);
-					}
-					$nodeObj->setTimeCreated($nodeAr['timeCreated']);
-					$nodeObj->setTimeLastSeen($nodeAr['timeLastSeen']);
-					$nodeObj->setBucket($this);
+					$node = new Node($nodeAr['path']);
+					$node->setDatadirBasePath($this->getDatadirBasePath());
+					$node->load();
 					
-					$this->nodes[$this->nodesId] = $nodeObj;
+					$this->nodes[$this->nodesId] = $node;
 				}
 			}
 			
@@ -88,24 +65,39 @@ class Bucket extends YamlStorage{
 	}
 	
 	public function setId($id){
-		#print "".__CLASS__."->".__FUNCTION__.": '".$id."'\n";
-		$this->id = (int)$id;
+		$this->data['id'] = (int)$id;
 	}
 	
 	public function getId(){
-		#print "".__CLASS__."->".__FUNCTION__."\n";
-		return (int)$this->id;
+		return (int)$this->data['id'];
 	}
 	
 	public function setMask($mask){
-		#print "".__CLASS__."->".__FUNCTION__.": ".$mask."\n";
 		$this->data['mask'] = $mask;
 	}
 	
 	public function getMask(){
-		#print "".__CLASS__."->".__FUNCTION__."\n";
 		return $this->data['mask'];
 	}
+	
+	public function setIsFull($isFull){
+		$this->data['isFull'] = $isFull;
+	}
+	
+	public function getIsFull(){
+		return $this->data['isFull'];
+	}
+	
+	public function isFull(){
+		if($this->getNodesNum() >= static::SIZE_MAX){
+			// If full, stay full.
+			$this->setIsFull(true);
+		}
+		
+		return $this->getIsFull();
+	}
+	
+	
 	
 	public function getNodes(){
 		return $this->nodes;
@@ -115,15 +107,18 @@ class Bucket extends YamlStorage{
 		return count($this->getNodes());
 	}
 	
-	public function setNodeLocal(Node $node){
-		$this->nodeLocal = $node;
+	public function setLocalNode(Node $localNode){
+		$this->localNode = $localNode;
 	}
 	
-	public function getNodeLocal(){
-		return $this->nodeLocal;
+	public function getLocalNode(){
+		return $this->localNode;
 	}
+	
+	
 	
 	public function nodeFind(Node $node){
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
 		return $this->nodeFindByIdHexStr($node->getIdHexStr());
 	}
 	
@@ -137,11 +132,16 @@ class Bucket extends YamlStorage{
 	}
 	
 	public function nodeAdd(Node $node, $sortNodes = true){
-		if(is_null($this->nodeFind($node))){
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		$onode = $this->nodeFind($node);
+		if(!$onode){
+			print __CLASS__.'->'.__FUNCTION__.': old node'."\n";
 			$node->setBucket($this);
-			$this->nodesId = $this->nodesId + 1;
+			
+			$this->nodesId++;
 			$this->nodes[$this->nodesId] = $node;
-			$this->setDataChanged();
+			
+			$this->setDataChanged(true);
 		}
 		if($sortNodes){
 			$this->nodesSort();
@@ -155,27 +155,19 @@ class Bucket extends YamlStorage{
 	public function nodesSort(){
 		$nodes = (array)$this->nodes;
 		
-		uasort($nodes, function($node_a, $node_b){
-			$dist_a = $this->getNodeLocal()->distance($node_a);
-			$dist_b = $this->getNodeLocal()->distance($node_b);
+		uasort($this->nodes, function($node_a, $node_b){
+			$dist_a = $this->getLocalNode()->distance($node_a);
+			$dist_b = $this->getLocalNode()->distance($node_b);
 			
 			if($dist_a == $dist_b){
 				return 0;
 			}
 			return $dist_a < $dist_b ? -1 : 1;
 		});
-		$this->setDataChanged();
 		
-		$this->nodes = new StackableArray($nodes);
+		$this->setDataChanged(true);
 	}
 	
-	public function isFull(){
-		if($this->getNodesNum() >= Bucket::SIZE_MAX){
-			// If full, stay full.
-			$this->data['isFull'] = true;
-		}
-		
-		return $this->data['isFull'];
-	}
+	
 	
 }
