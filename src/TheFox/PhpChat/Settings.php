@@ -6,13 +6,8 @@ use TheFox\Yaml\YamlStorage;
 
 class Settings extends YamlStorage{
 	
-	const USER_NICKNAME_LEN_MAX = 256;
-	const SSL_KEY_LEN_MIN = 2048;
-	
 	public function __construct($filePath = null){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		$this->setFilePath($filePath);
-		
+		parent::__construct($filePath);
 		
 		$this->data['version'] = '2.0.0';
 		$this->data['release'] = 2;
@@ -25,7 +20,7 @@ class Settings extends YamlStorage{
 		$this->data['node']['ip'] = '0.0.0.0';
 		$this->data['node']['ipPub'] = null;
 		$this->data['node']['port'] = 25000;
-		$this->data['node']['uuid'] = '';
+		$this->data['node']['id'] = '';
 		
 		$this->data['node']['sslKeyPrvPass'] = '';
 		$this->data['node']['sslKeyPrvPath'] = 'id_rsa.prv';
