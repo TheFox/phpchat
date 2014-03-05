@@ -2,6 +2,7 @@ vendor
 *.lock
 test*.php
 log
+data
 id_rsa*
 settings.yml
 socket.php
