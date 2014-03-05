@@ -12,8 +12,11 @@ class YamlStorage{
 	private $dataChanged = false;
 	private $isLoaded = false;
 	
-	public function __construct(){
+	public function __construct($filePath = null){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		if($filePath !== null){
+			$this->setFilePath($filePath);
+		}
 	}
 	
 	public function save(){
