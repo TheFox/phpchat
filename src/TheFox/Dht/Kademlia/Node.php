@@ -32,7 +32,7 @@ class Node extends YamlStorage{
 	}
 	
 	public function setIdHexStr($id){
-		print __CLASS__.'->'.__FUNCTION__.": $id\n";
+		#print __CLASS__.'->'.__FUNCTION__.": $id\n";
 		
 		$this->id = array_fill(0, static::ID_LEN, 0);
 		

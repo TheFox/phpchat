@@ -20,7 +20,7 @@ class YamlStorage{
 	}
 	
 	public function save(){
-		print __CLASS__.'->'.__FUNCTION__.': '.(int)$this->dataChanged."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': '.(int)$this->dataChanged."\n";
 		$rv = false;
 		
 		if($this->dataChanged){
