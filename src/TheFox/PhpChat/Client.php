@@ -166,7 +166,8 @@ class Client{
 			$msgData = $msg['data'];
 		}
 		
-		if($msgName == 'hello'){
+		if($msgName == 'nop'){}
+		elseif($msgName == 'hello'){
 			if(array_key_exists('ip', $msgData)){
 				if($msgData['ip'] != '127.0.0.1' && $this->getSettings()){
 					$this->getSettings()->data['node']['ipPub'] = $msgData['ip'];
