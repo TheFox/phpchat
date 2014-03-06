@@ -219,6 +219,20 @@ class Client{
 		$this->dataSend($this->msgCreate('id', $data));
 	}
 	
+	private function sendPing($id = ''){
+		$data = array(
+			'id' => $id,
+		);
+		$this->dataSend($this->msgCreate('ping', $data));
+	}
+	
+	private function sendPong($id = ''){
+		$data = array(
+			'id' => $id,
+		);
+		$this->dataSend($this->msgCreate('pong', $data));
+	}
+	
 	private function sendError($errorCode = 999, $msgName = ''){
 		$errors = array(
 			999 => 'Unknown error',
