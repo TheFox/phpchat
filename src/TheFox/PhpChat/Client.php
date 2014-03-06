@@ -135,6 +135,8 @@ class Client{
 	}
 	
 	private function getLog(){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
 		if($this->getServer()){
 			return $this->getServer()->getLog();
 		}
@@ -143,6 +145,8 @@ class Client{
 	}
 	
 	private function log($level, $msg){
+		#print __CLASS__.'->'.__FUNCTION__.': '.$level.', '.$msg."\n";
+		
 		if($this->getLog()){
 			if(method_exists($this->getLog(), $level)){
 				$this->getLog()->$level($msg);
@@ -177,14 +181,14 @@ class Client{
 		$msgRaw = base64_decode($msgRaw);
 		$msg = json_decode($msgRaw, true);
 		
-		print __CLASS__.'->'.__FUNCTION__.': '.$msgRaw."\n";
-		#ve($msg);
-		
 		$msgName = $msg['name'];
 		$msgData = array();
 		if(array_key_exists('data', $msg)){
 			$msgData = $msg['data'];
 		}
+		
+		print __CLASS__.'->'.__FUNCTION__.': '.$msgRaw."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': '.$msgName."\n";
 		
 		if($msgName == 'nop'){}
 		elseif($msgName == 'hello'){
@@ -230,8 +234,6 @@ class Client{
 				else{
 					$this->sendError(120, $msgName);
 				}
-				
-				$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$id.', '.$port);
 			}
 			else{
 				$this->sendError(110, $msgName);

@@ -118,7 +118,7 @@ class Bucket extends YamlStorage{
 	
 	
 	public function nodeFind(Node $node){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		return $this->nodeFindByIdHexStr($node->getIdHexStr());
 	}
 	
@@ -132,10 +132,10 @@ class Bucket extends YamlStorage{
 	}
 	
 	public function nodeAdd(Node $node, $sortNodes = true){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		$onode = $this->nodeFind($node);
 		if(!$onode){
-			print __CLASS__.'->'.__FUNCTION__.': old node'."\n";
+			#print __CLASS__.'->'.__FUNCTION__.': old node'."\n";
 			$node->setBucket($this);
 			
 			$this->nodesId++;
