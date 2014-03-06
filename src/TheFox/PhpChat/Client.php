@@ -3,6 +3,8 @@
 namespace TheFox\PhpChat;
 
 use Exception;
+use RuntimeException;
+
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
 
@@ -179,9 +181,13 @@ class Client{
 	}
 	
 	private function sendId(){
+		if(!$this->getLocalNode()){
+			throw new RuntimeException('localNode not set.');
+		}
+		
 		$data = array(
-			'id' => $this->getLocalNodeId(),
-			'port' => 25000,
+			'id'   => $this->getLocalNode()->getIdHexStr(),
+			'port' => $this->getLocalNode()->getPort(),
 		);
 		$this->dataSend($this->msgCreate('id', $data));
 	}

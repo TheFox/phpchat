@@ -10,7 +10,7 @@ class Table extends YamlStorage{
 	
 	private $buckets = array();
 	private $bucketsByMask = array();
-	private $nodeLocal = null;
+	private $localNode = null;
 	
 	public function __construct($filePath = null){
 		parent::__construct($filePath);
@@ -78,11 +78,11 @@ class Table extends YamlStorage{
 	}
 	
 	public function setLocalNode(Node $node){
-		$this->nodeLocal = $node;
+		$this->localNode = $node;
 	}
 	
 	public function getLocalNode(){
-		return $this->nodeLocal;
+		return $this->localNode;
 	}
 	
 	public function getNodes(){
@@ -157,6 +157,10 @@ class Table extends YamlStorage{
 	
 	public function nodeEnclose(Node $node){
 		#print "".__CLASS__."->".__FUNCTION__.": begin\n";
+		
+		if(!$this->getLocalNode()){
+			throw new RuntimeException('localNode not set.');
+		}
 		
 		$rv = $node;
 		

@@ -29,8 +29,6 @@ class Kernel extends Thread{
 		$this->localNode = new Node();
 		$this->localNode->setIdHexStr($this->settings->data['node']['id']);
 		$this->localNode->setPort($this->settings->data['node']['port']);
-		#ve($this->localNode);
-		ve($this->localNode->getIdHexStr());
 		
 		$this->server = new Server();
 		$this->server->setKernel($this);
@@ -40,6 +38,7 @@ class Kernel extends Thread{
 		$this->server->init();
 		
 		$this->table = new Table($this->settings->data['datadir'].'/table.yml');
+		$this->table->setLocalNode($this->getLocalNode());
 		
 		#ve($this->server);
 		$this->shutdown();

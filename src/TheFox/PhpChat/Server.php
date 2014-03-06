@@ -14,7 +14,6 @@ class Server{
 	private $log = null;
 	
 	private $kernel = null;
-	private $localNode = null;
 	private $ip = '';
 	private $port = 0;
 	
@@ -44,17 +43,6 @@ class Server{
 		return $this->kernel;
 	}
 	
-	/*public function setLocalNode(Node $localNode){
-		$this->localNode = $localNode;
-	}*/
-	
-	public function getLocalNode(){
-		if($this->getKernel()){
-			return $this->getKernel()->getLocalNode();
-		}
-		return null;
-	}
-	
 	public function setIp($ip){
 		$this->ip = $ip;
 	}
@@ -68,12 +56,18 @@ class Server{
 		$this->sslKeyPrvPass = $sslKeyPrvPass;
 	}
 	
-	public function setSettingsNodeIpPub($ipPub){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
+	public function getSettings(){
 		if($this->getKernel()){
-			$this->getKernel()->setSettingsNodeIpPub($ipPub);
+			return $this->getKernel()->getSettings();
 		}
+		return null;
+	}
+	
+	public function getLocalNode(){
+		if($this->getKernel()){
+			return $this->getKernel()->getLocalNode();
+		}
+		return null;
 	}
 	
 	public function init(){
