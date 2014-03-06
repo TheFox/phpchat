@@ -10,6 +10,7 @@ class Node extends YamlStorage{
 	
 	const ID_LEN = 16;
 	const ID_LEN_BITS = 128;
+	const SSL_KEY_LEN_MIN = 4096;
 	
 	private $id = array();
 	private $sslKeyPub = null;
@@ -80,9 +81,19 @@ class Node extends YamlStorage{
 		return $this->data['port'];
 	}
 	
-	public function setSslKeyPub($sslKeyPub){
-		$this->sslKeyPub = $sslKeyPub;
-		$this->setSslKeyPubFingerprint(static::genSslKeyFingerprint($sslKeyPub));
+	public function setSslKeyPub($strKeyPub){
+		
+		$sslPubKey = openssl_pkey_get_public($strKeyPub);
+		$sslPubKeyDetails = openssl_pkey_get_details($sslPubKey);
+		
+		if($sslPubKeyDetails['bits'] >= static::SSL_KEY_LEN_MIN){
+			$this->sslKeyPub = $strKeyPub;
+			$this->setSslKeyPubFingerprint(static::genSslKeyFingerprint($strKeyPub));
+			
+			return true;
+		}
+		
+		return false;
 	}
 	
 	public function getSslKeyPub(){

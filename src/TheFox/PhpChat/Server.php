@@ -75,7 +75,7 @@ class Server{
 	}
 	
 	public function getTable(){
-		if($this->getServer()){
+		if($this->getKernel()){
 			return $this->getKernel()->getTable();
 		}
 		

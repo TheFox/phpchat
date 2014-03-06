@@ -165,23 +165,27 @@ class Client{
 	public function dataRecv(){
 		$data = $this->getSocket()->read();
 		
-		$separatorPos = strpos($data, static::MSG_SEPARATOR);
-		if($separatorPos === false){
-			$this->recvBufferTmp .= $data;
-			$data = '';
-		}
-		else{
-			$msg = $this->recvBufferTmp.substr($data, 0, $separatorPos);
-			
-			$this->msgHandle($msg);
-		}
+		do{
+			$separatorPos = strpos($data, static::MSG_SEPARATOR);
+			if($separatorPos === false){
+				$this->recvBufferTmp .= $data;
+				$data = '';
+			}
+			else{
+				$msg = $this->recvBufferTmp.substr($data, 0, $separatorPos);
+				
+				$this->msgHandle($msg);
+				
+				$data = substr($data, $separatorPos + 1);
+			}
+		}while($data);
 	}
 	
 	private function msgHandle($msgRaw){
 		$msgRaw = base64_decode($msgRaw);
 		$msg = json_decode($msgRaw, true);
 		
-		$msgName = $msg['name'];
+		$msgName = strtolower($msg['name']);
 		$msgData = array();
 		if(array_key_exists('data', $msg)){
 			$msgData = $msg['data'];
@@ -199,44 +203,111 @@ class Client{
 					$this->getSettings()->setDataChanged(true);
 				}
 			}
+			
+			$this->sendId();
 		}
 		elseif($msgName == 'id'){
-			if(!$this->getStatus('hasId')){
-				$id = '';
-				$port = 0;
-				$sslKeyPub = null;
-				$isChannel = false;
-				if(array_key_exists('id', $msgData)){
-					$id = $msgData['id'];
-				}
-				if(array_key_exists('port', $msgData)){
-					$port = (int)$msgData['port'];
-				}
-				if(array_key_exists('sslKeyPub', $msgData)){
-					$sslKeyPub = base64_decode($msgData['sslKeyPub']);
-				}
-				if(array_key_exists('isChannel', $msgData)){
-					$isChannel = (bool)$msgData['isChannel'];
-				}
-				
-				$node = new Node();
-				$node->setIdHexStr($id);
-				$node->setIp($this->getIp());
-				$node->setPort($port);
-				$node->setSslKeyPub($sslKeyPub);
-				$node->setTimeLastSeen(time());
-				
-				$this->setStatus('isChannel', $this->getStatus('isChannel') | $isChannel);
-				
-				if(! $this->getLocalNode()->isEqual($node)){
-					$this->setNode($node);
+			#print __CLASS__.'->'.__FUNCTION__.': '.$msgName.', '.(int)$this->getStatus('hasId')."\n";
+			
+			if($this->getTable()){
+				if(!$this->getStatus('hasId')){
+					$id = '';
+					$port = 0;
+					$strKeyPub = '';
+					$strKeyPubFingerprint = '';
+					$isChannel = false;
+					if(array_key_exists('id', $msgData)){
+						$id = $msgData['id'];
+					}
+					if(array_key_exists('port', $msgData)){
+						$port = (int)$msgData['port'];
+					}
+					if(array_key_exists('sslKeyPub', $msgData)){
+						$strKeyPub = base64_decode($msgData['sslKeyPub']);
+						$strKeyPubFingerprint = Node::genSslKeyFingerprint($strKeyPub);
+					}
+					if(array_key_exists('isChannel', $msgData)){
+						$isChannel = (bool)$msgData['isChannel'];
+					}
+					
+					if($isChannel){
+						$this->setStatus('isChannel', true);
+					}
+					
+					$idOk = false;
+					
+					if(strIsUuid($id)){
+						if($strKeyPub){
+							
+							$node = new Node();
+							$node->setIdHexStr($id);
+							$node->setIp($this->getIp());
+							$node->setPort($port);
+							$node->setTimeLastSeen(time());
+							
+							$node = $this->getTable()->nodeEnclose($node);
+							
+							if(! $this->getLocalNode()->isEqual($node)){
+								if($node->getSslKeyPub()){
+									$this->log('debug', 'found old ssl public key');
+									
+									if( $node->getSslKeyPub() == $strKeyPub ){
+										$this->log('debug', 'ssl public key ok');
+										
+										$idOk = true;
+									}
+									else{
+										$this->sendError(230, $msgName);
+										$this->log('warning', 'ssl public key changed since last handshake');
+									}
+								}
+								else{
+									$sslPubKey = openssl_pkey_get_public($strKeyPub);
+									if($sslPubKey !== false){
+										$sslPubKeyDetails = openssl_pkey_get_details($sslPubKey);
+										
+										if($sslPubKeyDetails['bits'] >= Node::SSL_KEY_LEN_MIN){
+											$this->log('debug', 'no old ssl public key found. good. set new.');
+											
+											$idOk = true;
+										}
+										else{
+											$this->sendError(220, $msgName);
+										}
+									}
+									else{
+										$this->sendError(240, $msgName);
+									}
+								}
+							}
+							else{
+								$this->sendError(120, $msgName);
+							}
+						}
+						else{
+							$this->sendError(200, $msgName);
+						}
+					}
+					else{
+						$this->sendError(900, $msgName);
+					}
+					
+					if($idOk){
+						$node->setSslKeyPub($strKeyPub);
+						
+						$this->setStatus('hasId', true);
+						$this->setNode($node);
+						
+						$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$id.', '.$port.', '.$node->getSslKeyPubFingerprint());
+					}
+					
 				}
 				else{
-					$this->sendError(120, $msgName);
+					$this->sendError(110, $msgName);
 				}
 			}
 			else{
-				$this->sendError(110, $msgName);
+				$this->sendError(910, $msgName);
 			}
 		}
 		elseif($msgName == 'ping'){
@@ -318,11 +389,21 @@ class Client{
 	
 	private function sendError($errorCode = 999, $msgName = ''){
 		$errors = array(
-			// 100-199
+			// 100-199: ID
 			100 => 'You need to identify',
 			110 => 'You already identified',
 			120 => 'You are using my ID',
 			
+			// 200-399: SSL
+			200 => 'SSL: no public key found',
+			210 => 'SSL: you need a key with minimum length of '.Node::SSL_KEY_LEN_MIN.' bits',
+			220 => 'SSL: public key too short',
+			230 => 'SSL: public key changed since last handshake',
+			240 => 'SSL: invalid key',
+			
+			// 900-999: Misc
+			900 => 'Invalid data',
+			910 => 'Invalid setup',
 			999 => 'Unknown error',
 		);
 		
