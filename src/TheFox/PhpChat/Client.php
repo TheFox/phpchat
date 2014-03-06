@@ -185,6 +185,13 @@ class Client{
 			$this->log('debug', $this->getIp().':'.$this->getPort().' recv: '.$code.', '.$msg.', '.$name);
 			
 		}
+		elseif($msgName == 'ping'){
+			$id = '';
+			if(array_key_exists('id', $msgData)){
+				$id = $msgData['id'];
+			}
+			$this->sendPong($id);
+		}
 		elseif($msgName == 'error'){
 			$code = 0;
 			$msg = '';
