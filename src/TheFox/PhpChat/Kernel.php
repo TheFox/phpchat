@@ -29,6 +29,7 @@ class Kernel extends Thread{
 		$this->localNode = new Node();
 		$this->localNode->setIdHexStr($this->settings->data['node']['id']);
 		$this->localNode->setPort($this->settings->data['node']['port']);
+		$this->localNode->setSslKeyPub(file_get_contents($this->settings->data['node']['sslKeyPubPath']));
 		
 		$this->server = new Server();
 		$this->server->setKernel($this);

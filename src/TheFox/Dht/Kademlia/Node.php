@@ -12,6 +12,7 @@ class Node extends YamlStorage{
 	const ID_LEN_BITS = 128;
 	
 	private $id = array();
+	private $sslKeyPub = null;
 	private $bucket = null;
 	
 	public function __construct($filePath = null){
@@ -21,10 +22,24 @@ class Node extends YamlStorage{
 		$this->data['type'] = 'tcp';
 		$this->data['ip'] = '';
 		$this->data['port'] = 0;
-		$this->data['sslKeyPub'] = '';
 		$this->data['sslKeyPubFingerprint'] = '';
 		$this->data['timeCreated'] = time();
 		$this->data['timeLastSeen'] = 0;
+	}
+	
+	public function save(){
+		$this->data['sslKeyPub'] = base64_encode($this->sslKeyPub);
+		return parent::save();
+	}
+	
+	public function load(){
+		if(parent::load()){
+			$this->setSslKeyPub(base64_decode($this->data['sslKeyPub']));
+			unset($this->data['sslKeyPub']);
+			
+			return true;
+		}
+		return false;
 	}
 	
 	public function getId(){
@@ -32,8 +47,6 @@ class Node extends YamlStorage{
 	}
 	
 	public function setIdHexStr($id){
-		#print __CLASS__.'->'.__FUNCTION__.": $id\n";
-		
 		$this->id = array_fill(0, static::ID_LEN, 0);
 		
 		if(strIsUuid($id)){
@@ -68,12 +81,12 @@ class Node extends YamlStorage{
 	}
 	
 	public function setSslKeyPub($sslKeyPub){
-		$this->data['sslKeyPub'] = $sslKeyPub;
-		$this->setSslKeyPubFingerprint(static::genSslKeyFingerprint($this->sslKeyPub));
+		$this->sslKeyPub = $sslKeyPub;
+		$this->setSslKeyPubFingerprint(static::genSslKeyFingerprint($sslKeyPub));
 	}
 	
 	public function getSslKeyPub(){
-		return $this->data['sslKeyPub'];
+		return $this->sslKeyPub;
 	}
 	
 	public function setSslKeyPubFingerprint($sslKeyPubFingerprint){
