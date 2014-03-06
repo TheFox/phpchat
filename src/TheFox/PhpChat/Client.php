@@ -207,6 +207,13 @@ class Client{
 		$this->getSocket()->write($msg.static::MSG_SEPARATOR);
 	}
 	
+	public function sendHello(){
+		$data = array(
+			'ip' => $this->getIp(),
+		);
+		$this->dataSend($this->msgCreate('hello', $data));
+	}
+	
 	private function sendId(){
 		if(!$this->getLocalNode()){
 			throw new RuntimeException('localNode not set.');

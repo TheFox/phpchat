@@ -132,6 +132,8 @@ class Server{
 						
 						$this->clientAdd($client);
 						
+						$client->sendHello();
+						
 						$this->log->debug('new client: '.$client->getId().', '.$client->getIpPort());
 					}
 				}
