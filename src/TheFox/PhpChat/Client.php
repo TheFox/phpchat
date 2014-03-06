@@ -30,6 +30,7 @@ class Client{
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		$this->status['hasShutdown'] = false;
+		$this->status['hasId'] = false;
 	}
 	
 	public function __destruct(){
@@ -175,6 +176,15 @@ class Client{
 				}
 			}
 		}
+		elseif($msgName == 'id'){
+			$id = '';
+			if(array_key_exists('id', $msgData)){
+				$id = $msgData['id'];
+			}
+			
+			$this->log('debug', $this->getIp().':'.$this->getPort().' recv: '.$code.', '.$msg.', '.$name);
+			
+		}
 		elseif($msgName == 'error'){
 			$code = 0;
 			$msg = '';
@@ -220,9 +230,12 @@ class Client{
 			throw new RuntimeException('localNode not set.');
 		}
 		
+		$sslKeyPub = base64_encode($this->getLocalNode()->getSslKeyPub());
+		
 		$data = array(
-			'id'   => $this->getLocalNode()->getIdHexStr(),
-			'port' => $this->getLocalNode()->getPort(),
+			'id'        => $this->getLocalNode()->getIdHexStr(),
+			'port'      => $this->getLocalNode()->getPort(),
+			'sslKeyPub' => $sslKeyPub,
 		);
 		$this->dataSend($this->msgCreate('id', $data));
 	}
