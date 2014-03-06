@@ -174,6 +174,22 @@ class Client{
 				}
 			}
 		}
+		elseif($msgName == 'error'){
+			$code = 0;
+			$msg = '';
+			$name = '';
+			if(array_key_exists('msg', $msgData)){
+				$code = (int)$msgData['code'];
+			}
+			if(array_key_exists('msg', $msgData)){
+				$msg = $msgData['msg'];
+			}
+			if(array_key_exists('msg', $msgData)){
+				$name = $msgData['name'];
+			}
+			
+			$this->log('debug', $this->getIp().':'.$this->getPort().' recv: '.$code.', '.$msg.', '.$name);
+		}
 		elseif($msgName == 'quit'){
 			$this->shutdown();
 		}
@@ -201,6 +217,23 @@ class Client{
 			'port' => $this->getLocalNode()->getPort(),
 		);
 		$this->dataSend($this->msgCreate('id', $data));
+	}
+	
+	private function sendError($errorCode = 999, $msgName = ''){
+		$errors = array(
+			999 => 'Unknown error',
+		);
+		
+		if(!isset($errors[$errorCode])){
+			throw new RuntimeException('Error '.$errorCode.' not defined.');
+		}
+		
+		$data = array(
+			'code'   => $errorCode,
+			'msg' => $errors[$errorCode],
+			'name' => $msgName,
+		);
+		$this->dataSend($this->msgCreate('error', $data));
 	}
 	
 	public function shutdown(){
