@@ -35,6 +35,10 @@ class Server{
 		$this->log->info('start');
 	}
 	
+	public function getLog(){
+		return $this->log;
+	}
+	
 	public function setKernel($kernel){
 		$this->kernel = $kernel;
 	}

@@ -122,6 +122,22 @@ class Client{
 		return null;
 	}
 	
+	private function getLog(){
+		if($this->getServer()){
+			return $this->getServer()->getLog();
+		}
+		
+		return null;
+	}
+	
+	private function log($level, $msg){
+		if($this->getLog()){
+			if(method_exists($this->getLog(), $level)){
+				$this->getLog()->$level($msg);
+			}
+		}
+	}
+	
 	public function dataRecv(){
 		$data = $this->getSocket()->read();
 		
