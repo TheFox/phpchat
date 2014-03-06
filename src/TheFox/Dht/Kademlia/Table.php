@@ -3,6 +3,7 @@
 namespace TheFox\Dht\Kademlia;
 
 use Exception;
+use RuntimeException;
 
 use TheFox\Yaml\YamlStorage;
 
@@ -61,20 +62,24 @@ class Table extends YamlStorage{
 		return false;
 	}
 	
-	public function bucketsIdInc(){
-		$this->data['bucketsId']++;
-		
-		$this->setDataChanged();
-	}
-	
 	public function getBucketsId(){
 		return $this->data['bucketsId'];
 	}
 	
-	public function bucketAdd(Bucket $bucket){
+	public function bucketNew(){
+		$this->data['bucketsId']++;
+		
+		$bucket = new Bucket($this->getDatadirBasePath().'/bucket_'.$this->data['bucketsId'].'.yml');
+		$bucket->setId($this->data['bucketsId']);
+		$bucket->setDatadirBasePath($this->getDatadirBasePath());
+		$bucket->setLocalNode($this->getLocalNode());
+		
 		$this->buckets[$this->getBucketsId()] = $bucket;
 		$this->bucketsByMask[$bucket->getMask()] = $bucket;
-		$this->setDataChanged();
+		
+		$this->setDataChanged(true);
+		
+		return $bucket;
 	}
 	
 	public function setLocalNode(Node $node){
@@ -235,16 +240,8 @@ class Table extends YamlStorage{
 									$nbucket->nodeAdd($bnode, false);
 								}
 								else{
-									$this->bucketsIdInc();
-									
-									$nbucket = new Bucket($this->getBucketsId(), $bmaskName);
-									if($this->getDatadirBasePath()){
-										$nbucket->setFilePath($this->getDatadirBasePath().'/bucket_'.$bmaskName.'.yml');
-									}
-									$nbucket->setLocalNode($this->getLocalNode());
+									$nbucket = $this->bucketNew();
 									$nbucket->nodeAdd($bnode);
-									
-									$this->bucketAdd($nbucket);
 									
 									$bucketsUsed[$nbucket->getId()] = $nbucket;
 								}
@@ -270,17 +267,7 @@ class Table extends YamlStorage{
 						
 					}
 					else{
-						$this->bucketsIdInc();
-						
-						$bucket = new Bucket($this->getBucketsId(), $maskName);
-						if($this->getDatadirBasePath()){
-							$bucket->setFilePath($this->getDatadirBasePath().'/bucket_'.$maskName.'.yml');
-						}
-						$bucket->setLocalNode($this->getLocalNode());
-						$bucket->nodeAdd($node);
-						#$bucket->save();
-						
-						$this->bucketAdd($bucket);
+						$this->bucketNew();
 						
 						break;
 					}
