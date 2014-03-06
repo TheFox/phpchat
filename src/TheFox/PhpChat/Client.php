@@ -139,6 +139,14 @@ class Client{
 		}
 	}
 	
+	private function getTable(){
+		if($this->getServer()){
+			return $this->getServer()->getTable();
+		}
+		
+		return null;
+	}
+	
 	public function dataRecv(){
 		$data = $this->getSocket()->read();
 		

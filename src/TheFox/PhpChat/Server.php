@@ -74,6 +74,14 @@ class Server{
 		return null;
 	}
 	
+	public function getTable(){
+		if($this->getServer()){
+			return $this->getKernel()->getTable();
+		}
+		
+		return null;
+	}
+	
 	public function init(){
 		if($this->ip && $this->port){
 			$this->log->notice('listen on '.$this->ip.':'.$this->port);

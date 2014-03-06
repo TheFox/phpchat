@@ -55,6 +55,10 @@ class Kernel extends Thread{
 		return $this->settings;
 	}
 	
+	public function getTable(){
+		return $this->table;
+	}
+	
 	public function run(){
 		while(!$this->getExit()){
 			#print __CLASS__.'->'.__FUNCTION__.''."\n";
