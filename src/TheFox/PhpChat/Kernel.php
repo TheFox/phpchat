@@ -47,12 +47,20 @@ class Kernel extends Thread{
 		
 	}
 	
-	public function getLocalNode(){
-		return $this->localNode;
+	private function getLog(){
+		return $this->log;
 	}
 	
 	public function getSettings(){
 		return $this->settings;
+	}
+	
+	public function getLocalNode(){
+		return $this->localNode;
+	}
+	
+	private function getServer(){
+		return $this->server;
 	}
 	
 	public function getTable(){
@@ -72,11 +80,14 @@ class Kernel extends Thread{
 	}
 	
 	public function shutdown(){
-		$this->log->info('shutdown');
+		$this->getLog()->info('shutdown');
 		
-		$this->server->shutdown();
-		$this->table->save();
-		$this->settings->save();
+		$this->getSettings()->data['firstRun'] = $this->getTable()->getNodesNum() > 0;
+		$this->getSettings()->setDataChanged(true);
+		
+		$this->getServer()->shutdown();
+		$this->getTable()->save();
+		$this->getSettings()->save();
 	}
 	
 }

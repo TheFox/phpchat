@@ -21,6 +21,7 @@ class Client{
 	
 	private $server = null;
 	private $socket = null;
+	private $node = null;
 	private $ip = '';
 	private $port = 0;
 	
@@ -30,6 +31,8 @@ class Client{
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		$this->status['hasShutdown'] = false;
+		$this->status['isChannel'] = false;
+		
 		$this->status['hasId'] = false;
 	}
 	
@@ -70,6 +73,14 @@ class Client{
 	
 	public function getSocket(){
 		return $this->socket;
+	}
+	
+	public function setNode(Node $node){
+		$this->node = $node;
+	}
+	
+	public function getNode(){
+		return $this->node;
 	}
 	
 	public function setIp($ip){
@@ -186,13 +197,45 @@ class Client{
 			}
 		}
 		elseif($msgName == 'id'){
-			$id = '';
-			if(array_key_exists('id', $msgData)){
-				$id = $msgData['id'];
+			if(!$this->getStatus('hasId')){
+				$id = '';
+				$port = 0;
+				$sslKeyPub = null;
+				$isChannel = false;
+				if(array_key_exists('id', $msgData)){
+					$id = $msgData['id'];
+				}
+				if(array_key_exists('port', $msgData)){
+					$port = (int)$msgData['port'];
+				}
+				if(array_key_exists('sslKeyPub', $msgData)){
+					$sslKeyPub = base64_decode($msgData['sslKeyPub']);
+				}
+				if(array_key_exists('isChannel', $msgData)){
+					$isChannel = (bool)$msgData['isChannel'];
+				}
+				
+				$node = new Node();
+				$node->setIdHexStr($id);
+				$node->setIp($this->getIp());
+				$node->setPort($port);
+				$node->setSslKeyPub($sslKeyPub);
+				$node->setTimeLastSeen(time());
+				
+				$this->setStatus('isChannel', $this->getStatus('isChannel') | $isChannel);
+				
+				if(! $this->getLocalNode()->isEqual($node)){
+					$this->setNode($node);
+				}
+				else{
+					$this->sendError(120, $msgName);
+				}
+				
+				$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$id.', '.$port);
 			}
-			
-			$this->log('debug', $this->getIp().':'.$this->getPort().' recv: '.$code.', '.$msg.', '.$name);
-			
+			else{
+				$this->sendError(110, $msgName);
+			}
 		}
 		elseif($msgName == 'ping'){
 			$id = '';
@@ -215,7 +258,7 @@ class Client{
 				$name = $msgData['name'];
 			}
 			
-			$this->log('debug', $this->getIp().':'.$this->getPort().' recv: '.$code.', '.$msg.', '.$name);
+			$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$code.', '.$msg.', '.$name);
 		}
 		elseif($msgName == 'quit'){
 			$this->shutdown();
@@ -241,7 +284,7 @@ class Client{
 		$this->dataSend($this->msgCreate('hello', $data));
 	}
 	
-	private function sendId(){
+	private function sendId($isChannel = false){
 		if(!$this->getLocalNode()){
 			throw new RuntimeException('localNode not set.');
 		}
@@ -252,6 +295,7 @@ class Client{
 			'id'        => $this->getLocalNode()->getIdHexStr(),
 			'port'      => $this->getLocalNode()->getPort(),
 			'sslKeyPub' => $sslKeyPub,
+			'isChannel' => (bool)$isChannel,
 		);
 		$this->dataSend($this->msgCreate('id', $data));
 	}
@@ -272,6 +316,11 @@ class Client{
 	
 	private function sendError($errorCode = 999, $msgName = ''){
 		$errors = array(
+			// 100-199
+			100 => 'You need to identify',
+			110 => 'You already identified',
+			120 => 'You are using my ID',
+			
 			999 => 'Unknown error',
 		);
 		
