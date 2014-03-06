@@ -26,3 +26,10 @@ function strIsUuid($str){
 	}
 	return false;;
 }
+
+function strIsIp($ip){
+	if(preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/', $ip)){
+		return true;
+	}
+	return false;
+}
