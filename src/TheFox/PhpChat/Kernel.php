@@ -39,6 +39,7 @@ class Kernel extends Thread{
 		
 		$this->table = new Table($this->settings->data['datadir'].'/table.yml');
 		$this->table->setLocalNode($this->getLocalNode());
+		$this->table->setDatadirBasePath($this->settings->data['datadir']);
 		
 		#ve($this->server);
 		$this->shutdown();
@@ -49,12 +50,8 @@ class Kernel extends Thread{
 		return $this->localNode;
 	}
 	
-	public function setSettingsNodeIpPub($ipPub){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
-		if($ipPub != '127.0.0.1'){
-			$this->settings->data['node']['ipPub'] = $ipPub;
-			$this->settings->setDataChanged(true);
-		}
+	public function getSettings(){
+		return $this->settings;
 	}
 	
 	public function run(){

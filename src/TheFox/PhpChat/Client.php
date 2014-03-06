@@ -107,14 +107,6 @@ class Client{
 		$this->ssl = openssl_pkey_get_private(file_get_contents($sslKeyPrvPath), $sslKeyPrvPass);
 	}
 	
-	public function setSettingsNodeIpPub($ipPub){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
-		if($this->getServer()){
-			$this->getServer()->kernelSettingsNodeIpPubSet($ipPub);
-		}
-	}
-	
 	public function getLocalNode(){
 		if($this->getServer()){
 			return $this->getServer()->getLocalNode();
@@ -122,12 +114,12 @@ class Client{
 		return null;
 	}
 	
-	public function getLocalNodeId(){
-		if($this->getLocalNode()){
-			#return $this->getLocalNode()->getIdHexStr();
+	public function getSettings(){
+		if($this->getServer()){
+			return $this->getServer()->getSettings();
 		}
 		
-		return 'xyz';
+		return null;
 	}
 	
 	public function dataRecv(){
@@ -160,7 +152,10 @@ class Client{
 		
 		if($msgName == 'hello'){
 			if(array_key_exists('ip', $msgData)){
-				$this->setSettingsNodeIpPub($msgData['ip']);
+				if($msgData['ip'] != '127.0.0.1' && $this->getSettings()){
+					$this->getSettings()->data['node']['ipPub'] = $msgData['ip'];
+					$this->getSettings()->setDataChanged(true);
+				}
 			}
 		}
 		elseif($msgName == 'quit'){
