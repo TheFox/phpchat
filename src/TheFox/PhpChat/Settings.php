@@ -9,8 +9,8 @@ class Settings extends YamlStorage{
 	public function __construct($filePath = null){
 		parent::__construct($filePath);
 		
-		$this->data['version'] = '2.0.0';
-		$this->data['release'] = 2;
+		$this->data['version'] = '0.1.0';
+		$this->data['release'] = 1;
 		$this->data['datadir'] = 'data';
 		$this->data['firstRun'] = true;
 		#$this->data['isBootstrap'] = true;
