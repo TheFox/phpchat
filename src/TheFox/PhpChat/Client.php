@@ -15,6 +15,8 @@ use TheFox\Dht\Kademlia\Node;
 class Client{
 	
 	const MSG_SEPARATOR = "\n";
+	const NODE_FIND_NUM = 8;
+	const NODE_FIND_MAX_NODE_IDS = 1024;
 	
 	private $id = 0;
 	private $status = array();
@@ -378,7 +380,164 @@ class Client{
 				$actions = $this->actionsGetByCriterion(ClientAction::CRITERION_AFTER_ID_OK);
 				foreach($actions as $actionsId => $action){
 					$this->actionRemove($action);
-					ve($action);
+					$action->functionExec($this);
+				}
+			}
+			else{
+				$this->sendError(100, $msgName);
+			}
+		}
+		elseif($msgName == 'node_find'){
+			if($this->getStatus('hasId')){
+				$rid = '';
+				$num = static::NODE_FIND_NUM;
+				$nodeId = '';
+				if(array_key_exists('rid', $msgData)){
+					$rid = $msgData['rid'];
+				}
+				if(array_key_exists('num', $msgData)){
+					$num = $msgData['num'];
+				}
+				if(array_key_exists('nodeId', $msgData)){
+					$nodeId = $msgData['nodeId'];
+				}
+				
+				$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$rid.', '.$nodeId);
+				
+				if($nodeId){
+					$node = new Node();
+					$node->setIdHexStr($nodeId);
+					
+					if( $node->isEqual($this->getLocalNode()) ){
+						$this->log('debug', 'node find: find myself');
+						
+						$this->sendNodeFound($rid);
+					}
+					elseif( !$node->isEqual($this->getNode()) && $onode = $this->getTable()->nodeFindInBuckets($node) ){
+						$this->log('debug', 'node find: find in buckets');
+						
+						$this->sendNodeFound($rid, array($onode));
+					}
+					else{
+						$this->log('debug', 'node find: closest to "'.$node->getIdHexStr().'"');
+						
+						$nodes = $this->getTable()->nodeFindClosest($node, $num);
+						foreach($nodes as $cnodeId => $cnode){
+							if($cnode->isEqual($this->getNode())){
+								unset($nodes[$cnodeId]);
+								break;
+							}
+						}
+						
+						$this->sendNodeFound($rid, $nodes);
+					}
+				}
+			}
+			else{
+				$this->sendError(100, $msgName);
+			}
+		}
+		elseif($msgName == 'node_found'){
+			if($this->getStatus('hasId')){
+				$rid = '';
+				$nodes = array();
+				if(array_key_exists('rid', $msgData)){
+					$rid = $msgData['rid'];
+				}
+				if(array_key_exists('nodes', $msgData)){
+					$nodes = $msgData['nodes'];
+				}
+				
+				if($rid){
+					$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$rid);
+					
+					$request = null;
+					$request = $this->requestGetByRid($rid);
+					if($request){
+						$this->requestRemove($request);
+						
+						$nodeId = $request['data']['nodeId'];
+						$nodesFoundIds = $request['data']['nodesFoundIds'];
+						$distanceOld =   $request['data']['distance'];
+						$ip = ''; $port = 0;
+						
+						if($nodes){
+							// Find the smallest distance.
+							foreach($nodes as $nodeArId => $nodeAr){
+								
+								$node = new Node();
+								if(isset($nodeAr['id'])){
+									$node->setIdHexStr($nodeAr['id']);
+								}
+								if(isset($nodeAr['ip'])){
+									$node->setIp($nodeAr['ip']);
+								}
+								if(isset($nodeAr['port'])){
+									$node->setPort($nodeAr['port']);
+								}
+								if(isset($nodeAr['sslKeyPub'])){
+									$node->setSslKeyPub(base64_decode($nodeAr['sslKeyPub']));
+								}
+								$node->setTimeLastSeen(time());
+								
+								$distanceNew = $this->getLocalNode()->distanceHexStr($node);
+								
+								$this->log('debug', 'node found: '.$nodeArId.', '.$nodeAr['id'].', do='.$distanceOld.', dn='.$distanceNew);
+								
+								if(!$this->getLocalNode()->isEqual($node)){
+									if($this->getSettings()->data['node']['ipPub'] != $node->getIp() || $this->getLocalNode()->getPort() != $node->getPort()){
+										if(!in_array($node->getIdHexStr(), $nodesFoundIds)){
+											
+											$nodesFoundIds[] = $nodeAr['id'];
+											if(count($nodesFoundIds) > static::NODE_FIND_MAX_NODE_IDS){
+												array_shift($nodesFoundIds);
+											}
+											
+											if($nodeAr['id'] == $nodeId){
+												$this->log('debug', 'node found: find completed');
+												$ip = ''; $port = 0;
+											}
+											else{
+												if($distanceOld != $distanceNew){
+													$distanceMin = Node::idMinHexStr($distanceOld, $distanceNew);
+													if($distanceMin == $distanceNew){ // Is smaller then $distanceOld.
+														$distanceOld = $distanceNew;
+														$ip = $node->getIp(); $port = $node->getPort();
+													}
+												}
+											}
+											
+											$this->getTable()->nodeEnclose($node);
+										}
+										else{
+											$this->log('debug', 'node found: already known');
+										}
+									}
+									else{
+										$this->log('debug', 'node found: myself, ip:port equal ('.$node->getIp().':'.$node->getPort().')');
+									}
+								}
+								else{
+									$this->log('debug', 'node found: myself, node equal');
+								}
+							}
+						}
+						
+						if($ip){
+							// Further search at the nearest node.
+							$this->log('debug', 'node found: ip ('.$ip.':'.$port.') ok');
+							
+							$clientActions = array();
+							$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_OK);
+							$action->functionSet(function($client){ $client->sendNodeFind($nodeId, $distanceOld, $nodesFoundIds); });
+							$clientActions[] = $action;
+							
+							$this->getServer()->connect($ip, $port, $clientActions);
+						}
+					}
+				}
+				else{
+					$this->sendError(900, $msgName);
 				}
 			}
 			else{
@@ -453,6 +612,49 @@ class Client{
 		$data = array(
 		);
 		$this->dataSend($this->msgCreate('id_ok', $data));
+	}
+	
+	private function sendNodeFind($nodeId, $distance = 'ffffffff-ffff-4fff-bfff-ffffffffffff', $nodesFoundIds = array()){
+		if(!$this->getTable()){
+			throw new RuntimeException('table not set.');
+		}
+		
+		$rid = (string)Uuid::uuid4();
+		
+		$this->requestAdd('node_find', $rid, array(
+			'nodeId' => $nodeId,
+			'distance' => $distance,
+			'nodesFoundIds' => $nodesFoundIds,
+		));
+		
+		$data = array(
+			'rid'       => $rid,
+			'num'       => static::NODE_FIND_NUM,
+			'nodeId'    => $nodeId,
+		);
+		$this->dataSend($this->msgCreate('node_find', $data));
+	}
+	
+	private function sendNodeFound($rid, $nodes = array()){
+		if(!$this->getTable()){
+			throw new RuntimeException('table not set.');
+		}
+		
+		$nodesOut = array();
+		foreach($nodes as $nodeId => $node){
+			$nodesOut[] = array(
+				'id' => $node->getIdHexStr(),
+				'ip' => $node->getIp(),
+				'port' => $node->getPort(),
+				'sslKeyPub' => base64_encode($node->getSslKeyPub()),
+			);
+		}
+		
+		$data = array(
+			'rid'       => $rid,
+			'nodes'     => $nodesOut,
+		);
+		$this->dataSend($this->msgCreate('node_found', $data));
 	}
 	
 	private function sendPing($id = ''){
