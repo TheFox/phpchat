@@ -133,12 +133,7 @@ class Server{
 					// Server
 					$socket = $this->socket->accept();
 					if($socket){
-						
-						$client = new Client();
-						$client->setSocket($socket);
-						$client->setSslPrv($this->sslKeyPrvPath, $this->sslKeyPrvPass);
-						
-						$this->clientAdd($client);
+						$this->clientNew($socket);
 						
 						$client->sendHello();
 						
@@ -175,10 +170,16 @@ class Server{
 	private function clientNew($socket){
 		$this->clientsId++;
 		
+		$client = new Client();
+		$client->setSocket($socket);
+		$client->setSslPrv($this->sslKeyPrvPath, $this->sslKeyPrvPass);
+		
 		$client->setId($this->clientsId);
 		$client->setServer($this);
 		
 		$this->clients[$this->clientsId] = $client;
+		
+		return $client;
 	}
 	
 	private function clientGetByHandle($handle){
