@@ -28,6 +28,8 @@ class Client{
 	private $recvBufferTmp = '';
 	private $requestsId = 0;
 	private $requests = array();
+	private $actionsId = 0;
+	private $actions = array();
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -190,6 +192,18 @@ class Client{
 	
 	private function requestRemove($request){
 		unset($this->requests[$request['id']]);
+	}
+	
+	public function actionAdd(ClientAction $action){
+		$this->actionsId++;
+		
+		$action->setId($this->actionsId);
+		
+		$this->actions[$this->actionsId] = $action;
+	}
+	
+	public function actionRemove(ClientAction $action){
+		unset($this->actions[$action->getId()]);
 	}
 	
 	public function dataRecv(){
