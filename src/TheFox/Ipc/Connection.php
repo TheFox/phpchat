@@ -55,23 +55,28 @@ class Connection{
 		$function = $this->functions[$name];
 		#array_unshift($args, $this);
 		
-		if(is_object($function['objc'])){
-			if(is_string($function['func'])){
-				#print __CLASS__.'->'.__FUNCTION__.': exec '. get_class($function['objc']) .'->'.$function['func'].'()'."\n";
-				return call_user_func_array(array($function['objc'], $function['func']), $args);
-			}
+		$objc = $this->objc;
+		$func = $this->func;
+		
+		if($objc === null && $func === null){
+			#print __CLASS__.'->'.__FUNCTION__.': null'."\n";
+			return null;
 		}
-		elseif(is_string($function['func'])){
-			#print __CLASS__.'->'.__FUNCTION__.': exec '.$function['func'].'()'."\n";
-			return call_user_func_array($function['func'], $args);
+		elseif($objc === null && $func instanceof Closure){
+			#print __CLASS__.'->'.__FUNCTION__.': exec anon "'.$name.'"'."\n";
+			return call_user_func_array($func, $args);
 		}
-		elseif($function['func'] === null){
-			#print __CLASS__.'->'.__FUNCTION__.': exec '.$name.''."\n";
+		elseif($objc === null && is_string($func)){
+			#print __CLASS__.'->'.__FUNCTION__.': exec string "'.$func.'"'."\n";
+			return call_user_func_array($func, $args);
+		}
+		elseif(is_object($objc) && is_string($func)){
+			#print __CLASS__.'->'.__FUNCTION__.': exec objc'."\n";
+			return call_user_func_array(array($objc, $func), $args);
+		}
+		elseif($objc === null && $func === null){
+			#print __CLASS__.'->'.__FUNCTION__.': exec by name "'.$name.'"'."\n";
 			return call_user_func_array($name, $args);
-		}
-		else{
-			#print __CLASS__.'->'.__FUNCTION__.': exec anon '.$name.''."\n";
-			return call_user_func_array($function['func'], $args);
 		}
 	}
 	
