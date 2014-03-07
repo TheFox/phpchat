@@ -209,7 +209,7 @@ class Server{
 			$connected = $socket->connect($ip, $port);
 		}
 		catch(Exception $e){
-			$this->log->debug('connection to '.$ip.', '.$port.' failed');
+			$this->log->debug('connection to '.$ip.', '.$port.' failed: '.$e->getMessage());
 		}
 		
 		if($connected){
