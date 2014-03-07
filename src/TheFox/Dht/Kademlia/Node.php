@@ -29,11 +29,15 @@ class Node extends YamlStorage{
 	}
 	
 	public function save(){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
 		$this->data['sslKeyPub'] = base64_encode($this->sslKeyPub);
 		return parent::save();
 	}
 	
 	public function load(){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
 		if(parent::load()){
 			$this->setSslKeyPub(base64_decode($this->data['sslKeyPub']));
 			unset($this->data['sslKeyPub']);

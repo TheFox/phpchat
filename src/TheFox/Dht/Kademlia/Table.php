@@ -39,6 +39,8 @@ class Table extends YamlStorage{
 	}
 	
 	public function load(){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
 		if(parent::load()){
 			
 			if(isset($this->data['buckets']) && $this->data['buckets']){
@@ -67,6 +69,9 @@ class Table extends YamlStorage{
 	}
 	
 	public function bucketNew(){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': '.$this->getDatadirBasePath()."\n";
+		
 		$this->data['bucketsId']++;
 		
 		$bucket = new Bucket($this->getDatadirBasePath().'/bucket_'.$this->data['bucketsId'].'.yml');
@@ -161,7 +166,7 @@ class Table extends YamlStorage{
 	}
 	
 	public function nodeEnclose(Node $node){
-		#print "".__CLASS__."->".__FUNCTION__.": begin\n";
+		#print __CLASS__."->".__FUNCTION__.''."\n";
 		
 		if(!$this->getLocalNode()){
 			throw new RuntimeException('localNode not set.');

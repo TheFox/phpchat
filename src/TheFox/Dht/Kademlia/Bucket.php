@@ -29,6 +29,8 @@ class Bucket extends YamlStorage{
 		$this->data['nodes'] = array();
 		
 		foreach($this->nodes as $nodeId => $node){
+			#print __CLASS__.'->'.__FUNCTION__.': '.$nodeId.', '.(int)$node->getDataChanged()."\n";
+			
 			$this->data['nodes'][$nodeId] = array(
 				'path' => $node->getFilePath(),
 			);
@@ -42,6 +44,8 @@ class Bucket extends YamlStorage{
 	}
 	
 	public function load(){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
 		if(parent::load()){
 			
 			if(array_key_exists('nodes', $this->data) && $this->data['nodes']){
