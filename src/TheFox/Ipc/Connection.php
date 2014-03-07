@@ -4,6 +4,7 @@ namespace TheFox\Ipc;
 
 use Exception;
 use OutOfBoundsException;
+use Closure;
 
 class Connection{
 	
