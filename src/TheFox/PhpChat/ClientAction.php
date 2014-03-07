@@ -14,7 +14,8 @@ class ClientAction{
 	
 	private $id = 0;
 	private $criteria = 0;
-	
+	private $objc = null;
+	private $func = null;
 	
 	public function __construct($criteria = 0){
 		$this->criteria = $criteria;
@@ -34,6 +35,22 @@ class ClientAction{
 	
 	public function hasCriterion($criterion){
 		return $this->getCriteria() & $criterion;
+	}
+	
+	public function functionSet($objc, $func = null){
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+		#ve($objc);
+		#ve($func);
+		
+		if($func === null){
+			#print __CLASS__.'->'.__FUNCTION__.': func is null'."\n";
+			$this->func = $objc;
+		}
+		else{
+			$this->objc = $objc;
+			$this->func = $func;
+		}
 	}
 	
 }
