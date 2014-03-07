@@ -9,10 +9,6 @@ class StreamSocket extends AbstractSocket{
 	private $ip = '';
 	private $port = 0;
 	
-	public function __construct(){
-		
-	}
-	
 	public function bind($ip, $port){
 		$this->ip = $ip;
 		$this->port = $port;
