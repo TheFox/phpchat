@@ -145,7 +145,7 @@ if(!file_exists($settings->data['node']['sslKeyPrvPath'])){
 				
 				if($decrypted == 'test my keys'){
 					$log->info('ssl: test keys ok');
-					file_put_contents($settings->data['node']['ssl_key_pub_path'], $keyPub);
+					file_put_contents($settings->data['node']['sslKeyPubPath'], $keyPub);
 				}
 				else{
 					$log->critical('ssl: test keys failed');
