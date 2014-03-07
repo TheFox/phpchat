@@ -81,4 +81,8 @@ class YamlStorage{
 		#print __CLASS__.'->'.__FUNCTION__.': '.(int)$this->dataChanged."\n";
 	}
 	
+	public function getDataChanged(){
+		return $this->dataChanged;
+	}
+	
 }
