@@ -24,7 +24,7 @@ class Bucket extends YamlStorage{
 	}
 	
 	public function save(){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		$this->data['nodes'] = array();
 		
