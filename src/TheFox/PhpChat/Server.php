@@ -172,7 +172,7 @@ class Server{
 		$this->socket->close();
 	}
 	
-	public function clientAdd(Client $client){
+	private function clientNew($socket){
 		$this->clientsId++;
 		
 		$client->setId($this->clientsId);
@@ -181,7 +181,7 @@ class Server{
 		$this->clients[$this->clientsId] = $client;
 	}
 	
-	public function clientGetByHandle($handle){
+	private function clientGetByHandle($handle){
 		foreach($this->clients as $clientId => $client){
 			if($client->getSocket()->getHandle() == $handle){
 				return $client;
@@ -191,7 +191,7 @@ class Server{
 		return null;
 	}
 	
-	public function clientRemove(Client $client){
+	private function clientRemove(Client $client){
 		$this->log->debug('client remove: '.$client->getId());
 		
 		$client->shutdown();
