@@ -250,7 +250,7 @@ class Client{
 			}
 		}
 		else{
-			$this->log('error', 'json_decode failed');
+			$this->log('error', 'json_decode failed: "'.$msgRaw.'"');
 		}
 		
 		#print __CLASS__.'->'.__FUNCTION__.': '.$this->getIp().':'.$this->getPort().' raw: '.$msgRaw."\n";
