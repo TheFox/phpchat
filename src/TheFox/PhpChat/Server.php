@@ -201,6 +201,27 @@ class Server{
 		unset($this->clients[$clientsId]);
 	}
 	
+	public function connect($ip, $port, $clientActions = array()){
+		$socket = new Socket();
+		
+		$connected = false;
+		try{
+			$connected = $socket->connect($ip, $port);
+		}
+		catch(Exception $e){
+			$this->log->debug('connection to '.$ip.', '.$port.' failed');
+		}
+		
+		if($connected){
+			$client = $this->clientNew($socket);
+			
+			foreach($clientActions as $clientAction){
+				$client->actionAdd($clientAction);
+			}
+			
+			ve($client);
+		}
+	}
 	
 	
 }
