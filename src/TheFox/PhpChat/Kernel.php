@@ -43,7 +43,7 @@ class Kernel extends Thread{
 		$this->table->setLocalNode($this->getLocalNode());
 		
 		#ve($this->server);
-		$this->shutdown();
+		#$this->shutdown();
 		
 	}
 	
@@ -83,6 +83,7 @@ class Kernel extends Thread{
 		$this->getLog()->info('shutdown');
 		
 		$this->getSettings()->data['firstRun'] = $this->getTable()->getNodesNum() > 0;
+		$this->getLog()->debug('getNodesNum: '.(int)$this->getTable()->getNodesNum().', '.(int)$this->getSettings()->data['firstRun']);
 		$this->getSettings()->setDataChanged(true);
 		
 		$this->getServer()->shutdown();

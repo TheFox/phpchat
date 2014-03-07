@@ -254,7 +254,7 @@ class Client{
 		}
 		
 		#print __CLASS__.'->'.__FUNCTION__.': '.$this->getIp().':'.$this->getPort().' raw: '.$msgRaw."\n";
-		print __CLASS__.'->'.__FUNCTION__.': '.$msgName."\n";
+		print __CLASS__.'->'.__FUNCTION__.': "'.$msgName.'"'."\n";
 		
 		if($msgName == 'nop'){}
 		elseif($msgName == 'hello'){

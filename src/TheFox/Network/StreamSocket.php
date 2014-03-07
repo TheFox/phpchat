@@ -85,7 +85,7 @@ class StreamSocket extends AbstractSocket{
 	}
 	
 	public function write($data){
-		$rv = stream_socket_sendto($this->getHandle(), $data);
+		$rv = @stream_socket_sendto($this->getHandle(), $data);
 		
 		#print __CLASS__.'->'.__FUNCTION__.': '.$rv.', "'.substr($data, 0, -1).'"'."\n";
 		return $rv;
