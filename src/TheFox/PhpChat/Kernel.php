@@ -82,8 +82,8 @@ class Kernel extends Thread{
 	public function shutdown(){
 		$this->getLog()->info('shutdown');
 		
-		$this->getSettings()->data['firstRun'] = $this->getTable()->getNodesNum() > 0;
 		$this->getLog()->debug('getNodesNum: '.(int)$this->getTable()->getNodesNum().', '.(int)$this->getSettings()->data['firstRun']);
+		$this->getSettings()->data['firstRun'] = $this->getTable()->getNodesNum() <= 0;
 		$this->getSettings()->setDataChanged(true);
 		
 		$this->getServer()->shutdown();
