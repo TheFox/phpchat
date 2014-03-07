@@ -26,6 +26,8 @@ class Client{
 	private $port = 0;
 	
 	private $recvBufferTmp = '';
+	private $requestsId = 0;
+	private $requests = array();
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -160,6 +162,34 @@ class Client{
 		}
 		
 		return null;
+	}
+	
+	private function requestAdd($name, $rid, $data = array()){
+		$this->requestsId++;
+		
+		$request = array(
+			'id' => $this->requestsId,
+			'name' => $name,
+			'rid' => $rid,
+			'data' => $data,
+		);
+		
+		$this->requests[$this->requestsId] = $request;
+		
+		return $request;
+	}
+	
+	private function requestGetByRid($rid){
+		foreach($this->requests as $requestId => $request){
+			if($request['rid'] == $rid){
+				return $request;
+			}
+		}
+		return null;
+	}
+	
+	private function requestRemove($request){
+		unset($this->requests[$request['id']]);
 	}
 	
 	public function dataRecv(){
