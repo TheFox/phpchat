@@ -219,6 +219,8 @@ class Server{
 				$client->actionAdd($clientAction);
 			}
 			
+			$client->sendHello();
+			
 			#ve($client);
 		}
 	}

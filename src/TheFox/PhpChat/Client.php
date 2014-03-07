@@ -357,6 +357,8 @@ class Client{
 						$this->setStatus('hasId', true);
 						$this->setNode($node);
 						
+						$this->sendIdOk();
+						
 						$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$id.', '.$port.', '.$node->getSslKeyPubFingerprint());
 					}
 					
@@ -370,6 +372,18 @@ class Client{
 			}
 		}
 		elseif($msgName == 'id_ok'){
+			$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName);
+			
+			if($this->getStatus('hasId')){
+				$actions = $this->actionsGetByCriterion(ClientAction::CRITERION_AFTER_ID_OK);
+				foreach($actions as $actionsId => $action){
+					$this->actionRemove($action);
+					ve($action);
+				}
+			}
+			else{
+				$this->sendError(100, $msgName);
+			}
 		}
 		elseif($msgName == 'ping'){
 			$id = '';
