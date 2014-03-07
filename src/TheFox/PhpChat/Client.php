@@ -615,7 +615,7 @@ class Client{
 		$this->dataSend($this->msgCreate('id_ok', $data));
 	}
 	
-	private function sendNodeFind($nodeId, $distance = 'ffffffff-ffff-4fff-bfff-ffffffffffff', $nodesFoundIds = array()){
+	public function sendNodeFind($nodeId, $distance = 'ffffffff-ffff-4fff-bfff-ffffffffffff', $nodesFoundIds = array()){
 		if(!$this->getTable()){
 			throw new RuntimeException('table not set.');
 		}
