@@ -239,13 +239,18 @@ class Client{
 		$msgRaw = base64_decode($msgRaw);
 		$msg = json_decode($msgRaw, true);
 		
-		$msgName = strtolower($msg['name']);
+		$msgName = '';
 		$msgData = array();
-		if(array_key_exists('data', $msg)){
-			$msgData = $msg['data'];
+		if($msg){
+			$msgName = strtolower($msg['name']);
+			if(array_key_exists('data', $msg)){
+				$msgData = $msg['data'];
+			}
 		}
-		
-		print __CLASS__.'->'.__FUNCTION__.': '.$msgRaw."\n";
+		else{
+			$this->log('error', 'json_decode failed');
+		}
+		#print __CLASS__.'->'.__FUNCTION__.': '.$this->getIp().':'.$this->getPort().' raw: '.$msgRaw."\n";
 		#print __CLASS__.'->'.__FUNCTION__.': '.$msgName."\n";
 		
 		if($msgName == 'nop'){}
@@ -403,6 +408,7 @@ class Client{
 	}
 	
 	private function dataSend($msg){
+		$msg = base64_encode($msg);
 		$this->getSocket()->write($msg.static::MSG_SEPARATOR);
 	}
 	
