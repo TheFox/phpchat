@@ -364,6 +364,8 @@ class Client{
 				$this->sendError(910, $msgName);
 			}
 		}
+		elseif($msgName == 'id_ok'){
+		}
 		elseif($msgName == 'ping'){
 			$id = '';
 			if(array_key_exists('id', $msgData)){
@@ -425,6 +427,12 @@ class Client{
 			'isChannel' => (bool)$isChannel,
 		);
 		$this->dataSend($this->msgCreate('id', $data));
+	}
+	
+	private function sendIdOk(){
+		$data = array(
+		);
+		$this->dataSend($this->msgCreate('id_ok', $data));
 	}
 	
 	private function sendPing($id = ''){
