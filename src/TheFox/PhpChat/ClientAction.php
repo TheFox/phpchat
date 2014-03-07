@@ -55,7 +55,7 @@ class ClientAction{
 	}
 	
 	public function functionExec(){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		#print __CLASS__.'->'.__FUNCTION__.': inst '.(int)($this->func instanceof Closure)."\n";
 		
 		$args = func_get_args();
