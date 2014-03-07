@@ -17,6 +17,7 @@ class Table extends YamlStorage{
 		parent::__construct($filePath);
 		
 		$this->data['bucketsId'] = 0;
+		$this->data['timeCreated'] = time();
 	}
 	
 	public function save(){
@@ -124,7 +125,7 @@ class Table extends YamlStorage{
 		}
 		
 		$rv = array_values($nodes);
-		return new StackableArray($rv);
+		return $rv;
 	}
 	
 	public function nodeFindInBuckets(Node $node){
@@ -151,7 +152,7 @@ class Table extends YamlStorage{
 		}
 		
 		$rv = array_values($nodes);
-		return new StackableArray($rv);
+		return $rv;
 	}
 	
 	public function nodeFindByKeyPubFingerprint($fingerprint){

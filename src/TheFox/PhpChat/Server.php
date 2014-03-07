@@ -186,8 +186,6 @@ class Server{
 		$client->setId($this->clientsId);
 		$client->setServer($this);
 		
-		
-		
 		if($this->getSettings()->data['firstRun'] && !$this->getHasDhtNetworkBootstrapped()){
 			$this->setHasDhtNetworkBootstrapped(true);
 			
