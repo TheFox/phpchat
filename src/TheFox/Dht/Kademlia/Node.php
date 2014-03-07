@@ -39,6 +39,7 @@ class Node extends YamlStorage{
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		if(parent::load()){
+			$this->setIdHexStr($this->data['id']);
 			$this->setSslKeyPub(base64_decode($this->data['sslKeyPub']));
 			unset($this->data['sslKeyPub']);
 			
@@ -86,15 +87,16 @@ class Node extends YamlStorage{
 	}
 	
 	public function setSslKeyPub($strKeyPub){
-		
 		$sslPubKey = openssl_pkey_get_public($strKeyPub);
-		$sslPubKeyDetails = openssl_pkey_get_details($sslPubKey);
-		
-		if($sslPubKeyDetails['bits'] >= static::SSL_KEY_LEN_MIN){
-			$this->sslKeyPub = $strKeyPub;
-			$this->setSslKeyPubFingerprint(static::genSslKeyFingerprint($strKeyPub));
+		if($sslPubKey !== false){
+			$sslPubKeyDetails = openssl_pkey_get_details($sslPubKey);
 			
-			return true;
+			if($sslPubKeyDetails['bits'] >= static::SSL_KEY_LEN_MIN){
+				$this->sslKeyPub = $strKeyPub;
+				$this->setSslKeyPubFingerprint(static::genSslKeyFingerprint($strKeyPub));
+				
+				return true;
+			}
 		}
 		
 		return false;

@@ -47,6 +47,7 @@ class Table extends YamlStorage{
 				foreach($this->data['buckets'] as $bucketId => $bucketAr){
 					$bucket = new Bucket($bucketAr['path']);
 					$bucket->setDatadirBasePath($this->getDatadirBasePath());
+					$bucket->setLocalNode($this->getLocalNode());
 					$bucket->load();
 					
 					$this->buckets[$bucketId] = $bucket;
@@ -183,9 +184,7 @@ class Table extends YamlStorage{
 					$onode->setIp($node->getIp());
 					$onode->setPort($node->getPort());
 					$onode->setTimeLastSeen($node->getTimeLastSeen());
-					$onode->setDataChanged();
-					
-					$onode->getBucket()->setDataChanged();
+					$onode->setDataChanged(true);
 				}
 				
 				$rv = $onode;
@@ -262,7 +261,7 @@ class Table extends YamlStorage{
 								#$ubucket->save();
 							}
 							
-							$this->setDataChanged();
+							$this->setDataChanged(true);
 						}
 						else{
 							$bucket->nodeAdd($node);
@@ -272,7 +271,8 @@ class Table extends YamlStorage{
 						
 					}
 					else{
-						$this->bucketNew();
+						$nbucket = $this->bucketNew();
+						$nbucket->nodeAdd($node);
 						
 						break;
 					}

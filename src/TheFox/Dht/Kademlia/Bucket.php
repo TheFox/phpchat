@@ -140,7 +140,10 @@ class Bucket extends YamlStorage{
 		$onode = $this->nodeFind($node);
 		if(!$onode){
 			#print __CLASS__.'->'.__FUNCTION__.': old node'."\n";
+			$node->setFilePath($this->getDatadirBasePath().'/node_'.$node->getIdHexStr().'.yml');
+			$node->setDatadirBasePath($this->getDatadirBasePath());
 			$node->setBucket($this);
+			$node->setDataChanged(true);
 			
 			$this->nodesId++;
 			$this->nodes[$this->nodesId] = $node;
@@ -157,8 +160,6 @@ class Bucket extends YamlStorage{
 	}
 	
 	public function nodesSort(){
-		$nodes = (array)$this->nodes;
-		
 		uasort($this->nodes, function($node_a, $node_b){
 			$dist_a = $this->getLocalNode()->distance($node_a);
 			$dist_b = $this->getLocalNode()->distance($node_b);
