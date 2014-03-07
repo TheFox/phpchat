@@ -24,6 +24,7 @@ class Server{
 	private $sslKeyPrvPass = null;
 	private $isListening = false;
 	private $socket = null;
+	private $hasDhtNetworkBootstrapped = false;
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -58,6 +59,14 @@ class Server{
 	public function setSslPrv($sslKeyPrvPath, $sslKeyPrvPass){
 		$this->sslKeyPrvPath = $sslKeyPrvPath;
 		$this->sslKeyPrvPass = $sslKeyPrvPass;
+	}
+	
+	private function setHasDhtNetworkBootstrapped($hasDhtNetworkBootstrapped){
+		$this->hasDhtNetworkBootstrapped = $hasDhtNetworkBootstrapped;
+	}
+	
+	private function getHasDhtNetworkBootstrapped(){
+		return $this->hasDhtNetworkBootstrapped;
 	}
 	
 	public function getSettings(){
@@ -176,6 +185,20 @@ class Server{
 		
 		$client->setId($this->clientsId);
 		$client->setServer($this);
+		
+		
+		
+		if($this->getSettings()->data['firstRun'] && !$this->getHasDhtNetworkBootstrapped()){
+			$this->setHasDhtNetworkBootstrapped(true);
+			
+			$this->log->debug('dht network bootstrap');
+			
+			$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_OK);
+			$action->functionSet(function($client){
+				$client->sendNodeFind($client->getLocalNode()->getIdHexStr());
+			});
+			$client->actionAdd($action);
+		}
 		
 		$this->clients[$this->clientsId] = $client;
 		
