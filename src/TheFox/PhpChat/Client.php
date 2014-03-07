@@ -202,6 +202,16 @@ class Client{
 		$this->actions[$this->actionsId] = $action;
 	}
 	
+	private function actionsGetByCriterion($criterion){
+		$rv = array();
+		foreach($this->actions as $actionsId => $action){
+			if($action->hasCriterion($criterion)){
+				$rv[] = $action;
+			}
+		}
+		return $rv;
+	}
+	
 	public function actionRemove(ClientAction $action){
 		unset($this->actions[$action->getId()]);
 	}
