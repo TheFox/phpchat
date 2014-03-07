@@ -238,8 +238,7 @@ class Client{
 	}
 	
 	private function msgHandle($msgRaw){
-		$msgRaw = base64_decode($msgRaw);
-		$msg = json_decode($msgRaw, true);
+		$msg = json_decode(base64_decode($msgRaw), true);
 		
 		$msgName = '';
 		$msgData = array();
