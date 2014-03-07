@@ -219,7 +219,7 @@ class Server{
 				$client->actionAdd($clientAction);
 			}
 			
-			ve($client);
+			#ve($client);
 		}
 	}
 	
