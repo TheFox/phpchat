@@ -133,7 +133,7 @@ class Server{
 					// Server
 					$socket = $this->socket->accept();
 					if($socket){
-						$this->clientNew($socket);
+						$client = $this->clientNew($socket);
 						
 						$client->sendHello();
 						
