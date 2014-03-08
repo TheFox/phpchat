@@ -33,6 +33,10 @@ class Kernel extends Thread{
 		$this->localNode->setPort($this->settings->data['node']['port']);
 		$this->localNode->setSslKeyPub(file_get_contents($this->settings->data['node']['sslKeyPubPath']));
 		
+		$this->table = new Table($this->settings->data['datadir'].'/table.yml');
+		$this->table->setDatadirBasePath($this->settings->data['datadir']);
+		$this->table->setLocalNode($this->getLocalNode());
+		
 		$this->server = new Server();
 		$this->server->setKernel($this);
 		$this->server->setIp($this->settings->data['node']['ip']);
@@ -44,9 +48,6 @@ class Kernel extends Thread{
 		}
 		
 		
-		$this->table = new Table($this->settings->data['datadir'].'/table.yml');
-		$this->table->setDatadirBasePath($this->settings->data['datadir']);
-		$this->table->setLocalNode($this->getLocalNode());
 		
 		#ve($this->server);
 		#$this->shutdown();
