@@ -20,6 +20,8 @@ class Kernel extends Thread{
 	private $table;
 	
 	public function __construct(){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
 		$this->log = new Logger('kernel');
 		$this->log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::ERROR));
 		$this->log->pushHandler(new LoggerStreamHandler('log/kernel.log', Logger::DEBUG));
@@ -68,8 +70,10 @@ class Kernel extends Thread{
 	}
 	
 	public function run(){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
 		while(!$this->getExit()){
-			#print __CLASS__.'->'.__FUNCTION__.''."\n";
+			#print __CLASS__.'->'.__FUNCTION__.': '.$this->getExit()."\n";
 			
 			$this->server->run();
 			
@@ -80,6 +84,8 @@ class Kernel extends Thread{
 	}
 	
 	public function shutdown(){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
 		$this->getLog()->info('shutdown');
 		
 		$this->getLog()->debug('getNodesNum: '.(int)$this->getTable()->getNodesNum().', '.(int)$this->getSettings()->data['firstRun']);

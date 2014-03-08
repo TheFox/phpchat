@@ -39,7 +39,7 @@ class ClientAction{
 	}
 	
 	public function functionSet($objc, $func = null){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		#ve($objc);
 		#ve($func);

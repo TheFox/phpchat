@@ -118,6 +118,8 @@ class Server{
 			}
 			
 		}
+		
+		$this->log->notice('listen failed');
 	}
 	
 	public function run(){
@@ -134,7 +136,7 @@ class Server{
 		$readHandlesNum = count($readHandles);
 		
 		$handlesChanged = $this->socket->select($readHandles, $writeHandles, $exceptHandles);
-		#$this->log->debug('collect readable sockets: '.$handlesChanged.'/'.$readHandlesNum);
+		#$this->log->debug('collect readable sockets: '.(int)$handlesChanged.'/'.$readHandlesNum);
 		
 		if($handlesChanged){
 			foreach($readHandles as $readableHandle){
