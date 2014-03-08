@@ -13,12 +13,12 @@ class Thread{
 		
 	}
 	
-	public function setExit($exit){
+	public function setExit($exit = 1){
 		$this->exit = $exit;
 	}
 	
 	public function getExit(){
-		return $this->exit;
+		return (int)$this->exit;
 	}
 	
 }
