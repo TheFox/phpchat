@@ -32,6 +32,9 @@ class Client{
 	private $requests = array();
 	private $actionsId = 0;
 	private $actions = array();
+	private $sslTestToken = '';
+	private $sslPasswordLocal = '';
+	private $sslPasswordPeer = '';
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -40,6 +43,11 @@ class Client{
 		$this->status['isChannel'] = false;
 		
 		$this->status['hasId'] = false;
+		$this->status['hasSslInit'] = false;
+		$this->status['hasSendSslInit'] = false;
+		$this->status['hasSslInitOk'] = false;
+		$this->status['hasSslTest'] = false;
+		$this->status['hasSslVerify'] = false;
 	}
 	
 	public function __destruct(){
@@ -546,6 +554,283 @@ class Client{
 				$this->sendError(100, $msgName);
 			}
 		}
+		
+		elseif($msgName == 'ssl_init'){
+			if($this->getStatus('hasId')){
+				if(!$this->getStatus('hasSslInit')){
+					$this->setStatus('hasSslInit', true);
+					
+					$this->sendSslInit();
+					
+					#$this->setStatus('hasSslInitOk', true);
+					$this->sendSslInitOk();
+				}
+			}
+			else{
+				$this->sendError(100, $msgName);
+			}
+		}
+		elseif($msgName == 'ssl_init_ok'){
+			if($this->getStatus('hasSslInit') && !$this->getStatus('hasSslInitOk')){
+				$this->setStatus('hasSslInitOk', true);
+				#$this->setStatus('hasSslInit', true);
+				#print __CLASS__.'->'.__FUNCTION__.': "'.$msgName.'", '.(int)$this->getStatus('hasSslInit').', '.(int)$this->getStatus('hasSslInitOk')."\n";
+				
+				$this->sslTestToken = (string)Uuid::uuid4();
+				$this->sendSslTest($this->sslTestToken);
+			}
+			else{
+				$this->sendError(250, $msgName);
+				$this->log('warning', $msgName.' SSL: you already initialized ssl');
+			}
+		}
+		elseif($msgName == 'ssl_test'){
+			print __CLASS__.'->'.__FUNCTION__.': "'.$msgName.'", '.(int)$this->getStatus('hasSslInitOk').', '.(int)$this->getStatus('hasSslTest').''."\n";
+			
+			if($this->getStatus('hasSslInitOk') && !$this->getStatus('hasSslTest')){
+				$token = '';
+				if(array_key_exists('token', $msgData)){
+					$token = $msgData['token'];
+				}
+				
+				if($token){
+					$this->setStatus('hasSslTest', true);
+					$this->sendSslVerify($token);
+				}
+				else{
+					$this->sendError(900, $msgName);
+				}
+			}
+			else{
+				$this->sendError(260, $msgName);
+				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
+			}
+		}
+		elseif($msgName == 'ssl_verify'){
+			if($this->getStatus('hasSslTest') && !$this->getStatus('hasSslVerify')){
+				$token = '';
+				if(array_key_exists('token', $msgData)){
+					$token = $msgData['token'];
+				}
+				
+				if($token && $this->sslTestToken && $token == $this->sslTestToken){
+					$this->setStatus('hasSslVerify', true);
+				}
+				else{
+					$this->sendError(900, $msgName);
+				}
+			}
+			else{
+				$this->sendError(260, $msgName);
+				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
+			}
+		}
+		/*elseif(substr($line, 0, 17) == 'SSL_PASSWORD_PUT '){
+			if($this->getHasSslVerified() && !$this->getSslPasswordNode()){
+				$data = substr($line, 17);
+				
+				$data = $this->sslPrivateDecrypt($data);
+				if($data){
+					$this->log('debug', 'socket rcev '.$this->getIp().':'.$this->getPort().' SSL_PASSWORD_PUT: '.$data);
+					
+					$this->setSslPasswordNode($data);
+					$this->sendSslPasswordTest();
+				}
+				else{
+					#$this->log('warning', 'SSL_PASSWORD_PUT sslPrivateDecrypt failed');
+					
+					if($this->getIsChannel()){ $this->consoleMsgSslFailed(); }
+				}
+			}
+			else{
+				#$this->log('warning', 'ssl password put: failed');
+				
+				if($this->getIsChannel()){ $this->consoleMsgSslFailed(); }
+			}
+		}
+		elseif(substr($line, 0, 18) == 'SSL_PASSWORD_TEST '){
+			if($this->getSslPasswordNode() && !$this->getHasSslPasswordTest()){
+				$data = substr($line, 18);
+				
+				$data = $this->sslPasswordDecrypt($data);
+				if($data){
+					$token = $data;
+					
+					$this->log('debug', 'socket rcev '.$this->getIp().':'.$this->getPort().' SSL_PASSWORD_TEST: '.$token);
+					
+					$this->setHasSslPasswordTest(true);
+					$this->sendSslPasswordVerify($token);
+				}
+				else{
+					#$this->log('warning', 'SSL_PASSWORD_TEST sslPasswordDecrypt failed');
+					
+					if($this->getIsChannel()){ $this->consoleMsgSslFailed(); }
+				}
+			}
+			else{
+				#$this->log('warning', 'ssl password test: failed');
+				
+				if($this->getIsChannel()){ $this->consoleMsgSslFailed(); }
+			}
+		}
+		elseif(substr($line, 0, 20) == 'SSL_PASSWORD_VERIFY '){
+			if($this->getHasSslPasswordTest() && !$this->getHasSsl()){
+				$data = substr($line, 20);
+				
+				$data = $this->sslPasswordDecrypt($data);
+				if($data){
+					$token = $data;
+					
+					$this->log('debug', 'socket rcev '.$this->getIp().':'.$this->getPort().' SSL_PASSWORD_TEST: '.$token);
+					
+					if($this->sslPasswordVerifyToken($token)){
+						$this->setHasSsl(true);
+						
+						if($this->getIsChannel()){ $this->consoleMsgSslOk($this->getNode()->getIdHexStr()); }
+					}
+					else{
+						if($this->getIsChannel()){ $this->consoleMsgSslFailed(); }
+					}
+				}
+				else{
+					$this->log('warning', 'SSL_PASSWORD_TEST sslPasswordDecrypt failed');
+					
+					if($this->getIsChannel()){ $this->consoleMsgSslFailed(); }
+				}
+			}
+			else{
+				$this->log('warning', 'ssl password verify: failed');
+				
+				if($this->getIsChannel()){ $this->consoleMsgSslFailed(); }
+			}
+		}
+		elseif(substr($line, 0, 16) == 'SSL_KEY_PUB_GET '){
+			if($this->getHasId()){
+				$data = substr($line, 16);
+				
+				$json = json_decode($data, true);
+				#ve($json);
+				
+				#print "check ".(int)$json.' '.(int)isset($json['rid']).' '.(int)isset($json['nodeSslKeyPubFingerprint'])."\n";
+				
+				if( $json && isset($json['rid']) && isset($json['nodeSslKeyPubFingerprint'])
+					&& strIsUuid($json['rid']) ){
+					
+					$this->log('debug', 'socket rcev '.$this->getIp().':'.$this->getPort().' SSL_KEY_PUB_GET: '.$json['rid'].', '.$json['nodeSslKeyPubFingerprint']);
+					
+					if(Node::sslKeyPubFingerprintVerify($json['nodeSslKeyPubFingerprint'])){
+						$node = $this->settings['tmp']['table']->nodeFindByKeyPubFingerprint($json['nodeSslKeyPubFingerprint']);
+						if(is_object($node)){
+							$this->sendSslPubKeyPut($json['rid'], $node->getIdHexStr(), $node->getIp(), $node->getPort(), $node->getSslKeyPubFingerprint(), $node->getSslKeyPub());
+						}
+						else{
+							// Not found.
+							$this->sendSslPubKeyPut($json['rid']);
+						}
+					}
+					else{
+						// Fingerprint not valid.
+						$this->sendSslPubKeyPut($json['rid']);
+					}
+				}
+				else{
+					$this->sendError(900, 'SSL_KEY_PUB_GET');
+				}
+			}
+			else{
+				$this->log('warning', 'ssl key pub get: failed');
+			}
+		}
+		elseif(substr($line, 0, 16) == 'SSL_KEY_PUB_PUT '){
+			if($this->getHasId()){
+				$data = substr($line, 16);
+				
+				$json = json_decode($data, true);
+				if( $json && isset($json['rid']) && strIsUuid($json['rid']) ){
+					
+					$this->log('debug', 'socket rcev '.$this->getIp().':'.$this->getPort().' SSL_KEY_PUB_PUT: '.$json['rid']);
+					
+					$action = $this->actionSslKeyPublicGetFindByRid($json['rid']);
+					if($action){
+						
+						$nodeSslKeyPub = '';
+						$nodeSslKeyPubFingerprint = '';
+						if(isset($json['nodeSslKeyPub']) && $json['nodeSslKeyPub']){
+							$nodeSslKeyPub = base64_decode($json['nodeSslKeyPub']);
+							$nodeSslKeyPubFingerprint = Node::genSslKeyFingerprint($nodeSslKeyPub);
+							
+							$this->log('debug', 'socket      '.$this->getIp().':'.$this->getPort().' SSL_KEY_PUB_PUT: '.$json['rid'].', '.$nodeSslKeyPubFingerprint);
+						}
+						
+						$node = new Node();
+						if(isset($json['nodeId'])){
+							$node->setIdHexStr($json['nodeId']);
+						}
+						if(isset($json['nodeIp'])){
+							$node->setIp($json['nodeIp']);
+						}
+						if(isset($json['nodePort'])){
+							$node->setPort($json['nodePort']);
+						}
+						$node->setTimeLastSeen(time());
+						
+						if($nodeSslKeyPub){
+							if(
+								isset($json['nodeSslKeyPubFingerprint'])
+								&&    $json['nodeSslKeyPubFingerprint']
+								&&    $json['nodeSslKeyPubFingerprint'] == $nodeSslKeyPubFingerprint
+								&&  $action['nodeSslKeyPubFingerprint'] == $nodeSslKeyPubFingerprint
+							){
+								$node->setSslKeyPub($nodeSslKeyPub);
+								
+								$this->log('debug', 'socket      '.$this->getIp().':'.$this->getPort().' SSL_KEY_PUB_PUT: '.$json['rid'].', set ssl key pub');
+							}
+						}
+						elseif(
+							isset($json['nodeSslKeyPubFingerprint'])
+							&&    $json['nodeSslKeyPubFingerprint']
+							&&    $json['nodeSslKeyPubFingerprint'] == $action['nodeSslKeyPubFingerprint']
+							&& Node::sslKeyPubFingerprintVerify($json['nodeSslKeyPubFingerprint'])
+						){
+							$node->setSslKeyPubFingerprint($json['nodeSslKeyPubFingerprint']);
+							
+							$this->log('debug', 'socket      '.$this->getIp().':'.$this->getPort().' SSL_KEY_PUB_PUT: '.$json['rid'].', set ssl key pub fingerprint');
+						}
+						
+						$onode = $this->settings['tmp']['table']->nodeFindInBuckets($node);
+						if(is_object($onode)){
+							$this->log('debug', 'socket      '.$this->getIp().':'.$this->getPort().' SSL_KEY_PUB_PUT: found old node');
+							
+							if(!$onode->getSslKeyPub() && $node->getSslKeyPub()){
+								$onode->setSslKeyPub($node->getSslKeyPub());
+								$onode->setDataChanged();
+							}
+							if(!$onode->getSslKeyPubFingerprint() && $node->getSslKeyPubFingerprint()){
+								$onode->setSslKeyPubFingerprint($node->getSslKeyPubFingerprint());
+								$onode->setDataChanged();
+							}
+						}
+						else{
+							$this->log('debug', 'socket      '.$this->getIp().':'.$this->getPort().' SSL_KEY_PUB_PUT: new node');
+							
+							$this->settings['tmp']['table']->nodeEnclose($node);
+						}
+						
+						$this->actionRemove($action);
+					}
+					else{
+						$this->log('debug', 'socket      '.$this->getIp().':'.$this->getPort().' SSL_KEY_PUB_PUT: action not found');
+					}
+				}
+				else{
+					$this->sendError(900, 'SSL_KEY_PUB_PUT');
+				}
+			}
+			else{
+				$this->log('warning', 'ssl key pub put: failed');
+			}
+		}*/
+		
 		elseif($msgName == 'ping'){
 			$id = '';
 			if(array_key_exists('id', $msgData)){
@@ -587,6 +872,103 @@ class Client{
 	private function dataSend($msg){
 		$msg = base64_encode($msg);
 		$this->getSocket()->write($msg.static::MSG_SEPARATOR);
+	}
+	
+	public function sslPublicEncrypt($data){
+		$rv = '';
+		/*
+		if(openssl_sign($data, $sign, $this->getSsl(), OPENSSL_ALGO_SHA1)){
+			$sign = base64_encode($sign);
+			
+			if(openssl_public_encrypt($data, $cryped, $this->getNode()->getSslKeyPub())){
+				$data = base64_encode($cryped);
+				
+				$jsonStr = json_encode(array('data' => $data, 'sign' => $sign));
+				$gzdata = gzencode($jsonStr, 9);
+				
+				$rv = base64_encode($gzdata);
+			}
+		}
+		*/
+		return $rv;
+	}
+	
+	public function sslPrivateDecrypt($data){
+		$rv = '';
+		/*
+		$data = base64_decode($data);
+		$data = gzdecode($data);
+		$json = json_decode($data, true);
+		
+		$data = base64_decode($json['data']);
+		$sign = base64_decode($json['sign']);
+		
+		if(openssl_private_decrypt($data, $decrypted, $this->getSsl())){
+			if(openssl_verify($decrypted, $sign, $this->getNode()->getSslKeyPub(), OPENSSL_ALGO_SHA1)){
+				$rv = $decrypted;
+			}
+		}
+		*/
+		return $rv;
+	}
+	
+	public function sslPasswordEncrypt($data){
+		$rv = '';
+		/*
+		if($this->getSslPassword() && $this->getSslPasswordNode()){
+			$password = $this->getSslPassword().'_'.$this->getSslPasswordNode();
+			
+			if(openssl_sign($data, $sign, $this->getSsl(), OPENSSL_ALGO_SHA1)){
+				$sign = base64_encode($sign);
+				$data = base64_encode($data);
+				
+				$jsonStr = json_encode(array('data' => $data, 'sign' => $sign));
+				$data = gzencode($jsonStr, 9);
+				
+				$iv = substr(hash('sha512', mt_rand(0, 999999), true), 0, 16);
+				$data = openssl_encrypt($data, 'AES-256-CBC', $password, 0, $iv);
+				if($data !== false){
+					$iv = base64_encode($iv);
+					
+					$data = gzencode( json_encode(array('data' => $data, 'iv' => $iv)) , 9);
+					$rv = base64_encode($data);
+				}
+			}
+		}
+		*/
+		return $rv;
+	}
+	
+	public function sslPasswordDecrypt($data){
+		$rv = '';
+		/*
+		if($this->getSslPassword() && $this->getSslPasswordNode()){
+			$password = $this->getSslPasswordNode().'_'.$this->getSslPassword();
+			#$this->log('debug', 'password: '.$password);
+			
+			$data = base64_decode($data);
+			$json = json_decode(gzdecode($data), true);
+			
+			$data = $json['data'];
+			$iv = base64_decode($json['iv']);
+			
+			$data = openssl_decrypt($data, 'AES-256-CBC', $password, 0, $iv);
+			if($data !== false){
+				$json = json_decode(gzdecode($data), true);
+				
+				$data = base64_decode($json['data']);
+				$sign = base64_decode($json['sign']);
+				
+				if(openssl_verify($data, $sign, $this->getNode()->getSslKeyPub(), OPENSSL_ALGO_SHA1)){
+					$rv = $data;
+				}
+				else{ $this->log('warning', 'sslPasswordDecrypt openssl_verify failed'); }
+			}
+			else{ $this->log('warning', 'sslPasswordDecrypt openssl_decrypt failed'); }
+		}
+		else{ $this->log('warning', 'sslPasswordDecrypt no passwords set'); }
+		*/
+		return $rv;
 	}
 	
 	public function sendHello(){
@@ -661,6 +1043,70 @@ class Client{
 		$this->dataSend($this->msgCreate('node_found', $data));
 	}
 	
+	public function sendSslInit($x = ''){
+		if(!$this->ssl){
+			throw new RuntimeException('ssl not set.');
+		}
+		
+		if($this->getStatus('hasSendSslInit')){
+			print __CLASS__.'->'.__FUNCTION__.': set hasSslInit to true'."\n";
+			
+			$this->setStatus('hasSslInit', true);
+		}
+		else{
+			print __CLASS__.'->'.__FUNCTION__.': send ssl_init'."\n";
+			$this->setStatus('hasSendSslInit', true);
+			#$this->setStatus('hasSslInit', true);
+			
+			$data = array(
+				'x' => $x,
+			);
+			$this->dataSend($this->msgCreate('ssl_init', $data));
+		}
+		
+		/*
+		$this->setStatus('hasSslInit', true);
+		
+		print __CLASS__.'->'.__FUNCTION__.': send ssl_init'."\n";
+		$data = array(
+			'x' => $x,
+		);
+		$this->dataSend($this->msgCreate('ssl_init', $data));
+		*/
+	}
+	
+	public function sendSslInitOk(){
+		if(!$this->ssl){
+			throw new RuntimeException('ssl not set.');
+		}
+		
+		$data = array(
+		);
+		$this->dataSend($this->msgCreate('ssl_init_ok', $data));
+	}
+	
+	public function sendSslTest($token){
+		if(!$this->ssl){
+			throw new RuntimeException('ssl not set.');
+		}
+		
+		$data = array(
+			'token' => $token,
+		);
+		$this->dataSend($this->msgCreate('ssl_test', $data));
+	}
+	
+	public function sendSslVerify($token){
+		if(!$this->ssl){
+			throw new RuntimeException('ssl not set.');
+		}
+		
+		$data = array(
+			'token' => $token,
+		);
+		$this->dataSend($this->msgCreate('ssl_verify', $data));
+	}
+	
 	private function sendPing($id = ''){
 		$data = array(
 			'id' => $id,
@@ -688,6 +1134,8 @@ class Client{
 			220 => 'SSL: public key too short',
 			230 => 'SSL: public key changed since last handshake',
 			240 => 'SSL: invalid key',
+			250 => 'SSL: you already initialized ssl',
+			260 => 'SSL: you need to initialize ssl',
 			
 			// 900-999: Misc
 			900 => 'Invalid data',
