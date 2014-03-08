@@ -573,6 +573,8 @@ class Client{
 	}
 	
 	private function msgCreate($name, $data){
+		print __CLASS__.'->'.__FUNCTION__.': "'.$name.'"'."\n";
+		
 		$json = array(
 			'name' => $name,
 			'data' => $data,
