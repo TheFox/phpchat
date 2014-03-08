@@ -50,7 +50,7 @@ class StreamSocket extends AbstractSocket{
 	}
 	
 	public function select(&$readHandles, &$writeHandles, &$exceptHandles){
-		return stream_select($readHandles, $writeHandles, $exceptHandles, 0);
+		return @stream_select($readHandles, $writeHandles, $exceptHandles, 0);
 	}
 	
 	public function getPeerName(&$ip, &$port){

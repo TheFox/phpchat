@@ -38,7 +38,11 @@ class Kernel extends Thread{
 		$this->server->setIp($this->settings->data['node']['ip']);
 		$this->server->setPort($this->settings->data['node']['port']);
 		$this->server->setSslPrv($this->settings->data['node']['sslKeyPrvPath'], $this->settings->data['node']['sslKeyPrvPass']);
-		$this->server->init();
+		if(!$this->server->init()){
+			#print __CLASS__.'->'.__FUNCTION__.': failed'."\n";
+			$this->setExit(1);
+		}
+		
 		
 		$this->table = new Table($this->settings->data['datadir'].'/table.yml');
 		$this->table->setDatadirBasePath($this->settings->data['datadir']);

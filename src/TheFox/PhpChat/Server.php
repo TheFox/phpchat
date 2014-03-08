@@ -110,6 +110,8 @@ class Server{
 					if($this->socket->listen()){
 						$this->log->notice('listen ok');
 						$this->isListening = true;
+						
+						return true;
 					}
 				}
 				catch(Exception $e){
@@ -120,6 +122,7 @@ class Server{
 		}
 		
 		$this->log->notice('listen failed');
+		return false;
 	}
 	
 	public function run(){
