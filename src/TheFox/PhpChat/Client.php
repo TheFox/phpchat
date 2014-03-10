@@ -588,7 +588,6 @@ class Client{
 				$this->sendError(100, $msgName);
 			}
 		}
-		
 		elseif($msgName == 'ssl_init'){
 			if($this->getSsl()){
 				if($this->getStatus('hasId')){
@@ -774,133 +773,128 @@ class Client{
 				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
 			}
 		}
-		/*
-		elseif(substr($line, 0, 16) == 'SSL_KEY_PUB_GET '){
-			if($this->getHasId()){
-				$data = substr($line, 16);
+		elseif($msgName == 'ssl_key_pub_get'){
+			if($this->getStatus('hasId')){
+				$rid = '';
+				$nodeSslKeyPubFingerprint = '';
+				if(array_key_exists('rid', $msgData)){
+					$rid = $msgData['rid'];
+				}
+				if(array_key_exists('nodeSslKeyPubFingerprint', $msgData)){
+					$nodeSslKeyPubFingerprint = $msgData['nodeSslKeyPubFingerprint'];
+				}
 				
-				$json = json_decode($data, true);
-				#ve($json);
+				$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$rid);
 				
-				#print "check ".(int)$json.' '.(int)isset($json['rid']).' '.(int)isset($json['nodeSslKeyPubFingerprint'])."\n";
-				
-				if( $json && isset($json['rid']) && isset($json['nodeSslKeyPubFingerprint'])
-					&& strIsUuid($json['rid']) ){
+				if(Node::sslKeyPubFingerprintVerify($nodeSslKeyPubFingerprint)){
+					$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': pub key fp ok');
 					
-					$this->log('debug', 'socket rcev '.$this->getIp().':'.$this->getPort().' SSL_KEY_PUB_GET: '.$json['rid'].', '.$json['nodeSslKeyPubFingerprint']);
-					
-					if(Node::sslKeyPubFingerprintVerify($json['nodeSslKeyPubFingerprint'])){
-						$node = $this->settings['tmp']['table']->nodeFindByKeyPubFingerprint($json['nodeSslKeyPubFingerprint']);
-						if(is_object($node)){
-							$this->sendSslPubKeyPut($json['rid'], $node->getIdHexStr(), $node->getIp(), $node->getPort(), $node->getSslKeyPubFingerprint(), $node->getSslKeyPub());
-						}
-						else{
-							// Not found.
-							$this->sendSslPubKeyPut($json['rid']);
-						}
+					$node = $this->getTable()->nodeFindByKeyPubFingerprint($nodeSslKeyPubFingerprint);
+					if($node){
+						$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': found node');
+						
+						$this->sendSslKeyPubPut($rid, $node->getIdHexStr(), $node->getIp(), $node->getPort(), $node->getSslKeyPubFingerprint(), $node->getSslKeyPub());
 					}
 					else{
-						// Fingerprint not valid.
-						$this->sendSslPubKeyPut($json['rid']);
+						// Not found.
+						$this->sendSslKeyPubPut($rid);
+						
+						$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': node not found A');
 					}
 				}
 				else{
-					$this->sendError(900, 'SSL_KEY_PUB_GET');
+					// Fingerprint not valid.
+					$this->sendSslKeyPubPut($rid);
+					
+					$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': node not found B');
 				}
 			}
 			else{
-				$this->log('warning', 'ssl key pub get: failed');
+				$this->sendError(100, $msgName);
 			}
 		}
-		elseif(substr($line, 0, 16) == 'SSL_KEY_PUB_PUT '){
-			if($this->getHasId()){
-				$data = substr($line, 16);
+		elseif($msgName == 'ssl_key_pub_put'){
+			if($this->getStatus('hasId')){
+				$rid = '';
+				$nodeId = '';
+				$nodeIp = '';
+				$nodePort = '';
+				$nodeSslKeyPubFingerprint = '';
+				#$nodeSslKeyPubFingerprintByKeyPub = '';
+				$nodeSslKeyPub = '';
+				if(array_key_exists('rid', $msgData)){
+					$rid = $msgData['rid'];
+				}
+				if(array_key_exists('nodeId', $msgData)){
+					$nodeId = $msgData['nodeId'];
+				}
+				if(array_key_exists('nodeIp', $msgData)){
+					$nodeIp = $msgData['nodeIp'];
+				}
+				if(array_key_exists('nodePort', $msgData)){
+					$nodePort = $msgData['nodePort'];
+				}
+				if(array_key_exists('nodeSslKeyPubFingerprint', $msgData)){
+					$nodeSslKeyPubFingerprint = $msgData['nodeSslKeyPubFingerprint'];
+				}
+				if(array_key_exists('nodeSslKeyPub', $msgData)){
+					$nodeSslKeyPub = base64_decode($msgData['nodeSslKeyPub']);
+					#$nodeSslKeyPubFingerprintByKeyPub = Node::genSslKeyFingerprint($nodeSslKeyPub);
+				}
 				
-				$json = json_decode($data, true);
-				if( $json && isset($json['rid']) && strIsUuid($json['rid']) ){
+				$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': "'.$rid.'" "'.$nodeId.'" "'.$nodeIp.'" "'.$nodePort.'" "'.$nodeSslKeyPubFingerprint.'"');
+				
+				$request = $this->requestGetByRid($rid);
+				if($request){
+					$this->requestRemove($request);
+					$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': request '.$request['id']);
 					
-					$this->log('debug', 'socket rcev '.$this->getIp().':'.$this->getPort().' SSL_KEY_PUB_PUT: '.$json['rid']);
-					
-					$action = $this->actionSslKeyPublicGetFindByRid($json['rid']);
-					if($action){
-						
-						$nodeSslKeyPub = '';
-						$nodeSslKeyPubFingerprint = '';
-						if(isset($json['nodeSslKeyPub']) && $json['nodeSslKeyPub']){
-							$nodeSslKeyPub = base64_decode($json['nodeSslKeyPub']);
-							$nodeSslKeyPubFingerprint = Node::genSslKeyFingerprint($nodeSslKeyPub);
-							
-							$this->log('debug', 'socket      '.$this->getIp().':'.$this->getPort().' SSL_KEY_PUB_PUT: '.$json['rid'].', '.$nodeSslKeyPubFingerprint);
-						}
-						
+					if($nodeId){
 						$node = new Node();
-						if(isset($json['nodeId'])){
-							$node->setIdHexStr($json['nodeId']);
-						}
-						if(isset($json['nodeIp'])){
-							$node->setIp($json['nodeIp']);
-						}
-						if(isset($json['nodePort'])){
-							$node->setPort($json['nodePort']);
-						}
+						$node->setIdHexStr($nodeId);
+						$node->setIp($nodeIp);
+						$node->setPort($nodePort);
+						$node->setSslKeyPub($nodeSslKeyPub);
 						$node->setTimeLastSeen(time());
+						$node->setDataChanged(true);
 						
-						if($nodeSslKeyPub){
-							if(
-								isset($json['nodeSslKeyPubFingerprint'])
-								&&    $json['nodeSslKeyPubFingerprint']
-								&&    $json['nodeSslKeyPubFingerprint'] == $nodeSslKeyPubFingerprint
-								&&  $action['nodeSslKeyPubFingerprint'] == $nodeSslKeyPubFingerprint
-							){
-								$node->setSslKeyPub($nodeSslKeyPub);
-								
-								$this->log('debug', 'socket      '.$this->getIp().':'.$this->getPort().' SSL_KEY_PUB_PUT: '.$json['rid'].', set ssl key pub');
-							}
-						}
-						elseif(
-							isset($json['nodeSslKeyPubFingerprint'])
-							&&    $json['nodeSslKeyPubFingerprint']
-							&&    $json['nodeSslKeyPubFingerprint'] == $action['nodeSslKeyPubFingerprint']
-							&& Node::sslKeyPubFingerprintVerify($json['nodeSslKeyPubFingerprint'])
+						if(
+							$nodeSslKeyPubFingerprint
+							&& $nodeSslKeyPub
+							&& Node::sslKeyPubFingerprintVerify($nodeSslKeyPubFingerprint)
+							&& $request['data']['nodeSslKeyPubFingerprint'] == $nodeSslKeyPubFingerprint
+							&& $node->getSslKeyPubFingerprint() == $nodeSslKeyPubFingerprint
 						){
-							$node->setSslKeyPubFingerprint($json['nodeSslKeyPubFingerprint']);
 							
-							$this->log('debug', 'socket      '.$this->getIp().':'.$this->getPort().' SSL_KEY_PUB_PUT: '.$json['rid'].', set ssl key pub fingerprint');
-						}
-						
-						$onode = $this->settings['tmp']['table']->nodeFindInBuckets($node);
-						if(is_object($onode)){
-							$this->log('debug', 'socket      '.$this->getIp().':'.$this->getPort().' SSL_KEY_PUB_PUT: found old node');
+							$onode = $this->getTable()->nodeFindInBuckets($node);
+							if($onode){
+								$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$rid.', old node');
+								
+								if(!$onode->getSslKeyPub() && $node->getSslKeyPub()){
+									$onode->setSslKeyPub($node->getSslKeyPub());
+									$onode->setDataChanged(true);
+								}
+							}
+							else{
+								$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$rid.', new node');
+								
+								$this->getTable()->nodeEnclose($node);
+							}
 							
-							if(!$onode->getSslKeyPub() && $node->getSslKeyPub()){
-								$onode->setSslKeyPub($node->getSslKeyPub());
-								$onode->setDataChanged();
-							}
-							if(!$onode->getSslKeyPubFingerprint() && $node->getSslKeyPubFingerprint()){
-								$onode->setSslKeyPubFingerprint($node->getSslKeyPubFingerprint());
-								$onode->setDataChanged();
-							}
 						}
 						else{
-							$this->log('debug', 'socket      '.$this->getIp().':'.$this->getPort().' SSL_KEY_PUB_PUT: new node');
-							
-							$this->settings['tmp']['table']->nodeEnclose($node);
+							$this->sendError(900, $msgName);
 						}
-						
-						$this->actionRemove($action);
-					}
-					else{
-						$this->log('debug', 'socket      '.$this->getIp().':'.$this->getPort().' SSL_KEY_PUB_PUT: action not found');
 					}
 				}
 				else{
-					$this->sendError(900, 'SSL_KEY_PUB_PUT');
+					$this->sendError(900, $msgName);
 				}
 			}
 			else{
-				$this->log('warning', 'ssl key pub put: failed');
+				$this->sendError(100, $msgName);
 			}
-		}*/
+		}
 		
 		elseif($msgName == 'ping'){
 			$id = '';
@@ -1289,6 +1283,35 @@ class Client{
 			'token' => $token,
 		);
 		$this->dataSend($this->sslMsgCreatePasswordEncrypt('ssl_password_verify', $data));
+	}
+	
+	public function sendSslKeyPubGet($nodeSslKeyPubFingerprint){
+		$rid = (string)Uuid::uuid4();
+		
+		print __CLASS__.'->'.__FUNCTION__.': '.$rid.', '.$nodeSslKeyPubFingerprint."\n";
+		
+		$this->requestAdd('ssl_key_pub_get', $rid, array(
+			'nodeSslKeyPubFingerprint' => $nodeSslKeyPubFingerprint,
+		));
+		
+		$data = array(
+			'rid' => $rid,
+			'nodeSslKeyPubFingerprint' => $nodeSslKeyPubFingerprint,
+		);
+		$this->dataSend($this->msgCreate('ssl_key_pub_get', $data));
+	}
+	
+	private function sendSslKeyPubPut($rid, $nodeId = null, $nodeIp = null, $nodePort = null, $nodeSslKeyPubFingerprint = null, $nodeSslKeyPub = null){
+		
+		$data = array(
+			'rid' => $rid,
+			'nodeId' => $nodeId,
+			'nodeIp' => $nodeIp,
+			'nodePort' => $nodePort,
+			'nodeSslKeyPubFingerprint' => $nodeSslKeyPubFingerprint,
+			'nodeSslKeyPub' => base64_encode($nodeSslKeyPub),
+		);
+		$this->dataSend($this->msgCreate('ssl_key_pub_put', $data));
 	}
 	
 	private function sendPing($id = ''){
