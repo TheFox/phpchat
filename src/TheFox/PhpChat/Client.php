@@ -274,6 +274,7 @@ class Client{
 		else{
 			#$this->log('error', 'json_decode failed: "'.$msgRaw.'"');
 			$this->log('error', 'json_decode failed: "'.base64_decode($msgRaw).'"');
+			#$this->log('error', 'json_decode failed');
 		}
 		
 		#print __CLASS__.'->'.__FUNCTION__.': '.$this->getIp().':'.$this->getPort().' raw: '.$msgRaw."\n";
@@ -621,7 +622,7 @@ class Client{
 			}
 		}
 		elseif($msgName == 'ssl_test'){
-			print __CLASS__.'->'.__FUNCTION__.': "'.$msgName.'", '.(int)$this->getStatus('hasSslInitOk').', '.(int)$this->getStatus('hasSslTest').''."\n";
+			#print __CLASS__.'->'.__FUNCTION__.': "'.$msgName.'", '.(int)$this->getStatus('hasSslInitOk').', '.(int)$this->getStatus('hasSslTest').''."\n";
 			
 			if($this->getStatus('hasSslInitOk') && !$this->getStatus('hasSslTest')){
 				$msgData = $this->sslMsgDataPrivateDecrypt($msgData);
@@ -660,7 +661,7 @@ class Client{
 					
 					if($token && $this->sslTestToken && $token == $this->sslTestToken){
 						$this->log('debug', 'SSL: verified');
-						print __CLASS__.'->'.__FUNCTION__.': '.$msgName.' SSL: verified'."\n";
+						#print __CLASS__.'->'.__FUNCTION__.': '.$msgName.' SSL: verified'."\n";
 						
 						$this->setStatus('hasSslVerify', true);
 						$this->sendSslPasswordPut();
@@ -692,7 +693,7 @@ class Client{
 						$this->setStatus('hasSslPasswortPut', true);
 						$this->sslPasswordPeer = $password;
 						
-						$this->log('debug', 'SSL: peer password: '.$this->sslPasswordPeer);
+						#$this->log('debug', 'SSL: peer password: '.$this->sslPasswordPeer);
 						
 						$this->sendSslPasswordTest();
 					}
@@ -751,7 +752,8 @@ class Client{
 					if($token){
 						if($this->sslPasswordToken && $token == hash('sha512', $this->sslPasswordToken.'_'.$this->getNode()->getSslKeyPubFingerprint())){
 							$this->setStatus('hasSsl', true);
-							print __CLASS__.'->'.__FUNCTION__.': '.$msgName.' SSL: password verified'."\n";
+							$this->log('debug', 'SSL: password verified');
+							#print __CLASS__.'->'.__FUNCTION__.': '.$msgName.' SSL: password verified'."\n";
 						}
 						else{
 							$this->sendError(290, $msgName);
@@ -924,6 +926,7 @@ class Client{
 			}
 			
 			$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$code.', '.$msg.', '.$name);
+			#print $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$code.', '.$msg.', '.$name."\n";
 		}
 		elseif($msgName == 'quit'){
 			$this->shutdown();
@@ -931,7 +934,7 @@ class Client{
 	}
 	
 	private function msgCreate($name, $data){
-		print __CLASS__.'->'.__FUNCTION__.': "'.$name.'"'."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': "'.$name.'"'."\n";
 		
 		$json = array(
 			'name' => $name,
@@ -1202,12 +1205,12 @@ class Client{
 		}
 		
 		if($this->getStatus('hasSendSslInit')){
-			print __CLASS__.'->'.__FUNCTION__.': set hasSslInit to true'."\n";
+			#print __CLASS__.'->'.__FUNCTION__.': set hasSslInit to true'."\n";
 			
 			$this->setStatus('hasSslInit', true);
 		}
 		else{
-			print __CLASS__.'->'.__FUNCTION__.': send ssl_init'."\n";
+			#print __CLASS__.'->'.__FUNCTION__.': send ssl_init'."\n";
 			$this->setStatus('hasSendSslInit', true);
 			#$this->setStatus('hasSslInit', true);
 			
