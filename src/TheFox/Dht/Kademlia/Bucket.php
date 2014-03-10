@@ -57,6 +57,8 @@ class Bucket extends YamlStorage{
 					$node->load();
 					
 					$this->nodes[$this->nodesId] = $node;
+					
+					#print __CLASS__.'->'.__FUNCTION__.': node '.$this->nodesId."\n";
 				}
 			}
 			

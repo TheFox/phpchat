@@ -156,8 +156,14 @@ class Table extends YamlStorage{
 	}
 	
 	public function nodeFindByKeyPubFingerprint($fingerprint){
+		#print __CLASS__.'->'.__FUNCTION__.': '.$fingerprint."\n";
+		
 		foreach($this->buckets as $bucketId => $bucket){
+			#print __CLASS__.'->'.__FUNCTION__.': bucket '.$bucketId."\n";
+			
 			foreach($bucket->getNodes() as $cnodeId => $cnode){
+				#print __CLASS__.'->'.__FUNCTION__.': node '.$cnodeId."\n";
+				
 				if($fingerprint == $cnode->getSslKeyPubFingerprint()){
 					return $cnode;
 				}
@@ -168,7 +174,7 @@ class Table extends YamlStorage{
 	}
 	
 	public function nodeEnclose(Node $node){
-		#print __CLASS__."->".__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		if(!$this->getLocalNode()){
 			throw new RuntimeException('localNode not set.');

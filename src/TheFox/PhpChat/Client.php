@@ -353,16 +353,16 @@ class Client{
 							
 							if(! $this->getLocalNode()->isEqual($node)){
 								if($node->getSslKeyPub()){
-									$this->log('debug', 'found old ssl public key');
+									#$this->log('debug', 'found old ssl public key');
 									
 									if( $node->getSslKeyPub() == $strKeyPub ){
-										$this->log('debug', 'ssl public key ok');
+										#$this->log('debug', 'ssl public key ok');
 										
 										$idOk = true;
 									}
 									else{
 										$this->sendError(230, $msgName);
-										$this->log('warning', 'ssl public key changed since last handshake');
+										#$this->log('warning', 'ssl public key changed since last handshake');
 									}
 								}
 								else{
@@ -371,7 +371,7 @@ class Client{
 										$sslPubKeyDetails = openssl_pkey_get_details($sslPubKey);
 										
 										if($sslPubKeyDetails['bits'] >= Node::SSL_KEY_LEN_MIN){
-											$this->log('debug', 'no old ssl public key found. good. set new.');
+											#$this->log('debug', 'no old ssl public key found. good. set new.');
 											
 											$idOk = true;
 										}
@@ -404,7 +404,8 @@ class Client{
 						
 						$this->sendIdOk();
 						
-						$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$id.', '.$port.', '.$node->getSslKeyPubFingerprint());
+						#$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$id.', '.$port.', '.$node->getSslKeyPubFingerprint());
+						$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$id.', '.$port);
 					}
 					
 				}
@@ -611,9 +612,6 @@ class Client{
 		elseif($msgName == 'ssl_init_ok'){
 			if($this->getStatus('hasSslInit') && !$this->getStatus('hasSslInitOk')){
 				$this->setStatus('hasSslInitOk', true);
-				#$this->setStatus('hasSslInit', true);
-				#print __CLASS__.'->'.__FUNCTION__.': "'.$msgName.'", '.(int)$this->getStatus('hasSslInit').', '.(int)$this->getStatus('hasSslInitOk')."\n";
-				
 				$this->sendSslTest();
 			}
 			else{
