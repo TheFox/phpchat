@@ -2,12 +2,12 @@
 
 namespace TheFox\PhpChat;
 
-use TheFox\Ipc\Connection;
-use TheFox\Ipc\StreamHandler;
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler as LoggerStreamHandler;
 use TheFox\Dht\Kademlia\Table;
 use TheFox\Dht\Kademlia\Node;
+use TheFox\Ipc\ConnectionServer;
+use TheFox\Ipc\StreamHandler as IpcStreamHandler;
 
 class Kernel extends Thread{
 	
@@ -18,6 +18,7 @@ class Kernel extends Thread{
 	private $localNode;
 	private $server;
 	private $table;
+	private $ipcConsoleConnection = null;
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -57,6 +58,9 @@ class Kernel extends Thread{
 			$this->setExit(1);
 		}
 		
+		$this->ipcConsoleConnection = new ConnectionServer();
+		$this->ipcConsoleConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20000));
+		$this->ipcConsoleConnection->connect();
 		
 		
 		#ve($this->server);
