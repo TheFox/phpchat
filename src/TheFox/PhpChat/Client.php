@@ -28,14 +28,15 @@ class Client{
 	private $port = 0;
 	private $ssl = null;
 	private $sslTestToken = '';
+	private $sslPasswordToken = '';
+	private $sslPasswordLocal = '';
+	private $sslPasswordPeer = '';
 	
 	private $recvBufferTmp = '';
 	private $requestsId = 0;
 	private $requests = array();
 	private $actionsId = 0;
 	private $actions = array();
-	private $sslPasswordLocal = '';
-	private $sslPasswordPeer = '';
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -49,6 +50,10 @@ class Client{
 		$this->status['hasSslInitOk'] = false;
 		$this->status['hasSslTest'] = false;
 		$this->status['hasSslVerify'] = false;
+		$this->status['hasSslPasswortPut'] = false;
+		$this->status['hasSslPasswortTest'] = false;
+		$this->status['hasSslPasswortVerify'] = false;
+		$this->status['hasSsl'] = false;
 	}
 	
 	public function __destruct(){
@@ -674,85 +679,102 @@ class Client{
 				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
 			}
 		}
-		/*elseif(substr($line, 0, 17) == 'SSL_PASSWORD_PUT '){
-			if($this->getHasSslVerified() && !$this->getSslPasswordNode()){
-				$data = substr($line, 17);
-				
-				$data = $this->sslPrivateDecrypt($data);
-				if($data){
-					$this->log('debug', 'socket rcev '.$this->getIp().':'.$this->getPort().' SSL_PASSWORD_PUT: '.$data);
+		elseif($msgName == 'ssl_password_put'){
+			if($this->getStatus('hasSslVerify') && !$this->getStatus('hasSslPasswortPut')){
+				$msgData = $this->sslMsgDataPrivateDecrypt($msgData);
+				if($msgData){
+					$password = '';
+					if(array_key_exists('password', $msgData)){
+						$password = $msgData['password'];
+					}
 					
-					$this->setSslPasswordNode($data);
-					$this->sendSslPasswordTest();
-				}
-				else{
-					#$this->log('warning', 'SSL_PASSWORD_PUT sslPrivateDecrypt failed');
-					
-					if($this->getIsChannel()){ $this->consoleMsgSslFailed(); }
-				}
-			}
-			else{
-				#$this->log('warning', 'ssl password put: failed');
-				
-				if($this->getIsChannel()){ $this->consoleMsgSslFailed(); }
-			}
-		}
-		elseif(substr($line, 0, 18) == 'SSL_PASSWORD_TEST '){
-			if($this->getSslPasswordNode() && !$this->getHasSslPasswordTest()){
-				$data = substr($line, 18);
-				
-				$data = $this->sslPasswordDecrypt($data);
-				if($data){
-					$token = $data;
-					
-					$this->log('debug', 'socket rcev '.$this->getIp().':'.$this->getPort().' SSL_PASSWORD_TEST: '.$token);
-					
-					$this->setHasSslPasswordTest(true);
-					$this->sendSslPasswordVerify($token);
-				}
-				else{
-					#$this->log('warning', 'SSL_PASSWORD_TEST sslPasswordDecrypt failed');
-					
-					if($this->getIsChannel()){ $this->consoleMsgSslFailed(); }
-				}
-			}
-			else{
-				#$this->log('warning', 'ssl password test: failed');
-				
-				if($this->getIsChannel()){ $this->consoleMsgSslFailed(); }
-			}
-		}
-		elseif(substr($line, 0, 20) == 'SSL_PASSWORD_VERIFY '){
-			if($this->getHasSslPasswordTest() && !$this->getHasSsl()){
-				$data = substr($line, 20);
-				
-				$data = $this->sslPasswordDecrypt($data);
-				if($data){
-					$token = $data;
-					
-					$this->log('debug', 'socket rcev '.$this->getIp().':'.$this->getPort().' SSL_PASSWORD_TEST: '.$token);
-					
-					if($this->sslPasswordVerifyToken($token)){
-						$this->setHasSsl(true);
+					if($password){
+						$this->setStatus('hasSslPasswortPut', true);
+						$this->sslPasswordPeer = $password;
 						
-						if($this->getIsChannel()){ $this->consoleMsgSslOk($this->getNode()->getIdHexStr()); }
+						$this->log('debug', 'SSL: peer password: '.$this->sslPasswordPeer);
+						
+						$this->sendSslPasswordTest();
 					}
 					else{
-						if($this->getIsChannel()){ $this->consoleMsgSslFailed(); }
+						$this->sendError(900, $msgName);
 					}
 				}
 				else{
-					$this->log('warning', 'SSL_PASSWORD_TEST sslPasswordDecrypt failed');
-					
-					if($this->getIsChannel()){ $this->consoleMsgSslFailed(); }
+					$this->sendError(270, $msgName);
+					$this->log('warning', $msgName.' SSL: decryption failed');
 				}
 			}
 			else{
-				$this->log('warning', 'ssl password verify: failed');
-				
-				if($this->getIsChannel()){ $this->consoleMsgSslFailed(); }
+				$this->sendError(260, $msgName);
+				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
 			}
 		}
+		elseif($msgName == 'ssl_password_test'){
+			if($this->getStatus('hasSslPasswortPut') && !$this->getStatus('hasSslPasswortTest')){
+				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
+				if($msgData){
+					$token = '';
+					if(array_key_exists('token', $msgData)){
+						$token = $msgData['token'];
+					}
+					
+					if($token){
+						$this->setStatus('hasSslPasswortTest', true);
+						$this->sendSslPasswordVerify($token);
+					}
+					else{
+						$this->sendError(900, $msgName);
+					}
+				}
+				else{
+					$this->sendError(270, $msgName);
+					$this->log('warning', $msgName.' SSL: decryption failed');
+				}
+			}
+			else{
+				$this->sendError(260, $msgName);
+				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
+			}
+		}
+		elseif($msgName == 'ssl_password_verify'){
+			if($this->getStatus('hasSslPasswortTest') && !$this->getStatus('hasSsl')){
+				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
+				if($msgData){
+					$token = '';
+					if(array_key_exists('token', $msgData)){
+						$token = $msgData['token'];
+					}
+					
+					#print __CLASS__.'->'.__FUNCTION__.': '.$msgName.' SSL: password token: '.$token."\n";
+					
+					if($token){
+						if($this->sslPasswordToken && $token == hash('sha512', $this->sslPasswordToken.'_'.$this->getNode()->getSslKeyPubFingerprint())){
+							$this->setStatus('hasSsl', true);
+							print __CLASS__.'->'.__FUNCTION__.': '.$msgName.' SSL: password verified'."\n";
+						}
+						else{
+							$this->sendError(290, $msgName);
+						}
+						
+						$this->sslTestToken = '';
+						$this->sslPasswordToken = '';
+					}
+					else{
+						$this->sendError(900, $msgName);
+					}
+				}
+				else{
+					$this->sendError(270, $msgName);
+					$this->log('warning', $msgName.' SSL: decryption failed');
+				}
+			}
+			else{
+				$this->sendError(260, $msgName);
+				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
+			}
+		}
+		/*
 		elseif(substr($line, 0, 16) == 'SSL_KEY_PUB_GET '){
 			if($this->getHasId()){
 				$data = substr($line, 16);
@@ -953,14 +975,37 @@ class Client{
 	}
 	
 	private function sslMsgDataPrivateDecrypt($dataEnc){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		$data = $this->sslPrivateDecrypt($dataEnc);
 		if($data){
 			$data = json_decode($data, true);
 			
-			#print __CLASS__.'->'.__FUNCTION__.''."\n"; ve($data);
-			
+			return $data;
+		}
+		
+		return null;
+	}
+	
+	private function sslMsgCreatePasswordEncrypt($name, $data){
+		#print __CLASS__.'->'.__FUNCTION__.': "'.$name.'"'."\n";
+		
+		$data = json_encode($data);
+		$dataEnc = $this->sslPasswordEncrypt($data);
+		
+		if($dataEnc){
+			$json = array(
+				'name' => $name,
+				'data' => $dataEnc,
+			);
+			return json_encode($json);
+		}
+		
+		return null;
+	}
+	
+	private function sslMsgDataPasswordDecrypt($dataEnc){
+		$data = $this->sslPasswordDecrypt($dataEnc);
+		if($data){
+			$data = json_decode($data, true);
 			return $data;
 		}
 		
@@ -1006,9 +1051,8 @@ class Client{
 	}
 	
 	private function sslPasswordEncrypt($data){
-		/*
-		if($this->getSslPassword() && $this->getSslPasswordNode()){
-			$password = $this->getSslPassword().'_'.$this->getSslPasswordNode();
+		if($this->sslPasswordLocal && $this->sslPasswordPeer){
+			$password = $this->sslPasswordLocal.'_'.$this->sslPasswordPeer;
 			
 			if(openssl_sign($data, $sign, $this->getSsl(), OPENSSL_ALGO_SHA1)){
 				$sign = base64_encode($sign);
@@ -1029,16 +1073,14 @@ class Client{
 				}
 			}
 		}
-		*/
+		
 		return null;
 	}
 	
 	private function sslPasswordDecrypt($data){
-		$rv = '';
-		/*
-		if($this->getSslPassword() && $this->getSslPasswordNode()){
-			$password = $this->getSslPasswordNode().'_'.$this->getSslPassword();
-			#$this->log('debug', 'password: '.$password);
+		if($this->sslPasswordLocal && $this->sslPasswordPeer){
+			$password = $this->sslPasswordPeer.'_'.$this->sslPasswordLocal;
+			$this->log('debug', 'password: '.$password);
 			
 			$data = base64_decode($data);
 			$json = json_decode(gzdecode($data), true);
@@ -1054,15 +1096,15 @@ class Client{
 				$sign = base64_decode($json['sign']);
 				
 				if(openssl_verify($data, $sign, $this->getNode()->getSslKeyPub(), OPENSSL_ALGO_SHA1)){
-					$rv = $data;
+					return $data;
 				}
 				else{ $this->log('warning', 'sslPasswordDecrypt openssl_verify failed'); }
 			}
 			else{ $this->log('warning', 'sslPasswordDecrypt openssl_decrypt failed'); }
 		}
 		else{ $this->log('warning', 'sslPasswordDecrypt no passwords set'); }
-		*/
-		return $rv;
+		
+		return null;
 	}
 	
 	public function sendNop(){
@@ -1220,6 +1262,47 @@ class Client{
 		$this->dataSend($this->sslMsgCreatePublicEncrypt('ssl_verify', $data));
 	}
 	
+	private function sendSslPasswordPut(){
+		if(!$this->getSsl()){
+			throw new RuntimeException('ssl not set.');
+		}
+		
+		$addr = $this->getIp().':'.$this->getPort();
+		$password = hash('sha512', $addr.'_'.mt_rand(0, 999999));
+		
+		$this->sslPasswordLocal = $password;
+		$this->log('debug', 'SSL: local password: '.$this->sslPasswordLocal);
+		
+		$data = array(
+			'password' => $password,
+		);
+		$this->dataSend($this->sslMsgCreatePublicEncrypt('ssl_password_put', $data));
+	}
+	
+	private function sendSslPasswordTest(){
+		if(!$this->getSsl()){
+			throw new RuntimeException('ssl not set.');
+		}
+		
+		$this->sslPasswordToken = (string)Uuid::uuid4();
+		
+		$data = array(
+			'token' => $this->sslPasswordToken,
+		);
+		$this->dataSend($this->sslMsgCreatePasswordEncrypt('ssl_password_test', $data));
+	}
+	
+	private function sendSslPasswordVerify($token){
+		if(!$this->getSsl()){
+			throw new RuntimeException('ssl not set.');
+		}
+		
+		$token = hash('sha512', $token.'_'.$this->getLocalNode()->getSslKeyPubFingerprint());
+		
+		$data = array(
+			'token' => $token,
+		);
+		$this->dataSend($this->sslMsgCreatePasswordEncrypt('ssl_password_verify', $data));
 	}
 	
 	private function sendPing($id = ''){
@@ -1253,6 +1336,7 @@ class Client{
 			260 => 'SSL: you need to initialize ssl',
 			270 => 'SSL: decryption failed',
 			280 => 'SSL: verification failed',
+			290 => 'SSL: password verification failed',
 			390 => 'SSL: invalid setup',
 			
 			// 900-999: Misc
