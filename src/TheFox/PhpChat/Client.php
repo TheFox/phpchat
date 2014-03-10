@@ -277,6 +277,18 @@ class Client{
 		#print __CLASS__.'->'.__FUNCTION__.': "'.$msgName.'", '.json_encode($msg['data'])."\n";
 		
 		if($msgName == 'nop'){}
+		elseif($msgName == 'test'){
+			$len = 0;
+			$test_data = 'N/A';
+			if(array_key_exists('len', $msgData)){
+				$len = (int)$msgData['len'];
+			}
+			if(array_key_exists('test_data', $msgData)){
+				$test_data = $msgData['test_data'];
+			}
+			
+			#print __CLASS__.'->'.__FUNCTION__.': '.$msgName.', '.$len.' == '.strlen($test_data).', "'.substr($test_data, 0, 10).'", "'.substr($test_data, -10).'"'."\n";
+		}
 		elseif($msgName == 'hello'){
 			if(array_key_exists('ip', $msgData)){
 				$ip = $msgData['ip'];
@@ -1057,6 +1069,16 @@ class Client{
 		$data = array(
 		);
 		$this->dataSend($this->msgCreate('nop', $data));
+	}
+	
+	public function sendTest(){
+		$test_data = 'BEGIN_'.str_repeat('abcdef', 4096).'_END';
+		$len = strlen($test_data);
+		$data = array(
+			'len' => $len,
+			'test_data' => $test_data,
+		);
+		$this->dataSend($this->msgCreate('test', $data));
 	}
 	
 	public function sendHello(){
