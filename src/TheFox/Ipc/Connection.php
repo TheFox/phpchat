@@ -3,6 +3,7 @@
 namespace TheFox\Ipc;
 
 use Exception;
+use RuntimeException;
 use OutOfBoundsException;
 use Closure;
 
@@ -141,7 +142,7 @@ class Connection{
 	
 	public function connect(){
 		if($this->handler === null){
-			throw new Exception('Handler not set. Use setHandler().');
+			throw new RuntimeException('Handler not set. Use setHandler().');
 		}
 		
 		if($this->isServer()){
