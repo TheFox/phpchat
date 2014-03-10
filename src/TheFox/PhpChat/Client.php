@@ -291,11 +291,15 @@ class Client{
 			
 			if($this->getTable()){
 				if(!$this->getStatus('hasId')){
+					$release = 0;
 					$id = '';
 					$port = 0;
 					$strKeyPub = '';
 					$strKeyPubFingerprint = '';
 					$isChannel = false;
+					if(array_key_exists('release', $msgData)){
+						$release = (int)$msgData['release'];
+					}
 					if(array_key_exists('id', $msgData)){
 						$id = $msgData['id'];
 					}
@@ -1001,6 +1005,7 @@ class Client{
 		$sslKeyPub = base64_encode($this->getLocalNode()->getSslKeyPub());
 		
 		$data = array(
+			'release'   => $this->getSettings()->data['release'],
 			'id'        => $this->getLocalNode()->getIdHexStr(),
 			'port'      => $this->getLocalNode()->getPort(),
 			'sslKeyPub' => $sslKeyPub,
