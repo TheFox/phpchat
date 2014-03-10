@@ -980,6 +980,12 @@ class Client{
 		return $rv;
 	}
 	
+	public function sendNop(){
+		$data = array(
+		);
+		$this->dataSend($this->msgCreate('nop', $data));
+	}
+	
 	public function sendHello(){
 		$data = array(
 			'ip' => $this->getIp(),
