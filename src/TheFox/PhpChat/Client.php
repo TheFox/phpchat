@@ -26,6 +26,7 @@ class Client{
 	private $node = null;
 	private $ip = '';
 	private $port = 0;
+	private $ssl = null;
 	
 	private $recvBufferTmp = '';
 	private $requestsId = 0;
@@ -129,8 +130,16 @@ class Client{
 		return $this->getIp().':'.$this->getPort();
 	}
 	
+	public function setSsl($ssl){
+		$this->ssl = $ssl;
+	}
+	
+	public function getSsl(){
+		return $this->ssl;
+	}
+	
 	public function setSslPrv($sslKeyPrvPath, $sslKeyPrvPass){
-		$this->ssl = openssl_pkey_get_private(file_get_contents($sslKeyPrvPath), $sslKeyPrvPass);
+		$this->setSsl(openssl_pkey_get_private(file_get_contents($sslKeyPrvPath), $sslKeyPrvPass));
 	}
 	
 	public function getLocalNode(){
@@ -1044,7 +1053,7 @@ class Client{
 	}
 	
 	public function sendSslInit($x = ''){
-		if(!$this->ssl){
+		if(!$this->getSsl()){
 			throw new RuntimeException('ssl not set.');
 		}
 		
@@ -1076,7 +1085,7 @@ class Client{
 	}
 	
 	public function sendSslInitOk(){
-		if(!$this->ssl){
+		if(!$this->getSsl()){
 			throw new RuntimeException('ssl not set.');
 		}
 		
@@ -1086,7 +1095,7 @@ class Client{
 	}
 	
 	public function sendSslTest($token){
-		if(!$this->ssl){
+		if(!$this->getSsl()){
 			throw new RuntimeException('ssl not set.');
 		}
 		
@@ -1097,7 +1106,7 @@ class Client{
 	}
 	
 	public function sendSslVerify($token){
-		if(!$this->ssl){
+		if(!$this->getSsl()){
 			throw new RuntimeException('ssl not set.');
 		}
 		
