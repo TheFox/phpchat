@@ -18,7 +18,7 @@ if(function_exists('pcntl_signal')){
 		$log->notice('main abort ['.$exit.']');
 		$kernel->setExit($exit);
 		if($exit >= 2)
-			exit();
+			exit(1);
 	}
 	pcntl_signal(SIGTERM, 'signalHandler');
 	pcntl_signal(SIGINT, 'signalHandler');
