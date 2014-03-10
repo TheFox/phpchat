@@ -266,13 +266,14 @@ class Client{
 			}
 		}
 		else{
-			$this->log('error', 'json_decode failed: "'.$msgRaw.'"');
+			#$this->log('error', 'json_decode failed: "'.$msgRaw.'"');
+			$this->log('error', 'json_decode failed: "'.base64_decode($msgRaw).'"');
 		}
 		
 		#print __CLASS__.'->'.__FUNCTION__.': '.$this->getIp().':'.$this->getPort().' raw: '.$msgRaw."\n";
 		#print __CLASS__.'->'.__FUNCTION__.': '.$this->getIp().':'.$this->getPort().' raw: '.$msgRaw."\n";
 		#print __CLASS__.'->'.__FUNCTION__.': "'.$msgName.'"'."\n";
-		print __CLASS__.'->'.__FUNCTION__.': "'.$msgName.'", '.json_encode($msg['data'])."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': "'.$msgName.'", '.json_encode($msg['data'])."\n";
 		
 		if($msgName == 'nop'){}
 		elseif($msgName == 'hello'){
@@ -627,6 +628,8 @@ class Client{
 				}
 				
 				if($token && $this->sslTestToken && $token == $this->sslTestToken){
+					$this->log('debug', 'SSL: verified');
+					
 					$this->setStatus('hasSslVerify', true);
 				}
 				else{
