@@ -141,21 +141,23 @@ class Connection{
 	}
 	
 	public function connect(){
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
 		if($this->handler === null){
 			throw new RuntimeException('Handler not set. Use setHandler().');
 		}
 		
-		if($this->isServer()){
-			try{
+		try{
+			if($this->isServer()){
 				$this->handler->listen();
-				return true;
 			}
-			catch(Exception $e){
-				return false;
+			else{
+				$this->handler->connect();
 			}
+			return true;
 		}
-		else{
-			return $this->handler->connect();
+		catch(Exception $e){
+			return false;
 		}
 	}
 	
