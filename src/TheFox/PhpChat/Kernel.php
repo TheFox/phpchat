@@ -41,7 +41,8 @@ class Kernel extends Thread{
 		$this->table = new Table($this->settings->data['datadir'].'/table.yml');
 		$this->table->setDatadirBasePath($this->settings->data['datadir']);
 		$this->table->setLocalNode($this->getLocalNode());
-		$this->getLog()->info('setup table: done');
+		$load = $this->table->load();
+		$this->getLog()->info('setup table: done ('.(int)$load.')');
 		
 		$this->getLog()->info('setup server');
 		$this->server = new Server();
