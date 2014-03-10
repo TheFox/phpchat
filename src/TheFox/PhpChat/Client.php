@@ -27,13 +27,13 @@ class Client{
 	private $ip = '';
 	private $port = 0;
 	private $ssl = null;
+	private $sslTestToken = '';
 	
 	private $recvBufferTmp = '';
 	private $requestsId = 0;
 	private $requests = array();
 	private $actionsId = 0;
 	private $actions = array();
-	private $sslTestToken = '';
 	private $sslPasswordLocal = '';
 	private $sslPasswordPeer = '';
 	
@@ -571,18 +571,23 @@ class Client{
 		}
 		
 		elseif($msgName == 'ssl_init'){
-			if($this->getStatus('hasId')){
-				if(!$this->getStatus('hasSslInit')){
-					$this->setStatus('hasSslInit', true);
-					
-					$this->sendSslInit();
-					
-					#$this->setStatus('hasSslInitOk', true);
-					$this->sendSslInitOk();
+			if($this->getSsl()){
+				if($this->getStatus('hasId')){
+					if(!$this->getStatus('hasSslInit')){
+						$this->setStatus('hasSslInit', true);
+						
+						$this->sendSslInit();
+						
+						#$this->setStatus('hasSslInitOk', true);
+						$this->sendSslInitOk();
+					}
+				}
+				else{
+					$this->sendError(100, $msgName);
 				}
 			}
 			else{
-				$this->sendError(100, $msgName);
+				$this->sendError(390, $msgName);
 			}
 		}
 		elseif($msgName == 'ssl_init_ok'){
@@ -591,8 +596,7 @@ class Client{
 				#$this->setStatus('hasSslInit', true);
 				#print __CLASS__.'->'.__FUNCTION__.': "'.$msgName.'", '.(int)$this->getStatus('hasSslInit').', '.(int)$this->getStatus('hasSslInitOk')."\n";
 				
-				$this->sslTestToken = (string)Uuid::uuid4();
-				$this->sendSslTest($this->sslTestToken);
+				$this->sendSslTest();
 			}
 			else{
 				$this->sendError(250, $msgName);
@@ -603,17 +607,24 @@ class Client{
 			print __CLASS__.'->'.__FUNCTION__.': "'.$msgName.'", '.(int)$this->getStatus('hasSslInitOk').', '.(int)$this->getStatus('hasSslTest').''."\n";
 			
 			if($this->getStatus('hasSslInitOk') && !$this->getStatus('hasSslTest')){
-				$token = '';
-				if(array_key_exists('token', $msgData)){
-					$token = $msgData['token'];
-				}
-				
-				if($token){
-					$this->setStatus('hasSslTest', true);
-					$this->sendSslVerify($token);
+				$msgData = $this->sslMsgDataPrivateDecrypt($msgData);
+				if($msgData){
+					$token = '';
+					if(array_key_exists('token', $msgData)){
+						$token = $msgData['token'];
+					}
+					
+					if($token){
+						$this->setStatus('hasSslTest', true);
+						$this->sendSslVerify($token);
+					}
+					else{
+						$this->sendError(900, $msgName);
+					}
 				}
 				else{
-					$this->sendError(900, $msgName);
+					$this->sendError(270, $msgName);
+					$this->log('warning', $msgName.' SSL: decryption failed');
 				}
 			}
 			else{
@@ -623,18 +634,27 @@ class Client{
 		}
 		elseif($msgName == 'ssl_verify'){
 			if($this->getStatus('hasSslTest') && !$this->getStatus('hasSslVerify')){
-				$token = '';
-				if(array_key_exists('token', $msgData)){
-					$token = $msgData['token'];
-				}
-				
-				if($token && $this->sslTestToken && $token == $this->sslTestToken){
-					$this->log('debug', 'SSL: verified');
+				$msgData = $this->sslMsgDataPrivateDecrypt($msgData);
+				if($msgData){
+					$token = '';
+					if(array_key_exists('token', $msgData)){
+						$token = $msgData['token'];
+					}
 					
-					$this->setStatus('hasSslVerify', true);
+					if($token && $this->sslTestToken && $token == $this->sslTestToken){
+						$this->log('debug', 'SSL: verified');
+						print __CLASS__.'->'.__FUNCTION__.': '.$msgName.' SSL: verified'."\n";
+						
+						$this->setStatus('hasSslVerify', true);
+						$this->sendSslPasswordPut();
+					}
+					else{
+						$this->sendError(280, $msgName);
+					}
 				}
 				else{
-					$this->sendError(900, $msgName);
+					$this->sendError(270, $msgName);
+					$this->log('warning', $msgName.' SSL: decryption failed');
 				}
 			}
 			else{
@@ -887,32 +907,74 @@ class Client{
 	}
 	
 	private function dataSend($msg){
-		$msg = base64_encode($msg);
-		$this->getSocket()->write($msg.static::MSG_SEPARATOR);
+		#print __CLASS__.'->'.__FUNCTION__.': "'.$msg.'"'."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+		if($msg){
+			$msg = base64_encode($msg);
+			$this->getSocket()->write($msg.static::MSG_SEPARATOR);
+		}
 	}
 	
-	public function sslPublicEncrypt($data){
-		$rv = '';
-		/*
+	private function sslMsgCreatePublicEncrypt($name, $data){
+		#print __CLASS__.'->'.__FUNCTION__.': "'.$name.'"'."\n";
+		#ve($data);
+		
+		$data = json_encode($data);
+		
+		#ve($data);
+		$dataEnc = $this->sslPublicEncrypt($data);
+		
+		if($dataEnc){
+			#ve($dataEnc);
+			
+			$json = array(
+				'name' => $name,
+				'data' => $dataEnc,
+			);
+			
+			#print __CLASS__.'->'.__FUNCTION__.': "'.$name.'", "'.json_encode($json).'"'."\n";
+			return json_encode($json);
+		}
+		
+		return null;
+	}
+	
+	private function sslMsgDataPrivateDecrypt($dataEnc){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+		$data = $this->sslPrivateDecrypt($dataEnc);
+		if($data){
+			$data = json_decode($data, true);
+			
+			#print __CLASS__.'->'.__FUNCTION__.''."\n"; ve($data);
+			
+			return $data;
+		}
+		
+		return null;
+	}
+	
+	private function sslPublicEncrypt($data){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
 		if(openssl_sign($data, $sign, $this->getSsl(), OPENSSL_ALGO_SHA1)){
 			$sign = base64_encode($sign);
 			
 			if(openssl_public_encrypt($data, $cryped, $this->getNode()->getSslKeyPub())){
 				$data = base64_encode($cryped);
-				
 				$jsonStr = json_encode(array('data' => $data, 'sign' => $sign));
 				$gzdata = gzencode($jsonStr, 9);
-				
 				$rv = base64_encode($gzdata);
+				
+				return $rv;
 			}
 		}
-		*/
-		return $rv;
+		
+		return null;
 	}
 	
-	public function sslPrivateDecrypt($data){
-		$rv = '';
-		/*
+	private function sslPrivateDecrypt($data){
 		$data = base64_decode($data);
 		$data = gzdecode($data);
 		$json = json_decode($data, true);
@@ -923,14 +985,15 @@ class Client{
 		if(openssl_private_decrypt($data, $decrypted, $this->getSsl())){
 			if(openssl_verify($decrypted, $sign, $this->getNode()->getSslKeyPub(), OPENSSL_ALGO_SHA1)){
 				$rv = $decrypted;
+				
+				return $rv;
 			}
 		}
-		*/
-		return $rv;
+		
+		return null;
 	}
 	
-	public function sslPasswordEncrypt($data){
-		$rv = '';
+	private function sslPasswordEncrypt($data){
 		/*
 		if($this->getSslPassword() && $this->getSslPasswordNode()){
 			$password = $this->getSslPassword().'_'.$this->getSslPasswordNode();
@@ -949,14 +1012,16 @@ class Client{
 					
 					$data = gzencode( json_encode(array('data' => $data, 'iv' => $iv)) , 9);
 					$rv = base64_encode($data);
+					
+					return $rv;
 				}
 			}
 		}
 		*/
-		return $rv;
+		return null;
 	}
 	
-	public function sslPasswordDecrypt($data){
+	private function sslPasswordDecrypt($data){
 		$rv = '';
 		/*
 		if($this->getSslPassword() && $this->getSslPasswordNode()){
@@ -1099,7 +1164,7 @@ class Client{
 		*/
 	}
 	
-	public function sendSslInitOk(){
+	private function sendSslInitOk(){
 		if(!$this->getSsl()){
 			throw new RuntimeException('ssl not set.');
 		}
@@ -1109,18 +1174,20 @@ class Client{
 		$this->dataSend($this->msgCreate('ssl_init_ok', $data));
 	}
 	
-	public function sendSslTest($token){
+	private function sendSslTest(){
 		if(!$this->getSsl()){
 			throw new RuntimeException('ssl not set.');
 		}
 		
+		$this->sslTestToken = (string)Uuid::uuid4();
+		
 		$data = array(
-			'token' => $token,
+			'token' => $this->sslTestToken,
 		);
-		$this->dataSend($this->msgCreate('ssl_test', $data));
+		$this->dataSend($this->sslMsgCreatePublicEncrypt('ssl_test', $data));
 	}
 	
-	public function sendSslVerify($token){
+	private function sendSslVerify($token){
 		if(!$this->getSsl()){
 			throw new RuntimeException('ssl not set.');
 		}
@@ -1128,7 +1195,9 @@ class Client{
 		$data = array(
 			'token' => $token,
 		);
-		$this->dataSend($this->msgCreate('ssl_verify', $data));
+		$this->dataSend($this->sslMsgCreatePublicEncrypt('ssl_verify', $data));
+	}
+	
 	}
 	
 	private function sendPing($id = ''){
@@ -1160,6 +1229,9 @@ class Client{
 			240 => 'SSL: invalid key',
 			250 => 'SSL: you already initialized ssl',
 			260 => 'SSL: you need to initialize ssl',
+			270 => 'SSL: decryption failed',
+			280 => 'SSL: verification failed',
+			390 => 'SSL: invalid setup',
 			
 			// 900-999: Misc
 			900 => 'Invalid data',
