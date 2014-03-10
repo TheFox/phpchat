@@ -246,6 +246,7 @@ class Client{
 			}
 			else{
 				$msg = $this->recvBufferTmp.substr($data, 0, $separatorPos);
+				$this->recvBufferTmp = '';
 				
 				$this->msgHandle($msg);
 				
