@@ -1083,7 +1083,7 @@ class Client{
 	private function sslPasswordDecrypt($data){
 		if($this->sslPasswordLocal && $this->sslPasswordPeer){
 			$password = $this->sslPasswordPeer.'_'.$this->sslPasswordLocal;
-			$this->log('debug', 'password: '.$password);
+			#$this->log('debug', 'password: '.$password);
 			
 			$data = base64_decode($data);
 			$json = json_decode(gzdecode($data), true);
@@ -1199,36 +1199,21 @@ class Client{
 		$this->dataSend($this->msgCreate('node_found', $data));
 	}
 	
-	public function sendSslInit($x = ''){
+	public function sendSslInit(){
 		if(!$this->getSsl()){
 			throw new RuntimeException('ssl not set.');
 		}
 		
 		if($this->getStatus('hasSendSslInit')){
-			#print __CLASS__.'->'.__FUNCTION__.': set hasSslInit to true'."\n";
-			
 			$this->setStatus('hasSslInit', true);
 		}
 		else{
-			#print __CLASS__.'->'.__FUNCTION__.': send ssl_init'."\n";
 			$this->setStatus('hasSendSslInit', true);
-			#$this->setStatus('hasSslInit', true);
 			
 			$data = array(
-				'x' => $x,
 			);
 			$this->dataSend($this->msgCreate('ssl_init', $data));
 		}
-		
-		/*
-		$this->setStatus('hasSslInit', true);
-		
-		print __CLASS__.'->'.__FUNCTION__.': send ssl_init'."\n";
-		$data = array(
-			'x' => $x,
-		);
-		$this->dataSend($this->msgCreate('ssl_init', $data));
-		*/
 	}
 	
 	private function sendSslInitOk(){
@@ -1274,7 +1259,7 @@ class Client{
 		$password = hash('sha512', $addr.'_'.mt_rand(0, 999999));
 		
 		$this->sslPasswordLocal = $password;
-		$this->log('debug', 'SSL: local password: '.$this->sslPasswordLocal);
+		#$this->log('debug', 'SSL: local password: '.$this->sslPasswordLocal);
 		
 		$data = array(
 			'password' => $password,

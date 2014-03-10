@@ -162,7 +162,7 @@ class Server{
 							$this->clientRemove($client);
 						}
 						else{
-							$this->log->debug('old client: '.$client->getId().', '.$client->getIpPort());
+							#$this->log->debug('old client: '.$client->getId().', '.$client->getIpPort());
 							$client->dataRecv();
 							
 							if($client->getStatus('hasShutdown')){
