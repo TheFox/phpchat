@@ -217,6 +217,7 @@ class Console extends Thread{
 			foreach($this->msgStack as $msgId => $msg){
 				$this->linePrint($msg['text']);
 			}
+			$this->msgStack = array();
 		}
 	}
 	
