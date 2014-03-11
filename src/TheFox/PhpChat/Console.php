@@ -224,6 +224,7 @@ class Console extends Thread{
 						.PHP_EOL."/exit                     - exit this programm"
 						.PHP_EOL.''
 					);
+					$this->printPs1('printMsgStack');
 				}
 				elseif($line == 'nick'){
 					#print 'Your nickname: '.$this->settings['phpchat']['user']['nickname'].PHP_EOL;
