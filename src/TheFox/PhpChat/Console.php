@@ -110,6 +110,8 @@ class Console extends Thread{
 			throw new RuntimeException('Could not connect to kernel process.');
 		}
 		
+		$this->nick = $this->getIpcKernelConnection()->execSync('getSettingsUserNickname');
+		
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		$this->log->debug('tty setup');
@@ -220,6 +222,27 @@ class Console extends Thread{
 						.PHP_EOL."/exit                     - exit this programm"
 						.PHP_EOL.''
 					);
+				}
+				elseif($line == 'nick'){
+					#print 'Your nickname: '.$this->settings['phpchat']['user']['nickname'].PHP_EOL;
+					#print 'Your nickname: '.$this->nick.PHP_EOL;
+					$this->msgAdd('Your nickname: '.$this->nick);
+				}
+				elseif(substr($line, 0, 5) == 'nick '){
+					$tmp = substr($line, 5);
+					$tmp = preg_replace('/[^a-zA-Z0-9-_.]/', '', $tmp);
+					$tmp = substr($tmp, 0, Settings::USER_NICKNAME_LEN_MAX);
+					
+					if($tmp){
+						$this->nick = $tmp;
+						
+						$this->getIpcKernelConnection()->execAsync('setSettingsUserNickname', array($this->nick));
+						
+						$this->msgAdd('New nickname: '.$this->nick);
+					}
+					else{
+						$this->msgAdd('Your nickname: '.$this->nick);
+					}
 				}
 				elseif($line == 'exit'){
 					print "\nexit\n";

@@ -62,6 +62,8 @@ class Kernel extends Thread{
 		$this->ipcConsoleConnection = new ConnectionServer();
 		$this->ipcConsoleConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20000));
 		$this->ipcConsoleConnection->functionAdd('shutdown', $this, 'ipcConsoleShutdown');
+		$this->ipcConsoleConnection->functionAdd('getSettingsUserNickname', $this, 'getSettingsUserNickname');
+		$this->ipcConsoleConnection->functionAdd('setSettingsUserNickname', $this, 'setSettingsUserNickname');
 		$this->ipcConsoleConnection->connect();
 		
 		
@@ -77,6 +79,22 @@ class Kernel extends Thread{
 	public function getSettings(){
 		#ve($this->settings);
 		return $this->settings;
+	}
+	
+	public function getSettingsUserNickname(){
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#ve($this->settings);
+		
+		return $this->getSettings()->data['user']['nickname'];
+	}
+	
+	public function setSettingsUserNickname($userNickname){
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		sleep(4);
+		$this->ipcConsoleConnection->execAsync('msgAdd', array('setting nickname: '.$userNickname));
+		
+		$this->getSettings()->data['user']['nickname'] = $userNickname;
+		$this->getSettings()->setDataChanged(true);
 	}
 	
 	public function getLocalNode(){
