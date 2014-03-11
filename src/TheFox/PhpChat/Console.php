@@ -28,6 +28,7 @@ class Console extends Thread{
 	private $msgStack = array();
 	private $buffer = '';
 	private $modeChannel = false;
+	private $nick = '';
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -62,6 +63,17 @@ class Console extends Thread{
 	
 	private function getPs1(){
 		return $this->ps1;
+	}
+	
+	public function printPs1($debug = ''){
+		if($this->modeChannel){
+			#print $debug.$this->settings['phpchat']['user']['nickname'].':> _'.$this->buffer.'_'; # TODO
+			print $this->nick.':> '.$this->buffer;
+		}
+		else{
+			print $debug.' '.$this->getPs1().' _'.$this->buffer.'_'; # TODO
+			#print $this->getPs1().$this->buffer;
+		}
 	}
 	
 	private function lineClear(){
@@ -103,6 +115,8 @@ class Console extends Thread{
 		stream_set_blocking($this->stdin, 0);
 		
 		print PHP_EOL."Type '/help' for help.".PHP_EOL;
+		
+		$this->printPs1('init');
 		
 		return true;
 	}
@@ -218,6 +232,7 @@ class Console extends Thread{
 				$this->linePrint($msg['text']);
 			}
 			$this->msgStack = array();
+			$this->printPs1('printMsgStack');
 		}
 	}
 	
