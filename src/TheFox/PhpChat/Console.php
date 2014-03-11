@@ -105,6 +105,7 @@ class Console extends Thread{
 		$this->setIpcKernelConnection(new ConnectionClient());
 		$this->getIpcKernelConnection()->setHandler(new IpcStreamHandler('127.0.0.1', 20000));
 		$this->getIpcKernelConnection()->functionAdd('shutdown', $this, 'ipcKernelShutdown');
+		$this->getIpcKernelConnection()->functionAdd('msgAdd', $this, 'msgAdd');
 		
 		if(!$this->getIpcKernelConnection()->connect()){
 			throw new RuntimeException('Could not connect to kernel process.');
@@ -124,6 +125,7 @@ class Console extends Thread{
 		print PHP_EOL."Type '/help' for help.".PHP_EOL;
 		
 		$this->printPs1('init');
+		$this->msgAdd('start');
 		
 		return true;
 	}
@@ -245,11 +247,23 @@ class Console extends Thread{
 					}
 				}
 				elseif($line == 'exit'){
-					print "\nexit\n";
+					#print "\nexit\n";
+					#$this->msgAdd('exit');
 					$this->setExit(1);
 				}
 				
 			}
+			else{
+				if($this->modeChannel){
+					
+				}
+				else{
+					$this->printPs1('handleLine');
+				}
+			}
+		}
+		else{
+			$this->printPs1('handleLine');
 		}
 	}
 	
@@ -257,7 +271,7 @@ class Console extends Thread{
 		if($this->msgStack){
 			$this->lineClear();
 			foreach($this->msgStack as $msgId => $msg){
-				$this->linePrint($msg['text']);
+				$this->linePrint($this->getDate().' '.$msg['text']);
 			}
 			$this->msgStack = array();
 			$this->printPs1('printMsgStack');
