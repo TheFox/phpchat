@@ -122,21 +122,21 @@ class Connection{
 	}
 	
 	public function execSync($name, $args = array(), $timeout = null){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		if($timeout === null){
 			$timeout = static::EXEC_SYNC_TIMEOUT;
 		}
 		
 		if($this->isServer()){
-			print __CLASS__.'->'.__FUNCTION__.': sendFunctionExec'."\n";
+			#print __CLASS__.'->'.__FUNCTION__.': sendFunctionExec'."\n";
 			$clientsNum = $this->handler->getClientsNum();
 			$execsId = $this->execAdd($name, $args, null, $timeout, 's');
 			$this->handler->sendFunctionExec($name, $args, $execsId);
 			
 			$start = time();
 			while( time() - $timeout <= $start && $this->execs[$execsId]['clientsReturned'] < $clientsNum ){
-				print __CLASS__.'->'.__FUNCTION__.': server: '.count($this->execs).', '.$this->execs[$execsId]['clientsReturned'].'/'.$clientsNum."\n";
+				#print __CLASS__.'->'.__FUNCTION__.': server: '.count($this->execs).', '.$this->execs[$execsId]['clientsReturned'].'/'.$clientsNum."\n";
 				$this->run();
 				usleep(static::LOOP_USLEEP);
 			}
@@ -174,7 +174,7 @@ class Connection{
 	}
 	
 	public function connect(){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		if($this->handler === null){
 			throw new RuntimeException('Handler not set. Use setHandler().');
@@ -195,7 +195,7 @@ class Connection{
 	}
 	
 	private function msgHandle($msg, $clientId = null){
-		print __CLASS__.'->'.__FUNCTION__.': "'.$msg.'"'."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': "'.$msg.'"'."\n";
 		
 		if($msg == 'ID'){
 			$this->handler->sendIdOk($clientId);
@@ -215,7 +215,7 @@ class Connection{
 				$this->handler->sendFunctionRetn($value, $json['rid'], $clientId);
 			}
 			catch(Exception $e){
-				print __CLASS__.'->'.__FUNCTION__.': '.$e->getMessage().''."\n";
+				#print __CLASS__.'->'.__FUNCTION__.': '.$e->getMessage().''."\n";
 			}
 		}
 		elseif(substr($msg, 0, 14) == 'FUNCTION_RETN '){

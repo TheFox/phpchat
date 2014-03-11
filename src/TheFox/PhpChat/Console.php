@@ -105,7 +105,7 @@ class Console extends Thread{
 			throw new RuntimeException('Could not connect to kernel process.');
 		}
 		
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		$this->log->debug('tty setup');
 		#system('stty -icanon && echo icanon ok');
@@ -122,7 +122,7 @@ class Console extends Thread{
 	}
 	
 	public function run(){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		if(!$this->getIpcKernelConnection()){
 			throw new RuntimeException('You must first run init().');
@@ -237,8 +237,7 @@ class Console extends Thread{
 	}
 	
 	public function shutdown(){
-		print __CLASS__.'->'.__FUNCTION__.': '.(int)$this->ipcKernelShutdown."\n";
-		
+		#print __CLASS__.'->'.__FUNCTION__.': '.(int)$this->ipcKernelShutdown."\n";
 		$this->getLog()->info('shutdown');
 		
 		fclose($this->stdin);

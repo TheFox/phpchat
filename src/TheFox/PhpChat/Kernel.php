@@ -75,6 +75,7 @@ class Kernel extends Thread{
 	}
 	
 	public function getSettings(){
+		#ve($this->settings);
 		return $this->settings;
 	}
 	

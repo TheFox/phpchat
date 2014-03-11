@@ -89,7 +89,7 @@ abstract class AbstractHandler{
 	
 	public function recv($handle, $data){
 		$dataLen = strlen($data);
-		print __CLASS__.'->'.__FUNCTION__.': '.$dataLen.', '.(int)($handle === null)."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': '.$dataLen.', '.(int)($handle === null)."\n";
 		
 		if($this->isListening()){ // is Server
 			$client = $this->clientGetByHandle($handle);
