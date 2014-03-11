@@ -237,11 +237,15 @@ class Connection{
 					$this->msgHandle($msg, $client['id']);
 				}
 			}
+			
+			return true;
 		}
 		else{
 			foreach($this->handler->recvBuffer() as $msg){
 				$this->msgHandle($msg);
 			}
+			
+			return $this->handler->isConnected();
 		}
 	}
 	
