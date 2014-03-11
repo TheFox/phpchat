@@ -121,6 +121,8 @@ class Connection{
 	}
 	
 	public function execSync($name, $args = array(), $timeout = null){
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
 		if($timeout === null){
 			$timeout = static::EXEC_SYNC_TIMEOUT;
 		}

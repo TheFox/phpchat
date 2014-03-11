@@ -26,7 +26,7 @@ class Console extends Thread{
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		$this->log = new Logger('console');
-		$this->log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::ERROR));
+		$this->log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::INFO));
 		$this->log->pushHandler(new LoggerStreamHandler('log/console.log', Logger::DEBUG));
 		
 		$this->log->info('start');
