@@ -108,6 +108,8 @@ class StreamHandler extends AbstractHandler{
 	}
 	
 	public function handleDataRecv($handle){
+		#print __CLASS__.'->'.__FUNCTION__.': '.(int)($handle === null)."\n";
+		
 		$data = stream_socket_recvfrom($handle, 1500);
 		$this->recv($handle, $data);
 		

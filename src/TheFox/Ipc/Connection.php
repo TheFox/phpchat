@@ -66,6 +66,7 @@ class Connection{
 		}
 		
 		$function = $this->functions[$name];
+		#ve($function);
 		#array_unshift($args, $this);
 		
 		$objc = $function['objc'];

@@ -31,15 +31,16 @@ abstract class AbstractHandler{
 	
 	
 	public function send($data, $clientId = null){
-		print __CLASS__.'->'.__FUNCTION__.': "'.$data.'"'."\n";
+		print __CLASS__.'->'.__FUNCTION__.': all='.(int)($clientId === null).', "'.$data.'"'."\n";
 		
-		if($this->isListening()){ // Server
+		if($this->isListening()){ // is Server
 			if($clientId !== null && isset($this->clients[$clientId])){
+				// Send to a certain client.
 				$client = $this->clients[$clientId];
 				$this->handleDataSend($client['handle'], base64_encode($data).$this->getSendSeparator());
 			}
 		}
-		elseif($this->isConnected()){ // Client
+		elseif($this->isConnected()){ // is Client
 			$this->handleDataSend($this->getHandle(), base64_encode($data).$this->getSendSeparator());
 		}
 	}
@@ -80,13 +81,13 @@ abstract class AbstractHandler{
 	
 	public function recv($handle, $data){
 		$dataLen = strlen($data);
-		print __CLASS__.'->'.__FUNCTION__.': '.$dataLen.''."\n";
+		print __CLASS__.'->'.__FUNCTION__.': '.$dataLen.', '.(int)($handle === null)."\n";
 		
-		if($this->isListening()){
+		if($this->isListening()){ // is Server
 			$client = $this->clientFindByHandle($handle);
 			$this->clientHandleRevcData($client, $data);
 		}
-		elseif($this->isConnected()){
+		elseif($this->isConnected()){ // is Client
 			$this->hasData(true);
 			
 			do{
