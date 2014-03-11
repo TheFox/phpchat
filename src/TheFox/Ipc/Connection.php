@@ -14,6 +14,7 @@ class Connection{
 	
 	private $isServer = false;
 	private $handler = null;
+	private $onClientConnectFunction = null;
 	private $functions = array();
 	private $execsId = 0;
 	private $execs = array();
@@ -34,6 +35,16 @@ class Connection{
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		$this->handler = $handler;
+	}
+	
+	public function setOnClientConnectFunction(Closure $onClientConnectFunction){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+		if($this->handler === null){
+			throw new RuntimeException('Handler not set. Use setHandler().');
+		}
+		
+		$this->handler->setOnClientConnectFunction($onClientConnectFunction);
 	}
 	
 	public function functionAdd($name, $objc = null, $func = null){

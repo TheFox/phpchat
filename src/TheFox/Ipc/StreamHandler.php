@@ -3,6 +3,7 @@
 namespace TheFox\Ipc;
 
 use RuntimeException;
+use Closure;
 
 class StreamHandler extends AbstractHandler{
 	
@@ -70,6 +71,7 @@ class StreamHandler extends AbstractHandler{
 						#print __CLASS__.'->'.__FUNCTION__.': accept'."\n";
 						$handle = @stream_socket_accept($this->getHandle(), 2);
 						$client = $this->clientAdd($handle);
+						$this->execOnClientConnectFunction($client);
 					}
 					else{
 						// Client

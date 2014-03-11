@@ -2,6 +2,8 @@
 
 namespace TheFox\Ipc;
 
+use Closure;
+
 abstract class AbstractHandler{
 	
 	private $ip;
@@ -14,6 +16,7 @@ abstract class AbstractHandler{
 	
 	private $clientsId = 0;
 	private $clients = array();
+	private $onClientConnectFunction = null;
 	
 	private $recvBufferId = 0;
 	private $recvBuffer = array();
@@ -248,6 +251,19 @@ abstract class AbstractHandler{
 	
 	public function clientRemove($client){
 		unset($this->clients[$client['id']]);
+	}
+	
+	public function setOnClientConnectFunction(Closure $onClientConnectFunction){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+		$this->onClientConnectFunction = $onClientConnectFunction;
+	}
+	
+	public function execOnClientConnectFunction($client){
+		if($this->onClientConnectFunction){
+			$func = $this->onClientConnectFunction;
+			$func($client);
+		}
 	}
 	
 }
