@@ -68,8 +68,8 @@ class Connection{
 		$function = $this->functions[$name];
 		#array_unshift($args, $this);
 		
-		$objc = $this->objc;
-		$func = $this->func;
+		$objc = $function['objc'];
+		$func = $function['func'];
 		
 		if($objc === null && $func === null){
 			#print __CLASS__.'->'.__FUNCTION__.': null'."\n";
