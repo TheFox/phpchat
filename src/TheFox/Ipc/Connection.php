@@ -102,6 +102,7 @@ class Connection{
 			'name' => $name,
 			'execRetn' => $retnFunc,
 			'hasReturned' => false,
+			'clientsReturned' => 0,
 			'timeout' => $timeout,
 			'value' => null,
 			'type' => $type, // [a]sync, [s]ync
@@ -211,6 +212,7 @@ class Connection{
 			if(array_key_exists($rid, $this->execs)){
 				$this->execs[$rid]['value'] = $value;
 				$this->execs[$rid]['hasReturned'] = true;
+				$this->execs[$rid]['clientsReturned']++;
 				
 				if($this->execs[$rid]['execRetn']){
 					$func = $this->execs[$rid]['execRetn'];
