@@ -128,20 +128,39 @@ class Connection{
 			$timeout = static::EXEC_SYNC_TIMEOUT;
 		}
 		
-		$execsId = $this->execAdd($name, $args, null, $timeout, 's');
-		$this->handler->sendFunctionExec($name, $args, $execsId);
-		
-		$start = time();
-		while( time() - $timeout <= $start && !$this->execs[$execsId]['hasReturned'] ){
-			$this->run();
-			usleep(static::LOOP_USLEEP);
+		if($this->isServer()){
+			print __CLASS__.'->'.__FUNCTION__.': sendFunctionExec'."\n";
+			$clientsNum = $this->handler->getClientsNum();
+			$execsId = $this->execAdd($name, $args, null, $timeout, 's');
+			$this->handler->sendFunctionExec($name, $args, $execsId);
+			
+			$start = time();
+			while( time() - $timeout <= $start && $this->execs[$execsId]['clientsReturned'] < $clientsNum ){
+				print __CLASS__.'->'.__FUNCTION__.': server: '.count($this->execs).', '.$this->execs[$execsId]['clientsReturned'].'/'.$clientsNum."\n";
+				$this->run();
+				#usleep(static::LOOP_USLEEP);
+				usleep(750000); # TODO
+			}
+			
+			unset($this->execs[$execsId]);
+			
+			return null;
 		}
-		
-		$value = $this->execs[$execsId]['value'];
-		unset($this->execs[$execsId]);
-		#print "remove B $execsId\n";
-		
-		return $value;
+		else{
+			$execsId = $this->execAdd($name, $args, null, $timeout, 's');
+			$this->handler->sendFunctionExec($name, $args, $execsId);
+			
+			$start = time();
+			while( time() - $timeout <= $start && !$this->execs[$execsId]['hasReturned'] ){
+				$this->run();
+				usleep(static::LOOP_USLEEP);
+			}
+			
+			$value = $this->execs[$execsId]['value'];
+			unset($this->execs[$execsId]);
+			
+			return $value;
+		}
 	}
 	
 	public function wait(){

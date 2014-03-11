@@ -31,13 +31,21 @@ abstract class AbstractHandler{
 	
 	
 	public function send($data, $clientId = null){
-		print __CLASS__.'->'.__FUNCTION__.': all='.(int)($clientId === null).', "'.$data.'"'."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': all='.(int)($clientId === null).', "'.$data.'"'."\n";
 		
 		if($this->isListening()){ // is Server
 			if($clientId !== null && isset($this->clients[$clientId])){
 				// Send to a certain client.
 				$client = $this->clients[$clientId];
 				$this->handleDataSend($client['handle'], base64_encode($data).$this->getSendSeparator());
+			}
+			else{
+				// Send to all clients.
+				#print __CLASS__.'->'.__FUNCTION__.': send to all, "'.$data.'"'."\n";
+				foreach($this->clients as $clientId => $client){
+					#print __CLASS__.'->'.__FUNCTION__.': send to '.$client['id'].', "'.$data.'"'."\n";
+					$this->handleDataSend($client['handle'], base64_encode($data).$this->getSendSeparator());
+				}
 			}
 		}
 		elseif($this->isConnected()){ // is Client
@@ -193,6 +201,10 @@ abstract class AbstractHandler{
 	
 	public function getClients(){
 		return $this->clients;
+	}
+	
+	public function getClientsNum(){
+		return count($this->clients);
 	}
 	
 	public function clientAdd($handle){
