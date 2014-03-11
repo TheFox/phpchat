@@ -96,6 +96,11 @@ class Console extends Thread{
 		$this->modeChannel = $modeChannel;
 	}
 	
+	private function getDate(){
+		$dt = new DateTime('now', new DateTimeZone('UTC'));
+		return $dt->format('H:i:s');
+	}
+	
 	public function init(){
 		$this->setIpcKernelConnection(new ConnectionClient());
 		$this->getIpcKernelConnection()->setHandler(new IpcStreamHandler('127.0.0.1', 20000));
