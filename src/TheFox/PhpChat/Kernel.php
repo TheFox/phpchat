@@ -19,6 +19,7 @@ class Kernel extends Thread{
 	private $server;
 	private $table;
 	private $ipcConsoleConnection = null;
+	private $ipcConsoleShutdown = false;
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -60,6 +61,7 @@ class Kernel extends Thread{
 		
 		$this->ipcConsoleConnection = new ConnectionServer();
 		$this->ipcConsoleConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20000));
+		$this->ipcConsoleConnection->functionAdd('shutdown', $this, 'ipcConsoleShutdown');
 		$this->ipcConsoleConnection->connect();
 		
 		
@@ -95,6 +97,7 @@ class Kernel extends Thread{
 			#print __CLASS__.'->'.__FUNCTION__.': '.$this->getExit()."\n";
 			
 			$this->server->run();
+			$this->ipcConsoleConnection->run();
 			
 			usleep(static::LOOP_USLEEP);
 		}
@@ -107,6 +110,13 @@ class Kernel extends Thread{
 		
 		$this->getLog()->info('shutdown');
 		
+		if($this->ipcConsoleShutdown){
+			$this->ipcConsoleConnection->execAsync('shutdown');
+		}
+		else{
+			$this->ipcConsoleConnection->execSync('shutdown');
+		}
+		
 		$this->getLog()->debug('getNodesNum: '.(int)$this->getTable()->getNodesNum().', '.(int)$this->getSettings()->data['firstRun']);
 		$this->getSettings()->data['firstRun'] = $this->getTable()->getNodesNum() <= 0;
 		$this->getSettings()->setDataChanged(true);
@@ -114,6 +124,12 @@ class Kernel extends Thread{
 		$this->getServer()->shutdown();
 		$this->getTable()->save();
 		$this->getSettings()->save();
+	}
+	
+	public function ipcConsoleShutdown(){
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		$this->setExit(1);
+		$this->ipcConsoleShutdown = true;
 	}
 	
 }

@@ -20,6 +20,7 @@ class Console extends Thread{
 	
 	private $log = null;
 	private $ipcKernelConnection = null;
+	private $ipcKernelShutdown = false;
 	private $ps1 = 'phpchat:> ';
 	private $tcols = 0;
 	private $tlines = 0;
@@ -81,6 +82,7 @@ class Console extends Thread{
 	public function init(){
 		$this->setIpcKernelConnection(new ConnectionClient());
 		$this->getIpcKernelConnection()->setHandler(new IpcStreamHandler('127.0.0.1', 20000));
+		$this->getIpcKernelConnection()->functionAdd('shutdown', $this, 'ipcKernelShutdown');
 		
 		if(!$this->getIpcKernelConnection()->connect()){
 			throw new RuntimeException('Could not connect to kernel process.');
@@ -108,11 +110,15 @@ class Console extends Thread{
 		}
 		
 		while(!$this->getExit()){
-			#print __CLASS__.'->'.__FUNCTION__.': '.$this->getExit()."\n";
 			$this->readStdin();
 			$this->printMsgStack();
 			
-			$this->getIpcKernelConnection()->run();
+			if(!$this->getIpcKernelConnection()->run()){
+				$this->log->info('Connection to kernel process end unexpected.');
+				$this->setExit(1);
+			}
+			
+			#print __CLASS__.'->'.__FUNCTION__.': '.$this->getExit()."\n";
 			
 			usleep(static::LOOP_USLEEP);
 		}
@@ -210,7 +216,7 @@ class Console extends Thread{
 	}
 	
 	public function shutdown(){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		print __CLASS__.'->'.__FUNCTION__.': '.(int)$this->ipcKernelShutdown."\n";
 		
 		$this->getLog()->info('shutdown');
 		
@@ -219,6 +225,19 @@ class Console extends Thread{
 		$this->log->debug('tty restore');
 		system('stty sane');
 		
+		if(!$this->ipcKernelShutdown){
+			$this->getIpcKernelConnection()->execSync('shutdown');
+		}
+	}
+	
+	public function ipcKernelShutdown(){
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+		$this->log->info('Connection to kernel process closed.');
+		$this->setExit(1);
+		$this->ipcKernelShutdown = true;
+		
+		return null;
 	}
 	
 }
