@@ -89,10 +89,7 @@ class Kernel extends Thread{
 	}
 	
 	public function setSettingsUserNickname($userNickname){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
-		sleep(4);
-		$this->ipcConsoleConnection->execAsync('msgAdd', array('setting nickname: '.$userNickname));
-		
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		$this->getSettings()->data['user']['nickname'] = $userNickname;
 		$this->getSettings()->setDataChanged(true);
 	}
