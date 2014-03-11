@@ -6,6 +6,8 @@ use TheFox\Yaml\YamlStorage;
 
 class Settings extends YamlStorage{
 	
+	const USER_NICKNAME_LEN_MAX = 256;
+	
 	public function __construct($filePath = null){
 		parent::__construct($filePath);
 		
@@ -42,6 +44,10 @@ class Settings extends YamlStorage{
 			$this->setDataChanged(true);
 			$this->save();
 		}
+	}
+	
+	public function __sleep(){
+		return array('data');
 	}
 	
 }
