@@ -27,6 +27,7 @@ class Console extends Thread{
 	private $stdin = null;
 	private $msgStack = array();
 	private $buffer = '';
+	private $modeChannel = false;
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -77,6 +78,10 @@ class Console extends Thread{
 		$this->msgStack[] = array(
 			'text' => $text,
 		);
+	}
+	
+	public function setModeChannel($modeChannel){
+		$this->modeChannel = $modeChannel;
 	}
 	
 	public function init(){
