@@ -71,8 +71,8 @@ class Console extends Thread{
 			print $this->nick.':> '.$this->buffer;
 		}
 		else{
-			print $debug.' '.$this->getPs1().' _'.$this->buffer.'_'; # TODO
-			#print $this->getPs1().$this->buffer;
+			#print $debug.' '.$this->getPs1().' _'.$this->buffer.'_'; # TODO
+			print $this->getPs1().$this->buffer;
 		}
 	}
 	
