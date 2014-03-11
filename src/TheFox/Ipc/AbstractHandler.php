@@ -84,7 +84,7 @@ abstract class AbstractHandler{
 		print __CLASS__.'->'.__FUNCTION__.': '.$dataLen.', '.(int)($handle === null)."\n";
 		
 		if($this->isListening()){ // is Server
-			$client = $this->clientFindByHandle($handle);
+			$client = $this->clientGetByHandle($handle);
 			$this->clientHandleRevcData($client, $data);
 		}
 		elseif($this->isConnected()){ // is Client
