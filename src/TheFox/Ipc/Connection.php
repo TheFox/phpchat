@@ -138,8 +138,7 @@ class Connection{
 			while( time() - $timeout <= $start && $this->execs[$execsId]['clientsReturned'] < $clientsNum ){
 				print __CLASS__.'->'.__FUNCTION__.': server: '.count($this->execs).', '.$this->execs[$execsId]['clientsReturned'].'/'.$clientsNum."\n";
 				$this->run();
-				#usleep(static::LOOP_USLEEP);
-				usleep(750000); # TODO
+				usleep(static::LOOP_USLEEP);
 			}
 			
 			unset($this->execs[$execsId]);
