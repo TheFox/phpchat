@@ -117,6 +117,10 @@ class Kernel extends Thread{
 		return $this->table;
 	}
 	
+	public function getIpcConsoleConnection(){
+		return $this->ipcConsoleConnection;
+	}
+	
 	public function run(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
