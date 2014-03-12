@@ -37,6 +37,10 @@ class Connection{
 		$this->handler = $handler;
 	}
 	
+	public function getHandler(){
+		return $this->handler;
+	}
+	
 	public function setOnClientConnectFunction(Closure $onClientConnectFunction){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
