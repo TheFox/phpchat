@@ -64,6 +64,7 @@ class Kernel extends Thread{
 		$this->ipcConsoleConnection->functionAdd('shutdown', $this, 'ipcConsoleShutdown');
 		$this->ipcConsoleConnection->functionAdd('getSettingsUserNickname', $this, 'getSettingsUserNickname');
 		$this->ipcConsoleConnection->functionAdd('setSettingsUserNickname', $this, 'setSettingsUserNickname');
+		$this->ipcConsoleConnection->functionAdd('serverConnect', $this, 'serverConnect');
 		$this->ipcConsoleConnection->connect();
 		
 		
@@ -100,6 +101,16 @@ class Kernel extends Thread{
 	
 	private function getServer(){
 		return $this->server;
+	}
+	
+	public function serverConnect($ip, $port){
+		print __CLASS__.'->'.__FUNCTION__.': '.$ip.':'.$port."\n";
+		
+		if($this->getServer()){
+			return $this->getServer()->connect($ip, $port);
+		}
+		
+		return false;
 	}
 	
 	public function getTable(){

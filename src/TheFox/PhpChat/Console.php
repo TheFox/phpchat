@@ -226,6 +226,32 @@ class Console extends Thread{
 					);
 					$this->printPs1('printMsgStack help');
 				}
+				elseif(substr($line, 0, 8) == 'connect '){
+					$data = substr($line, 8);
+					$ip = '';
+					$port = 0;
+					
+					$pos = strpos($data, ' ');
+					if($pos === false){
+						print 'Usage: /connect <IP> <PORT>'.PHP_EOL.'/connect 192.168.241.10 25000'.PHP_EOL;
+						$this->printPs1('printMsgStack connect A');
+					}
+					else{
+						$ip = substr($data, 0, $pos);
+						$port = (int)substr($data, $pos + 1);
+						
+						if($port <= 0xffff){
+							$this->msgAdd('Connecting to '.$ip.':'.$port.' ...');
+							$connected = $this->getIpcKernelConnection()->execSync('serverConnect', array($ip, $port));
+							$this->msgAdd('Connection to '.$ip.':'.$port.' '.($connected ? 'established' : 'failed').'.');
+							$this->printPs1('printMsgStack connect B');
+						}
+						else{
+							print 'ERROR: Port can not be bigger than '. 0xffff .'.'.PHP_EOL;
+							$this->printPs1('printMsgStack connect C');
+						}
+					}
+				}
 				elseif($line == 'nick'){
 					#print 'Your nickname: '.$this->settings['phpchat']['user']['nickname'].PHP_EOL;
 					#print 'Your nickname: '.$this->nick.PHP_EOL;

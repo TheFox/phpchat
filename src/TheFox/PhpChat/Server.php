@@ -249,7 +249,11 @@ class Server{
 			$client->sendHello();
 			
 			#ve($client);
+			
+			return true;
 		}
+		
+		return false;
 	}
 	
 	
