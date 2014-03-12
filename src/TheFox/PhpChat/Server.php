@@ -134,6 +134,7 @@ class Server{
 			$readHandles[] = $this->socket->getHandle();
 		}
 		foreach($this->clients as $clientId => $client){
+			// Collect client handles.
 			$readHandles[] = $client->getSocket()->getHandle();
 		}
 		$readHandlesNum = count($readHandles);

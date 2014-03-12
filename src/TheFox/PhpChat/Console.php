@@ -196,7 +196,7 @@ class Console extends Thread{
 					}
 					else{
 						$this->buffer .= $char;
-						$this->log->debug('buffer "'.$this->buffer.'"');
+						#$this->log->debug('buffer "'.$this->buffer.'"');
 					}
 				}
 			}
@@ -224,7 +224,7 @@ class Console extends Thread{
 						.PHP_EOL."/exit                     - exit this programm"
 						.PHP_EOL.''
 					);
-					$this->printPs1('printMsgStack');
+					$this->printPs1('printMsgStack help');
 				}
 				elseif($line == 'nick'){
 					#print 'Your nickname: '.$this->settings['phpchat']['user']['nickname'].PHP_EOL;
