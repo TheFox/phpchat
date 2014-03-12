@@ -9,17 +9,19 @@ use Closure;
 class ClientAction{
 	
 	const CRITERION_NONE = 0;
-	const CRITERION_AFTER_CONNECT = 1;
-	const CRITERION_AFTER_ID = 2;
-	const CRITERION_AFTER_ID_OK = 4;
+	const CRITERION_ON_CONSTRUCT = 100;
+	const CRITERION_AFTER_CONNECT = 200;
+	const CRITERION_AFTER_ID = 300;
+	const CRITERION_AFTER_ID_OK = 310;
+	const CRITERION_AFTER_HAS_SSL = 400;
 	
 	private $id = 0;
-	private $criteria = 0;
+	private $criteria = array();
 	private $objc = null;
 	private $func = null;
 	
-	public function __construct($criteria = 0){
-		$this->criteria = $criteria;
+	public function __construct($criterion){
+		$this->criteria = array($criterion);
 	}
 	
 	public function setId($id){
@@ -30,12 +32,8 @@ class ClientAction{
 		return $this->id;
 	}
 	
-	public function getCriteria(){
-		return $this->criteria;
-	}
-	
 	public function hasCriterion($criterion){
-		return $this->getCriteria() & $criterion;
+		return in_array($criterion, $this->criteria);
 	}
 	
 	public function functionSet($objc, $func = null){
