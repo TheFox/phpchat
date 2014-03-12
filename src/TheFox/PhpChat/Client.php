@@ -304,6 +304,15 @@ class Client{
 				}
 			}
 			
+			$actions = $this->actionsGetByCriterion(ClientAction::CRITERION_AFTER_HELLO);
+			foreach($actions as $actionsId => $action){
+				$this->actionRemove($action);
+				$action->functionExec($this);
+				
+				print __CLASS__.'->'.__FUNCTION__.': action CRITERION_AFTER_HELLO'."\n";
+				#ve($action);
+			}
+			
 			$this->sendId();
 		}
 		elseif($msgName == 'id'){
