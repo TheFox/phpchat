@@ -242,7 +242,7 @@ class Console extends Thread{
 						
 						if($port <= 0xffff){
 							$this->msgAdd('Connecting to '.$ip.':'.$port.' ...');
-							$connected = $this->getIpcKernelConnection()->execSync('serverConnect', array($ip, $port));
+							$connected = $this->getIpcKernelConnection()->execSync('serverConnect', array($ip, $port, true));
 							$this->msgAdd('Connection to '.$ip.':'.$port.' '.($connected ? 'established' : 'failed').'.');
 							$this->printPs1('printMsgStack connect B');
 						}

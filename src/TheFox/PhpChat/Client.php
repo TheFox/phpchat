@@ -911,6 +911,22 @@ class Client{
 			}
 		}
 		
+		elseif($msgName == 'talk_request'){
+			if($this->getStatus('hasSsl')){
+				$rid = '';
+				$userNickname = '';
+				if(array_key_exists('rid', $msgData)){
+					$rid = $msgData['rid'];
+				}
+				if(array_key_exists('userNickname', $msgData)){
+					$userNickname = $msgData['userNickname'];
+				}
+				
+				
+				
+			}
+		}
+		
 		elseif($msgName == 'ping'){
 			$id = '';
 			if(array_key_exists('id', $msgData)){
@@ -1327,6 +1343,20 @@ class Client{
 			'nodeSslKeyPub' => base64_encode($nodeSslKeyPub),
 		);
 		$this->dataSend($this->msgCreate('ssl_key_pub_put', $data));
+	}
+	
+	public function sendTalkRequest($userNickname){
+		$rid = (string)Uuid::uuid4();
+		
+		$this->requestAdd('talk_request', $rid, array(
+			'userNickname' => $userNickname,
+		));
+		
+		$data = array(
+			'rid' => $rid,
+			'userNickname' => $userNickname,
+		);
+		$this->dataSend($this->sslMsgCreatePublicEncrypt('talk_request', $data));
 	}
 	
 	private function sendPing($id = ''){

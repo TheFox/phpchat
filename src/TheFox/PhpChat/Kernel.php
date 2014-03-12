@@ -103,11 +103,34 @@ class Kernel extends Thread{
 		return $this->server;
 	}
 	
-	public function serverConnect($ip, $port){
+	public function serverConnect($ip, $port, $isTalkRequest = false){
 		print __CLASS__.'->'.__FUNCTION__.': '.$ip.':'.$port."\n";
 		
 		if($this->getServer()){
-			return $this->getServer()->connect($ip, $port);
+			
+			$clientActions = array();
+			if($isTalkRequest){
+				
+				$action = new ClientAction(ClientAction::CRITERION_AFTER_HELLO);
+				$action->functionSet(function($client){
+					$client->setStatus('isChannel', true);
+				});
+				$clientActions[] = $action;
+				
+				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_OK);
+				$action->functionSet(function($client){
+					$client->sendSslInit();
+				});
+				$clientActions[] = $action;
+				
+				$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
+				$action->functionSet(function($client){
+					$client->sendTalkRequest('test_nick');
+				});
+				$clientActions[] = $action;
+			}
+			
+			return $this->getServer()->connect($ip, $port, $clientActions);
 		}
 		
 		return false;
