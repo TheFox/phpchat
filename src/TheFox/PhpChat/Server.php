@@ -48,6 +48,14 @@ class Server{
 		return $this->kernel;
 	}
 	
+	public function kernelHasConsole(){
+		if($this->getKernel() && $this->getKernel()->getIpcConsoleConnection() && $this->getKernel()->getIpcConsoleConnection()->getHandler()){
+			
+			return $this->getKernel()->getIpcConsoleConnection()->getHandler()->getClientsNum() > 0;
+		}
+		return false;
+	}
+	
 	public function setIp($ip){
 		$this->ip = $ip;
 	}
