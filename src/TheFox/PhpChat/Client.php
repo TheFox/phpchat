@@ -1140,7 +1140,7 @@ class Client{
 		$this->dataSend($this->msgCreate('hello', $data));
 	}
 	
-	private function sendId($isChannel = false){
+	private function sendId(){
 		if(!$this->getLocalNode()){
 			throw new RuntimeException('localNode not set.');
 		}
@@ -1152,7 +1152,7 @@ class Client{
 			'id'        => $this->getLocalNode()->getIdHexStr(),
 			'port'      => $this->getLocalNode()->getPort(),
 			'sslKeyPub' => $sslKeyPub,
-			'isChannel' => (bool)$isChannel,
+			'isChannel' => $this->getStatus('isChannel'),
 		);
 		$this->dataSend($this->msgCreate('id', $data));
 	}
