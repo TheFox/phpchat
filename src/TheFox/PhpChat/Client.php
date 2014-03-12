@@ -760,6 +760,12 @@ class Client{
 							$this->setStatus('hasSsl', true);
 							$this->log('debug', 'SSL: password verified');
 							#print __CLASS__.'->'.__FUNCTION__.': '.$msgName.' SSL: password verified'."\n";
+							
+							$actions = $this->actionsGetByCriterion(ClientAction::CRITERION_AFTER_HAS_SSL);
+							foreach($actions as $actionsId => $action){
+								$this->actionRemove($action);
+								$action->functionExec($this);
+							}
 						}
 						else{
 							$this->sendError(290, $msgName);
