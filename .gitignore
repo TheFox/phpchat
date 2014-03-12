@@ -1,6 +1,6 @@
 vendor
 *.lock
-test*.php
+test
 log
 data
 id_rsa*
