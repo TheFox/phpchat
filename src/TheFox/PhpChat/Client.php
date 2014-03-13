@@ -601,11 +601,10 @@ class Client{
 			if($this->getSsl()){
 				if($this->getStatus('hasId')){
 					if(!$this->getStatus('hasSslInit')){
+						$this->log('debug', 'SSL: init');
+						
 						$this->setStatus('hasSslInit', true);
-						
 						$this->sendSslInit();
-						
-						#$this->setStatus('hasSslInitOk', true);
 						$this->sendSslInitOk();
 					}
 				}
@@ -619,6 +618,8 @@ class Client{
 		}
 		elseif($msgName == 'ssl_init_ok'){
 			if($this->getStatus('hasSslInit') && !$this->getStatus('hasSslInitOk')){
+				$this->log('debug', 'SSL: init ok');
+				
 				$this->setStatus('hasSslInitOk', true);
 				$this->sendSslTest();
 			}
@@ -639,6 +640,8 @@ class Client{
 					}
 					
 					if($token){
+						$this->log('debug', 'SSL: test');
+						
 						$this->setStatus('hasSslTest', true);
 						$this->sendSslVerify($token);
 					}
@@ -696,10 +699,10 @@ class Client{
 					}
 					
 					if($password){
+						$this->log('debug', 'SSL: password put');
+						
 						$this->setStatus('hasSslPasswortPut', true);
 						$this->sslPasswordPeer = $password;
-						
-						#$this->log('debug', 'SSL: peer password: '.$this->sslPasswordPeer);
 						
 						$this->sendSslPasswordTest();
 					}
@@ -757,9 +760,9 @@ class Client{
 					
 					if($token){
 						if($this->sslPasswordToken && $token == hash('sha512', $this->sslPasswordToken.'_'.$this->getNode()->getSslKeyPubFingerprint())){
-							$this->setStatus('hasSsl', true);
 							$this->log('debug', 'SSL: password verified');
-							#print __CLASS__.'->'.__FUNCTION__.': '.$msgName.' SSL: password verified'."\n";
+							
+							$this->setStatus('hasSsl', true);
 							
 							$actions = $this->actionsGetByCriterion(ClientAction::CRITERION_AFTER_HAS_SSL);
 							foreach($actions as $actionsId => $action){
