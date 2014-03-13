@@ -345,7 +345,9 @@ class Console extends Thread{
 					#$this->msgAdd('exit');
 					$this->setExit(1);
 				}
-				
+				else{
+					$this->printPs1('handleLine else');
+				}
 			}
 			else{
 				if($this->modeChannel){
