@@ -408,7 +408,7 @@ class Console extends Thread{
 		$talkRequest->setClient($client);
 		$talkRequest->setUserNickname($userNickname);
 		
-		$this->consoleMsgAdd('User "'.$talkRequest->getUserNickname().'" wants to talk to you. Type "/request accept '.$talkRequest->getId().'" to get in touch.');
+		$this->msgAdd('User "'.$talkRequest->getUserNickname().'" wants to talk to you. Type "/request accept '.$talkRequest->getId().'" to get in touch.');
 	}
 	
 	private function talkResponseSend(TalkRequest $talkRequest){

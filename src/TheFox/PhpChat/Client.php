@@ -980,6 +980,8 @@ class Client{
 						$userNickname = (int)$msgData['userNickname'];
 					}
 					
+					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$status);
+					
 					if($status == 0){
 						// Undefined
 					}
@@ -997,7 +999,7 @@ class Client{
 					}
 					elseif($status == 4){
 						// No console, standalone server.
-						$this->consoleMsgAdd($this->getIpPort().' has no user interface. Can\'t talk to.');
+						$this->consoleMsgAdd($this->getIpPort().' has no user interface. Can\'t talk to you.');
 					}
 					
 				}
