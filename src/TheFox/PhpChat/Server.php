@@ -227,6 +227,13 @@ class Server{
 		return null;
 	}
 	
+	public function clientTalkResponseSend(Client $client, $rid, $status, $userNickname = ''){
+		if(isset($this->clients[$client->getId()])){
+			$client = $this->clients[$client->getId()];
+			$client->sendTalkResponse($rid, $status, $userNickname);
+		}
+	}
+	
 	private function clientRemove(Client $client){
 		$this->log->debug('client remove: '.$client->getId());
 		

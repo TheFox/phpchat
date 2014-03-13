@@ -57,6 +57,12 @@ class Client{
 		$this->status['hasSsl'] = false;
 	}
 	
+	public function __sleep(){
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+		return array('id', 'ip', 'port');
+	}
+	
 	public function __destruct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 	}
@@ -935,6 +941,18 @@ class Client{
 					
 					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$userNickname);
 					
+					if($rid){
+						if($this->getServer() && $this->getServer()->kernelHasConsole()){
+							#$this->consoleMsgAdd('User "'.$userNickname.'" wants to talk to you.');
+							$this->consoleTalkRequestAdd($rid, $userNickname);
+						}
+						else{
+							$this->sendTalkResponse($rid, 4);
+						}
+					}
+					else{
+						$this->sendError(900, $msgName);
+					}
 				}
 				else{
 					$this->sendError(900, $msgName);
@@ -943,6 +961,46 @@ class Client{
 			else{
 				$this->sendError(260, $msgName);
 				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
+			}
+		}
+		elseif($msgName == 'talk_response'){
+			if($this->getStatus('hasSsl')){
+				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
+				if($msgData){
+					$rid = '';
+					$status = 0;
+					$userNickname = '';
+					if(array_key_exists('rid', $msgData)){
+						$rid = $msgData['rid'];
+					}
+					if(array_key_exists('status', $msgData)){
+						$status = (int)$msgData['status'];
+					}
+					if(array_key_exists('userNickname', $msgData)){
+						$userNickname = (int)$msgData['userNickname'];
+					}
+					
+					if($status == 0){
+						// Undefined
+					}
+					elseif($status == 1){
+						// Accepted
+						$this->consoleMsgAdd('Talk request accepted.'.PHP_EOL.'Now talking to "'.$userNickname.'".');
+					}
+					elseif($status == 2){
+						// Declined
+						$this->consoleMsgAdd('Talk request declined.');
+					}
+					elseif($status == 3){
+						// Timeout
+						$this->consoleMsgAdd('Talk request timed-out.');
+					}
+					elseif($status == 4){
+						// No console, standalone server.
+						$this->consoleMsgAdd($this->getIpPort().' has no user interface. Can\'t talk to.');
+					}
+					
+				}
 			}
 		}
 		
@@ -1377,6 +1435,17 @@ class Client{
 		$this->dataSend($this->sslMsgCreatePasswordEncrypt('talk_request', $data));
 	}
 	
+	public function sendTalkResponse($rid, $status, $userNickname = ''){
+		$rid = (string)Uuid::uuid4();
+		
+		$data = array(
+			'rid' => $rid,
+			'status' => (int)$status,
+			'userNickname' => $userNickname,
+		);
+		$this->dataSend($this->sslMsgCreatePasswordEncrypt('talk_response', $data));
+	}
+	
 	private function sendPing($id = ''){
 		$data = array(
 			'id' => $id,
@@ -1449,6 +1518,17 @@ class Client{
 			&& $this->getServer()->getKernel()->getIpcConsoleConnection()){
 			
 			$this->getServer()->getKernel()->getIpcConsoleConnection()->execAsync('msgAdd', array($msgText));
+		}
+	}
+	
+	private function consoleTalkRequestAdd($rid, $userNickname){
+		if(
+			$this->getServer()
+			&& $this->getServer()->getKernel()
+			&& $this->getServer()->getKernel()->getIpcConsoleConnection()){
+			
+			$this->getServer()->getKernel()->getIpcConsoleConnection()->execAsync('talkRequestAdd', 
+				array($this, $rid, $userNickname));
 		}
 	}
 	

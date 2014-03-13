@@ -28,7 +28,10 @@ class Console extends Thread{
 	private $msgStack = array();
 	private $buffer = '';
 	private $modeChannel = false;
+	private $modeChannelClient = null;
 	private $nick = '';
+	private $talkRequestsId = 0;
+	private $talkRequests = array();
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -106,6 +109,7 @@ class Console extends Thread{
 		$this->getIpcKernelConnection()->setHandler(new IpcStreamHandler('127.0.0.1', 20000));
 		$this->getIpcKernelConnection()->functionAdd('shutdown', $this, 'ipcKernelShutdown');
 		$this->getIpcKernelConnection()->functionAdd('msgAdd', $this, 'msgAdd');
+		$this->getIpcKernelConnection()->functionAdd('talkRequestAdd', $this, 'talkRequestAdd');
 		
 		if(!$this->getIpcKernelConnection()->connect()){
 			throw new RuntimeException('Could not connect to kernel process.');
@@ -252,6 +256,69 @@ class Console extends Thread{
 						}
 					}
 				}
+				elseif($line == 'request'){
+					print ' ID RID                                   IP:PORT               USERNAME'.PHP_EOL;
+					foreach($this->talkRequests as $talkRequestId => $request){
+						$ipPortStr = $request->getClient()->getIp().':'.$request->getClient()->getPort();
+						$ipPortStrLen = strlen($ipPortStr);
+						
+						printf('%3d %36s  %s %s'.PHP_EOL, $request->getId(), substr($request->getRid(), 0, 36), $ipPortStr.str_repeat(' ', 21 - $ipPortStrLen), $request->getUserNickname());
+					}
+					$this->printPs1('printMsgStack request');
+				}
+				elseif(substr($line, 0, 8) == 'request '){
+					$data = substr($line, 8);
+					
+					$pos = strpos($data, ' ');
+					if($pos === false){
+						print 'Usage: /request accept <ID>'.PHP_EOL.'       /request decl <ID>'.PHP_EOL;
+					}
+					else{
+						$action = substr($data, 0, $pos);
+						$id = substr($data, $pos + 1);
+						
+						if(isset($this->talkRequests[$id])){
+							$talkRequest = $this->talkRequests[$id];
+							
+							if($talkRequest->getStatus() == 0){
+								if($action == 'accept'){
+									$talkRequest->setStatus(1);
+									
+									$this->msgAdd('Accepting talk request ID '.$talkRequest->getId().'.'.PHP_EOL.'Now talking to "'.$talkRequest->getUserNickname().'".');
+									
+									$this->modeChannel = true;
+									$this->modeChannelClient = $talkRequest->getClient();
+									
+									#$this->settings['tmp']['server']->clientActionTalkResponseAdd($talkRequest['clientId'], $talkRequest['rid'], 1, $this->settings['phpchat']['user']['nickname']);
+									#$this->setChannelServerClientId($talkRequest['clientId']);
+									
+									#$this->settings['tmp']['addressbook']->contactAdd($talkRequest['nodeId'], $talkRequest->getUserNickname());
+								}
+								else{
+									$talkRequest->getStatus(2);
+									$this->msgAdd('Declining talk request ID '.$id.'.');
+									
+									#$this->settings['tmp']['server']->clientActionTalkResponseAdd($talkRequest['clientId'], $talkRequest['rid'], 2);
+								}
+								
+								$this->talkResponseSend($talkRequest);
+							}
+							elseif($request->getStatus() == 1){
+								$this->msgAdd('You already accepted this talk request.');
+							}
+							elseif($request->getStatus() == 2){
+								$this->msgAdd('You already declined this talk request.');
+							}
+							elseif($request->getStatus() == 3){
+								$this->msgAdd('Talk request ID '.$id.' timed-out.');
+							}
+						}
+						else{
+							#print $this->getDate()..PHP_EOL;
+							$this->msgAdd('Talk request ID '.$id.' not found.');
+						}
+					}
+				}
 				elseif($line == 'nick'){
 					#print 'Your nickname: '.$this->settings['phpchat']['user']['nickname'].PHP_EOL;
 					#print 'Your nickname: '.$this->nick.PHP_EOL;
@@ -327,6 +394,31 @@ class Console extends Thread{
 		$this->ipcKernelShutdown = true;
 		
 		return null;
+	}
+	
+	public function talkRequestAdd(Client $client, $rid, $userNickname){
+		$this->talkRequestsId++;
+		
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		ve($client);
+		
+		$talkRequest = new TalkRequest();
+		$talkRequest->setId($this->talkRequestsId);
+		$talkRequest->setRid($rid);
+		$talkRequest->setClient($client);
+		$talkRequest->setUserNickname($userNickname);
+		
+		$this->consoleMsgAdd('User "'.$talkRequest->getUserNickname().'" wants to talk to you. Type "/request accept '.$talkRequest->getId().'" to get in touch.');
+	}
+	
+	private function talkResponseSend(TalkRequest $talkRequest){
+		$userNickname = '';
+		if($talkRequest->getStatus() == 1){
+			$userNickname = $this->nick;
+		}
+		
+		$this->getIpcKernelConnection()->execAsync('serverTalkResponseSend',
+			array($talkRequest->getClient(), $talkRequest->getRid(), $talkRequest->getStatus(), $userNickname));
 	}
 	
 }

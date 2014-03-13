@@ -125,7 +125,7 @@ class Kernel extends Thread{
 				
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
 				$action->functionSet(function($client){
-					$client->sendTalkRequest('test_nick');
+					$client->sendTalkRequest($this->getSettingsUserNickname());
 				});
 				$clientActions[] = $action;
 			}
@@ -134,6 +134,14 @@ class Kernel extends Thread{
 		}
 		
 		return false;
+	}
+	
+	public function serverTalkResponseSend(Client $client, $rid, $status, $userNickname = ''){
+		print __CLASS__.'->'.__FUNCTION__.': '.$rid.', '.$status.', '.$userNickname."\n";
+		
+		if($this->getServer()){
+			$this->getServer()->clientTalkResponseSend($client, $rid, $status, $userNickname);
+		}
 	}
 	
 	public function getTable(){
