@@ -113,7 +113,7 @@ class Kernel extends Thread{
 				
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_HELLO);
 				$action->functionSet(function($client){
-					$client->setStatus('isChannel', true);
+					$client->setStatus('isChannelLocal', true);
 				});
 				$clientActions[] = $action;
 				

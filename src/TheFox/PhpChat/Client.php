@@ -42,7 +42,8 @@ class Client{
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		$this->status['hasShutdown'] = false;
-		$this->status['isChannel'] = false;
+		$this->status['isChannelLocal'] = false;
+		$this->status['isChannelPeer'] = false;
 		
 		$this->status['hasId'] = false;
 		$this->status['hasSslInit'] = false;
@@ -325,7 +326,7 @@ class Client{
 					$port = 0;
 					$strKeyPub = '';
 					$strKeyPubFingerprint = '';
-					$isChannel = false;
+					$isChannelPeer = false;
 					if(array_key_exists('release', $msgData)){
 						$release = (int)$msgData['release'];
 					}
@@ -339,12 +340,12 @@ class Client{
 						$strKeyPub = base64_decode($msgData['sslKeyPub']);
 						$strKeyPubFingerprint = Node::genSslKeyFingerprint($strKeyPub);
 					}
-					if(array_key_exists('isChannel', $msgData)){
-						$isChannel = (bool)$msgData['isChannel'];
+					if(array_key_exists('isChannel', $msgData)){ // isChannelPeer
+						$isChannelPeer = (bool)$msgData['isChannel'];
 					}
 					
-					if($isChannel){
-						$this->setStatus('isChannel', true);
+					if($isChannelPeer){
+						$this->setStatus('isChannelPeer', true);
 					}
 					
 					$idOk = false;
@@ -1181,7 +1182,7 @@ class Client{
 			'id'        => $this->getLocalNode()->getIdHexStr(),
 			'port'      => $this->getLocalNode()->getPort(),
 			'sslKeyPub' => $sslKeyPub,
-			'isChannel' => $this->getStatus('isChannel'),
+			'isChannel' => $this->getStatus('isChannelLocal'),
 		);
 		$this->dataSend($this->msgCreate('id', $data));
 	}
