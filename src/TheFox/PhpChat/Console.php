@@ -399,8 +399,8 @@ class Console extends Thread{
 	public function talkRequestAdd(Client $client, $rid, $userNickname){
 		$this->talkRequestsId++;
 		
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
-		ve($client);
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#ve($client);
 		
 		$talkRequest = new TalkRequest();
 		$talkRequest->setId($this->talkRequestsId);
