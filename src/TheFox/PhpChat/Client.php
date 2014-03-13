@@ -933,7 +933,7 @@ class Client{
 						$userNickname = $msgData['userNickname'];
 					}
 					
-					$this->log('debug', getIpPort().' recv '.$msgName.': '.$rid.', '.$userNickname);
+					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$userNickname);
 					
 				}
 				else{
@@ -968,7 +968,6 @@ class Client{
 			}
 			
 			$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$code.', '.$msg.', '.$name);
-			#print $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$code.', '.$msg.', '.$name."\n";
 		}
 		elseif($msgName == 'quit'){
 			$this->shutdown();
