@@ -230,6 +230,10 @@ class Server{
 	private function clientRemove(Client $client){
 		$this->log->debug('client remove: '.$client->getId());
 		
+		if($client->getStatus('isChannelLocal') || $client->getStatus('isChannelPeer')){
+			$this->consoleMsgAdd('Connection to '.$client->getIpPort().' closed.');
+		}
+		
 		$client->shutdown();
 		
 		$clientsId = $client->getId();
@@ -264,5 +268,11 @@ class Server{
 		return false;
 	}
 	
+	private function consoleMsgAdd($msgText){
+		if($this->getKernel() && $this->getKernel()->getIpcConsoleConnection()){
+			
+			$this->getKernel()->getIpcConsoleConnection()->execAsync('msgAdd', array($msgText));
+		}
+	}
 	
 }

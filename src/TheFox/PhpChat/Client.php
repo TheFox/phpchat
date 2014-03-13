@@ -436,6 +436,11 @@ class Client{
 					$this->actionRemove($action);
 					$action->functionExec($this);
 				}
+				
+				if($this->getStatus('isChannelPeer')){
+					$this->consoleMsgAdd('New incoming channel connection from '.$this->getIpPort().'');
+				}
+				
 			}
 			else{
 				$this->sendError(100, $msgName);
@@ -1435,6 +1440,16 @@ class Client{
 			if($this->ssl){
 				openssl_free_key($this->ssl);
 			}
+		}
+	}
+	
+	private function consoleMsgAdd($msgText){
+		if(
+			$this->getServer()
+			&& $this->getServer()->getKernel()
+			&& $this->getServer()->getKernel()->getIpcConsoleConnection()){
+			
+			$this->getServer()->getKernel()->getIpcConsoleConnection()->execAsync('msgAdd', array($msgText));
 		}
 	}
 	

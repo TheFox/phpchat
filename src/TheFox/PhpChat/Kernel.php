@@ -186,4 +186,10 @@ class Kernel extends Thread{
 		$this->ipcConsoleShutdown = true;
 	}
 	
+	public function ipcConsoleMsgSend($msgText){
+		if($this->getIpcConsoleConnection()){
+			$this->getIpcConsoleConnection()->execAsync('msgAdd', array($msgText));
+		}
+	}
+	
 }
