@@ -413,8 +413,8 @@ class Client{
 						
 						$this->sendIdOk();
 						
-						#$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$id.', '.$port.', '.$node->getSslKeyPubFingerprint());
-						$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$id.', '.$port);
+						#$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$id.', '.$port.', '.$node->getSslKeyPubFingerprint());
+						$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$id.', '.$port);
 					}
 					
 				}
@@ -427,7 +427,7 @@ class Client{
 			}
 		}
 		elseif($msgName == 'id_ok'){
-			$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName);
+			$this->log('debug', $this->getIpPort().' recv '.$msgName);
 			
 			if($this->getStatus('hasId')){
 				$actions = $this->actionsGetByCriterion(ClientAction::CRITERION_AFTER_ID_OK);
@@ -455,7 +455,7 @@ class Client{
 					$nodeId = $msgData['nodeId'];
 				}
 				
-				$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$rid.', '.$nodeId);
+				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$nodeId);
 				
 				if($nodeId){
 					$node = new Node();
@@ -502,7 +502,7 @@ class Client{
 				}
 				
 				if($rid){
-					$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$rid);
+					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid);
 					
 					$request = null;
 					$request = $this->requestGetByRid($rid);
@@ -802,14 +802,14 @@ class Client{
 					$nodeSslKeyPubFingerprint = $msgData['nodeSslKeyPubFingerprint'];
 				}
 				
-				$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$rid);
+				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid);
 				
 				if(Node::sslKeyPubFingerprintVerify($nodeSslKeyPubFingerprint)){
-					$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': pub key fp ok');
+					$this->log('debug', $this->getIpPort().' recv '.$msgName.': pub key fp ok');
 					
 					$node = $this->getTable()->nodeFindByKeyPubFingerprint($nodeSslKeyPubFingerprint);
 					if($node){
-						$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': found node');
+						$this->log('debug', $this->getIpPort().' recv '.$msgName.': found node');
 						
 						$this->sendSslKeyPubPut($rid, $node->getIdHexStr(), $node->getIp(), $node->getPort(), $node->getSslKeyPubFingerprint(), $node->getSslKeyPub());
 					}
@@ -817,14 +817,14 @@ class Client{
 						// Not found.
 						$this->sendSslKeyPubPut($rid);
 						
-						$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': node not found A');
+						$this->log('debug', $this->getIpPort().' recv '.$msgName.': node not found A');
 					}
 				}
 				else{
 					// Fingerprint not valid.
 					$this->sendSslKeyPubPut($rid);
 					
-					$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': node not found B');
+					$this->log('debug', $this->getIpPort().' recv '.$msgName.': node not found B');
 				}
 			}
 			else{
@@ -860,12 +860,12 @@ class Client{
 					#$nodeSslKeyPubFingerprintByKeyPub = Node::genSslKeyFingerprint($nodeSslKeyPub);
 				}
 				
-				$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': "'.$rid.'" "'.$nodeId.'" "'.$nodeIp.'" "'.$nodePort.'" "'.$nodeSslKeyPubFingerprint.'"');
+				$this->log('debug', $this->getIpPort().' recv '.$msgName.': "'.$rid.'" "'.$nodeId.'" "'.$nodeIp.'" "'.$nodePort.'" "'.$nodeSslKeyPubFingerprint.'"');
 				
 				$request = $this->requestGetByRid($rid);
 				if($request){
 					$this->requestRemove($request);
-					$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': request '.$request['id']);
+					$this->log('debug', $this->getIpPort().' recv '.$msgName.': request '.$request['id']);
 					
 					if($nodeId){
 						$node = new Node();
@@ -886,7 +886,7 @@ class Client{
 							
 							$onode = $this->getTable()->nodeFindInBuckets($node);
 							if($onode){
-								$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$rid.', old node');
+								$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', old node');
 								
 								if(!$onode->getSslKeyPub() && $node->getSslKeyPub()){
 									$onode->setSslKeyPub($node->getSslKeyPub());
@@ -894,7 +894,7 @@ class Client{
 								}
 							}
 							else{
-								$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$rid.', new node');
+								$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', new node');
 								
 								$this->getTable()->nodeEnclose($node);
 							}
@@ -927,8 +927,7 @@ class Client{
 						$userNickname = $msgData['userNickname'];
 					}
 					
-					$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$rid.', '.$userNickname);
-					
+					$this->log('debug', getIpPort().' recv '.$msgName.': '.$rid.', '.$userNickname);
 					
 				}
 				else{
@@ -962,7 +961,7 @@ class Client{
 				$name = $msgData['name'];
 			}
 			
-			$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$code.', '.$msg.', '.$name);
+			$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$code.', '.$msg.', '.$name);
 			#print $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$code.', '.$msg.', '.$name."\n";
 		}
 		elseif($msgName == 'quit'){
