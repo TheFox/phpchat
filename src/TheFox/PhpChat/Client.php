@@ -1370,7 +1370,7 @@ class Client{
 			'rid' => $rid,
 			'userNickname' => $userNickname,
 		);
-		$this->dataSend($this->sslPasswordEncrypt('talk_request', $data));
+		$this->dataSend($this->sslMsgCreatePasswordEncrypt('talk_request', $data));
 	}
 	
 	private function sendPing($id = ''){
