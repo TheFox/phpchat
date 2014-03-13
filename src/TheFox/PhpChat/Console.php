@@ -408,6 +408,8 @@ class Console extends Thread{
 		$talkRequest->setClient($client);
 		$talkRequest->setUserNickname($userNickname);
 		
+		$this->talkRequests[$this->talkRequestsId] = $talkRequest;
+		
 		$this->msgAdd('User "'.$talkRequest->getUserNickname().'" wants to talk to you. Type "/request accept '.$talkRequest->getId().'" to get in touch.');
 	}
 	
