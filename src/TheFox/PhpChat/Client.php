@@ -916,17 +916,28 @@ class Client{
 		
 		elseif($msgName == 'talk_request'){
 			if($this->getStatus('hasSsl')){
-				$rid = '';
-				$userNickname = '';
-				if(array_key_exists('rid', $msgData)){
-					$rid = $msgData['rid'];
+				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
+				if($msgData){
+					$rid = '';
+					$userNickname = '';
+					if(array_key_exists('rid', $msgData)){
+						$rid = $msgData['rid'];
+					}
+					if(array_key_exists('userNickname', $msgData)){
+						$userNickname = $msgData['userNickname'];
+					}
+					
+					$this->log('debug', $this->getIp().':'.$this->getPort().' recv '.$msgName.': '.$rid.', '.$userNickname);
+					
+					
 				}
-				if(array_key_exists('userNickname', $msgData)){
-					$userNickname = $msgData['userNickname'];
+				else{
+					$this->sendError(900, $msgName);
 				}
-				
-				
-				
+			}
+			else{
+				$this->sendError(260, $msgName);
+				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
 			}
 		}
 		
@@ -1359,7 +1370,7 @@ class Client{
 			'rid' => $rid,
 			'userNickname' => $userNickname,
 		);
-		$this->dataSend($this->sslMsgCreatePublicEncrypt('talk_request', $data));
+		$this->dataSend($this->sslPasswordEncrypt('talk_request', $data));
 	}
 	
 	private function sendPing($id = ''){
