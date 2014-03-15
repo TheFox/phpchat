@@ -964,6 +964,8 @@ class Client{
 			}
 		}
 		elseif($msgName == 'talk_response'){
+			$this->log('debug', $this->getIpPort().' recv '.$msgName);
+			
 			if($this->getStatus('hasSsl')){
 				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
 				if($msgData){
