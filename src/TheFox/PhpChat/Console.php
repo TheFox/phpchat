@@ -6,6 +6,9 @@ use RuntimeException;
 use DateTime;
 use DateTimeZone;
 
+use Rhumsaa\Uuid\Uuid;
+use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
+
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler as LoggerStreamHandler;
 use TheFox\Ipc\ConnectionClient;
@@ -118,6 +121,7 @@ class Console extends Thread{
 		$this->getIpcKernelConnection()->functionAdd('shutdown', $this, 'ipcKernelShutdown');
 		$this->getIpcKernelConnection()->functionAdd('msgAdd', $this, 'msgAdd');
 		$this->getIpcKernelConnection()->functionAdd('talkRequestAdd', $this, 'talkRequestAdd');
+		$this->getIpcKernelConnection()->functionAdd('talkMsgAdd', $this, 'talkMsgAdd');
 		$this->getIpcKernelConnection()->functionAdd('setModeChannelClient', $this, 'setModeChannelClient');
 		
 		if(!$this->getIpcKernelConnection()->connect()){
@@ -360,7 +364,8 @@ class Console extends Thread{
 			}
 			else{
 				if($this->modeChannel){
-					# TODO
+					$this->talkMsgAdd(0, $this->userNickname, $line);
+					$this->talkMsgSend($line);
 				}
 				else{
 					$this->printPs1('handleLine');
@@ -432,6 +437,21 @@ class Console extends Thread{
 		
 		$this->getIpcKernelConnection()->execAsync('serverTalkResponseSend',
 			array($talkRequest->getClient(), $talkRequest->getRid(), $talkRequest->getStatus(), $userNickname));
+	}
+	
+	private function talkMsgSend($text){
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+		$rid = (string)Uuid::uuid4();
+		
+		$args = array($this->getModeChannelClient(), $rid, $this->userNickname, $text);
+		$this->getIpcKernelConnection()->execAsync('serverTalkMsgSend', $args);
+	}
+	
+	public function talkMsgAdd($rid = '', $userNickname, $text){
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+		$this->msgAdd('<'.$userNickname.'> '.$text);
 	}
 	
 }

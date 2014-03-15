@@ -66,6 +66,7 @@ class Kernel extends Thread{
 		$this->ipcConsoleConnection->functionAdd('setSettingsUserNickname', $this, 'setSettingsUserNickname');
 		$this->ipcConsoleConnection->functionAdd('serverConnect', $this, 'serverConnect');
 		$this->ipcConsoleConnection->functionAdd('serverTalkResponseSend', $this, 'serverTalkResponseSend');
+		$this->ipcConsoleConnection->functionAdd('serverTalkMsgSend', $this, 'serverTalkMsgSend');
 		$this->ipcConsoleConnection->connect();
 		
 		
@@ -144,6 +145,14 @@ class Kernel extends Thread{
 		
 		if($this->getServer()){
 			$this->getServer()->clientTalkResponseSend($client, $rid, $status, $userNickname);
+		}
+	}
+	
+	public function serverTalkMsgSend(Client $client, $rid, $userNickname, $text){
+		print __CLASS__.'->'.__FUNCTION__.': '.$rid.', '.$userNickname.', '.$text."\n";
+		
+		if($this->getServer()){
+			$this->getServer()->clientTalkMsgSend($client, $rid, $userNickname, $text);
 		}
 	}
 	

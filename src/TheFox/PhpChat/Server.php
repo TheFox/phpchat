@@ -234,6 +234,13 @@ class Server{
 		}
 	}
 	
+	public function clientTalkMsgSend(Client $client, $rid, $userNickname, $text){
+		if(isset($this->clients[$client->getId()])){
+			$client = $this->clients[$client->getId()];
+			$client->sendTalkMsg($rid, $userNickname, $text);
+		}
+	}
+	
 	private function clientRemove(Client $client){
 		$this->log->debug('client remove: '.$client->getId());
 		

@@ -1008,6 +1008,31 @@ class Client{
 				}
 			}
 		}
+		elseif($msgName == 'talk_msg'){
+			#$this->log('debug', $this->getIpPort().' recv '.$msgName);
+			
+			if($this->getStatus('hasSsl')){
+				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
+				if($msgData){
+					$rid = '';
+					$userNickname = '';
+					$text = '';
+					if(array_key_exists('rid', $msgData)){
+						$rid = $msgData['rid'];
+					}
+					if(array_key_exists('userNickname', $msgData)){
+						$userNickname = $msgData['userNickname'];
+					}
+					if(array_key_exists('text', $msgData)){
+						$text = $msgData['text'];
+					}
+					
+					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$userNickname.', '.$text);
+					
+					$this->consoleTalkMsgAdd($rid, $userNickname, $text);
+				}
+			}
+		}
 		
 		elseif($msgName == 'ping'){
 			$id = '';
@@ -1451,6 +1476,15 @@ class Client{
 		$this->dataSend($this->sslMsgCreatePasswordEncrypt('talk_response', $data));
 	}
 	
+	public function sendTalkMsg($rid, $userNickname, $text){
+		$data = array(
+			'rid' => $rid,
+			'userNickname' => $userNickname,
+			'text' => $text,
+		);
+		$this->dataSend($this->sslMsgCreatePasswordEncrypt('talk_msg', $data));
+	}
+	
 	private function sendPing($id = ''){
 		$data = array(
 			'id' => $id,
@@ -1534,6 +1568,16 @@ class Client{
 			
 			$this->getServer()->getKernel()->getIpcConsoleConnection()->execAsync('talkRequestAdd', 
 				array($this, $rid, $userNickname));
+		}
+	}
+	
+	private function consoleTalkMsgAdd($rid, $userNickname, $text){
+		if(
+			$this->getServer()
+			&& $this->getServer()->getKernel()
+			&& $this->getServer()->getKernel()->getIpcConsoleConnection()){
+			
+			$this->getServer()->getKernel()->getIpcConsoleConnection()->execAsync('talkMsgAdd', array($rid, $userNickname, $text));
 		}
 	}
 	
