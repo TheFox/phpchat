@@ -339,7 +339,9 @@ class Console extends Thread{
 				}
 				elseif($line == 'close'){
 					$this->talkCloseSend();
-					$this->msgAdd('Connection closed.');
+					
+					$this->setModeChannel(false);
+					$this->setModeChannelClient(null);
 				}
 				elseif($line == 'nick'){
 					#print 'Your nickname: '.$this->settings['phpchat']['user']['nickname'].PHP_EOL;
