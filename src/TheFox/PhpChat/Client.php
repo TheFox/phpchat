@@ -979,7 +979,7 @@ class Client{
 						$status = (int)$msgData['status'];
 					}
 					if(array_key_exists('userNickname', $msgData)){
-						$userNickname = (int)$msgData['userNickname'];
+						$userNickname = $msgData['userNickname'];
 					}
 					
 					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$status);
