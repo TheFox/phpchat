@@ -277,7 +277,6 @@ class Server{
 	
 	private function consoleMsgAdd($msgText){
 		if($this->getKernel() && $this->getKernel()->getIpcConsoleConnection()){
-			
 			$this->getKernel()->getIpcConsoleConnection()->execAsync('msgAdd', array($msgText));
 		}
 	}

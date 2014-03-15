@@ -29,7 +29,7 @@ class Console extends Thread{
 	private $buffer = '';
 	private $modeChannel = false;
 	private $modeChannelClient = null;
-	private $nick = '';
+	private $userNickname = '';
 	private $talkRequestsId = 0;
 	private $talkRequests = array();
 	
@@ -79,7 +79,7 @@ class Console extends Thread{
 	public function printPs1($debug = ''){
 		if($this->modeChannel){
 			#print $debug.$this->settings['phpchat']['user']['nickname'].':> _'.$this->buffer.'_'; # TODO
-			print $this->nick.':> '.$this->buffer;
+			print $this->userNickname.':> '.$this->buffer;
 		}
 		else{
 			#print $debug.' '.$this->getPs1().' _'.$this->buffer.'_'; # TODO
@@ -124,7 +124,7 @@ class Console extends Thread{
 			throw new RuntimeException('Could not connect to kernel process.');
 		}
 		
-		$this->nick = $this->getIpcKernelConnection()->execSync('getSettingsUserNickname');
+		$this->userNickname = $this->getIpcKernelConnection()->execSync('getSettingsUserNickname');
 		
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
@@ -330,8 +330,8 @@ class Console extends Thread{
 				}
 				elseif($line == 'nick'){
 					#print 'Your nickname: '.$this->settings['phpchat']['user']['nickname'].PHP_EOL;
-					#print 'Your nickname: '.$this->nick.PHP_EOL;
-					$this->msgAdd('Your nickname: '.$this->nick);
+					#print 'Your nickname: '.$this->userNickname.PHP_EOL;
+					$this->msgAdd('Your nickname: '.$this->userNickname);
 				}
 				elseif(substr($line, 0, 5) == 'nick '){
 					$tmp = substr($line, 5);
@@ -339,14 +339,14 @@ class Console extends Thread{
 					$tmp = substr($tmp, 0, Settings::USER_NICKNAME_LEN_MAX);
 					
 					if($tmp){
-						$this->nick = $tmp;
+						$this->userNickname = $tmp;
 						
-						$this->getIpcKernelConnection()->execAsync('setSettingsUserNickname', array($this->nick));
+						$this->getIpcKernelConnection()->execAsync('setSettingsUserNickname', array($this->userNickname));
 						
-						$this->msgAdd('New nickname: '.$this->nick);
+						$this->msgAdd('New nickname: '.$this->userNickname);
 					}
 					else{
-						$this->msgAdd('Your nickname: '.$this->nick);
+						$this->msgAdd('Your nickname: '.$this->userNickname);
 					}
 				}
 				elseif($line == 'exit'){
@@ -427,7 +427,7 @@ class Console extends Thread{
 	private function talkResponseSend(TalkRequest $talkRequest){
 		$userNickname = '';
 		if($talkRequest->getStatus() == 1){
-			$userNickname = $this->nick;
+			$userNickname = $this->userNickname;
 		}
 		
 		$this->getIpcKernelConnection()->execAsync('serverTalkResponseSend',
