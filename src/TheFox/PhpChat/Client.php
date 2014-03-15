@@ -990,6 +990,7 @@ class Client{
 					elseif($status == 1){
 						// Accepted
 						$this->consoleMsgAdd('Talk request accepted.'.PHP_EOL.'Now talking to "'.$userNickname.'".');
+						$this->consoleSetModeChannel(true);
 						$this->consoleSetModeChannelClient($this);
 					}
 					elseif($status == 2){
@@ -1051,6 +1052,7 @@ class Client{
 					$this->sendQuit();
 					
 					$this->consoleMsgAdd('Talk closed by "'.$userNickname.'".');
+					$this->consoleSetModeChannel(false);
 					$this->consoleSetModeChannelClient(null);
 				}
 			}
@@ -1614,6 +1616,16 @@ class Client{
 			&& $this->getServer()->getKernel()->getIpcConsoleConnection()){
 			
 			$this->getServer()->getKernel()->getIpcConsoleConnection()->execAsync('talkMsgAdd', array($rid, $userNickname, $text));
+		}
+	}
+	
+	private function consoleSetModeChannel($modeChannel){
+		if(
+			$this->getServer()
+			&& $this->getServer()->getKernel()
+			&& $this->getServer()->getKernel()->getIpcConsoleConnection()){
+			
+			$this->getServer()->getKernel()->getIpcConsoleConnection()->execAsync('setModeChannel', array($modeChannel));
 		}
 	}
 	

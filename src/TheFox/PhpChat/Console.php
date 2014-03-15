@@ -71,6 +71,14 @@ class Console extends Thread{
 		return $this->ps1;
 	}
 	
+	public function setModeChannel($modeChannel){
+		$this->modeChannel = $modeChannel;
+	}
+	
+	private function getModeChannel(){
+		return $this->modeChannel;
+	}
+	
 	public function setModeChannelClient(Client $modeChannelClient){
 		$this->modeChannelClient = $modeChannelClient;
 	}
@@ -80,7 +88,7 @@ class Console extends Thread{
 	}
 	
 	public function printPs1($debug = ''){
-		if($this->modeChannel){
+		if($this->getModeChannel()){
 			#print $debug.$this->settings['phpchat']['user']['nickname'].':> _'.$this->buffer.'_'; # TODO
 			print $this->userNickname.':> '.$this->buffer;
 		}
@@ -106,10 +114,6 @@ class Console extends Thread{
 		);
 	}
 	
-	public function setModeChannel($modeChannel){
-		$this->modeChannel = $modeChannel;
-	}
-	
 	private function getDate(){
 		$dt = new DateTime('now', new DateTimeZone('UTC'));
 		return $dt->format('H:i:s');
@@ -122,6 +126,7 @@ class Console extends Thread{
 		$this->getIpcKernelConnection()->functionAdd('msgAdd', $this, 'msgAdd');
 		$this->getIpcKernelConnection()->functionAdd('talkRequestAdd', $this, 'talkRequestAdd');
 		$this->getIpcKernelConnection()->functionAdd('talkMsgAdd', $this, 'talkMsgAdd');
+		$this->getIpcKernelConnection()->functionAdd('setModeChannel', $this, 'setModeChannel');
 		$this->getIpcKernelConnection()->functionAdd('setModeChannelClient', $this, 'setModeChannelClient');
 		
 		if(!$this->getIpcKernelConnection()->connect()){
@@ -299,7 +304,7 @@ class Console extends Thread{
 									
 									$this->msgAdd('Accepting talk request ID '.$talkRequest->getId().'.'.PHP_EOL.'Now talking to "'.$talkRequest->getUserNickname().'".');
 									
-									$this->modeChannel = true;
+									$this->setModeChannel(true);
 									$this->setModeChannelClient($talkRequest->getClient());
 									
 									#$this->settings['tmp']['server']->clientActionTalkResponseAdd($talkRequest['clientId'], $talkRequest['rid'], 1, $this->settings['phpchat']['user']['nickname']);
@@ -367,7 +372,7 @@ class Console extends Thread{
 				}
 			}
 			else{
-				if($this->modeChannel){
+				if($this->getModeChannel()){
 					$this->talkMsgAdd(0, $this->userNickname, $line);
 					$this->talkMsgSend($line);
 				}
