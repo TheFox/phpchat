@@ -241,6 +241,13 @@ class Server{
 		}
 	}
 	
+	public function clientTalkCloseSend(Client $client, $rid, $userNickname){
+		if(isset($this->clients[$client->getId()])){
+			$client = $this->clients[$client->getId()];
+			$client->sendTalkClose($rid, $userNickname);
+		}
+	}
+	
 	private function clientRemove(Client $client){
 		$this->log->debug('client remove: '.$client->getId());
 		

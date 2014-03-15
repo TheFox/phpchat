@@ -1033,6 +1033,28 @@ class Client{
 				}
 			}
 		}
+		elseif($msgName == 'talk_close'){
+			if($this->getStatus('hasSsl')){
+				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
+				if($msgData){
+					$rid = '';
+					$userNickname = '';
+					if(array_key_exists('rid', $msgData)){
+						$rid = $msgData['rid'];
+					}
+					if(array_key_exists('userNickname', $msgData)){
+						$userNickname = $msgData['userNickname'];
+					}
+					
+					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$userNickname);
+					
+					$this->sendQuit();
+					
+					$this->consoleMsgAdd('Talk closed by "'.$userNickname.'".');
+					$this->consoleSetModeChannelClient(null);
+				}
+			}
+		}
 		
 		elseif($msgName == 'ping'){
 			$id = '';
@@ -1485,6 +1507,14 @@ class Client{
 		$this->dataSend($this->sslMsgCreatePasswordEncrypt('talk_msg', $data));
 	}
 	
+	public function sendTalkClose($rid, $userNickname){
+		$data = array(
+			'rid' => $rid,
+			'userNickname' => $userNickname,
+		);
+		$this->dataSend($this->sslMsgCreatePasswordEncrypt('talk_close', $data));
+	}
+	
 	private function sendPing($id = ''){
 		$data = array(
 			'id' => $id,
@@ -1535,6 +1565,12 @@ class Client{
 			'name' => $msgName,
 		);
 		$this->dataSend($this->msgCreate('error', $data));
+	}
+	
+	private function sendQuit(){
+		$data = array(
+		);
+		$this->dataSend($this->msgCreate('quit', $data));
 	}
 	
 	public function shutdown(){

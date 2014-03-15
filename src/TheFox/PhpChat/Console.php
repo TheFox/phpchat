@@ -332,6 +332,10 @@ class Console extends Thread{
 						}
 					}
 				}
+				elseif($line == 'close'){
+					$this->talkCloseSend();
+					$this->msgAdd('Connection closed.');
+				}
 				elseif($line == 'nick'){
 					#print 'Your nickname: '.$this->settings['phpchat']['user']['nickname'].PHP_EOL;
 					#print 'Your nickname: '.$this->userNickname.PHP_EOL;
@@ -452,6 +456,15 @@ class Console extends Thread{
 		print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		$this->msgAdd('<'.$userNickname.'> '.$text);
+	}
+	
+	private function talkCloseSend(){
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+		$rid = (string)Uuid::uuid4();
+		
+		$args = array( $this->getModeChannelClient(), $rid, $this->userNickname);
+		$this->getIpcKernelConnection()->execAsync('serverTalkCloseSend', $args);
 	}
 	
 }
