@@ -68,6 +68,14 @@ class Console extends Thread{
 		return $this->ps1;
 	}
 	
+	public function setModeChannelClient(Client $modeChannelClient){
+		$this->modeChannelClient = $modeChannelClient;
+	}
+	
+	private function getModeChannelClient(){
+		return $this->modeChannelClient;
+	}
+	
 	public function printPs1($debug = ''){
 		if($this->modeChannel){
 			#print $debug.$this->settings['phpchat']['user']['nickname'].':> _'.$this->buffer.'_'; # TODO
@@ -110,6 +118,7 @@ class Console extends Thread{
 		$this->getIpcKernelConnection()->functionAdd('shutdown', $this, 'ipcKernelShutdown');
 		$this->getIpcKernelConnection()->functionAdd('msgAdd', $this, 'msgAdd');
 		$this->getIpcKernelConnection()->functionAdd('talkRequestAdd', $this, 'talkRequestAdd');
+		$this->getIpcKernelConnection()->functionAdd('setModeChannelClient', $this, 'setModeChannelClient');
 		
 		if(!$this->getIpcKernelConnection()->connect()){
 			throw new RuntimeException('Could not connect to kernel process.');
@@ -287,7 +296,7 @@ class Console extends Thread{
 									$this->msgAdd('Accepting talk request ID '.$talkRequest->getId().'.'.PHP_EOL.'Now talking to "'.$talkRequest->getUserNickname().'".');
 									
 									$this->modeChannel = true;
-									$this->modeChannelClient = $talkRequest->getClient();
+									$this->setModeChannelClient($talkRequest->getClient());
 									
 									#$this->settings['tmp']['server']->clientActionTalkResponseAdd($talkRequest['clientId'], $talkRequest['rid'], 1, $this->settings['phpchat']['user']['nickname']);
 									#$this->setChannelServerClientId($talkRequest['clientId']);

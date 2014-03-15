@@ -990,6 +990,7 @@ class Client{
 					elseif($status == 1){
 						// Accepted
 						$this->consoleMsgAdd('Talk request accepted.'.PHP_EOL.'Now talking to "'.$userNickname.'".');
+						$this->consoleSetModeChannelClient();
 					}
 					elseif($status == 2){
 						// Declined
@@ -1533,6 +1534,16 @@ class Client{
 			
 			$this->getServer()->getKernel()->getIpcConsoleConnection()->execAsync('talkRequestAdd', 
 				array($this, $rid, $userNickname));
+		}
+	}
+	
+	private function consoleSetModeChannelClient(){
+		if(
+			$this->getServer()
+			&& $this->getServer()->getKernel()
+			&& $this->getServer()->getKernel()->getIpcConsoleConnection()){
+			
+			$this->getServer()->getKernel()->getIpcConsoleConnection()->execAsync('setModeChannelClient', array($this));
 		}
 	}
 	
