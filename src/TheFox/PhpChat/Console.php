@@ -221,7 +221,7 @@ class Console extends Thread{
 						.PHP_EOL."/talk <NICK|UUID>         - open a connection to a know nick"
 						.PHP_EOL."/request                  - list all talk requests"
 						.PHP_EOL."/request accept <ID>      - accept  a talk request"
-						.PHP_EOL."/request decl <ID>        - decline a talk request"
+						.PHP_EOL."/request decline <ID>     - decline a talk request"
 						.PHP_EOL."/close                    - close talk"
 						.PHP_EOL."/nick                     - print your nickname"
 						.PHP_EOL."/nick <NICK>              - set a new nickname"
