@@ -65,6 +65,7 @@ class Kernel extends Thread{
 		$this->ipcConsoleConnection->functionAdd('getSettingsUserNickname', $this, 'getSettingsUserNickname');
 		$this->ipcConsoleConnection->functionAdd('setSettingsUserNickname', $this, 'setSettingsUserNickname');
 		$this->ipcConsoleConnection->functionAdd('serverConnect', $this, 'serverConnect');
+		$this->ipcConsoleConnection->functionAdd('serverTalkResponseSend', $this, 'serverTalkResponseSend');
 		$this->ipcConsoleConnection->connect();
 		
 		
