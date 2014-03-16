@@ -9,6 +9,9 @@ A decentralized, peer-to-peer, encrypted chat in PHP.
 ## ToDo
 - Hashcash on connect: <http://en.wikipedia.org/wiki/Hashcash> | <https://en.bitcoin.it/wiki/Hashcash>
 
+## Contribute
+You're welcome to contribute to this project. Fork this project at <https://github.com/TheFox/phpchat2>. You should read GitHub's [How to Fork a Repo](https://help.github.com/articles/fork-a-repo).
+
 ## License
 Copyright (C) 2014 Christian Mayer (<thefox21at@gmail.com> - <http://fox21.at>)
 
