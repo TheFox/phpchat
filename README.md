@@ -1,6 +1,11 @@
 # PHPChat2
 A decentralized, peer-to-peer, encrypted chat in PHP.
 
+## Features
+- [Peer-to-peer](http://en.wikipedia.org/wiki/Peer-to-peer) instant messaging.
+- Decentralized: See [DHT](http://en.wikipedia.org/wiki/Distributed_hash_table) and <http://bittorrent.org/beps/bep_0005.html>.
+- Encryption: SSL
+
 ## ToDo
 - Hashcash on connect: <http://en.wikipedia.org/wiki/Hashcash> | <https://en.bitcoin.it/wiki/Hashcash>
 
