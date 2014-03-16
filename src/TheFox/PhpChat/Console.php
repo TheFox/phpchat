@@ -306,17 +306,10 @@ class Console extends Thread{
 									
 									$this->setModeChannel(true);
 									$this->setModeChannelClient($talkRequest->getClient());
-									
-									#$this->settings['tmp']['server']->clientActionTalkResponseAdd($talkRequest['clientId'], $talkRequest['rid'], 1, $this->settings['phpchat']['user']['nickname']);
-									#$this->setChannelServerClientId($talkRequest['clientId']);
-									
-									#$this->settings['tmp']['addressbook']->contactAdd($talkRequest['nodeId'], $talkRequest->getUserNickname());
 								}
 								else{
 									$talkRequest->getStatus(2);
 									$this->msgAdd('Declining talk request ID '.$id.'.');
-									
-									#$this->settings['tmp']['server']->clientActionTalkResponseAdd($talkRequest['clientId'], $talkRequest['rid'], 2);
 								}
 								
 								$this->talkResponseSend($talkRequest);
@@ -344,8 +337,6 @@ class Console extends Thread{
 					$this->setModeChannelClient(null);
 				}
 				elseif($line == 'nick'){
-					#print 'Your nickname: '.$this->settings['phpchat']['user']['nickname'].PHP_EOL;
-					#print 'Your nickname: '.$this->userNickname.PHP_EOL;
 					$this->msgAdd('Your nickname: '.$this->userNickname);
 				}
 				elseif(substr($line, 0, 5) == 'nick '){
