@@ -6,6 +6,17 @@ A decentralized, peer-to-peer, encrypted chat in PHP.
 - Decentralized: See [DHT](http://en.wikipedia.org/wiki/Distributed_hash_table) and <http://bittorrent.org/beps/bep_0005.html>.
 - Encryption: SSL
 
+## Install
+1. Clone
+
+	`git clone https://github.com/TheFox/phpchat2.git`
+
+2. Change to your `phpchat2` directory and run
+
+	`composer install`
+
+3. You must forward TCP port 25000 (default) on your modem to your computer. After the chat has been started once there will be a `settings.yml`. Edit this file to change the incoming port.
+
 ## Dependencies
 Before running PHPChat, make sure you have all the needed dependencies
 installed on your system.
