@@ -6,6 +6,16 @@ A decentralized, peer-to-peer, encrypted chat in PHP.
 - Decentralized: See [DHT](http://en.wikipedia.org/wiki/Distributed_hash_table) and <http://bittorrent.org/beps/bep_0005.html>.
 - Encryption: SSL
 
+## Dependencies
+Before running PHPChat, make sure you have all the needed dependencies
+installed on your system.
+
+Here's a list of dependencies needed for PHPChat:
+
+- PHP >= 5.3
+- PHP module: [pthreads](http://pthreads.org/)
+- [Composer](https://getcomposer.org/)
+
 ## ToDo
 - Hashcash on connect: <http://en.wikipedia.org/wiki/Hashcash> | <https://en.bitcoin.it/wiki/Hashcash>
 
