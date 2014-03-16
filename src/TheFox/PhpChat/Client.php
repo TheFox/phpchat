@@ -58,7 +58,7 @@ class Client{
 	}
 	
 	public function __sleep(){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		return array('id', 'ip', 'port');
 	}
@@ -316,7 +316,7 @@ class Client{
 				$this->actionRemove($action);
 				$action->functionExec($this);
 				
-				print __CLASS__.'->'.__FUNCTION__.': action CRITERION_AFTER_HELLO'."\n";
+				#print __CLASS__.'->'.__FUNCTION__.': action CRITERION_AFTER_HELLO'."\n";
 				#ve($action);
 			}
 			
@@ -1449,7 +1449,7 @@ class Client{
 	public function sendSslKeyPubGet($nodeSslKeyPubFingerprint){
 		$rid = (string)Uuid::uuid4();
 		
-		print __CLASS__.'->'.__FUNCTION__.': '.$rid.', '.$nodeSslKeyPubFingerprint."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': '.$rid.', '.$nodeSslKeyPubFingerprint."\n";
 		
 		$this->requestAdd('ssl_key_pub_get', $rid, array(
 			'nodeSslKeyPubFingerprint' => $nodeSslKeyPubFingerprint,

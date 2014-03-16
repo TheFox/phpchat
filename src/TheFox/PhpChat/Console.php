@@ -432,6 +432,8 @@ class Console extends Thread{
 	}
 	
 	private function talkResponseSend(TalkRequest $talkRequest){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
 		$userNickname = '';
 		if($talkRequest->getStatus() == 1){
 			$userNickname = $this->userNickname;
@@ -442,7 +444,7 @@ class Console extends Thread{
 	}
 	
 	private function talkMsgSend($text){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		$rid = (string)Uuid::uuid4();
 		
@@ -451,13 +453,13 @@ class Console extends Thread{
 	}
 	
 	public function talkMsgAdd($rid = '', $userNickname, $text){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		$this->msgAdd('<'.$userNickname.'> '.$text);
 	}
 	
 	private function talkCloseSend(){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		$rid = (string)Uuid::uuid4();
 		
