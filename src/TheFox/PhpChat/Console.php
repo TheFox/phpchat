@@ -323,13 +323,13 @@ class Console extends Thread{
 								
 								$this->talkResponseSend($talkRequest);
 							}
-							elseif($request->getStatus() == 1){
+							elseif($talkRequest->getStatus() == 1){
 								$this->msgAdd('You already accepted this talk request.');
 							}
-							elseif($request->getStatus() == 2){
+							elseif($talkRequest->getStatus() == 2){
 								$this->msgAdd('You already declined this talk request.');
 							}
-							elseif($request->getStatus() == 3){
+							elseif($talkRequest->getStatus() == 3){
 								$this->msgAdd('Talk request ID '.$id.' timed-out.');
 							}
 						}
