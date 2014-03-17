@@ -295,4 +295,16 @@ class Server{
 		}
 	}
 	
+	public function consoleSetModeChannel($modeChannel){
+		if($this->getKernel() && $this->getKernel()->getIpcConsoleConnection()){
+			$this->getKernel()->getIpcConsoleConnection()->execAsync('setModeChannel', array($modeChannel));
+		}
+	}
+	
+	public function consoleSetModeChannelClient($client){
+		if($this->getKernel() && $this->getKernel()->getIpcConsoleConnection()){
+			$this->getKernel()->getIpcConsoleConnection()->execAsync('setModeChannelClient', array($client));
+		}
+	}
+	
 }

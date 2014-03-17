@@ -1616,22 +1616,14 @@ class Client{
 	}
 	
 	private function consoleSetModeChannel($modeChannel){
-		if(
-			$this->getServer()
-			&& $this->getServer()->getKernel()
-			&& $this->getServer()->getKernel()->getIpcConsoleConnection()){
-			
-			$this->getServer()->getKernel()->getIpcConsoleConnection()->execAsync('setModeChannel', array($modeChannel));
+		if($this->getServer()){
+			$this->getServer()->consoleSetModeChannel($modeChannel);
 		}
 	}
 	
 	private function consoleSetModeChannelClient($client){
-		if(
-			$this->getServer()
-			&& $this->getServer()->getKernel()
-			&& $this->getServer()->getKernel()->getIpcConsoleConnection()){
-			
-			$this->getServer()->getKernel()->getIpcConsoleConnection()->execAsync('setModeChannelClient', array($client));
+		if($this->getServer()){
+			$this->getServer()->consoleSetModeChannelClient($client);
 		}
 	}
 	
