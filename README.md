@@ -28,7 +28,7 @@ Here's a list of dependencies needed for PHPChat:
 - [Composer](https://getcomposer.org/)
 
 ## ToDo
-- Hashcash on connect: <http://en.wikipedia.org/wiki/Hashcash> | <https://en.bitcoin.it/wiki/Hashcash>
+- Hashcash on connect. [link_1](http://en.wikipedia.org/wiki/Hashcash) | [link_2](https://en.bitcoin.it/wiki/Hashcash)
 - Forward msgs to a uuid through another node. (relay)
 - Supernode over HTTP: no active process; just a http request, json interface. No GUI.
 - IMAP-server interface.
