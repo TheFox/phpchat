@@ -1096,6 +1096,9 @@ class Client{
 		elseif($msgName == 'quit'){
 			$this->shutdown();
 		}
+		else{
+			$this->log('debug', $this->getIpPort().' recv '.$msgName.': not implemented.');
+		}
 	}
 	
 	private function msgCreate($name, $data){
