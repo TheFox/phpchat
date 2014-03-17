@@ -416,7 +416,7 @@ class Console extends Thread{
 	}
 	
 	public function ipcKernelShutdown(){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		$this->log->info('Connection to kernel process closed.');
 		$this->setExit(1);
@@ -480,7 +480,7 @@ class Console extends Thread{
 	
 	private function sendRandomMsg(){
 		if($this->getModeChannel() && $this->nextRandomMsg <= time()){
-			print __CLASS__.'->'.__FUNCTION__.''."\n";
+			#print __CLASS__.'->'.__FUNCTION__.''."\n";
 			
 			$this->randomMsgSetNextTime();
 			

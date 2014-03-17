@@ -107,7 +107,7 @@ class Kernel extends Thread{
 	}
 	
 	public function serverConnect($ip, $port, $isTalkRequest = false){
-		print __CLASS__.'->'.__FUNCTION__.': '.$ip.':'.$port."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': '.$ip.':'.$port."\n";
 		
 		if($this->getServer()){
 			
@@ -142,7 +142,7 @@ class Kernel extends Thread{
 	}
 	
 	public function serverTalkResponseSend(Client $client, $rid, $status, $userNickname = ''){
-		print __CLASS__.'->'.__FUNCTION__.': '.$rid.', '.$status.', '.$userNickname."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': '.$rid.', '.$status.', '.$userNickname."\n";
 		
 		if($this->getServer()){
 			$this->getServer()->clientTalkResponseSend($client, $rid, $status, $userNickname);
@@ -150,7 +150,7 @@ class Kernel extends Thread{
 	}
 	
 	public function serverTalkMsgSend(Client $client, $rid, $userNickname, $text, $ignore = false){
-		print __CLASS__.'->'.__FUNCTION__.': '.$rid.', '.$userNickname.', '.$text.', '.(int)$ignore."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': '.$rid.', '.$userNickname.', '.$text.', '.(int)$ignore."\n";
 		
 		if($this->getServer()){
 			$this->getServer()->clientTalkMsgSend($client, $rid, $userNickname, $text, $ignore);
@@ -158,7 +158,7 @@ class Kernel extends Thread{
 	}
 	
 	public function serverTalkCloseSend(Client $client, $rid, $userNickname){
-		print __CLASS__.'->'.__FUNCTION__.': '.$rid.', '.$userNickname."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': '.$rid.', '.$userNickname."\n";
 		
 		if($this->getServer()){
 			$this->getServer()->clientTalkCloseSend($client, $rid, $userNickname);
@@ -210,7 +210,7 @@ class Kernel extends Thread{
 	}
 	
 	public function ipcConsoleShutdown(){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		$this->setExit(1);
 		$this->ipcConsoleShutdown = true;
 	}
