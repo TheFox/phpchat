@@ -289,7 +289,7 @@ class Console extends Thread{
 					
 					$pos = strpos($data, ' ');
 					if($pos === false){
-						print 'Usage: /request accept <ID>'.PHP_EOL.'       /request decl <ID>'.PHP_EOL;
+						print 'Usage: /request accept <ID>'.PHP_EOL.'       /request decline <ID>'.PHP_EOL;
 					}
 					else{
 						$action = substr($data, 0, $pos);
