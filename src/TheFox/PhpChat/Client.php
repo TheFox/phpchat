@@ -1062,7 +1062,7 @@ class Client{
 					}
 					
 					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$userNicknameOld.', '.$userNicknameNew);
-					$this->consoleMsgAdd('User "'.$userNicknameOld.'" changed nick to "'.$userNicknameNew.'".');
+					$this->consoleMsgAdd('User "'.$userNicknameOld.'" is now known as "'.$userNicknameNew.'".');
 				}
 			}
 		}
