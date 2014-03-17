@@ -1497,8 +1497,6 @@ class Client{
 	}
 	
 	public function sendTalkResponse($rid, $status, $userNickname = ''){
-		$rid = (string)Uuid::uuid4();
-		
 		$data = array(
 			'rid' => $rid,
 			'status' => (int)$status,
