@@ -516,7 +516,6 @@ class Client{
 				if($rid){
 					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid);
 					
-					$request = null;
 					$request = $this->requestGetByRid($rid);
 					if($request){
 						$this->requestRemove($request);
@@ -946,7 +945,6 @@ class Client{
 					
 					if($rid){
 						if($this->getServer() && $this->getServer()->kernelHasConsole()){
-							#$this->consoleMsgAdd('User "'.$userNickname.'" wants to talk to you.');
 							$this->consoleTalkRequestAdd($rid, $userNickname);
 						}
 						else{
