@@ -241,6 +241,13 @@ class Server{
 		}
 	}
 	
+	public function clientTalkUserNicknameChangeSend(Client $client, $userNicknameOld, $userNicknameNew){
+		if(isset($this->clients[$client->getId()])){
+			$client = $this->clients[$client->getId()];
+			$client->sendTalkUserNicknameChange($userNicknameOld, $userNicknameNew);
+		}
+	}
+	
 	public function clientTalkCloseSend(Client $client, $rid, $userNickname){
 		if(isset($this->clients[$client->getId()])){
 			$client = $this->clients[$client->getId()];

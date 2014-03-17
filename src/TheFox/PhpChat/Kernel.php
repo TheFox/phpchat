@@ -67,6 +67,7 @@ class Kernel extends Thread{
 		$this->ipcConsoleConnection->functionAdd('serverConnect', $this, 'serverConnect');
 		$this->ipcConsoleConnection->functionAdd('serverTalkResponseSend', $this, 'serverTalkResponseSend');
 		$this->ipcConsoleConnection->functionAdd('serverTalkMsgSend', $this, 'serverTalkMsgSend');
+		$this->ipcConsoleConnection->functionAdd('serverTalkUserNicknameChangeSend', $this, 'serverTalkUserNicknameChangeSend');
 		$this->ipcConsoleConnection->functionAdd('serverTalkCloseSend', $this, 'serverTalkCloseSend');
 		$this->ipcConsoleConnection->connect();
 		
@@ -154,6 +155,12 @@ class Kernel extends Thread{
 		
 		if($this->getServer()){
 			$this->getServer()->clientTalkMsgSend($client, $rid, $userNickname, $text, $ignore);
+		}
+	}
+	
+	public function serverTalkUserNicknameChangeSend(Client $client, $userNicknameOld, $userNicknameNew){
+		if($this->getServer()){
+			$this->getServer()->clientTalkUserNicknameChangeSend($client, $userNicknameOld, $userNicknameNew);
 		}
 	}
 	

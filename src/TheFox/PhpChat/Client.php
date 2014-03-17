@@ -1046,6 +1046,26 @@ class Client{
 				}
 			}
 		}
+		elseif($msgName == 'talk_user_nickname_change'){
+			#$this->log('debug', $this->getIpPort().' recv '.$msgName);
+			
+			if($this->getStatus('hasSsl')){
+				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
+				if($msgData){
+					$userNicknameOld = '';
+					$userNicknameNew = '';
+					if(array_key_exists('userNicknameOld', $msgData)){
+						$userNicknameOld = $msgData['userNicknameOld'];
+					}
+					if(array_key_exists('userNicknameNew', $msgData)){
+						$userNicknameNew = $msgData['userNicknameNew'];
+					}
+					
+					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$userNicknameOld.', '.$userNicknameNew);
+					$this->consoleMsgAdd('User "'.$userNicknameOld.'" changed nick to "'.$userNicknameNew.'".');
+				}
+			}
+		}
 		elseif($msgName == 'talk_close'){
 			if($this->getStatus('hasSsl')){
 				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
@@ -1521,6 +1541,14 @@ class Client{
 			'ignore' => $ignore,
 		);
 		$this->dataSend($this->sslMsgCreatePasswordEncrypt('talk_msg', $data));
+	}
+	
+	public function sendTalkUserNicknameChange($userNicknameOld, $userNicknameNew){
+		$data = array(
+			'userNicknameOld' => $userNicknameOld,
+			'userNicknameNew' => $userNicknameNew,
+		);
+		$this->dataSend($this->sslMsgCreatePasswordEncrypt('talk_user_nickname_change', $data));
 	}
 	
 	public function sendTalkClose($rid, $userNickname){

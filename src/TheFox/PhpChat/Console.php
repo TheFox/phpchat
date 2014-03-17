@@ -354,11 +354,16 @@ class Console extends Thread{
 					$tmp = substr($tmp, 0, Settings::USER_NICKNAME_LEN_MAX);
 					
 					if($tmp){
+						$userNicknameOld = $this->userNickname;
 						$this->userNickname = $tmp;
 						
 						$this->getIpcKernelConnection()->execAsync('setSettingsUserNickname', array($this->userNickname));
 						
 						$this->msgAdd('New nickname: '.$this->userNickname);
+						
+						if($this->getModeChannel()){
+							$this->talkUserNicknameChangeSend($userNicknameOld, $this->userNickname);
+						}
 					}
 					else{
 						$this->msgAdd('Your nickname: '.$this->userNickname);
@@ -467,6 +472,11 @@ class Console extends Thread{
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		$this->msgAdd('<'.$userNickname.'> '.$text);
+	}
+	
+	private function talkUserNicknameChangeSend($userNicknameOld, $userNicknameNew){
+		$this->getIpcKernelConnection()->execAsync('serverTalkUserNicknameChangeSend',
+			array($this->getModeChannelClient(), $userNicknameOld, $userNicknameNew));
 	}
 	
 	private function talkCloseSend(){
