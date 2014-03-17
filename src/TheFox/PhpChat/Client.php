@@ -985,30 +985,36 @@ class Client{
 						$userNickname = $msgData['userNickname'];
 					}
 					
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$status);
-					
-					if($status == 0){
-						// Undefined
+					$request = $this->requestGetByRid($rid);
+					if($request){
+						$this->requestRemove($request);
+						$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$status);
+						
+						if($status == 0){
+							// Undefined
+						}
+						elseif($status == 1){
+							// Accepted
+							$this->consoleMsgAdd('Talk request accepted.'.PHP_EOL.'Now talking to "'.$userNickname.'".');
+							$this->consoleSetModeChannel(true);
+							$this->consoleSetModeChannelClient($this);
+						}
+						elseif($status == 2){
+							// Declined
+							$this->consoleMsgAdd('Talk request declined.');
+						}
+						elseif($status == 3){
+							// Timeout
+							$this->consoleMsgAdd('Talk request timed-out.');
+						}
+						elseif($status == 4){
+							// No console, standalone server.
+							$this->consoleMsgAdd($this->getIpPort().' has no user interface. Can\'t talk to you.');
+						}
 					}
-					elseif($status == 1){
-						// Accepted
-						$this->consoleMsgAdd('Talk request accepted.'.PHP_EOL.'Now talking to "'.$userNickname.'".');
-						$this->consoleSetModeChannel(true);
-						$this->consoleSetModeChannelClient($this);
+					else{
+						$this->sendError(900, $msgName);
 					}
-					elseif($status == 2){
-						// Declined
-						$this->consoleMsgAdd('Talk request declined.');
-					}
-					elseif($status == 3){
-						// Timeout
-						$this->consoleMsgAdd('Talk request timed-out.');
-					}
-					elseif($status == 4){
-						// No console, standalone server.
-						$this->consoleMsgAdd($this->getIpPort().' has no user interface. Can\'t talk to you.');
-					}
-					
 				}
 			}
 		}
