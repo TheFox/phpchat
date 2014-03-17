@@ -1589,12 +1589,8 @@ class Client{
 	}
 	
 	private function consoleMsgAdd($msgText){
-		if(
-			$this->getServer()
-			&& $this->getServer()->getKernel()
-			&& $this->getServer()->getKernel()->getIpcConsoleConnection()){
-			
-			$this->getServer()->getKernel()->getIpcConsoleConnection()->execAsync('msgAdd', array($msgText));
+		if($this->getServer()){
+			$this->getServer()->consoleMsgAdd($msgText);
 		}
 	}
 	
