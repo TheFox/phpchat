@@ -79,7 +79,7 @@ class Console extends Thread{
 		return $this->modeChannel;
 	}
 	
-	public function setModeChannelClient(Client $modeChannelClient){
+	public function setModeChannelClient($modeChannelClient){
 		$this->modeChannelClient = $modeChannelClient;
 	}
 	
