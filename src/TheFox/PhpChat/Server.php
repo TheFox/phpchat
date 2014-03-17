@@ -234,10 +234,10 @@ class Server{
 		}
 	}
 	
-	public function clientTalkMsgSend(Client $client, $rid, $userNickname, $text){
+	public function clientTalkMsgSend(Client $client, $rid, $userNickname, $text, $ignore = false){
 		if(isset($this->clients[$client->getId()])){
 			$client = $this->clients[$client->getId()];
-			$client->sendTalkMsg($rid, $userNickname, $text);
+			$client->sendTalkMsg($rid, $userNickname, $text, $ignore);
 		}
 	}
 	

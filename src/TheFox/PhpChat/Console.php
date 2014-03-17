@@ -20,6 +20,10 @@ class Console extends Thread{
 	const CHAR_ESCAPE = "\033";
 	const CHAR_BACKSPACE = "\177";
 	const CHAR_EOF = "\004";
+	const RANDOM_MSG_DELAY_MIN = 30;
+	const RANDOM_MSG_DELAY_MAX = 300;
+	const RANDOM_MSG_CHAR_SET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+	const RANDOM_MSG_CHAR_SET_LEN = 58;
 	
 	private $log = null;
 	private $ipcKernelConnection = null;
@@ -35,6 +39,7 @@ class Console extends Thread{
 	private $userNickname = '';
 	private $talkRequestsId = 0;
 	private $talkRequests = array();
+	private $nextRandomMsg = 0;
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -49,6 +54,9 @@ class Console extends Thread{
 		$this->tcols = (int)exec('tput cols');
 		$this->tlines = (int)exec('tput lines');
 		$this->log->debug('cols = '.$this->tcols.', lines = '.$this->tlines);
+		
+		$this->nextRandomMsg = time() + Console::RANDOM_MSG_DELAY_MIN;
+		$this->randomMsgDebug();
 	}
 	
 	private function getLog(){
@@ -162,6 +170,7 @@ class Console extends Thread{
 		while(!$this->getExit()){
 			$this->readStdin();
 			$this->printMsgStack();
+			$this->sendRandomMsg();
 			
 			if(!$this->getIpcKernelConnection()->run()){
 				$this->log->info('Connection to kernel process end unexpected.');
@@ -445,12 +454,12 @@ class Console extends Thread{
 			array($talkRequest->getClient(), $talkRequest->getRid(), $talkRequest->getStatus(), $userNickname));
 	}
 	
-	private function talkMsgSend($text){
+	private function talkMsgSend($text, $ignore = false){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		$rid = (string)Uuid::uuid4();
 		
-		$args = array($this->getModeChannelClient(), $rid, $this->userNickname, $text);
+		$args = array($this->getModeChannelClient(), $rid, $this->userNickname, $text, $ignore);
 		$this->getIpcKernelConnection()->execAsync('serverTalkMsgSend', $args);
 	}
 	
@@ -467,6 +476,37 @@ class Console extends Thread{
 		
 		$args = array( $this->getModeChannelClient(), $rid, $this->userNickname);
 		$this->getIpcKernelConnection()->execAsync('serverTalkCloseSend', $args);
+	}
+	
+	private function sendRandomMsg(){
+		if($this->getModeChannel() && $this->nextRandomMsg <= time()){
+			print __CLASS__.'->'.__FUNCTION__.''."\n";
+			
+			$this->randomMsgSetNextTime();
+			
+			$charset = Console::RANDOM_MSG_CHAR_SET;
+			
+			$text = '';
+			
+			for($n = mt_rand(mt_rand(0, 100), mt_rand(1024, 2048)); $n > 0; $n--){
+				$text .= $charset[mt_rand(0, Console::RANDOM_MSG_CHAR_SET_LEN - 1)];
+			}
+			
+			$this->talkMsgSend($text, true);
+			
+			$this->randomMsgDebug();
+		}
+	}
+	
+	private function randomMsgSetNextTime(){
+		$this->nextRandomMsg = time() + mt_rand(Console::RANDOM_MSG_DELAY_MIN, Console::RANDOM_MSG_DELAY_MAX);
+	}
+	
+	private function randomMsgDebug(){
+		$dt = new DateTime();
+		$dt->setTimestamp($this->nextRandomMsg);
+		
+		$this->log->debug('next random msg: '.$dt->format('Y/m/d H:i:s'));
 	}
 	
 }

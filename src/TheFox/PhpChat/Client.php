@@ -1025,6 +1025,7 @@ class Client{
 					$rid = '';
 					$userNickname = '';
 					$text = '';
+					$ignore = false;
 					if(array_key_exists('rid', $msgData)){
 						$rid = $msgData['rid'];
 					}
@@ -1034,10 +1035,14 @@ class Client{
 					if(array_key_exists('text', $msgData)){
 						$text = $msgData['text'];
 					}
+					if(array_key_exists('ignore', $msgData)){
+						$ignore = $msgData['ignore'];
+					}
 					
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$userNickname.', '.$text);
-					
-					$this->consoleTalkMsgAdd($rid, $userNickname, $text);
+					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$userNickname.', '. (int)$ignore .', '.$text);
+					if(!$ignore){
+						$this->consoleTalkMsgAdd($rid, $userNickname, $text);
+					}
 				}
 			}
 		}
@@ -1505,11 +1510,12 @@ class Client{
 		$this->dataSend($this->sslMsgCreatePasswordEncrypt('talk_response', $data));
 	}
 	
-	public function sendTalkMsg($rid, $userNickname, $text){
+	public function sendTalkMsg($rid, $userNickname, $text, $ignore){
 		$data = array(
 			'rid' => $rid,
 			'userNickname' => $userNickname,
 			'text' => $text,
+			'ignore' => $ignore,
 		);
 		$this->dataSend($this->sslMsgCreatePasswordEncrypt('talk_msg', $data));
 	}

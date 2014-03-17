@@ -149,11 +149,11 @@ class Kernel extends Thread{
 		}
 	}
 	
-	public function serverTalkMsgSend(Client $client, $rid, $userNickname, $text){
-		print __CLASS__.'->'.__FUNCTION__.': '.$rid.', '.$userNickname.', '.$text."\n";
+	public function serverTalkMsgSend(Client $client, $rid, $userNickname, $text, $ignore = false){
+		print __CLASS__.'->'.__FUNCTION__.': '.$rid.', '.$userNickname.', '.$text.', '.(int)$ignore."\n";
 		
 		if($this->getServer()){
-			$this->getServer()->clientTalkMsgSend($client, $rid, $userNickname, $text);
+			$this->getServer()->clientTalkMsgSend($client, $rid, $userNickname, $text, $ignore);
 		}
 	}
 	
