@@ -965,8 +965,6 @@ class Client{
 			}
 		}
 		elseif($msgName == 'talk_response'){
-			$this->log('debug', $this->getIpPort().' recv '.$msgName);
-			
 			if($this->getStatus('hasSsl')){
 				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
 				if($msgData){
@@ -982,6 +980,8 @@ class Client{
 					if(array_key_exists('userNickname', $msgData)){
 						$userNickname = $msgData['userNickname'];
 					}
+					
+					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.(int)$status.', '.$userNickname);
 					
 					$request = $this->requestGetByRid($rid);
 					if($request){
