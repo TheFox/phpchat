@@ -986,7 +986,7 @@ class Client{
 					$request = $this->requestGetByRid($rid);
 					if($request){
 						$this->requestRemove($request);
-						$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$status);
+						$this->log('debug', $this->getIpPort().' recv '.$msgName.': request ok');
 						
 						if($status == 0){
 							// Undefined
