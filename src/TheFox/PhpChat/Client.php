@@ -600,6 +600,9 @@ class Client{
 							$this->getServer()->connect($ip, $port, $clientActions);
 						}
 					}
+					else{
+						$this->sendError(900, $msgName);
+					}
 				}
 				else{
 					$this->sendError(900, $msgName);
