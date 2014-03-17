@@ -366,6 +366,8 @@ class Console extends Thread{
 			}
 			else{
 				if($this->getModeChannel()){
+					$this->lineClear();
+					print Console::CHAR_ESCAPE.'[1A';
 					$this->talkMsgAdd(0, $this->userNickname, $line);
 					$this->talkMsgSend($line);
 				}
