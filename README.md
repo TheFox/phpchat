@@ -25,7 +25,6 @@ installed on your system.
 Here's a list of dependencies needed for PHPChat:
 
 - PHP >= 5.3
-- PHP module: [pthreads](http://pthreads.org/)
 - [Composer](https://getcomposer.org/)
 
 ## ToDo
