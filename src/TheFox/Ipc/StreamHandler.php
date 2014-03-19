@@ -55,6 +55,8 @@ class StreamHandler extends AbstractHandler{
 			foreach($this->getClients() as $client){
 				$readHandles[] = $client['handle'];
 			}
+			
+			#print __CLASS__.'->'.__FUNCTION__.': isListening ('.count($readHandles).')'."\n";
 		}
 		elseif($this->isConnected()){
 			#print __CLASS__.'->'.__FUNCTION__.': isConnected'."\n";
@@ -64,6 +66,8 @@ class StreamHandler extends AbstractHandler{
 		
 		if(count($readHandles)){
 			$handlesChangedNum = stream_select($readHandles, $writeHandles, $exceptHandles, 0);
+			#print __CLASS__.'->'.__FUNCTION__.': handlesChangedNum ('.$handlesChangedNum.')'."\n";
+			
 			if($handlesChangedNum){
 				foreach($readHandles as $readableHandle){
 					if($this->isListening() && $readableHandle == $this->getHandle()){
@@ -113,7 +117,7 @@ class StreamHandler extends AbstractHandler{
 		$data = stream_socket_recvfrom($handle, 1500);
 		$this->recv($handle, $data);
 		
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': "'.$data.'"'."\n";
 	}
 	
 }

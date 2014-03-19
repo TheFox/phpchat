@@ -41,7 +41,7 @@ abstract class AbstractHandler{
 			}
 			else{
 				// Send to all clients.
-				#print __CLASS__.'->'.__FUNCTION__.': send to all, "'.$data.'"'."\n";
+				#print __CLASS__.'->'.__FUNCTION__.': send to all ('.count($this->clients).'), "'.$data.'"'."\n";
 				foreach($this->clients as $clientId => $client){
 					#print __CLASS__.'->'.__FUNCTION__.': send to '.$client['id'].', "'.$data.'"'."\n";
 					$this->handleDataSend($client['handle'], base64_encode($data).$this->getSendSeparator());
@@ -208,6 +208,8 @@ abstract class AbstractHandler{
 	}
 	
 	public function clientAdd($handle){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
 		$this->clientsId++;
 		$this->clients[$this->clientsId] = array(
 			'id' => $this->clientsId,

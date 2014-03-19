@@ -133,7 +133,7 @@ class Connection{
 		}
 		
 		if($this->isServer()){
-			#print __CLASS__.'->'.__FUNCTION__.': sendFunctionExec'."\n";
+			#print __CLASS__.'->'.__FUNCTION__.': sendFunctionExec: '.$name."\n";
 			$clientsNum = $this->handler->getClientsNum();
 			$execsId = $this->execAdd($name, $args, null, $timeout, 's');
 			$this->handler->sendFunctionExec($name, $args, $execsId);
