@@ -247,6 +247,11 @@ class Client{
 		unset($this->actions[$action->getId()]);
 	}
 	
+	public function run(){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+	}
+	
 	public function dataRecv(){
 		$data = $this->getSocket()->read();
 		
