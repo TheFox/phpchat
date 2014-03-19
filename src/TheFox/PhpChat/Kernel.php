@@ -20,6 +20,7 @@ class Kernel extends Thread{
 	private $table;
 	private $ipcConsoleConnection = null;
 	private $ipcConsoleShutdown = false;
+	private $ipcCronjobConnection = null;
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -70,6 +71,10 @@ class Kernel extends Thread{
 		$this->ipcConsoleConnection->functionAdd('serverTalkUserNicknameChangeSend', $this, 'serverTalkUserNicknameChangeSend');
 		$this->ipcConsoleConnection->functionAdd('serverTalkCloseSend', $this, 'serverTalkCloseSend');
 		$this->ipcConsoleConnection->connect();
+		
+		$this->ipcCronjobConnection = new ConnectionServer();
+		$this->ipcCronjobConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20001));
+		$this->ipcCronjobConnection->connect();
 		
 		
 		#ve($this->server);
@@ -188,6 +193,7 @@ class Kernel extends Thread{
 			
 			$this->server->run();
 			$this->ipcConsoleConnection->run();
+			$this->ipcCronjobConnection->run();
 			
 			usleep(static::LOOP_USLEEP);
 		}
@@ -206,6 +212,10 @@ class Kernel extends Thread{
 		else{
 			$this->ipcConsoleConnection->execSync('shutdown');
 		}
+		
+		#print __CLASS__.'->'.__FUNCTION__.': ipcCronjobConnection send shutdown'."\n";
+		$this->ipcCronjobConnection->execSync('shutdown');
+		#print __CLASS__.'->'.__FUNCTION__.': ipcCronjobConnection send done'."\n";
 		
 		$this->getLog()->debug('getNodesNum: '.(int)$this->getTable()->getNodesNum().', '.(int)$this->getSettings()->data['firstRun']);
 		$this->getSettings()->data['firstRun'] = $this->getTable()->getNodesNum() <= 0;

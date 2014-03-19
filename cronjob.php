@@ -24,4 +24,18 @@ if(function_exists('pcntl_signal')){
 	pcntl_signal(SIGINT, 'signalHandler');
 }
 
-$cronjob->run();
+try{
+	$cronjob->init();
+}
+catch(Exception $e){
+	$log->error('init: '.$e->getMessage());
+	exit(1);
+}
+
+try{
+	$cronjob->run();
+}
+catch(Exception $e){
+	$log->error('run: '.$e->getMessage());
+	exit(1);
+}
