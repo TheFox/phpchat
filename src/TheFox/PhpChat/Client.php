@@ -17,6 +17,8 @@ class Client{
 	const MSG_SEPARATOR = "\n";
 	const NODE_FIND_NUM = 8;
 	const NODE_FIND_MAX_NODE_IDS = 1024;
+	const PING_TTL = 25;
+	const PONG_TTL = 30;
 	
 	private $id = 0;
 	private $status = array();
@@ -37,6 +39,8 @@ class Client{
 	private $requests = array();
 	private $actionsId = 0;
 	private $actions = array();
+	private $pingTime = 0;
+	private $pongTime = 0;
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -250,6 +254,29 @@ class Client{
 	public function run(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
+		$this->checkPingSend();
+		$this->checkPongTimeout();
+	}
+	
+	private function checkPingSend(){
+		if($this->pingTime < time() - static::PING_TTL){
+			#print __CLASS__.'->'.__FUNCTION__.''."\n";
+			
+			$this->sendPing();
+		}
+	}
+	
+	private function checkPongTimeout(){
+		if(!$this->pongTime){
+			#print __CLASS__.'->'.__FUNCTION__.': set pong time'."\n";
+			$this->pongTime = time();
+		}
+		#print __CLASS__.'->'.__FUNCTION__.': check '.( time() - static::PONG_TTL - $this->pongTime )."\n";
+		if($this->pongTime < time() - static::PONG_TTL){
+			#print __CLASS__.'->'.__FUNCTION__.': shutdown'."\n";
+			$this->sendQuit();
+			$this->shutdown();
+		}
 	}
 	
 	public function dataRecv(){
@@ -1102,6 +1129,13 @@ class Client{
 			}
 			$this->sendPong($id);
 		}
+		elseif($msgName == 'pong'){
+			$id = '';
+			if(array_key_exists('id', $msgData)){
+				$id = $msgData['id'];
+			}
+			$this->pongTime = time();
+		}
 		elseif($msgName == 'error'){
 			$code = 0;
 			$msg = '';
@@ -1565,6 +1599,8 @@ class Client{
 	}
 	
 	private function sendPing($id = ''){
+		$this->pingTime = time();
+		
 		$data = array(
 			'id' => $id,
 		);
