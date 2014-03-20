@@ -74,6 +74,7 @@ class Kernel extends Thread{
 		
 		$this->ipcCronjobConnection = new ConnectionServer();
 		$this->ipcCronjobConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20001));
+		$this->ipcCronjobConnection->functionAdd('getTable', $this, 'getTable');
 		$this->ipcCronjobConnection->connect();
 		
 		

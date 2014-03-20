@@ -23,6 +23,10 @@ class Bucket extends YamlStorage{
 		$this->data['timeCreated'] = time();
 	}
 	
+	public function __sleep(){
+		return array('nodes');
+	}
+	
 	public function save(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		

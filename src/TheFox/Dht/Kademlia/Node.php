@@ -28,6 +28,10 @@ class Node extends YamlStorage{
 		$this->data['timeLastSeen'] = 0;
 	}
 	
+	public function __sleep(){
+		return array('data');
+	}
+	
 	public function save(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		

@@ -20,6 +20,10 @@ class Table extends YamlStorage{
 		$this->data['timeCreated'] = time();
 	}
 	
+	public function __sleep(){
+		return array('buckets');
+	}
+	
 	public function save(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
