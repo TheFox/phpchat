@@ -68,6 +68,13 @@ class Cronjob extends Thread{
 				$hours++;
 			}
 			
+			if($hours == 0 && $minutes == 1 && $seconds == 0){
+				$this->pingClosestNodes();
+			}
+			if($minutes % 15 == 0 && $seconds == 0){
+				$this->pingClosestNodes();
+			}
+			
 			$this->getIpcKernelConnection()->run();
 			
 			#usleep(static::LOOP_USLEEP);
@@ -77,6 +84,21 @@ class Cronjob extends Thread{
 		}
 		
 		$this->shutdown();
+	}
+	
+	private function pingClosestNodes(){
+		print __CLASS__.'->'.__FUNCTION__.': getTable'."\n";
+		$table = $this->getIpcKernelConnection()->execSync('getTable');
+		
+		$nodes = $table->getNodesClosest(20);
+		#ve($table);
+		#ve($nodes);
+		
+		foreach($nodes as $nodeId => $node){
+			#print __CLASS__.'->'.__FUNCTION__.': ping: '.$node->getIpPort()."\n";
+			
+			$this->getIpcKernelConnection()->execAsync('serverConnect', array($node->getIp(), $node->getPort(), false, true));
+		}
 	}
 	
 	public function shutdown(){

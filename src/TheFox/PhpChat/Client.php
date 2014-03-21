@@ -1652,7 +1652,7 @@ class Client{
 		$this->dataSend($this->msgCreate('error', $data));
 	}
 	
-	private function sendQuit(){
+	public function sendQuit(){
 		$data = array(
 		);
 		$this->dataSend($this->msgCreate('quit', $data));

@@ -75,6 +75,7 @@ class Kernel extends Thread{
 		$this->ipcCronjobConnection = new ConnectionServer();
 		$this->ipcCronjobConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20001));
 		$this->ipcCronjobConnection->functionAdd('getTable', $this, 'getTable');
+		$this->ipcCronjobConnection->functionAdd('serverConnect', $this, 'serverConnect');
 		$this->ipcCronjobConnection->connect();
 		
 		
@@ -113,7 +114,7 @@ class Kernel extends Thread{
 		return $this->server;
 	}
 	
-	public function serverConnect($ip, $port, $isTalkRequest = false){
+	public function serverConnect($ip, $port, $isTalkRequest = false, $isPingOnly = false){
 		#print __CLASS__.'->'.__FUNCTION__.': '.$ip.':'.$port."\n";
 		
 		if($this->getServer()){
@@ -138,6 +139,16 @@ class Kernel extends Thread{
 					$this->ipcConsoleMsgSend('Sening talk request to '.$client->getIpPort().' ...');
 					$client->sendTalkRequest($this->getSettingsUserNickname());
 					$this->ipcConsoleMsgSend('Talk request sent to '.$client->getIpPort().'. Waiting for response ...');
+				});
+				$clientActions[] = $action;
+			}
+			
+			if($isPingOnly){
+				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_OK);
+				$action->functionSet(function($client){
+					#print __CLASS__.'->'.__FUNCTION__.': shutdown'."\n";
+					$client->sendQuit();
+					$client->shutdown();
 				});
 				$clientActions[] = $action;
 			}
@@ -179,6 +190,7 @@ class Kernel extends Thread{
 	}
 	
 	public function getTable(){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		return $this->table;
 	}
 	
