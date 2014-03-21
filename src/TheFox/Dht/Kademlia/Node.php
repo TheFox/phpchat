@@ -29,7 +29,7 @@ class Node extends YamlStorage{
 	}
 	
 	public function __sleep(){
-		return array('data');
+		return array('data', 'id');
 	}
 	
 	public function save(){
