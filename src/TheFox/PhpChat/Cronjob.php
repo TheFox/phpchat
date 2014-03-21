@@ -12,7 +12,6 @@ use TheFox\Ipc\StreamHandler as IpcStreamHandler;
 class Cronjob extends Thread{
 	
 	#const LOOP_USLEEP = 100000;
-	const LOOP_USLEEP = 1000000;
 	
 	private $log;
 	private $ipcKernelConnection = null;
@@ -46,17 +45,35 @@ class Cronjob extends Thread{
 	
 	public function run(){
 		print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		if(!$this->getIpcKernelConnection()){
 			throw new RuntimeException('You must first run init().');
 		}
 		
+		$hours = 0;
+		$minutes = 0;
+		$seconds = 0;
+		
 		while(!$this->getExit()){
-			print __CLASS__.'->'.__FUNCTION__.': '.$this->getExit()."\n";
+			#print __CLASS__.'->'.__FUNCTION__.': '.$this->getExit().', '.$hours.', '.$minutes.', '.$seconds."\n";
+			
+			$seconds++;
+			if($seconds >= 60){
+				$seconds = 0;
+				$minutes++;
+				
+				print __CLASS__.'->'.__FUNCTION__.': '.$this->getExit().', '.$hours.', '.$minutes.', '.$seconds."\n";
+			}
+			if($minutes >= 60){
+				$minutes = 0;
+				$hours++;
+			}
 			
 			$this->getIpcKernelConnection()->run();
 			
-			usleep(static::LOOP_USLEEP);
+			#usleep(static::LOOP_USLEEP);
+			sleep(1);
+			
+			#break; # TODO
 		}
 		
 		$this->shutdown();
