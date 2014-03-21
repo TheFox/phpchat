@@ -21,7 +21,7 @@ class Table extends YamlStorage{
 	}
 	
 	public function __sleep(){
-		return array('buckets');
+		return array('buckets', 'localNode');
 	}
 	
 	public function save(){
@@ -118,6 +118,10 @@ class Table extends YamlStorage{
 	}
 	
 	public function getNodesClosest($num = 20){
+		if(!$this->getLocalNode()){
+			throw new RuntimeException('localNode not set.');
+		}
+		
 		$nodes = array();
 		
 		foreach($this->buckets as $bucketId => $bucket){
