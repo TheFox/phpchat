@@ -27,7 +27,7 @@ class StreamSocket extends AbstractSocket{
 	}
 	
 	public function connect($ip, $port){
-		print __CLASS__.'->'.__FUNCTION__.': "'.$ip.'", "'.$port.'"'."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': "'.$ip.'", "'.$port.'"'."\n";
 		
 		$handle = @stream_socket_client('tcp://'.$ip.':'.$port, $errno, $errstr, 2);
 		if($handle !== false){
