@@ -90,6 +90,10 @@ class Node extends YamlStorage{
 		return $this->data['port'];
 	}
 	
+	public function getIpPort(){
+		return $this->data['ip'].':'.$this->data['port'];
+	}
+	
 	public function setSslKeyPub($strKeyPub){
 		$sslPubKey = openssl_pkey_get_public($strKeyPub);
 		if($sslPubKey !== false){
