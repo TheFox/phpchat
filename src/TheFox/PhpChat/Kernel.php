@@ -94,7 +94,7 @@ class Kernel extends Thread{
 	}
 	
 	public function getSettingsUserNickname(){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		#ve($this->settings);
 		
 		return $this->getSettings()->data['user']['nickname'];
