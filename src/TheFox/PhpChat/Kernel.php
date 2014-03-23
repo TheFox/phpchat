@@ -16,8 +16,8 @@ class Kernel extends Thread{
 	private $log;
 	private $settings;
 	private $localNode;
-	private $server;
 	private $table;
+	private $server;
 	private $ipcConsoleConnection = null;
 	private $ipcConsoleShutdown = false;
 	private $ipcCronjobConnection = null;
