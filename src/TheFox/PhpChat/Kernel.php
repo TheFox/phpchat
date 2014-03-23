@@ -17,6 +17,7 @@ class Kernel extends Thread{
 	private $settings;
 	private $localNode;
 	private $table;
+	private $addressbook;
 	private $server;
 	private $ipcConsoleConnection = null;
 	private $ipcConsoleShutdown = false;
@@ -47,6 +48,12 @@ class Kernel extends Thread{
 		$load = $this->table->load();
 		$this->getLog()->info('setup table: done ('.(int)$load.')');
 		
+		$this->getLog()->info('setup addressbook');
+		$this->addressbook = new Addressbook($this->settings->data['datadir'].'/addressbook.yml');
+		$this->addressbook->setDatadirBasePath($this->settings->data['datadir']);
+		$load = $this->addressbook->load();
+		$this->getLog()->info('setup addressbook: done ('.(int)$load.')');
+		
 		$this->getLog()->info('setup server');
 		$this->server = new Server();
 		$this->server->setKernel($this);
@@ -70,6 +77,8 @@ class Kernel extends Thread{
 		$this->ipcConsoleConnection->functionAdd('serverTalkMsgSend', $this, 'serverTalkMsgSend');
 		$this->ipcConsoleConnection->functionAdd('serverTalkUserNicknameChangeSend', $this, 'serverTalkUserNicknameChangeSend');
 		$this->ipcConsoleConnection->functionAdd('serverTalkCloseSend', $this, 'serverTalkCloseSend');
+		$this->ipcConsoleConnection->functionAdd('getAddressbook', $this, 'getAddressbook');
+		$this->ipcConsoleConnection->functionAdd('addressbookContactRemove', $this, 'addressbookContactRemove');
 		$this->ipcConsoleConnection->connect();
 		
 		$this->ipcCronjobConnection = new ConnectionServer();
@@ -194,6 +203,14 @@ class Kernel extends Thread{
 		return $this->table;
 	}
 	
+	public function getAddressbook(){
+		return $this->addressbook;
+	}
+	
+	public function addressbookContactRemove($id){
+		return $this->addressbook->contactRemove($id);
+	}
+	
 	public function getIpcConsoleConnection(){
 		return $this->ipcConsoleConnection;
 	}
@@ -236,6 +253,7 @@ class Kernel extends Thread{
 		
 		$this->getServer()->shutdown();
 		$this->getTable()->save();
+		$this->addressbook->save();
 		$this->getSettings()->save();
 	}
 	

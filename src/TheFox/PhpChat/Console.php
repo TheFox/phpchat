@@ -283,6 +283,35 @@ class Console extends Thread{
 						}
 					}
 				}
+				elseif($line == 'ab'){
+					print ' ID UUID                                  USERNAME'.PHP_EOL;
+					foreach($this->getIpcKernelConnection()->execSync('getAddressbook')->getContacts() as $contactId => $contact){
+						printf('%3d %36s  %s'.PHP_EOL, $contact->getId(), $contact->getNodeId(), $contact->getUserNickname());
+					}
+					$this->printPs1('printMsgStack ab');
+				}
+				elseif(substr($line, 0, 3) == 'ab '){
+					$data = substr($line, 3);
+					
+					$pos = strpos($data, ' ');
+					if($pos === false){
+						print 'Usage: /ab rem <ID>'.PHP_EOL;
+					}
+					else{
+						$action = substr($data, 0, $pos);
+						$id = substr($data, $pos + 1);
+						
+						if($action == 'rem'){
+							if($this->getIpcKernelConnection()->execSync('addressbookContactRemove', array($id))){
+								$this->msgAdd('Removed '.$id.' from addressbook.');
+							}
+							else{
+								print 'ERROR: Can not remove '.$id.' from addressbook.'.PHP_EOL;
+								$this->printPs1('printMsgStack ab rem');
+							}
+						}
+					}
+				}
 				elseif($line == 'request'){
 					print ' ID RID                                   IP:PORT               USERNAME'.PHP_EOL;
 					foreach($this->talkRequests as $talkRequestId => $request){
