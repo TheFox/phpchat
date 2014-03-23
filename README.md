@@ -32,8 +32,6 @@ Here's a list of dependencies needed for PHPChat:
 - Forward msgs to a uuid through another node. (relay)
 - Supernode over HTTP: no active process; just a http request, json interface. No GUI.
 - IMAP-server interface.
-- ~~Send nick changes to chat peer.~~
-- ~~Ping known nodes.~~
 
 ## Contribute
 You're welcome to contribute to this project. Fork this project at <https://github.com/TheFox/phpchat2>. You should read GitHub's [How to Fork a Repo](https://help.github.com/articles/fork-a-repo).
