@@ -245,7 +245,7 @@ class Console extends Thread{
 						         "/connect <IP> <PORT>      - open a connection"
 						.PHP_EOL."/ab                       - address book: list nicks"
 						.PHP_EOL."/ab rem <ID>              - address book: remove contact"
-						.PHP_EOL."/talk <NICK|UUID>         - open a connection to a know nick"
+						#.PHP_EOL."/talk <NICK|UUID>         - open a connection to a know nick"
 						.PHP_EOL."/request                  - list all talk requests"
 						.PHP_EOL."/request accept <ID>      - accept  a talk request"
 						.PHP_EOL."/request decline <ID>     - decline a talk request"
