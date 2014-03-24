@@ -169,7 +169,7 @@ class Kernel extends Thread{
 	}
 	
 	public function serverTalkResponseSend(Client $client, $rid, $status, $userNickname = ''){
-		#print __CLASS__.'->'.__FUNCTION__.': '.$rid.', '.$status.', '.$userNickname."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': '.$rid.', '.$status.', '.$userNickname.''."\n";
 		
 		if($this->getServer()){
 			$this->getServer()->clientTalkResponseSend($client, $rid, $status, $userNickname);

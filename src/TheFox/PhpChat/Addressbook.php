@@ -67,6 +67,8 @@ class Addressbook extends YamlStorage{
 	}
 	
 	public function contactAdd(Contact $contact){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
 		$ocontact = $this->contactGetByNodeId($contact->getNodeId());
 		if(!$ocontact){
 			$this->contactsId = $this->contactsId + 1;
