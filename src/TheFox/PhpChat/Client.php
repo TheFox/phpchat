@@ -64,7 +64,7 @@ class Client{
 	public function __sleep(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
-		return array('id', 'ip', 'port');
+		return array('id', 'ip', 'port', 'node');
 	}
 	
 	public function __destruct(){
@@ -1028,6 +1028,15 @@ class Client{
 							$this->consoleMsgAdd('Talk request accepted.'.PHP_EOL.'Now talking to "'.$userNickname.'".');
 							$this->consoleSetModeChannel(true);
 							$this->consoleSetModeChannelClient($this);
+							
+							if($this->getServer() && $this->getServer()->getKernel()){
+								// Add to addressbook.
+								$contact = new Contact();
+								$contact->setNodeId($this->getNode()->getIdHexStr());
+								$contact->setUserNickname($userNickname);
+								
+								$this->getServer()->getKernel()->getAddressbook()->contactAdd($contact);
+							}
 						}
 						elseif($status == 2){
 							// Declined
@@ -1091,6 +1100,18 @@ class Client{
 					}
 					if(array_key_exists('userNicknameNew', $msgData)){
 						$userNicknameNew = $msgData['userNicknameNew'];
+					}
+					
+					if($this->getServer() && $this->getServer()->getKernel()){
+						$contact = $this->getServer()->getKernel()->getAddressbook()->contactGetByNodeId($this->getNode()->getIdHexStr());
+						if($contact){
+							if(!$userNicknameOld){
+								$userNicknameOld = $contact->getUserNickname();
+							}
+							
+							$contact->setUserNickname($userNicknameNew);
+							$this->getServer()->getKernel()->getAddressbook()->setDataChanged(true);
+						}
 					}
 					
 					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$userNicknameOld.', '.$userNicknameNew);

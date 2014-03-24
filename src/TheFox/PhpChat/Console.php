@@ -482,6 +482,12 @@ class Console extends Thread{
 		$userNickname = '';
 		if($talkRequest->getStatus() == 1){
 			$userNickname = $this->userNickname;
+			
+			// Add to addressbook.
+			$contact = new Contact();
+			$contact->setNodeId($talkRequest->getClient()->getNode()->getIdHexStr());
+			$contact->setUserNickname($talkRequest->getUserNickname());
+			$this->getIpcKernelConnection()->execAsync('addressbookContactAdd', array($contact));
 		}
 		
 		$this->getIpcKernelConnection()->execAsync('serverTalkResponseSend',

@@ -78,6 +78,7 @@ class Kernel extends Thread{
 		$this->ipcConsoleConnection->functionAdd('serverTalkUserNicknameChangeSend', $this, 'serverTalkUserNicknameChangeSend');
 		$this->ipcConsoleConnection->functionAdd('serverTalkCloseSend', $this, 'serverTalkCloseSend');
 		$this->ipcConsoleConnection->functionAdd('getAddressbook', $this, 'getAddressbook');
+		$this->ipcConsoleConnection->functionAdd('addressbookContactAdd', $this, 'addressbookContactAdd');
 		$this->ipcConsoleConnection->functionAdd('addressbookContactRemove', $this, 'addressbookContactRemove');
 		$this->ipcConsoleConnection->connect();
 		
@@ -205,6 +206,10 @@ class Kernel extends Thread{
 	
 	public function getAddressbook(){
 		return $this->addressbook;
+	}
+	
+	public function addressbookContactAdd(Contact $contact){
+		$this->addressbook->contactAdd($contact);
 	}
 	
 	public function addressbookContactRemove($id){
