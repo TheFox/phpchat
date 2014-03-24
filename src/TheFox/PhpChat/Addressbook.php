@@ -75,6 +75,8 @@ class Addressbook extends YamlStorage{
 			
 			$this->contacts[$contact->getId()] = $contact;
 			$this->contactsByNodeId[$contact->getNodeId()] = $contact;
+			
+			$this->setDataChanged(true);
 		}
 	}
 	
