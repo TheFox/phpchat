@@ -288,7 +288,7 @@ class Console extends Thread{
 					foreach($this->getIpcKernelConnection()->execSync('getAddressbook')->getContacts() as $contactId => $contact){
 						printf('%3d %36s  %s'.PHP_EOL, $contact->getId(), $contact->getNodeId(), $contact->getUserNickname());
 					}
-					$this->printPs1('printMsgStack ab');
+					$this->printPs1('printMsgStack ab A');
 				}
 				elseif(substr($line, 0, 3) == 'ab '){
 					$data = substr($line, 3);
@@ -296,6 +296,7 @@ class Console extends Thread{
 					$pos = strpos($data, ' ');
 					if($pos === false){
 						print 'Usage: /ab rem <ID>'.PHP_EOL;
+						$this->printPs1('printMsgStack ab B');
 					}
 					else{
 						$action = substr($data, 0, $pos);
