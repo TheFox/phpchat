@@ -6,6 +6,7 @@ A decentralized, peer-to-peer, encrypted chat in PHP.
 - Decentralized: See [DHT](http://en.wikipedia.org/wiki/Distributed_hash_table) and <http://bittorrent.org/beps/bep_0005.html>.
 - Encryption: SSL
 - Send P2P random messages.
+- Addressbook: manage all conversation partners.
 
 ## Install
 1. Clone
