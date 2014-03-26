@@ -32,7 +32,7 @@ class Addressbook extends YamlStorage{
 			$objAr['userNickname'] = $contact->getUserNickname();
 			$objAr['timeCreated'] = $contact->getTimeCreated();
 			
-			$this->data['contacts'][] = $objAr;
+			$this->data['contacts'][$contactId] = $objAr;
 		}
 		
 		$rv = parent::save();
@@ -42,11 +42,15 @@ class Addressbook extends YamlStorage{
 	}
 	
 	public function load(){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
 		if(parent::load()){
 			
 			if(isset($this->data['contacts']) && $this->data['contacts']){
 				foreach($this->data['contacts'] as $contactId => $contactAr){
+					#$this->contactsId++;
 					$this->contactsId = $contactId;
+					#print __CLASS__.'->'.__FUNCTION__.': '.$this->contactsId."\n";
 					
 					$contact = new Contact();
 					$contact->setId($this->contactsId);
@@ -71,7 +75,7 @@ class Addressbook extends YamlStorage{
 		
 		$ocontact = $this->contactGetByNodeId($contact->getNodeId());
 		if(!$ocontact){
-			$this->contactsId = $this->contactsId + 1;
+			$this->contactsId++;
 			
 			$contact->setId($this->contactsId);
 			
