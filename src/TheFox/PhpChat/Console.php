@@ -311,6 +311,10 @@ class Console extends Thread{
 								$this->printPs1('printMsgStack ab rem');
 							}
 						}
+						else{
+							print 'ERROR: Command "'.$action.'" not found.'.PHP_EOL;
+							$this->printPs1('printMsgStack ab not found');
+						}
 					}
 				}
 				elseif($line == 'request'){
