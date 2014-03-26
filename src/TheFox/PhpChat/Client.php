@@ -387,11 +387,10 @@ class Client{
 					}
 					
 					$idOk = false;
+					$node = new Node();
 					
 					if(strIsUuid($id)){
 						if($strKeyPub){
-							
-							$node = new Node();
 							$node->setIdHexStr($id);
 							$node->setIp($this->getIp());
 							$node->setPort($port);
