@@ -273,10 +273,7 @@ class Console extends Thread{
 						$port = (int)substr($data, $pos + 1);
 						
 						if($port <= 0xffff){
-							$this->msgAdd('Connecting to '.$ip.':'.$port.' ...');
-							$connected = $this->getIpcKernelConnection()->execSync('serverConnect', array($ip, $port, true));
-							$this->msgAdd('Connection to '.$ip.':'.$port.' '.($connected ? 'established' : 'failed').'.');
-							$this->printPs1('printMsgStack connect B');
+							$this->connect($ip, $port);
 						}
 						else{
 							print 'ERROR: Port can not be bigger than '. 0xffff .'.'.PHP_EOL;
@@ -354,10 +351,7 @@ class Console extends Thread{
 						$node->setIdHexStr($uuid);
 						
 						if($onode = $this->getIpcKernelConnection()->execSync('getTable')->nodeFindInBuckets($node)){
-							$this->msgAdd('Connecting to '.$onode->getIpPort().' ...');
-							$connected = $this->getIpcKernelConnection()->execSync('serverConnect', array($onode->getIp(), $onode->getPort(), true));
-							$this->msgAdd('Connection to '.$onode->getIpPort().' '.($connected ? 'established' : 'failed').'.');
-							$this->printPs1('printMsgStack connect B');
+							$this->connect($onode->getIp(), $onode->getPort());
 						}
 						else{
 							print 'ERROR: Node '.$node->getIdHexStr().' not found.'.PHP_EOL;
@@ -510,6 +504,13 @@ class Console extends Thread{
 		$this->ipcKernelShutdown = true;
 		
 		return null;
+	}
+	
+	public function connect($ip, $port){
+		$this->msgAdd('Connecting to '.$ip.':'.$port.' ...');
+		$connected = $this->getIpcKernelConnection()->execSync('serverConnect', array($ip, $port, true));
+		$this->msgAdd('Connection to '.$ip.':'.$port.' '.($connected ? 'established' : 'failed').'.');
+		$this->printPs1('printMsgStack connect B');
 	}
 	
 	public function talkRequestAdd(Client $client, $rid, $userNickname){
