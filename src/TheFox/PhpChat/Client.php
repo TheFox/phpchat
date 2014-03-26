@@ -475,7 +475,19 @@ class Client{
 				}
 				
 				if($this->getStatus('isChannelPeer')){
-					$this->consoleMsgAdd('New incoming channel connection from '.$this->getIpPort().'');
+					$this->consoleMsgAdd('New incoming channel connection from '.$this->getIpPort().'.');
+				}
+				
+				if($this->getStatus('isChannelPeer') || $this->getStatus('isChannelLocal')){
+					if($this->getServer() && $this->getServer()->getKernel()){
+						$contact = $this->getServer()->getKernel()->getAddressbook()->contactGetByNodeId($this->getNode()->getIdHexStr());
+						if($contact){
+							$this->consoleMsgAdd('You talked to '.$this->getNode()->getIdHexStr().' ('.$contact->getUserNickname().') once before.');
+						}
+						else{
+							$this->consoleMsgAdd('You never talked to '.$this->getNode()->getIdHexStr().' before.'.PHP_EOL.'Verify the public keys with you conversation partner on another channel.'.PHP_EOL.'Public keys:'.PHP_EOL.'  Yours: '.$this->getLocalNode()->getSslKeyPubFingerprint().PHP_EOL.'  Peers: '.$this->getNode()->getSslKeyPubFingerprint());
+						}
+					}
 				}
 				
 			}
