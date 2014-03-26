@@ -13,6 +13,7 @@ use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler as LoggerStreamHandler;
 use TheFox\Ipc\ConnectionClient;
 use TheFox\Ipc\StreamHandler as IpcStreamHandler;
+use TheFox\Dht\Kademlia\Node;
 
 class Console extends Thread{
 	
@@ -314,6 +315,53 @@ class Console extends Thread{
 						else{
 							print 'ERROR: Command "'.$action.'" not found.'.PHP_EOL;
 							$this->printPs1('printMsgStack ab not found');
+						}
+					}
+				}
+				elseif($line == 'talk' || $line == 'talk '){
+					print 'Usage: /talk <NICK|UUID>'.PHP_EOL;
+					$this->printPs1('printMsgStack talk A');
+				}
+				elseif(substr($line, 0, 5) == 'talk '){
+					$data = substr($line, 5);
+					
+					$uuid = '';
+					if(strIsUuid($data)){
+						$uuid = $data;
+					}
+					else{
+						$contacts = $this->getIpcKernelConnection()->execSync('getAddressbook')->contactsGetByNick($data);
+						if(count($contacts) > 1){
+							print 'Found several nodes with nickname "'.$data.'". Delete old nodes or use UUID instead.'.PHP_EOL.PHP_EOL;
+							print ' ID UUID                                  USERNAME'.PHP_EOL;
+							foreach($contacts as $contactId => $contact){
+								printf('%3d %36s  %s'.PHP_EOL, $contact->getId(), $contact->getNodeId(), $contact->getUserNickname());
+							}
+							$this->printPs1('printMsgStack talk B');
+						}
+						elseif(count($contacts) == 1){
+							$contact = array_shift($contacts);
+							$uuid = $contact->getNodeId();
+						}
+						else{
+							print 'ERROR: Nick "'.$data.'" not found.'.PHP_EOL;
+							$this->printPs1('printMsgStack talk C');
+						}
+					}
+					
+					if($uuid){
+						$node = new Node();
+						$node->setIdHexStr($uuid);
+						
+						if($onode = $this->getIpcKernelConnection()->execSync('getTable')->nodeFindInBuckets($node)){
+							$this->msgAdd('Connecting to '.$onode->getIpPort().' ...');
+							$connected = $this->getIpcKernelConnection()->execSync('serverConnect', array($onode->getIp(), $onode->getPort(), true));
+							$this->msgAdd('Connection to '.$onode->getIpPort().' '.($connected ? 'established' : 'failed').'.');
+							$this->printPs1('printMsgStack connect B');
+						}
+						else{
+							print 'ERROR: Node '.$node->getIdHexStr().' not found.'.PHP_EOL;
+							$this->printPs1('printMsgStack talk D');
 						}
 					}
 				}

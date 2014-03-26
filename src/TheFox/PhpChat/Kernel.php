@@ -80,6 +80,7 @@ class Kernel extends Thread{
 		$this->ipcConsoleConnection->functionAdd('getAddressbook', $this, 'getAddressbook');
 		$this->ipcConsoleConnection->functionAdd('addressbookContactAdd', $this, 'addressbookContactAdd');
 		$this->ipcConsoleConnection->functionAdd('addressbookContactRemove', $this, 'addressbookContactRemove');
+		$this->ipcConsoleConnection->functionAdd('getTable', $this, 'getTable');
 		$this->ipcConsoleConnection->connect();
 		
 		$this->ipcCronjobConnection = new ConnectionServer();
