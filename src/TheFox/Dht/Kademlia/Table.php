@@ -253,7 +253,7 @@ class Table extends YamlStorage{
 									$nbucket = $this->bucketsByMask[$bmaskName];
 									
 									if($nbucket->isFull()){
-										throw new Exception('Bucket with mask '.$bmaskName.' can\'t be full.');
+										throw new RuntimeException('Bucket with mask '.$bmaskName.' can\'t be full.');
 									}
 									
 									$nbucket->nodeAdd($bnode, false);
