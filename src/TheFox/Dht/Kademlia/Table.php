@@ -74,7 +74,7 @@ class Table extends YamlStorage{
 		return $this->data['bucketsId'];
 	}
 	
-	public function bucketNew(){
+	private function bucketNew($mask){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		#print __CLASS__.'->'.__FUNCTION__.': '.$this->getDatadirBasePath()."\n";
 		
@@ -82,6 +82,7 @@ class Table extends YamlStorage{
 		
 		$bucket = new Bucket($this->getDatadirBasePath().'/bucket_'.$this->data['bucketsId'].'.yml');
 		$bucket->setId($this->data['bucketsId']);
+		$bucket->setMask($mask);
 		$bucket->setDatadirBasePath($this->getDatadirBasePath());
 		$bucket->setLocalNode($this->getLocalNode());
 		
@@ -259,7 +260,7 @@ class Table extends YamlStorage{
 									$nbucket->nodeAdd($bnode, false);
 								}
 								else{
-									$nbucket = $this->bucketNew();
+									$nbucket = $this->bucketNew($bmaskName);
 									$nbucket->nodeAdd($bnode);
 									
 									$bucketsUsed[$nbucket->getId()] = $nbucket;
@@ -286,7 +287,7 @@ class Table extends YamlStorage{
 						
 					}
 					else{
-						$nbucket = $this->bucketNew();
+						$nbucket = $this->bucketNew($maskName);
 						$nbucket->nodeAdd($node);
 						
 						break;
