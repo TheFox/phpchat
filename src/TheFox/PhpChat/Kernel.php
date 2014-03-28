@@ -87,6 +87,7 @@ class Kernel extends Thread{
 		$this->ipcCronjobConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20001));
 		$this->ipcCronjobConnection->functionAdd('getTable', $this, 'getTable');
 		$this->ipcCronjobConnection->functionAdd('serverConnect', $this, 'serverConnect');
+		$this->ipcCronjobConnection->functionAdd('save', $this, 'save');
 		$this->ipcCronjobConnection->connect();
 		
 		
@@ -237,6 +238,12 @@ class Kernel extends Thread{
 		$this->shutdown();
 	}
 	
+	public function save(){
+		$this->getTable()->save();
+		$this->addressbook->save();
+		$this->getSettings()->save();
+	}
+	
 	public function shutdown(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
@@ -258,9 +265,7 @@ class Kernel extends Thread{
 		$this->getSettings()->setDataChanged(true);
 		
 		$this->getServer()->shutdown();
-		$this->getTable()->save();
-		$this->addressbook->save();
-		$this->getSettings()->save();
+		$this->save();
 	}
 	
 	public function ipcConsoleShutdown(){
