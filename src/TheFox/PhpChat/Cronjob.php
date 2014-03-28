@@ -91,7 +91,7 @@ class Cronjob extends Thread{
 	}
 	
 	private function pingClosestNodes(){
-		print __CLASS__.'->'.__FUNCTION__.': getTable'."\n";
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
 		$table = $this->getIpcKernelConnection()->execSync('getTable');
 		
 		$nodes = $table->getNodesClosest(20);
