@@ -27,12 +27,12 @@ class Addressbook extends YamlStorage{
 		$this->data['contacts'] = array();
 		foreach($this->contacts as $contactId => $contact){
 			
-			$objAr = array();
-			$objAr['nodeId'] = $contact->getNodeId();
-			$objAr['userNickname'] = $contact->getUserNickname();
-			$objAr['timeCreated'] = $contact->getTimeCreated();
+			$contactAr = array();
+			$contactAr['nodeId'] = $contact->getNodeId();
+			$contactAr['userNickname'] = $contact->getUserNickname();
+			$contactAr['timeCreated'] = $contact->getTimeCreated();
 			
-			$this->data['contacts'][$contactId] = $objAr;
+			$this->data['contacts'][$contactId] = $contactAr;
 		}
 		
 		$rv = parent::save();
