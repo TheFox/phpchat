@@ -27,6 +27,7 @@ class MsgSendQueue extends YamlStorage{
 			$msgAr['srcNodeId'] = $msg->getSrcNodeId();
 			$msgAr['srcUserNickname'] = $msg->getSrcUserNickname();
 			$msgAr['dstNodeId'] = $msg->getDstNodeId();
+			$msgAr['text'] = $msg->getText();
 			$msgAr['timeCreated'] = $msg->getTimeCreated();
 			
 			$this->data['msgs'][$msgAr['id']] = $msgAr;
@@ -51,6 +52,7 @@ class MsgSendQueue extends YamlStorage{
 					$msg->setSrcNodeId($msgAr['srcNodeId']);
 					$msg->setSrcUserNickname($msgAr['srcUserNickname']);
 					$msg->setDstNodeId($msgAr['dstNodeId']);
+					$msg->setText($msgAr['text']);
 					$msg->setTimeCreated($msgAr['timeCreated']);
 					
 					$this->msgs[$msg->getId()] = $msg;
