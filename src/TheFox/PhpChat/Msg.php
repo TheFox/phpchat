@@ -27,7 +27,7 @@ class Msg{
 	}
 	
 	public function __sleep(){
-		#return array('id');
+		return array('id', 'srcNodeId', 'srcUserNickname', 'dstNodeId', 'text', 'timeCreated');
 	}
 	
 	public function setId($id){

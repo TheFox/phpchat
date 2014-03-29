@@ -16,6 +16,10 @@ class MsgSendQueue extends YamlStorage{
 		$this->data['timeCreated'] = time();
 	}
 	
+	public function __sleep(){
+		return array('msgs');
+	}
+	
 	public function save(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
