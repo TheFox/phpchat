@@ -80,11 +80,11 @@ class Msg{
 	}
 	
 	public function setTimeCreated($timeCreated){
-		$this->timeCreated = $timeCreated;
+		$this->timeCreated = (int)$timeCreated;
 	}
 	
 	public function getTimeCreated(){
-		return $this->timeCreated;
+		return (int)$this->timeCreated;
 	}
 	
 }
