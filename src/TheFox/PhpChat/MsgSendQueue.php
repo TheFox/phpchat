@@ -29,6 +29,7 @@ class MsgSendQueue extends YamlStorage{
 			$msgAr = array();
 			$msgAr['id'] = $msg->getId();
 			$msgAr['srcNodeId'] = $msg->getSrcNodeId();
+			$msgAr['srcSslKeyPub'] = $msg->getSrcSslKeyPub();
 			$msgAr['srcUserNickname'] = $msg->getSrcUserNickname();
 			$msgAr['dstNodeId'] = $msg->getDstNodeId();
 			$msgAr['text'] = $msg->getText();
@@ -54,6 +55,7 @@ class MsgSendQueue extends YamlStorage{
 					$msg = new Msg();
 					$msg->setId($msgAr['id']);
 					$msg->setSrcNodeId($msgAr['srcNodeId']);
+					$msg->setSrcSslKeyPub($msgAr['srcSslKeyPub']);
 					$msg->setSrcUserNickname($msgAr['srcUserNickname']);
 					$msg->setDstNodeId($msgAr['dstNodeId']);
 					$msg->setText($msgAr['text']);

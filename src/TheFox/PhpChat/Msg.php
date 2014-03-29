@@ -9,6 +9,7 @@ class Msg{
 	
 	private $id = '';
 	private $srcNodeId = '';
+	private $srcSslKeyPub = '';
 	private $srcUserNickname = '';
 	private $dstNodeId = '';
 	private $text = '';
@@ -27,7 +28,7 @@ class Msg{
 	}
 	
 	public function __sleep(){
-		return array('id', 'srcNodeId', 'srcUserNickname', 'dstNodeId', 'text', 'timeCreated');
+		return array('id', 'srcNodeId', 'srcSslKeyPub', 'srcUserNickname', 'dstNodeId', 'text', 'timeCreated');
 	}
 	
 	public function setId($id){
@@ -44,6 +45,14 @@ class Msg{
 	
 	public function getSrcNodeId(){
 		return $this->srcNodeId;
+	}
+	
+	public function setSrcSslKeyPub($srcSslKeyPub){
+		$this->srcSslKeyPub = $srcSslKeyPub;
+	}
+	
+	public function getSrcSslKeyPub(){
+		return $this->srcSslKeyPub;
 	}
 	
 	public function setSrcUserNickname($srcUserNickname){
