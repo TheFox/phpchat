@@ -240,7 +240,7 @@ class Kernel extends Thread{
 	
 	public function save(){
 		$this->getTable()->save();
-		$this->addressbook->save();
+		$this->getAddressbook()->save();
 		$this->getSettings()->save();
 	}
 	
