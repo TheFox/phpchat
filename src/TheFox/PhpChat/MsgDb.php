@@ -6,7 +6,6 @@ use TheFox\Yaml\YamlStorage;
 
 class MsgDb extends YamlStorage{
 	
-	private $msgsId = 0;
 	private $msgs = array();
 	
 	public function __construct($filePath = null){
