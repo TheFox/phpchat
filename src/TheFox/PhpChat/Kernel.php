@@ -18,6 +18,7 @@ class Kernel extends Thread{
 	private $localNode;
 	private $table;
 	private $addressbook;
+	private $msgDb;
 	private $server;
 	private $ipcConsoleConnection = null;
 	private $ipcConsoleShutdown = false;
@@ -54,6 +55,12 @@ class Kernel extends Thread{
 		$load = $this->addressbook->load();
 		$this->getLog()->info('setup addressbook: done ('.(int)$load.')');
 		
+		$this->getLog()->info('setup msgDb');
+		$this->msgDb = new MsgDb($this->settings->data['datadir'].'/msgdb.yml');
+		$this->msgDb->setDatadirBasePath($this->settings->data['datadir']);
+		$load = $this->msgDb->load();
+		$this->getLog()->info('setup msgDb: done ('.(int)$load.')');
+		
 		$this->getLog()->info('setup server');
 		$this->server = new Server();
 		$this->server->setKernel($this);
@@ -80,12 +87,16 @@ class Kernel extends Thread{
 		$this->ipcConsoleConnection->functionAdd('getAddressbook', $this, 'getAddressbook');
 		$this->ipcConsoleConnection->functionAdd('addressbookContactAdd', $this, 'addressbookContactAdd');
 		$this->ipcConsoleConnection->functionAdd('addressbookContactRemove', $this, 'addressbookContactRemove');
+		$this->ipcConsoleConnection->functionAdd('msgDbMsgAdd', $this, 'msgDbMsgAdd');
 		$this->ipcConsoleConnection->functionAdd('getTable', $this, 'getTable');
 		$this->ipcConsoleConnection->connect();
 		
 		$this->ipcCronjobConnection = new ConnectionServer();
 		$this->ipcCronjobConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20001));
+		$this->ipcCronjobConnection->functionAdd('getLocalNode', $this, 'getLocalNode');
 		$this->ipcCronjobConnection->functionAdd('getTable', $this, 'getTable');
+		$this->ipcCronjobConnection->functionAdd('tableNodeEnclose', $this, 'tableNodeEnclose');
+		$this->ipcCronjobConnection->functionAdd('getMsgDb', $this, 'getMsgDb');
 		$this->ipcCronjobConnection->functionAdd('serverConnect', $this, 'serverConnect');
 		$this->ipcCronjobConnection->functionAdd('save', $this, 'save');
 		$this->ipcCronjobConnection->connect();
@@ -126,10 +137,12 @@ class Kernel extends Thread{
 		return $this->server;
 	}
 	
-	public function serverConnect($ip, $port, $isTalkRequest = false, $isPingOnly = false){
-		#print __CLASS__.'->'.__FUNCTION__.': '.$ip.':'.$port."\n";
+	public function serverConnect($ip, $port, $isTalkRequest = false, $isPingOnly = false, $msg = null){
+		print __CLASS__.'->'.__FUNCTION__.': '.$ip.':'.$port."\n";
+		#ve($msg === null);
 		
 		if($this->getServer()){
+			#print __CLASS__.'->'.__FUNCTION__.' A'."\n";
 			
 			$clientActions = array();
 			if($isTalkRequest){
@@ -162,6 +175,16 @@ class Kernel extends Thread{
 					$client->sendQuit();
 					$client->shutdown();
 				});
+				$clientActions[] = $action;
+			}
+			
+			if($msg !== null){
+				#print __CLASS__.'->'.__FUNCTION__.' B'."\n";
+				
+				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_OK);
+				$action->functionSet(function($action, $client){
+					$client->sendMsg($action->getVar('msg'));
+				}, array('msg' => $msg));
 				$clientActions[] = $action;
 			}
 			
@@ -206,6 +229,15 @@ class Kernel extends Thread{
 		return $this->table;
 	}
 	
+	public function tableNodeEnclose(Node $node){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#ve($node);
+		
+		$enode = $this->getTable()->nodeEnclose($node);
+		
+		#ve($enode);
+	}
+	
 	public function getAddressbook(){
 		return $this->addressbook;
 	}
@@ -216,6 +248,18 @@ class Kernel extends Thread{
 	
 	public function addressbookContactRemove($id){
 		return $this->addressbook->contactRemove($id);
+	}
+	
+	public function getMsgDb(){
+		return $this->msgDb;
+	}
+	
+	public function msgDbMsgAdd(Msg $msg){
+		$msg->setSrcNodeId($this->settings->data['node']['id']);
+		$msg->setSrcSslKeyPub($this->localNode->getSslKeyPub());
+		$msg->setSrcUserNickname($this->settings->data['user']['nickname']);
+		
+		$this->getMsgDb()->msgAdd($msg);
 	}
 	
 	public function getIpcConsoleConnection(){
@@ -241,6 +285,8 @@ class Kernel extends Thread{
 	public function save(){
 		$this->getTable()->save();
 		$this->getAddressbook()->save();
+		$this->getMsgDb()->setDataChanged(true);
+		$this->getMsgDb()->save();
 		$this->getSettings()->save();
 	}
 	

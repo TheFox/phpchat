@@ -8,6 +8,7 @@ use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler as LoggerStreamHandler;
 use TheFox\Ipc\ConnectionClient;
 use TheFox\Ipc\StreamHandler as IpcStreamHandler;
+use TheFox\Dht\Kademlia\Node;
 
 class Cronjob extends Thread{
 	
@@ -15,6 +16,9 @@ class Cronjob extends Thread{
 	
 	private $log;
 	private $ipcKernelConnection = null;
+	private $msgDb;
+	private $table;
+	private $localNode;
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -68,6 +72,9 @@ class Cronjob extends Thread{
 				$hours++;
 			}
 			
+			if($seconds == 0){
+				$this->msgDbInit();
+			}
 			if($hours == 0 && $minutes == 1 && $seconds == 0){
 				$this->pingClosestNodes();
 			}
@@ -103,6 +110,107 @@ class Cronjob extends Thread{
 			
 			$this->getIpcKernelConnection()->execAsync('serverConnect', array($node->getIp(), $node->getPort(), false, true));
 		}
+	}
+	
+	private function msgDbInit(){
+		$this->msgDb = $this->getIpcKernelConnection()->execSync('getMsgDb');
+		$this->table = $this->getIpcKernelConnection()->execSync('getTable');
+		$this->localNode = $this->table->getLocalNode();
+		
+		#ve($this->table);
+		
+		$this->msgDbInitNodes();
+		$this->msgDbSendAll();
+	}
+	
+	private function msgDbInitNodes(){
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+		#ve($this->msgDb);
+		
+		/*
+		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
+			if($msg->getDstNodeId() && $msg->getSrcNodeId() == $this->localNode->getIdHexStr()){
+				$node = new Node();
+				$node->setIdHexStr($msg->getDstNodeId());
+				
+				$onode = $this->table->nodeEnclose($node);
+				if($node == $onode){
+					// New node.
+					print __CLASS__.'->'.__FUNCTION__.': new node'."\n";
+					$this->getIpcKernelConnection()->execAsync('tableNodeEnclose', array($node));
+				}
+			}
+		}
+		
+		$this->table = $this->getIpcKernelConnection()->execSync('getTable');
+		*/
+		
+		#print __CLASS__.'->'.__FUNCTION__.': done'."\n";
+	}
+	
+	private function msgDbSendAll(){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+		$processedMsgIds = array();
+		
+		// Send own msgs.
+		#print __CLASS__.'->'.__FUNCTION__.': own'."\n";
+		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
+			if(!in_array($msg->getId(), $processedMsgIds) && $msg->getDstNodeId() && $msg->getSrcNodeId() == $this->localNode->getIdHexStr()){
+				$processedMsgIds[] = $msg->getId();
+				$this->msgDbSendMsg($msg);
+			}
+		}
+		
+		// Send unsent msgs.
+		#print __CLASS__.'->'.__FUNCTION__.': unsent'."\n";
+		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
+			if(!in_array($msg->getId(), $processedMsgIds) && $msg->getDstNodeId() && $msg->getSrcNodeId() != $this->localNode->getIdHexStr()){
+				$processedMsgIds[] = $msg->getId();
+				$this->msgDbSendMsg($msg);
+			}
+		}
+		
+		// Relay all other msgs.
+		#print __CLASS__.'->'.__FUNCTION__.': other'."\n";
+		foreach($this->msgDb->getMsgs() as $msgId => $msg){
+			if(!in_array($msg->getId(), $processedMsgIds) && $msg->getDstNodeId()){
+				$processedMsgIds[] = $msg->getId();
+				$this->msgDbSendMsg($msg);
+			}
+		}
+		
+	}
+	
+	private function msgDbSendMsg(Msg $msg){
+		#ve($msg);
+		
+		$node = new Node();
+		$node->setIdHexStr($msg->getDstNodeId());
+		
+		$node = $this->table->nodeEnclose($node);
+		#ve($node);
+		
+		$nodes = $this->table->nodeFindClosest($node);
+		#ve($nodes);
+		
+		array_unshift($nodes, $node);
+		
+		
+		foreach($nodes as $nodeId => $node){
+			#ve($node);
+			
+			#print __CLASS__.'->'.__FUNCTION__.': node: '.$node->getIdHexStr().', "'.$node->getIp().'", "'.$node->getPort().'"'."\n";
+			
+			if($node->getIp() && $node->getPort()){
+				$rv = $this->getIpcKernelConnection()->execSync('serverConnect', array($node->getIp(), $node->getPort(), false, false, $msg));
+				
+				#print __CLASS__.'->'.__FUNCTION__.': node: '.$node->getIdHexStr().', '. (int)$rv .''."\n";
+			}
+			
+		}
+		
 	}
 	
 	public function shutdown(){

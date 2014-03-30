@@ -1492,7 +1492,7 @@ class Client{
 		$this->dataSend($this->msgCreate('node_found', $data));
 	}
 	
-	private function sendMsg(){
+	public function sendMsg(Msg $msg){
 		$rid = (string)Uuid::uuid4();
 		
 		$data = array(

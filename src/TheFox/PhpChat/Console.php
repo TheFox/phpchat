@@ -251,6 +251,7 @@ class Console extends Thread{
 						.PHP_EOL."/request accept <ID>      - accept  a talk request"
 						.PHP_EOL."/request decline <ID>     - decline a talk request"
 						.PHP_EOL."/close                    - close talk"
+						.PHP_EOL."/msg <UUID>               - send a msg to a public key"
 						.PHP_EOL."/nick                     - print your nickname"
 						.PHP_EOL."/nick <NICK>              - set a new nickname"
 						.PHP_EOL."/exit                     - exit this programm"
@@ -420,6 +421,8 @@ class Console extends Thread{
 					
 					$this->setModeChannel(false);
 					$this->setModeChannelClient(null);
+				}
+				elseif($line == 'msg'){
 				}
 				elseif($line == 'nick'){
 					$this->msgAdd('Your nickname: '.$this->userNickname);
