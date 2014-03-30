@@ -28,10 +28,10 @@ class MsgDb extends YamlStorage{
 			$msgAr = array();
 			$msgAr['id'] = $msg->getId();
 			$msgAr['srcNodeId'] = $msg->getSrcNodeId();
-			$msgAr['srcSslKeyPub'] = $msg->getSrcSslKeyPub();
+			$msgAr['srcSslKeyPub'] = base64_encode($msg->getSrcSslKeyPub());
 			$msgAr['srcUserNickname'] = $msg->getSrcUserNickname();
 			$msgAr['dstNodeId'] = $msg->getDstNodeId();
-			$msgAr['dstSslKeyPub'] = $msg->getDstSslKeyPub();
+			$msgAr['dstSslKeyPub'] = base64_encode($msg->getDstSslKeyPub());
 			$msgAr['text'] = $msg->getText();
 			$msgAr['sentNodes'] = $msg->getSentNodes();
 			$msgAr['timeCreated'] = $msg->getTimeCreated();
@@ -56,10 +56,10 @@ class MsgDb extends YamlStorage{
 					$msg = new Msg();
 					$msg->setId($msgAr['id']);
 					$msg->setSrcNodeId($msgAr['srcNodeId']);
-					$msg->setSrcSslKeyPub($msgAr['srcSslKeyPub']);
+					$msg->setSrcSslKeyPub(base64_decode($msgAr['srcSslKeyPub']));
 					$msg->setSrcUserNickname($msgAr['srcUserNickname']);
 					$msg->setDstNodeId($msgAr['dstNodeId']);
-					$msg->setDstSslKeyPub($msgAr['dstSslKeyPub']);
+					$msg->setDstSslKeyPub(base64_decode($msgAr['dstSslKeyPub']));
 					$msg->setText($msgAr['text']);
 					$msg->setSentNodes($msgAr['sentNodes']);
 					$msg->setTimeCreated($msgAr['timeCreated']);
