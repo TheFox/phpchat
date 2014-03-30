@@ -19,6 +19,7 @@ class ClientAction{
 	private $criteria = array();
 	private $objc = null;
 	private $func = null;
+	private $vars = array();
 	
 	public function __construct($criterion){
 		$this->criteria = array($criterion);
@@ -32,23 +33,45 @@ class ClientAction{
 		return $this->id;
 	}
 	
+	public function getVar($name = null){
+		if($name === null){
+			#print __CLASS__.'->'.__FUNCTION__.': name is null'."\n";
+			return $this->vars;
+		}
+		if(isset($this->vars[$name])){
+			#print __CLASS__.'->'.__FUNCTION__.': is set'."\n";
+			return $this->vars[$name];
+		}
+		
+		#print __CLASS__.'->'.__FUNCTION__.': null'."\n";
+		return null;
+	}
+	
 	public function hasCriterion($criterion){
 		return in_array($criterion, $this->criteria);
 	}
 	
-	public function functionSet($objc, $func = null){
+	public function functionSet($objc, $func = null, $vars = null){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		#ve($objc);
 		#ve($func);
 		
-		if($func === null){
+		if($func === null && $vars === null){
 			#print __CLASS__.'->'.__FUNCTION__.': func is null'."\n";
+			$this->objc = null;
 			$this->func = $objc;
+			$this->vars = array();
+		}
+		elseif($func !== null && $vars === null){
+			$this->objc = null;
+			$this->func = $objc;
+			$this->vars = $func;
 		}
 		else{
 			$this->objc = $objc;
 			$this->func = $func;
+			$this->vars = $vars;
 		}
 	}
 	
