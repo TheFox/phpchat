@@ -96,4 +96,14 @@ class MsgDb extends YamlStorage{
 		return $rv;
 	}
 	
+	public function getUnsentMsgs(){
+		$rv = array();
+		foreach($this->msgs as $msgId => $msg){
+			if(!$msg->getSentNodes()){
+				$rv[$msgId] = $msg;
+			}
+		}
+		return $rv;
+	}
+	
 }
