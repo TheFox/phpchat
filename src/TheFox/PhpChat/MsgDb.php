@@ -4,13 +4,13 @@ namespace TheFox\PhpChat;
 
 use TheFox\Yaml\YamlStorage;
 
-class MsgSendQueue extends YamlStorage{
+class MsgDb extends YamlStorage{
 	
 	private $msgsId = 0;
 	private $msgs = array();
 	
 	public function __construct($filePath = null){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
 		parent::__construct($filePath);
 		
 		$this->data['timeCreated'] = time();
@@ -75,6 +75,16 @@ class MsgSendQueue extends YamlStorage{
 	public function msgAdd(Msg $msg){
 		$this->msgs[$msg->getId()] = $msg;
 		$this->setDataChanged(true);
+	}
+	
+	public function getMsgWithNoDstNodeId(){
+		$rv = array();
+		foreach($this->msgs as $msgId => $msg){
+			if(!$msg->getDstNodeId()){
+				$rv[$msgId] = $msg;
+			}
+		}
+		return $rv;
 	}
 	
 }
