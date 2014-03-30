@@ -70,10 +70,6 @@ class Table extends YamlStorage{
 		return false;
 	}
 	
-	public function getBucketsId(){
-		return $this->data['bucketsId'];
-	}
-	
 	private function bucketNew($mask){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		#print __CLASS__.'->'.__FUNCTION__.': '.$this->getDatadirBasePath()."\n";
@@ -86,7 +82,7 @@ class Table extends YamlStorage{
 		$bucket->setDatadirBasePath($this->getDatadirBasePath());
 		$bucket->setLocalNode($this->getLocalNode());
 		
-		$this->buckets[$this->getBucketsId()] = $bucket;
+		$this->buckets[$this->data['bucketsId']] = $bucket;
 		$this->bucketsByMask[$bucket->getMask()] = $bucket;
 		
 		$this->setDataChanged(true);
