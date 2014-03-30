@@ -209,7 +209,7 @@ class Server{
 			$this->log->debug('dht network bootstrap');
 			
 			$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_OK);
-			$action->functionSet(function($client){
+			$action->functionSet(function($action, $client){
 				$client->sendNodeFind($client->getLocalNode()->getIdHexStr());
 			});
 			$client->actionAdd($action);

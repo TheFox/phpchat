@@ -135,19 +135,19 @@ class Kernel extends Thread{
 			if($isTalkRequest){
 				
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_HELLO);
-				$action->functionSet(function($client){
+				$action->functionSet(function($action, $client){
 					$client->setStatus('isChannelLocal', true);
 				});
 				$clientActions[] = $action;
 				
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_OK);
-				$action->functionSet(function($client){
+				$action->functionSet(function($action, $client){
 					$client->sendSslInit();
 				});
 				$clientActions[] = $action;
 				
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
-				$action->functionSet(function($client){
+				$action->functionSet(function($action, $client){
 					$this->ipcConsoleMsgSend('Sening talk request to '.$client->getIpPort().' ...');
 					$client->sendTalkRequest($this->getSettingsUserNickname());
 					$this->ipcConsoleMsgSend('Talk request sent to '.$client->getIpPort().'. Waiting for response ...');
@@ -157,7 +157,7 @@ class Kernel extends Thread{
 			
 			if($isPingOnly){
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_OK);
-				$action->functionSet(function($client){
+				$action->functionSet(function($action, $client){
 					#print __CLASS__.'->'.__FUNCTION__.': shutdown'."\n";
 					$client->sendQuit();
 					$client->shutdown();

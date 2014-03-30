@@ -57,6 +57,7 @@ class ClientAction{
 		#print __CLASS__.'->'.__FUNCTION__.': inst '.(int)($this->func instanceof Closure)."\n";
 		
 		$args = func_get_args();
+		array_unshift($args, $this);
 		
 		$objc = $this->objc;
 		$func = $this->func;
