@@ -21,7 +21,7 @@ class Table extends YamlStorage{
 	}
 	
 	public function __sleep(){
-		return array('buckets', 'localNode');
+		return array('data', 'buckets', 'localNode');
 	}
 	
 	public function save(){
