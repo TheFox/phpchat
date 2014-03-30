@@ -485,7 +485,7 @@ class Client{
 							$this->consoleMsgAdd('You talked to '.$this->getNode()->getIdHexStr().' ('.$contact->getUserNickname().') once before.');
 						}
 						else{
-							$this->consoleMsgAdd('You never talked to '.$this->getNode()->getIdHexStr().' before.'.PHP_EOL.'Verify the public keys with you conversation partner on another channel.'.PHP_EOL.'Public keys:'.PHP_EOL.'  Yours: '.$this->getLocalNode()->getSslKeyPubFingerprint().PHP_EOL.'  Peers: '.$this->getNode()->getSslKeyPubFingerprint());
+							$this->consoleMsgAdd('You never talked to '.$this->getNode()->getIdHexStr().' before.'.PHP_EOL.'Verify the public keys with you conversation partner on another channel.'.PHP_EOL.'Public keys fingerprints:'.PHP_EOL.'  Yours: '.$this->getLocalNode()->getSslKeyPubFingerprint().PHP_EOL.'  Peers: '.$this->getNode()->getSslKeyPubFingerprint());
 						}
 					}
 				}
