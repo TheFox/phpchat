@@ -10,7 +10,7 @@ class MsgDb extends YamlStorage{
 	private $msgs = array();
 	
 	public function __construct($filePath = null){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		parent::__construct($filePath);
 		
 		$this->data['timeCreated'] = time();
@@ -33,6 +33,7 @@ class MsgDb extends YamlStorage{
 			$msgAr['srcUserNickname'] = $msg->getSrcUserNickname();
 			$msgAr['dstNodeId'] = $msg->getDstNodeId();
 			$msgAr['text'] = $msg->getText();
+			$msgAr['sentNodes'] = $msg->getSentNodes();
 			$msgAr['timeCreated'] = $msg->getTimeCreated();
 			
 			$this->data['msgs'][$msgAr['id']] = $msgAr;
@@ -59,6 +60,7 @@ class MsgDb extends YamlStorage{
 					$msg->setSrcUserNickname($msgAr['srcUserNickname']);
 					$msg->setDstNodeId($msgAr['dstNodeId']);
 					$msg->setText($msgAr['text']);
+					$msg->setSentNodes($msgAr['sentNodes']);
 					$msg->setTimeCreated($msgAr['timeCreated']);
 					
 					$this->msgs[$msg->getId()] = $msg;

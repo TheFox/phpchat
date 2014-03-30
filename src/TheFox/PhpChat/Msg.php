@@ -13,6 +13,7 @@ class Msg{
 	private $srcUserNickname = '';
 	private $dstNodeId = '';
 	private $text = '';
+	private $sentNodes = array();
 	private $timeCreated = 0;
 	
 	public function __construct($text = ''){
@@ -28,7 +29,7 @@ class Msg{
 	}
 	
 	public function __sleep(){
-		return array('id', 'srcNodeId', 'srcSslKeyPub', 'srcUserNickname', 'dstNodeId', 'text', 'timeCreated');
+		return array('id', 'srcNodeId', 'srcSslKeyPub', 'srcUserNickname', 'dstNodeId', 'text', 'sentNodes', 'timeCreated');
 	}
 	
 	public function setId($id){
@@ -77,6 +78,14 @@ class Msg{
 	
 	public function getText(){
 		return $this->text;
+	}
+	
+	public function setSentNodes($sentNodes){
+		$this->sentNodes = $sentNodes;
+	}
+	
+	public function getSentNodes(){
+		return $this->sentNodes;
 	}
 	
 	public function setTimeCreated($timeCreated){
