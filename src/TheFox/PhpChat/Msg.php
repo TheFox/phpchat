@@ -111,7 +111,7 @@ class Msg{
 	}
 	
 	public function getTimeCreated(){
-		return (int)$this->timeCreated;
+		return((int)$this->timeCreated);
 	}
 	
 }
