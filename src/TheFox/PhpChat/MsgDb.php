@@ -82,6 +82,10 @@ class MsgDb extends YamlStorage{
 		$this->setDataChanged(true);
 	}
 	
+	public function getMsgs(){
+		return $this->msgs;
+	}
+	
 	public function getMsgWithNoDstNodeId(){
 		$rv = array();
 		foreach($this->msgs as $msgId => $msg){
