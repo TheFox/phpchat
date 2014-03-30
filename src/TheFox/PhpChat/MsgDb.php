@@ -34,6 +34,7 @@ class MsgDb extends YamlStorage{
 			$msgAr['dstSslKeyPub'] = base64_encode($msg->getDstSslKeyPub());
 			$msgAr['text'] = $msg->getText();
 			$msgAr['sentNodes'] = $msg->getSentNodes();
+			$msgAr['relayCount'] = $msg->getRelayCount();
 			$msgAr['timeCreated'] = $msg->getTimeCreated();
 			
 			$this->data['msgs'][$msgAr['id']] = $msgAr;
@@ -62,6 +63,7 @@ class MsgDb extends YamlStorage{
 					$msg->setDstSslKeyPub(base64_decode($msgAr['dstSslKeyPub']));
 					$msg->setText($msgAr['text']);
 					$msg->setSentNodes($msgAr['sentNodes']);
+					$msg->setRelayCount($msgAr['relayCount']);
 					$msg->setTimeCreated($msgAr['timeCreated']);
 					
 					$this->msgs[$msg->getId()] = $msg;

@@ -15,6 +15,7 @@ class Msg{
 	private $dstSslKeyPub = '';
 	private $text = '';
 	private $sentNodes = array();
+	private $relayCount = 0;
 	private $timeCreated = 0;
 	
 	public function __construct($text = ''){
@@ -30,7 +31,7 @@ class Msg{
 	}
 	
 	public function __sleep(){
-		return array('id', 'srcNodeId', 'srcSslKeyPub', 'srcUserNickname', 'dstNodeId', 'dstSslKeyPub', 'text', 'sentNodes', 'timeCreated');
+		return array('id', 'srcNodeId', 'srcSslKeyPub', 'srcUserNickname', 'dstNodeId', 'dstSslKeyPub', 'text', 'sentNodes', 'relayCount', 'timeCreated');
 	}
 	
 	public function setId($id){
@@ -95,6 +96,14 @@ class Msg{
 	
 	public function getSentNodes(){
 		return $this->sentNodes;
+	}
+	
+	public function setRelayCount($relayCount){
+		$this->relayCount = (int)$relayCount;
+	}
+	
+	public function getRelayCount(){
+		return((int)$this->relayCount);
 	}
 	
 	public function setTimeCreated($timeCreated){
