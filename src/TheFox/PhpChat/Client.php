@@ -654,6 +654,40 @@ class Client{
 				$this->sendError(100, $msgName);
 			}
 		}
+		
+		elseif($msgName == 'msg'){
+			if($this->getStatus('hasId')){
+				$rid = '';
+				if(array_key_exists('rid', $msgData)){
+					$rid = $msgData['rid'];
+				}
+				
+				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.'');
+				
+				$this->sendMsgResponse($rid);
+				
+				
+				
+			}
+			else{
+				$this->sendError(100, $msgName);
+			}
+		}
+		elseif($msgName == 'msg_response'){
+			if($this->getStatus('hasId')){
+				$rid = '';
+				if(array_key_exists('rid', $msgData)){
+					$rid = $msgData['rid'];
+				}
+				
+				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.'');
+				
+			}
+			else{
+				$this->sendError(100, $msgName);
+			}
+		}
+		
 		elseif($msgName == 'ssl_init'){
 			if($this->getSsl()){
 				if($this->getStatus('hasId')){
@@ -1456,6 +1490,22 @@ class Client{
 			'nodes'     => $nodesOut,
 		);
 		$this->dataSend($this->msgCreate('node_found', $data));
+	}
+	
+	private function sendMsg(){
+		$rid = (string)Uuid::uuid4();
+		
+		$data = array(
+			'rid' => $rid,
+		);
+		$this->dataSend($this->msgCreate('msg', $data));
+	}
+	
+	private function sendMsgResponse($rid){
+		$data = array(
+			'rid' => $rid,
+		);
+		$this->dataSend($this->msgCreate('msg_response', $data));
 	}
 	
 	public function sendSslInit(){
