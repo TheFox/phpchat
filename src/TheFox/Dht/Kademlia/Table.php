@@ -192,6 +192,8 @@ class Table extends YamlStorage{
 			
 			$onode = $this->nodeFindInBuckets($node);
 			if($onode){
+				#print __CLASS__.'->'.__FUNCTION__.': old node'."\n";
+				
 				if( $node->getTimeLastSeen() > $onode->getTimeLastSeen() ){
 					$onode->setIp($node->getIp());
 					$onode->setPort($node->getPort());
@@ -202,6 +204,8 @@ class Table extends YamlStorage{
 				$rv = $onode;
 			}
 			else{
+				#print __CLASS__.'->'.__FUNCTION__.': new node'."\n";
+				
 				$idLenBits = Node::ID_LEN_BITS - 1;
 				$mbase = array_fill(0, Node::ID_LEN, 0);
 				
@@ -293,6 +297,7 @@ class Table extends YamlStorage{
 			}
 			
 		}
+		#else{ print __CLASS__.'->'.__FUNCTION__.': same'."\n"; }
 		
 		return $rv;
 	}
