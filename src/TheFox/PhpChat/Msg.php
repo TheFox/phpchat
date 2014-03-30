@@ -12,7 +12,6 @@ class Msg{
 	private $srcSslKeyPub = '';
 	private $srcUserNickname = '';
 	private $dstNodeId = '';
-	private $dstSslKeyPub = '';
 	private $text = '';
 	private $sentNodes = array();
 	private $relayCount = 0;
@@ -31,7 +30,7 @@ class Msg{
 	}
 	
 	public function __sleep(){
-		return array('id', 'srcNodeId', 'srcSslKeyPub', 'srcUserNickname', 'dstNodeId', 'dstSslKeyPub', 'text', 'sentNodes', 'relayCount', 'timeCreated');
+		return array('id', 'srcNodeId', 'srcSslKeyPub', 'srcUserNickname', 'dstNodeId', 'text', 'sentNodes', 'relayCount', 'timeCreated');
 	}
 	
 	public function setId($id){
@@ -72,14 +71,6 @@ class Msg{
 	
 	public function getDstNodeId(){
 		return $this->dstNodeId;
-	}
-	
-	public function setDstSslKeyPub($dstSslKeyPub){
-		$this->dstSslKeyPub = $dstSslKeyPub;
-	}
-	
-	public function getDstSslKeyPub(){
-		return $this->dstSslKeyPub;
 	}
 	
 	public function setText($text){

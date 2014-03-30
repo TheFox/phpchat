@@ -31,7 +31,6 @@ class MsgDb extends YamlStorage{
 			$msgAr['srcSslKeyPub'] = base64_encode($msg->getSrcSslKeyPub());
 			$msgAr['srcUserNickname'] = $msg->getSrcUserNickname();
 			$msgAr['dstNodeId'] = $msg->getDstNodeId();
-			$msgAr['dstSslKeyPub'] = base64_encode($msg->getDstSslKeyPub());
 			$msgAr['text'] = $msg->getText();
 			$msgAr['sentNodes'] = $msg->getSentNodes();
 			$msgAr['relayCount'] = $msg->getRelayCount();
@@ -60,7 +59,6 @@ class MsgDb extends YamlStorage{
 					$msg->setSrcSslKeyPub(base64_decode($msgAr['srcSslKeyPub']));
 					$msg->setSrcUserNickname($msgAr['srcUserNickname']);
 					$msg->setDstNodeId($msgAr['dstNodeId']);
-					$msg->setDstSslKeyPub(base64_decode($msgAr['dstSslKeyPub']));
 					$msg->setText($msgAr['text']);
 					$msg->setSentNodes($msgAr['sentNodes']);
 					$msg->setRelayCount($msgAr['relayCount']);
