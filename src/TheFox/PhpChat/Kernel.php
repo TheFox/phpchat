@@ -137,7 +137,7 @@ class Kernel extends Thread{
 		return $this->server;
 	}
 	
-	public function serverConnect($ip, $port, $isTalkRequest = false, $isPingOnly = false, $msg = null){
+	public function serverConnect($ip, $port, $isTalkRequest = false, $isPingOnly = false, $msgId = null){
 		print __CLASS__.'->'.__FUNCTION__.': '.$ip.':'.$port."\n";
 		#ve($msg === null);
 		
@@ -178,14 +178,19 @@ class Kernel extends Thread{
 				$clientActions[] = $action;
 			}
 			
-			if($msg !== null){
+			if($msgId !== null){
 				#print __CLASS__.'->'.__FUNCTION__.' B'."\n";
 				
-				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_OK);
-				$action->functionSet(function($action, $client){
-					$client->sendMsg($action->getVar('msg'));
-				}, array('msg' => $msg));
-				$clientActions[] = $action;
+				$msg = $this->getMsgDb()->getMsgById($msgId);
+				if($msg){
+					ve($msg);
+					
+					$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_OK);
+					$action->functionSet(function($action, $client){
+						$client->sendMsg($action->getVar('msg'));
+					}, array('msg' => $msg));
+					$clientActions[] = $action;
+				}
 			}
 			
 			return $this->getServer()->connect($ip, $port, $clientActions);

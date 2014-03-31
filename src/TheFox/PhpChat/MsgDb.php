@@ -104,4 +104,14 @@ class MsgDb extends YamlStorage{
 		return $rv;
 	}
 	
+	public function getMsgById($id){
+		foreach($this->msgs as $msgId => $msg){
+			if($msg->getId() == $id){
+				return $msg;
+			}
+		}
+		
+		return null;
+	}
+	
 }
