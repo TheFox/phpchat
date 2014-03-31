@@ -160,9 +160,12 @@ class Msg{
 		return $this->ssl;
 	}
 	
-	public function setSslPrv($sslKeyPrvPath, $sslKeyPrvPass){
-		#$this->setSsl(openssl_pkey_get_private(file_get_contents($sslKeyPrvPath), $sslKeyPrvPass)); # TODO
-		$this->setSsl(openssl_pkey_get_private($sslKeyPrvPath, $sslKeyPrvPass));
+	public function setSslKeyPrvPath($sslKeyPrvPath, $sslKeyPrvPass){
+		$this->setSslPrvKey(file_get_contents($sslKeyPrvPath), $sslKeyPrvPass);
+	}
+	
+	public function setSslKeyPrv($sslKeyPrv, $sslKeyPrvPass){
+		$this->setSsl(openssl_pkey_get_private($sslKeyPrv, $sslKeyPrvPass));
 	}
 	
 	public function encrypt(){
