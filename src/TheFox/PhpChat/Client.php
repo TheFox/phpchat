@@ -702,7 +702,7 @@ class Client{
 					$timeCreated = (int)$msgData['timeCreated'];
 				}
 				
-				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.'');
+				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$id.'');
 				
 				$status = 1; // New
 				if($this->getMsgDb() && $this->getMsgDb()->getMsgById($id)){

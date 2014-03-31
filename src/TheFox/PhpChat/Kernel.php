@@ -179,12 +179,9 @@ class Kernel extends Thread{
 			}
 			
 			if($msgId !== null){
-				#print __CLASS__.'->'.__FUNCTION__.' B'."\n";
 				
 				$msg = $this->getMsgDb()->getMsgById($msgId);
 				if($msg){
-					ve($msg);
-					
 					$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_OK);
 					$action->functionSet(function($action, $client){
 						$client->sendMsg($action->getVar('msg'));
