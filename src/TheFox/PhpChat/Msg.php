@@ -173,7 +173,7 @@ class Msg{
 	}
 	
 	public function setSslKeyPrvPath($sslKeyPrvPath, $sslKeyPrvPass){
-		$this->setSslPrvKey(file_get_contents($sslKeyPrvPath), $sslKeyPrvPass);
+		$this->setSslKeyPrv(file_get_contents($sslKeyPrvPath), $sslKeyPrvPass);
 	}
 	
 	public function setSslKeyPrv($sslKeyPrv, $sslKeyPrvPass){
