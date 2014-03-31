@@ -158,6 +158,8 @@ class Cronjob extends Thread{
 		#print __CLASS__.'->'.__FUNCTION__.': own'."\n";
 		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
 			if(!in_array($msg->getId(), $processedMsgIds) && $msg->getDstNodeId() && $msg->getSrcNodeId() == $this->localNode->getIdHexStr()){
+				#print __CLASS__.'->'.__FUNCTION__.': own '.$msg->getId()."\n";
+				
 				$processedMsgIds[] = $msg->getId();
 				$this->msgDbSendMsg($msg);
 			}
@@ -167,6 +169,8 @@ class Cronjob extends Thread{
 		#print __CLASS__.'->'.__FUNCTION__.': unsent'."\n";
 		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
 			if(!in_array($msg->getId(), $processedMsgIds) && $msg->getDstNodeId() && $msg->getSrcNodeId() != $this->localNode->getIdHexStr()){
+				#print __CLASS__.'->'.__FUNCTION__.': unsent '.$msg->getId()."\n";
+				
 				$processedMsgIds[] = $msg->getId();
 				$this->msgDbSendMsg($msg);
 			}
@@ -176,6 +180,8 @@ class Cronjob extends Thread{
 		#print __CLASS__.'->'.__FUNCTION__.': other'."\n";
 		foreach($this->msgDb->getMsgs() as $msgId => $msg){
 			if(!in_array($msg->getId(), $processedMsgIds) && $msg->getDstNodeId()){
+				#print __CLASS__.'->'.__FUNCTION__.': other '.$msg->getId()."\n";
+				
 				$processedMsgIds[] = $msg->getId();
 				$this->msgDbSendMsg($msg);
 			}

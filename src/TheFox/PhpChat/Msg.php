@@ -169,7 +169,7 @@ class Msg{
 	}
 	
 	public function encrypt(){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		$rv = false;
 		
 		if(!$this->getSsl()){
@@ -256,7 +256,7 @@ class Msg{
 					$checksum = $fingerprintHex.$checksumHex;
 					#$num = Hex::decode($fingerprintHex.$checksumHex);
 					
-					print __CLASS__.'->'.__FUNCTION__.' checksum('.strlen($checksum).'): '.$checksum."\n";
+					#print __CLASS__.'->'.__FUNCTION__.' checksum('.strlen($checksum).'): '.$checksum."\n";
 					
 					$this->setChecksum($checksum);
 					
@@ -275,8 +275,8 @@ class Msg{
 	}
 	
 	public function decrypt(){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
 		$rv = false;
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		if(!$this->getSsl()){
 			throw new RuntimeException('ssl not set.', 1);
@@ -362,7 +362,7 @@ class Msg{
 							$checksumHex = substr($checksumHex, 0, 8); // 4 Bytes
 							$checksum = $fingerprintHex.$checksumHex;
 							
-							print __CLASS__.'->'.__FUNCTION__.' checksum('.strlen($checksum).'): '.$checksum."\n";
+							#print __CLASS__.'->'.__FUNCTION__.' checksum('.strlen($checksum).'): '.$checksum."\n";
 							
 							#print __CLASS__.'->'.__FUNCTION__.' checksum A ('.strlen($checksum).'): '.$checksum."\n";
 							#print __CLASS__.'->'.__FUNCTION__.' checksum B ('.strlen($this->getChecksum()).'): '.$this->getChecksum()."\n";
