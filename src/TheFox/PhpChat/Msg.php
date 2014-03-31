@@ -41,7 +41,21 @@ class Msg{
 	}
 	
 	public function __sleep(){
-		return array('version', 'id', 'srcNodeId', 'srcSslKeyPub', 'srcUserNickname', 'dstNodeId', 'text', 'sentNodes', 'relayCount', 'timeCreated');
+		return array(
+			'version',
+			'id',
+			'srcNodeId',
+			'srcSslKeyPub',
+			'srcUserNickname',
+			'dstNodeId',
+			'text',
+			'password',
+			'checksum',
+			'sentNodes',
+			'relayCount',
+			'encryptionMode',
+			'timeCreated',
+		);
 	}
 	
 	public function setVersion($version){
