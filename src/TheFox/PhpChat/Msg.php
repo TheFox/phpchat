@@ -107,6 +107,8 @@ class Msg{
 	}
 	
 	public function setDstSslPubKey($dstSslPubKey){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
 		$this->dstSslPubKey = $dstSslPubKey;
 	}
 	
