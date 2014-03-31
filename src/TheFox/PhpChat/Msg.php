@@ -7,6 +7,7 @@ use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
 
 class Msg{
 	
+	private $version = 1;
 	private $id = '';
 	private $srcNodeId = '';
 	private $srcSslKeyPub = '';
@@ -35,7 +36,15 @@ class Msg{
 	}
 	
 	public function __sleep(){
-		return array('id', 'srcNodeId', 'srcSslKeyPub', 'srcUserNickname', 'dstNodeId', 'text', 'sentNodes', 'relayCount', 'timeCreated');
+		return array('version', 'id', 'srcNodeId', 'srcSslKeyPub', 'srcUserNickname', 'dstNodeId', 'text', 'sentNodes', 'relayCount', 'timeCreated');
+	}
+	
+	public function setVersion($version){
+		$this->version = $version;
+	}
+	
+	public function getVersion(){
+		return $this->version;
 	}
 	
 	public function setId($id){

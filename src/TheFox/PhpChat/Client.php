@@ -666,6 +666,7 @@ class Client{
 		elseif($msgName == 'msg'){
 			if($this->getStatus('hasId')){
 				$rid = '';
+				$version = 0;
 				$id = '';
 				$srcNodeId = '';
 				$srcSslKeyPub = '';
@@ -676,6 +677,9 @@ class Client{
 				$timeCreated = 0;
 				if(array_key_exists('rid', $msgData)){
 					$rid = $msgData['rid'];
+				}
+				if(array_key_exists('version', $msgData)){
+					$version = (int)$msgData['version'];
 				}
 				if(array_key_exists('id', $msgData)){
 					$id = $msgData['id'];
@@ -713,6 +717,7 @@ class Client{
 				
 				if($status == 1 && $this->getMsgDb()){
 					$msg = new Msg();
+					$msg->setVersion($version);
 					$msg->setId($id);
 					$msg->setSrcNodeId($srcNodeId);
 					$msg->setSrcSslKeyPub($srcSslKeyPub);
@@ -1571,6 +1576,7 @@ class Client{
 		
 		$data = array(
 			'rid' => $rid,
+			'version' => $msg->getVersion(),
 			'id' => $msg->getId(),
 			'srcNodeId' => $msg->getSrcNodeId(),
 			'srcSslKeyPub' => $msg->getSrcSslKeyPub(),

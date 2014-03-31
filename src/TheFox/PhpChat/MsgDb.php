@@ -26,6 +26,7 @@ class MsgDb extends YamlStorage{
 		foreach($this->msgs as $msgId => $msg){
 			
 			$msgAr = array();
+			$msgAr['version'] = $msg->getVersion();
 			$msgAr['id'] = $msg->getId();
 			$msgAr['srcNodeId'] = $msg->getSrcNodeId();
 			$msgAr['srcSslKeyPub'] = base64_encode($msg->getSrcSslKeyPub());
@@ -54,6 +55,7 @@ class MsgDb extends YamlStorage{
 				foreach($this->data['msgs'] as $msgId => $msgAr){
 					
 					$msg = new Msg();
+					$msg->setVersion($msgAr['version']);
 					$msg->setId($msgAr['id']);
 					$msg->setSrcNodeId($msgAr['srcNodeId']);
 					$msg->setSrcSslKeyPub(base64_decode($msgAr['srcSslKeyPub']));
