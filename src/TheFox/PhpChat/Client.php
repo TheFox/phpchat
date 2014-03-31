@@ -673,66 +673,85 @@ class Client{
 		
 		elseif($msgName == 'msg'){
 			if($this->getStatus('hasId')){
-				$rid = '';
-				$version = 0;
-				$id = '';
-				$srcNodeId = '';
-				$srcSslKeyPub = '';
-				$dstNodeId = '';
-				$text = '';
-				$relayCount = 0;
-				$timeCreated = 0;
-				if(array_key_exists('rid', $msgData)){
-					$rid = $msgData['rid'];
-				}
-				if(array_key_exists('version', $msgData)){
-					$version = (int)$msgData['version'];
-				}
-				if(array_key_exists('id', $msgData)){
-					$id = $msgData['id'];
-				}
-				if(array_key_exists('srcNodeId', $msgData)){
-					$srcNodeId = $msgData['srcNodeId'];
-				}
-				if(array_key_exists('srcSslKeyPub', $msgData)){
-					$srcSslKeyPub = $msgData['srcSslKeyPub'];
-				}
-				if(array_key_exists('dstNodeId', $msgData)){
-					$dstNodeId = $msgData['dstNodeId'];
-				}
-				if(array_key_exists('text', $msgData)){
-					$text = $msgData['text'];
-				}
-				if(array_key_exists('relayCount', $msgData)){
-					$relayCount = (int)$msgData['relayCount'];
-				}
-				if(array_key_exists('timeCreated', $msgData)){
-					$timeCreated = (int)$msgData['timeCreated'];
-				}
-				
-				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$id.'');
-				
-				$status = 1; // New
-				if($this->getMsgDb() && $this->getMsgDb()->getMsgById($id)){
-					$status = 2; // Reject
-				}
-				
-				$this->sendMsgResponse($rid, $status);
-				
-				if($status == 1 && $this->getMsgDb()){
-					$msg = new Msg();
-					$msg->setVersion($version);
-					$msg->setId($id);
-					$msg->setSrcNodeId($srcNodeId);
-					$msg->setSrcSslKeyPub($srcSslKeyPub);
-					$msg->setDstNodeId($dstNodeId);
-					$msg->setText($text);
-					$msg->setRelayCount($relayCount);
-					$msg->setTimeCreated($timeCreated);
+				if($this->getMsgDb()){
+					$rid = '';
+					$version = 0;
+					$id = '';
+					$srcNodeId = '';
+					$srcSslKeyPub = '';
+					$dstNodeId = '';
+					$text = '';
+					$relayCount = 0;
+					$timeCreated = 0;
+					if(array_key_exists('rid', $msgData)){
+						$rid = $msgData['rid'];
+					}
+					if(array_key_exists('version', $msgData)){
+						$version = (int)$msgData['version'];
+					}
+					if(array_key_exists('id', $msgData)){
+						$id = $msgData['id'];
+					}
+					if(array_key_exists('srcNodeId', $msgData)){
+						$srcNodeId = $msgData['srcNodeId'];
+					}
+					if(array_key_exists('srcSslKeyPub', $msgData)){
+						$srcSslKeyPub = $msgData['srcSslKeyPub'];
+					}
+					if(array_key_exists('dstNodeId', $msgData)){
+						$dstNodeId = $msgData['dstNodeId'];
+					}
+					if(array_key_exists('text', $msgData)){
+						$text = $msgData['text'];
+					}
+					if(array_key_exists('relayCount', $msgData)){
+						$relayCount = (int)$msgData['relayCount'];
+					}
+					if(array_key_exists('timeCreated', $msgData)){
+						$timeCreated = (int)$msgData['timeCreated'];
+					}
 					
-					$this->getMsgDb()->msgAdd($msg);
+					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$id.'');
+					
+					$status = 1; // New
+					if($this->getMsgDb()->getMsgById($id)){
+						$status = 2; // Reject
+					}
+					
+					$srcNode = new Node();
+					$srcNode->setIdHexStr($srcNodeId);
+					$srcNode = $this->tableNodeEnclose($srcNode);
+					if($srcNode->getSslKeyPub()){
+						if($srcNode->getSslKeyPub() != $srcSslKeyPub){
+							$status = 3; // Error
+						}
+					}
+					else{
+						if(!$srcNode->setSslKeyPub($srcSslKeyPub)){
+							$status = 3; // Error
+						}
+					}
+					
+					
+					$this->sendMsgResponse($rid, $status);
+					
+					if($status == 1){
+						$msg = new Msg();
+						$msg->setVersion($version);
+						$msg->setId($id);
+						$msg->setSrcNodeId($srcNodeId);
+						$msg->setSrcSslKeyPub($srcSslKeyPub);
+						$msg->setDstNodeId($dstNodeId);
+						$msg->setText($text);
+						$msg->setRelayCount($relayCount);
+						$msg->setTimeCreated($timeCreated);
+						
+						$this->getMsgDb()->msgAdd($msg);
+					}
 				}
-				
+				else{
+					$this->sendError(390, $msgName);
+				}
 			}
 			else{
 				$this->sendError(100, $msgName);
