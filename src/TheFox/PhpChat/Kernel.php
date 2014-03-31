@@ -87,7 +87,7 @@ class Kernel extends Thread{
 		$this->ipcConsoleConnection->functionAdd('getAddressbook', $this, 'getAddressbook');
 		$this->ipcConsoleConnection->functionAdd('addressbookContactAdd', $this, 'addressbookContactAdd');
 		$this->ipcConsoleConnection->functionAdd('addressbookContactRemove', $this, 'addressbookContactRemove');
-		$this->ipcConsoleConnection->functionAdd('msgDbMsgAdd', $this, 'msgDbMsgAdd');
+		$this->ipcConsoleConnection->functionAdd('msgDbSrcMsgAdd', $this, 'msgDbSrcMsgAdd');
 		$this->ipcConsoleConnection->functionAdd('getTable', $this, 'getTable');
 		$this->ipcConsoleConnection->connect();
 		
@@ -254,7 +254,7 @@ class Kernel extends Thread{
 		return $this->msgDb;
 	}
 	
-	public function msgDbMsgAdd(Msg $msg){
+	public function msgDbSrcMsgAdd(Msg $msg){
 		$msg->setSrcNodeId($this->settings->data['node']['id']);
 		$msg->setSrcSslKeyPub($this->localNode->getSslKeyPub());
 		$msg->setSrcUserNickname($this->settings->data['user']['nickname']);
