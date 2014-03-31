@@ -744,6 +744,7 @@ class Client{
 						$msg->setDstNodeId($dstNodeId);
 						$msg->setText($text);
 						$msg->setRelayCount($relayCount);
+						$msg->setEncryptionMode('D');
 						$msg->setTimeCreated($timeCreated);
 						
 						$this->getMsgDb()->msgAdd($msg);
