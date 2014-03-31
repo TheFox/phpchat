@@ -85,6 +85,10 @@ class Msg{
 		$this->sentNodes = $sentNodes;
 	}
 	
+	public function addSentNode($nodeId){
+		$this->sentNodes[] = $nodeId;
+	}
+	
 	public function getSentNodes(){
 		return $this->sentNodes;
 	}
