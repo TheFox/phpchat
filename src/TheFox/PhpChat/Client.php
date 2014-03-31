@@ -681,6 +681,8 @@ class Client{
 					$srcSslKeyPub = '';
 					$dstNodeId = '';
 					$text = '';
+					$password = '';
+					$checksum = '';
 					$relayCount = 0;
 					$timeCreated = 0;
 					if(array_key_exists('rid', $msgData)){
@@ -703,6 +705,12 @@ class Client{
 					}
 					if(array_key_exists('text', $msgData)){
 						$text = $msgData['text'];
+					}
+					if(array_key_exists('password', $msgData)){
+						$password = $msgData['password'];
+					}
+					if(array_key_exists('checksum', $msgData)){
+						$checksum = $msgData['checksum'];
 					}
 					if(array_key_exists('relayCount', $msgData)){
 						$relayCount = (int)$msgData['relayCount'];
@@ -743,6 +751,8 @@ class Client{
 						$msg->setSrcSslKeyPub($srcSslKeyPub);
 						$msg->setDstNodeId($dstNodeId);
 						$msg->setText($text);
+						$msg->setPassword($password);
+						$msg->setChecksum($checksum);
 						$msg->setRelayCount($relayCount);
 						$msg->setEncryptionMode('D');
 						$msg->setTimeCreated($timeCreated);
