@@ -23,6 +23,7 @@ class Msg{
 	private $checksum = '';
 	private $sentNodes = array();
 	private $relayCount = 0;
+	private $encryptionMode = '';
 	private $timeCreated = 0;
 	
 	private $ssl = null;
@@ -141,6 +142,17 @@ class Msg{
 	
 	public function getRelayCount(){
 		return((int)$this->relayCount);
+	}
+	
+	public function setEncryptionMode($encryptionMode){
+		// S = with source node public key
+		// D = with destiation node public key
+		
+		$this->encryptionMode = $encryptionMode;
+	}
+	
+	public function getEncryptionMode(){
+		return $this->encryptionMode;
 	}
 	
 	public function setTimeCreated($timeCreated){
