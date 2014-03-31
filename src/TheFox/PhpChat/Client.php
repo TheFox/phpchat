@@ -794,6 +794,12 @@ class Client{
 			else{
 				$this->sendError(100, $msgName);
 			}
+			
+			$actions = $this->actionsGetByCriterion(ClientAction::CRITERION_AFTER_MSG_RESPONSE);
+			foreach($actions as $actionsId => $action){
+				$this->actionRemove($action);
+				$action->functionExec($this);
+			}
 		}
 		
 		elseif($msgName == 'ssl_init'){

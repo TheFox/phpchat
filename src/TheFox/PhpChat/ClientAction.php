@@ -13,6 +13,7 @@ class ClientAction{
 	const CRITERION_AFTER_HELLO = 200;
 	const CRITERION_AFTER_ID = 300;
 	const CRITERION_AFTER_ID_OK = 310;
+	const CRITERION_AFTER_MSG_RESPONSE = 320;
 	const CRITERION_AFTER_HAS_SSL = 400;
 	
 	private $id = 0;
