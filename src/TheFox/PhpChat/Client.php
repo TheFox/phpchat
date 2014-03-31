@@ -670,7 +670,6 @@ class Client{
 				$id = '';
 				$srcNodeId = '';
 				$srcSslKeyPub = '';
-				$srcUserNickname = '';
 				$dstNodeId = '';
 				$text = '';
 				$relayCount = 0;
@@ -689,9 +688,6 @@ class Client{
 				}
 				if(array_key_exists('srcSslKeyPub', $msgData)){
 					$srcSslKeyPub = $msgData['srcSslKeyPub'];
-				}
-				if(array_key_exists('srcUserNickname', $msgData)){
-					$srcUserNickname = $msgData['srcUserNickname'];
 				}
 				if(array_key_exists('dstNodeId', $msgData)){
 					$dstNodeId = $msgData['dstNodeId'];
@@ -721,7 +717,6 @@ class Client{
 					$msg->setId($id);
 					$msg->setSrcNodeId($srcNodeId);
 					$msg->setSrcSslKeyPub($srcSslKeyPub);
-					$msg->setSrcUserNickname($srcUserNickname);
 					$msg->setDstNodeId($dstNodeId);
 					$msg->setText($text);
 					$msg->setRelayCount($relayCount);
