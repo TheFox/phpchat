@@ -209,8 +209,9 @@ class Cronjob extends Thread{
 			
 			#print __CLASS__.'->'.__FUNCTION__.': node: '.$node->getIdHexStr().', "'.$node->getIp().'", "'.$node->getPort().'"'."\n";
 			
-			if($node->getIp() && $node->getPort()){
-				$rv = $this->getIpcKernelConnection()->execSync('serverConnect', array($node->getIp(), $node->getPort(), false, false, $msg));
+			if($node->getIp() && $node->getPort() && !in_array($node->getIdHexStr(), $msg->getSentNodes())){
+				$rv = $this->getIpcKernelConnection()->execSync('serverConnect', 
+					array($node->getIp(), $node->getPort(), false, false, $msg->getId() ));
 				
 				#print __CLASS__.'->'.__FUNCTION__.': node: '.$node->getIdHexStr().', '. (int)$rv .''."\n";
 			}
