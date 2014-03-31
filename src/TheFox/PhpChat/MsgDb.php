@@ -33,6 +33,7 @@ class MsgDb extends YamlStorage{
 			$msgAr['dstNodeId'] = $msg->getDstNodeId();
 			$msgAr['text'] = $msg->getText();
 			$msgAr['password'] = $msg->getPassword();
+			$msgAr['checksum'] = $msg->getChecksum();
 			$msgAr['sentNodes'] = $msg->getSentNodes();
 			$msgAr['relayCount'] = $msg->getRelayCount();
 			$msgAr['timeCreated'] = $msg->getTimeCreated();
@@ -62,6 +63,7 @@ class MsgDb extends YamlStorage{
 					$msg->setDstNodeId($msgAr['dstNodeId']);
 					$msg->setText($msgAr['text']);
 					$msg->setPassword($msgAr['password']);
+					$msg->setChecksum($msgAr['checksum']);
 					$msg->setSentNodes($msgAr['sentNodes']);
 					$msg->setRelayCount($msgAr['relayCount']);
 					$msg->setTimeCreated($msgAr['timeCreated']);
