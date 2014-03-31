@@ -95,15 +95,17 @@ class Node extends YamlStorage{
 	}
 	
 	public function setSslKeyPub($strKeyPub){
-		$sslPubKey = openssl_pkey_get_public($strKeyPub);
-		if($sslPubKey !== false){
-			$sslPubKeyDetails = openssl_pkey_get_details($sslPubKey);
-			
-			if($sslPubKeyDetails['bits'] >= static::SSL_KEY_LEN_MIN){
-				$this->sslKeyPub = $strKeyPub;
-				$this->setSslKeyPubFingerprint(static::genSslKeyFingerprint($strKeyPub));
+		if(!$this->sslKeyPub){
+			$sslPubKey = openssl_pkey_get_public($strKeyPub);
+			if($sslPubKey !== false){
+				$sslPubKeyDetails = openssl_pkey_get_details($sslPubKey);
 				
-				return true;
+				if($sslPubKeyDetails['bits'] >= static::SSL_KEY_LEN_MIN){
+					$this->sslKeyPub = $strKeyPub;
+					$this->setSslKeyPubFingerprint(static::genSslKeyFingerprint($strKeyPub));
+					
+					return true;
+				}
 			}
 		}
 		
