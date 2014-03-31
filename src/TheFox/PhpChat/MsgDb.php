@@ -86,6 +86,75 @@ class MsgDb extends YamlStorage{
 		$this->setDataChanged(true);
 	}
 	
+	public function msgUpdate(Msg $msgNew){
+		if(isset($this->msgs[$msg->getId()])){
+			$msgOld = $this->msgs[$msgNew->getId()];
+			
+			#ve($msgOld);
+			
+			if($msgOld->getVersion() != $msgNew->getVersion()){
+				#print __CLASS__.'->'.__FUNCTION__.': changed: version'."\n";
+				$msgOld->setVersion($msgNew->getVersion());
+				$this->setDataChanged(true);
+			}
+			if($msgOld->getId() != $msgNew->getId()){
+				#print __CLASS__.'->'.__FUNCTION__.': changed: id'."\n";
+				$msgOld->setId($msgNew->getId());
+				$this->setDataChanged(true);
+			}
+			if($msgOld->getSrcNodeId() != $msgNew->getSrcNodeId()){
+				#print __CLASS__.'->'.__FUNCTION__.': changed: srcNodeId'."\n";
+				$msgOld->setSrcNodeId($msgNew->getSrcNodeId());
+				$this->setDataChanged(true);
+			}
+			if($msgOld->getSrcSslKeyPub() != $msgNew->getSrcSslKeyPub()){
+				#print __CLASS__.'->'.__FUNCTION__.': changed: srcSslKeyPub'."\n";
+				$msgOld->setSrcSslKeyPub($msgNew->getSrcSslKeyPub());
+				$this->setDataChanged(true);
+			}
+			if($msgOld->getDstNodeId() != $msgNew->getDstNodeId()){
+				#print __CLASS__.'->'.__FUNCTION__.': changed: dstNodeId'."\n";
+				$msgOld->setDstNodeId($msgNew->getDstNodeId());
+				$this->setDataChanged(true);
+			}
+			if($msgOld->getText() != $msgNew->getText()){
+				#print __CLASS__.'->'.__FUNCTION__.': changed: text'."\n";
+				$msgOld->setText($msgNew->getText());
+				$this->setDataChanged(true);
+			}
+			if($msgOld->getPassword() != $msgNew->getPassword()){
+				#print __CLASS__.'->'.__FUNCTION__.': changed: password'."\n";
+				$msgOld->setPassword($msgNew->getPassword());
+				$this->setDataChanged(true);
+			}
+			if($msgOld->getChecksum() != $msgNew->getChecksum()){
+				#print __CLASS__.'->'.__FUNCTION__.': changed: checksum'."\n";
+				$msgOld->setChecksum($msgNew->getChecksum());
+				$this->setDataChanged(true);
+			}
+			if($msgNew->getSentNodes()){
+				#ve($msgNew->getSentNodes()); # TODO
+				$msgOld->setSentNodes(array_unique(array_merge($msgOld->getSentNodes(), $msgNew->getSentNodes())));
+			}
+			if($msgOld->getRelayCount() != $msgNew->getRelayCount()){
+				#print __CLASS__.'->'.__FUNCTION__.': changed: relayCount'."\n";
+				$msgOld->setRelayCount($msgNew->getRelayCount());
+				$this->setDataChanged(true);
+			}
+			if($msgOld->getEncryptionMode() != $msgNew->getEncryptionMode()){
+				#print __CLASS__.'->'.__FUNCTION__.': changed: encryptionMode'."\n";
+				$msgOld->setEncryptionMode($msgNew->getEncryptionMode());
+				$this->setDataChanged(true);
+			}
+			if($msgOld->getTimeCreated() != $msgNew->getTimeCreated()){
+				#print __CLASS__.'->'.__FUNCTION__.': changed: timeCreated'."\n";
+				$msgOld->setTimeCreated($msgNew->getTimeCreated());
+				$this->setDataChanged(true);
+			}
+			
+		}
+	}
+	
 	public function getMsgs(){
 		return $this->msgs;
 	}
