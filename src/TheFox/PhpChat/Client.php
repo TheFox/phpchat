@@ -201,6 +201,14 @@ class Client{
 		return null;
 	}
 	
+	private function tableNodeEnclose(Node $node){
+		if($this->getTable()){
+			return $this->getTable()->nodeEnclose($node);
+		}
+		
+		return null;
+	}
+	
 	private function getMsgDb(){
 		if($this->getServer()){
 			return $this->getServer()->getMsgDb();
