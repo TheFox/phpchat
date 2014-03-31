@@ -275,8 +275,8 @@ class Msg{
 	}
 	
 	public function decrypt(){
-		$rv = false;
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		$rv = '';
 		
 		if(!$this->getSsl()){
 			throw new RuntimeException('ssl not set.', 1);
@@ -368,10 +368,9 @@ class Msg{
 							#print __CLASS__.'->'.__FUNCTION__.' checksum B ('.strlen($this->getChecksum()).'): '.$this->getChecksum()."\n";
 							
 							if($checksum == $this->getChecksum()){
-								$this->setText($text);
 								$this->setSrcUserNickname($srcUserNickname);
 								
-								$rv = true;
+								$rv = $text;
 							}
 							else{
 								throw new RuntimeException('msg checksum does not match.', 206);
