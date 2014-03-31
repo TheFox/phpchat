@@ -95,7 +95,7 @@ class Msg{
 		$this->dstSslPubKey = $dstSslPubKey;
 	}
 	
-	private function getDstSslPubKey(){
+	public function getDstSslPubKey(){
 		return $this->dstSslPubKey;
 	}
 	
