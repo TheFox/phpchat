@@ -1578,7 +1578,7 @@ class Client{
 			'srcUserNickname' => $msg->getSrcUserNickname(),
 			'dstNodeId' => $msg->getDstNodeId(),
 			'text' => $msg->getText(),
-			'relayCount' => (int)$msg->getRelayCount(),
+			'relayCount' => (int)$msg->getRelayCount()+1,
 			'timeCreated' => (int)$msg->getTimeCreated(),
 		);
 		$this->dataSend($this->msgCreate('msg', $data));
