@@ -201,6 +201,14 @@ class Client{
 		return null;
 	}
 	
+	private function getMsgDb(){
+		if($this->getServer()){
+			return $this->getServer()->getMsgDb();
+		}
+		
+		return null;
+	}
+	
 	private function requestAdd($name, $rid, $data = array()){
 		$this->requestsId++;
 		

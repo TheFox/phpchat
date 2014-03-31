@@ -99,6 +99,14 @@ class Server{
 		return null;
 	}
 	
+	public function getMsgDb(){
+		if($this->getKernel()){
+			return $this->getKernel()->getMsgDb();
+		}
+		
+		return null;
+	}
+	
 	public function init(){
 		if($this->ip && $this->port){
 			$this->log->notice('listen on '.$this->ip.':'.$this->port);
