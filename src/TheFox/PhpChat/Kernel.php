@@ -91,6 +91,7 @@ class Kernel extends Thread{
 		$this->ipcConsoleConnection->functionAdd('getSettings', $this, 'getSettings');
 		$this->ipcConsoleConnection->functionAdd('getLocalNode', $this, 'getLocalNode');
 		$this->ipcConsoleConnection->functionAdd('getTable', $this, 'getTable');
+		$this->ipcConsoleConnection->functionAdd('save', $this, 'save');
 		$this->ipcConsoleConnection->connect();
 		
 		$this->ipcCronjobConnection = new ConnectionServer();

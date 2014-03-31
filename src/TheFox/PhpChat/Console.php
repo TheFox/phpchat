@@ -448,6 +448,10 @@ class Console extends Thread{
 						$this->msgAdd('Your nickname: '.$this->userNickname);
 					}
 				}
+				elseif($line == 'save'){
+					$this->getIpcKernelConnection()->execAsync('save');
+					$this->printPs1('printMsgStack save');
+				}
 				elseif($line == 'exit'){
 					#print "\nexit\n";
 					#$this->msgAdd('exit');
