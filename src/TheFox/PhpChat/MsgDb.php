@@ -30,7 +30,6 @@ class MsgDb extends YamlStorage{
 			$msgAr['id'] = $msg->getId();
 			$msgAr['srcNodeId'] = $msg->getSrcNodeId();
 			$msgAr['srcSslKeyPub'] = base64_encode($msg->getSrcSslKeyPub());
-			#$msgAr['srcUserNickname'] = $msg->getSrcUserNickname();
 			$msgAr['dstNodeId'] = $msg->getDstNodeId();
 			$msgAr['text'] = $msg->getText();
 			$msgAr['sentNodes'] = $msg->getSentNodes();
@@ -59,7 +58,6 @@ class MsgDb extends YamlStorage{
 					$msg->setId($msgAr['id']);
 					$msg->setSrcNodeId($msgAr['srcNodeId']);
 					$msg->setSrcSslKeyPub(base64_decode($msgAr['srcSslKeyPub']));
-					#$msg->setSrcUserNickname($msgAr['srcUserNickname']);
 					$msg->setDstNodeId($msgAr['dstNodeId']);
 					$msg->setText($msgAr['text']);
 					$msg->setSentNodes($msgAr['sentNodes']);
