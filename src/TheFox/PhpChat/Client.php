@@ -666,15 +666,64 @@ class Client{
 		elseif($msgName == 'msg'){
 			if($this->getStatus('hasId')){
 				$rid = '';
+				$id = '';
+				$srcNodeId = '';
+				$srcSslKeyPub = '';
+				$srcUserNickname = '';
+				$dstNodeId = '';
+				$text = '';
+				$relayCount = 0;
+				$timeCreated = 0;
 				if(array_key_exists('rid', $msgData)){
 					$rid = $msgData['rid'];
+				}
+				if(array_key_exists('id', $msgData)){
+					$id = $msgData['id'];
+				}
+				if(array_key_exists('srcNodeId', $msgData)){
+					$srcNodeId = $msgData['srcNodeId'];
+				}
+				if(array_key_exists('srcSslKeyPub', $msgData)){
+					$srcSslKeyPub = $msgData['srcSslKeyPub'];
+				}
+				if(array_key_exists('srcUserNickname', $msgData)){
+					$srcUserNickname = $msgData['srcUserNickname'];
+				}
+				if(array_key_exists('dstNodeId', $msgData)){
+					$dstNodeId = $msgData['dstNodeId'];
+				}
+				if(array_key_exists('text', $msgData)){
+					$text = $msgData['text'];
+				}
+				if(array_key_exists('relayCount', $msgData)){
+					$relayCount = (int)$msgData['relayCount'];
+				}
+				if(array_key_exists('timeCreated', $msgData)){
+					$timeCreated = (int)$msgData['timeCreated'];
 				}
 				
 				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.'');
 				
-				$this->sendMsgResponse($rid);
+				$status = 1; // New
+				if($this->getMsgDb() && $this->getMsgDb()->getMsgById($id)){
+					$status = 2; // Reject
+				}
 				
+				$this->sendMsgResponse($rid, $status);
 				
+				if($status == 1 && $this->getMsgDb()){
+					$msg = new Msg();
+					$msg->setId($id);
+					$msg->setSrcNodeId($srcNodeId);
+					$msg->setSrcSslKeyPub($srcSslKeyPub);
+					$msg->setSrcUserNickname($srcUserNickname);
+					$msg->setDstNodeId($dstNodeId);
+					$msg->setText($text);
+					$msg->setRelayCount($relayCount);
+					$msg->setTimeCreated($timeCreated);
+					
+					$this->getMsgDb()->msgAdd($msg);
+				}
 				
 			}
 			else{
@@ -684,12 +733,25 @@ class Client{
 		elseif($msgName == 'msg_response'){
 			if($this->getStatus('hasId')){
 				$rid = '';
+				$status = 0;
 				if(array_key_exists('rid', $msgData)){
 					$rid = $msgData['rid'];
 				}
+				if(array_key_exists('status', $msgData)){
+					$status = (int)$msgData['status'];
+				}
 				
-				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.'');
+				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$status);
 				
+				$request = $this->requestGetByRid($rid);
+				if($request){
+					#ve($request);
+					
+					$request['data']['msg']->addSentNode($this->getNode()->getIdHexStr());
+				}
+				else{
+					$this->sendError(900, $msgName);
+				}
 			}
 			else{
 				$this->sendError(100, $msgName);
@@ -1503,15 +1565,28 @@ class Client{
 	public function sendMsg(Msg $msg){
 		$rid = (string)Uuid::uuid4();
 		
+		$this->requestAdd('msg', $rid, array(
+			'msg' => $msg,
+		));
+		
 		$data = array(
 			'rid' => $rid,
+			'id' => $msg->getId(),
+			'srcNodeId' => $msg->getSrcNodeId(),
+			'srcSslKeyPub' => $msg->getSrcSslKeyPub(),
+			'srcUserNickname' => $msg->getSrcUserNickname(),
+			'dstNodeId' => $msg->getDstNodeId(),
+			'text' => $msg->getText(),
+			'relayCount' => (int)$msg->getRelayCount(),
+			'timeCreated' => (int)$msg->getTimeCreated(),
 		);
 		$this->dataSend($this->msgCreate('msg', $data));
 	}
 	
-	private function sendMsgResponse($rid){
+	private function sendMsgResponse($rid, $status){
 		$data = array(
 			'rid' => $rid,
+			'status' => (int)$status,
 		);
 		$this->dataSend($this->msgCreate('msg_response', $data));
 	}
