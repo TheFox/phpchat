@@ -138,9 +138,9 @@ class MsgDb extends YamlStorage{
 				$msgOld->setChecksum($msgNew->getChecksum());
 				$this->setDataChanged(true);
 			}
-			if($msgNew->getSentNodes()){
+			if(count($msgOld->getSentNodes()) < count($msgNew->getSentNodes())){
 				print __CLASS__.'->'.__FUNCTION__.': new sent nodes'."\n"; # TODO
-				#ve($msgNew->getSentNodes()); # TODO
+				ve($msgNew->getSentNodes()); # TODO
 				$msgOld->setSentNodes(array_unique(array_merge($msgOld->getSentNodes(), $msgNew->getSentNodes())));
 			}
 			if($msgOld->getRelayCount() != $msgNew->getRelayCount()){
