@@ -60,6 +60,10 @@ class Msg{
 		);
 	}
 	
+	public function __toString(){
+		return __CLASS__.'->{'.$this->getId().'}';
+	}
+	
 	public function setVersion($version){
 		$this->version = $version;
 	}
