@@ -765,7 +765,7 @@ class Client{
 								$text = $msg->decrypt();
 							}
 							catch(Exception $e){
-								print __CLASS__.'->'.__FUNCTION__.': could not decrypt msg'."\n"; # TODO
+								print __CLASS__.'->'.__FUNCTION__.': could not decrypt msg: '.$e->getMessage()."\n"; # TODO
 							}
 						}
 						else{
