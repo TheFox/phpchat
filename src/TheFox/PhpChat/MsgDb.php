@@ -87,67 +87,72 @@ class MsgDb extends YamlStorage{
 	}
 	
 	public function msgUpdate(Msg $msgNew){
-		if(isset($this->msgs[$msg->getId()])){
+		print __CLASS__.'->'.__FUNCTION__.''."\n"; # TODO
+		
+		if(isset($this->msgs[$msgNew->getId()])){
 			$msgOld = $this->msgs[$msgNew->getId()];
+			
+			print __CLASS__.'->'.__FUNCTION__.': update'."\n"; # TODO
 			
 			#ve($msgOld);
 			
 			if($msgOld->getVersion() != $msgNew->getVersion()){
-				#print __CLASS__.'->'.__FUNCTION__.': changed: version'."\n";
+				print __CLASS__.'->'.__FUNCTION__.': changed: version'."\n"; # TODO
 				$msgOld->setVersion($msgNew->getVersion());
 				$this->setDataChanged(true);
 			}
 			if($msgOld->getId() != $msgNew->getId()){
-				#print __CLASS__.'->'.__FUNCTION__.': changed: id'."\n";
+				print __CLASS__.'->'.__FUNCTION__.': changed: id'."\n"; # TODO
 				$msgOld->setId($msgNew->getId());
 				$this->setDataChanged(true);
 			}
 			if($msgOld->getSrcNodeId() != $msgNew->getSrcNodeId()){
-				#print __CLASS__.'->'.__FUNCTION__.': changed: srcNodeId'."\n";
+				print __CLASS__.'->'.__FUNCTION__.': changed: srcNodeId'."\n"; # TODO
 				$msgOld->setSrcNodeId($msgNew->getSrcNodeId());
 				$this->setDataChanged(true);
 			}
 			if($msgOld->getSrcSslKeyPub() != $msgNew->getSrcSslKeyPub()){
-				#print __CLASS__.'->'.__FUNCTION__.': changed: srcSslKeyPub'."\n";
+				print __CLASS__.'->'.__FUNCTION__.': changed: srcSslKeyPub'."\n"; # TODO
 				$msgOld->setSrcSslKeyPub($msgNew->getSrcSslKeyPub());
 				$this->setDataChanged(true);
 			}
 			if($msgOld->getDstNodeId() != $msgNew->getDstNodeId()){
-				#print __CLASS__.'->'.__FUNCTION__.': changed: dstNodeId'."\n";
+				print __CLASS__.'->'.__FUNCTION__.': changed: dstNodeId'."\n"; # TODO
 				$msgOld->setDstNodeId($msgNew->getDstNodeId());
 				$this->setDataChanged(true);
 			}
 			if($msgOld->getText() != $msgNew->getText()){
-				#print __CLASS__.'->'.__FUNCTION__.': changed: text'."\n";
+				print __CLASS__.'->'.__FUNCTION__.': changed: text'."\n"; # TODO
 				$msgOld->setText($msgNew->getText());
 				$this->setDataChanged(true);
 			}
 			if($msgOld->getPassword() != $msgNew->getPassword()){
-				#print __CLASS__.'->'.__FUNCTION__.': changed: password'."\n";
+				print __CLASS__.'->'.__FUNCTION__.': changed: password'."\n"; # TODO
 				$msgOld->setPassword($msgNew->getPassword());
 				$this->setDataChanged(true);
 			}
 			if($msgOld->getChecksum() != $msgNew->getChecksum()){
-				#print __CLASS__.'->'.__FUNCTION__.': changed: checksum'."\n";
+				print __CLASS__.'->'.__FUNCTION__.': changed: checksum'."\n"; # TODO
 				$msgOld->setChecksum($msgNew->getChecksum());
 				$this->setDataChanged(true);
 			}
 			if($msgNew->getSentNodes()){
+				print __CLASS__.'->'.__FUNCTION__.': new sent nodes'."\n"; # TODO
 				#ve($msgNew->getSentNodes()); # TODO
 				$msgOld->setSentNodes(array_unique(array_merge($msgOld->getSentNodes(), $msgNew->getSentNodes())));
 			}
 			if($msgOld->getRelayCount() != $msgNew->getRelayCount()){
-				#print __CLASS__.'->'.__FUNCTION__.': changed: relayCount'."\n";
+				print __CLASS__.'->'.__FUNCTION__.': changed: relayCount'."\n"; # TODO
 				$msgOld->setRelayCount($msgNew->getRelayCount());
 				$this->setDataChanged(true);
 			}
 			if($msgOld->getEncryptionMode() != $msgNew->getEncryptionMode()){
-				#print __CLASS__.'->'.__FUNCTION__.': changed: encryptionMode'."\n";
+				print __CLASS__.'->'.__FUNCTION__.': changed: encryptionMode'."\n"; # TODO
 				$msgOld->setEncryptionMode($msgNew->getEncryptionMode());
 				$this->setDataChanged(true);
 			}
 			if($msgOld->getTimeCreated() != $msgNew->getTimeCreated()){
-				#print __CLASS__.'->'.__FUNCTION__.': changed: timeCreated'."\n";
+				print __CLASS__.'->'.__FUNCTION__.': changed: timeCreated'."\n"; # TODO
 				$msgOld->setTimeCreated($msgNew->getTimeCreated());
 				$this->setDataChanged(true);
 			}

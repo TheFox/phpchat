@@ -88,7 +88,6 @@ class Kernel extends Thread{
 		$this->ipcConsoleConnection->functionAdd('addressbookContactAdd', $this, 'addressbookContactAdd');
 		$this->ipcConsoleConnection->functionAdd('addressbookContactRemove', $this, 'addressbookContactRemove');
 		$this->ipcConsoleConnection->functionAdd('msgDbMsgAdd', $this, 'msgDbMsgAdd');
-		$this->ipcConsoleConnection->functionAdd('msgDbMsgUpdate', $this, 'msgDbMsgUpdate');
 		$this->ipcConsoleConnection->functionAdd('getSettings', $this, 'getSettings');
 		$this->ipcConsoleConnection->functionAdd('getLocalNode', $this, 'getLocalNode');
 		$this->ipcConsoleConnection->functionAdd('getTable', $this, 'getTable');
@@ -97,10 +96,12 @@ class Kernel extends Thread{
 		
 		$this->ipcCronjobConnection = new ConnectionServer();
 		$this->ipcCronjobConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20001));
+		$this->ipcCronjobConnection->functionAdd('getSettings', $this, 'getSettings');
 		$this->ipcCronjobConnection->functionAdd('getLocalNode', $this, 'getLocalNode');
 		$this->ipcCronjobConnection->functionAdd('getTable', $this, 'getTable');
 		$this->ipcCronjobConnection->functionAdd('tableNodeEnclose', $this, 'tableNodeEnclose');
 		$this->ipcCronjobConnection->functionAdd('getMsgDb', $this, 'getMsgDb');
+		$this->ipcCronjobConnection->functionAdd('msgDbMsgUpdate', $this, 'msgDbMsgUpdate');
 		$this->ipcCronjobConnection->functionAdd('serverConnect', $this, 'serverConnect');
 		$this->ipcCronjobConnection->functionAdd('save', $this, 'save');
 		$this->ipcCronjobConnection->connect();
@@ -194,7 +195,7 @@ class Kernel extends Thread{
 					
 					$action = new ClientAction(ClientAction::CRITERION_AFTER_MSG_RESPONSE);
 					$action->functionSet(function($action, $client){
-						print __CLASS__.'->'.__FUNCTION__.': shutdown'."\n";
+						#print __CLASS__.'->'.__FUNCTION__.': shutdown'."\n";
 						$client->sendQuit();
 						$client->shutdown();
 					});
@@ -273,6 +274,9 @@ class Kernel extends Thread{
 	}
 	
 	public function msgDbMsgUpdate(Msg $msg){
+		$this->getMsgDb()->msgUpdate($msg);
+	}
+	
 	public function getIpcConsoleConnection(){
 		return $this->ipcConsoleConnection;
 	}

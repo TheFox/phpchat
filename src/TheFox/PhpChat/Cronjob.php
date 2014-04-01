@@ -17,6 +17,7 @@ class Cronjob extends Thread{
 	private $log;
 	private $ipcKernelConnection = null;
 	private $msgDb;
+	private $settings;
 	private $table;
 	private $localNode;
 	
@@ -98,7 +99,7 @@ class Cronjob extends Thread{
 	}
 	
 	private function pingClosestNodes(){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		$table = $this->getIpcKernelConnection()->execSync('getTable');
 		
 		$nodes = $table->getNodesClosest(20);
@@ -114,6 +115,7 @@ class Cronjob extends Thread{
 	
 	private function msgDbInit(){
 		$this->msgDb = $this->getIpcKernelConnection()->execSync('getMsgDb');
+		$this->settings = $this->getIpcKernelConnection()->execSync('getSettings');
 		$this->table = $this->getIpcKernelConnection()->execSync('getTable');
 		$this->localNode = $this->table->getLocalNode();
 		
@@ -124,27 +126,46 @@ class Cronjob extends Thread{
 	}
 	
 	private function msgDbInitNodes(){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
-		#ve($this->msgDb);
-		
-		/*
 		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
-			if($msg->getDstNodeId() && $msg->getSrcNodeId() == $this->localNode->getIdHexStr()){
+			if(
+				$msg->getDstNodeId()
+				&& $msg->getSrcNodeId() == $this->localNode->getIdHexStr()
+				&& $msg->getEncryptionMode() == 'S'
+			){
+				#print __CLASS__.'->'.__FUNCTION__.': find node '.$msg->getId()."\n";
+				
 				$node = new Node();
 				$node->setIdHexStr($msg->getDstNodeId());
 				
 				$onode = $this->table->nodeEnclose($node);
-				if($node == $onode){
-					// New node.
-					print __CLASS__.'->'.__FUNCTION__.': new node'."\n";
-					$this->getIpcKernelConnection()->execAsync('tableNodeEnclose', array($node));
+				
+				if($onode->getSslKeyPub()){
+					#print __CLASS__.'->'.__FUNCTION__.': found node'."\n";
+					#print __CLASS__.'->'.__FUNCTION__.': pub: '.$this->settings->data['node']['sslKeyPubPath']."\n";
+					
+					
+					$msg->setSrcSslKeyPub($this->localNode->getSslKeyPub());
+					$msg->setDstSslPubKey($this->localNode->getSslKeyPub());
+					$msg->setSslKeyPrvPath($this->settings->data['node']['sslKeyPrvPath'], $this->settings->data['node']['sslKeyPrvPass']);
+					#$text = $msg->decrypt();
+					
+					$msg->setText($msg->decrypt());
+					$msg->setEncryptionMode('D');
+					$msg->setDstSslPubKey($onode->getSslKeyPub());
+					$msg->encrypt();
+					
+					$this->getIpcKernelConnection()->execAsync('msgDbMsgUpdate', array($msg));
+					
+					#ve($text);
+					
 				}
+				
 			}
 		}
 		
-		$this->table = $this->getIpcKernelConnection()->execSync('getTable');
-		*/
+		$this->msgDb = $this->getIpcKernelConnection()->execSync('getMsgDb');
 		
 		#print __CLASS__.'->'.__FUNCTION__.': done'."\n";
 	}
@@ -155,21 +176,31 @@ class Cronjob extends Thread{
 		$processedMsgIds = array();
 		
 		// Send own msgs.
-		print __CLASS__.'->'.__FUNCTION__.': own'."\n";
+		print __CLASS__.'->'.__FUNCTION__.': own'."\n"; # TODO
 		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
-			if(!in_array($msg->getId(), $processedMsgIds) && $msg->getDstNodeId() && $msg->getSrcNodeId() == $this->localNode->getIdHexStr()){
-				print __CLASS__.'->'.__FUNCTION__.': own '.$msg->getId()."\n";
+			if(
+				!in_array($msg->getId(), $processedMsgIds)
+				&& $msg->getDstNodeId()
+				&& $msg->getSrcNodeId() == $this->localNode->getIdHexStr()
+				&& $msg->getEncryptionMode() == 'D'
+			){
+				print __CLASS__.'->'.__FUNCTION__.': own '.$msg->getId()."\n"; # TODO
 				
 				$processedMsgIds[] = $msg->getId();
 				$this->msgDbSendMsg($msg);
 			}
 		}
 		
-		// Send unsent msgs.
-		#print __CLASS__.'->'.__FUNCTION__.': unsent'."\n";
+		// Send foreign unsent msgs.
+		print __CLASS__.'->'.__FUNCTION__.': unsent'."\n"; # TODO
 		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
-			if(!in_array($msg->getId(), $processedMsgIds) && $msg->getDstNodeId() && $msg->getSrcNodeId() != $this->localNode->getIdHexStr()){
-				print __CLASS__.'->'.__FUNCTION__.': unsent '.$msg->getId()."\n";
+			if(
+				!in_array($msg->getId(), $processedMsgIds)
+				&& $msg->getDstNodeId()
+				&& $msg->getSrcNodeId() != $this->localNode->getIdHexStr()
+				&& $msg->getEncryptionMode() == 'D'
+			){
+				print __CLASS__.'->'.__FUNCTION__.': unsent '.$msg->getId()."\n"; # TODO
 				
 				$processedMsgIds[] = $msg->getId();
 				$this->msgDbSendMsg($msg);
@@ -177,19 +208,25 @@ class Cronjob extends Thread{
 		}
 		
 		// Relay all other msgs.
-		#print __CLASS__.'->'.__FUNCTION__.': other'."\n";
+		print __CLASS__.'->'.__FUNCTION__.': other'."\n"; # TODO
 		foreach($this->msgDb->getMsgs() as $msgId => $msg){
-			if(!in_array($msg->getId(), $processedMsgIds) && $msg->getDstNodeId()){
-				print __CLASS__.'->'.__FUNCTION__.': other '.$msg->getId()."\n";
+			if(
+				!in_array($msg->getId(), $processedMsgIds)
+				&& $msg->getDstNodeId()
+				&& $msg->getEncryptionMode() == 'D'
+			){
+				print __CLASS__.'->'.__FUNCTION__.': other '.$msg->getId()."\n"; # TODO
 				
 				$processedMsgIds[] = $msg->getId();
 				$this->msgDbSendMsg($msg);
 			}
 		}
 		
+		print __CLASS__.'->'.__FUNCTION__.': done'."\n"; # TODO
 	}
 	
 	private function msgDbSendMsg(Msg $msg){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		#ve($msg);
 		
 		$node = new Node();
@@ -210,14 +247,15 @@ class Cronjob extends Thread{
 			#print __CLASS__.'->'.__FUNCTION__.': node: '.$node->getIdHexStr().', "'.$node->getIp().'", "'.$node->getPort().'"'."\n";
 			
 			if($node->getIp() && $node->getPort() && !in_array($node->getIdHexStr(), $msg->getSentNodes())){
-				$rv = $this->getIpcKernelConnection()->execSync('serverConnect', 
-					array($node->getIp(), $node->getPort(), false, false, $msg->getId() ));
+				$serverConnectArgs = array($node->getIp(), $node->getPort(), false, false, $msg->getId());
+				$rv = $this->getIpcKernelConnection()->execSync('serverConnect', $serverConnectArgs);
 				
 				#print __CLASS__.'->'.__FUNCTION__.': node: '.$node->getIdHexStr().', '. (int)$rv .''."\n";
 			}
 			
 		}
 		
+		#print __CLASS__.'->'.__FUNCTION__.': done'."\n";
 	}
 	
 	public function shutdown(){

@@ -307,16 +307,22 @@ class Msg{
 		$rv = '';
 		
 		if(!$this->getSsl()){
-			throw new RuntimeException('ssl not set.', 1);
+			throw new RuntimeException('ssl not set.', 10);
 		}
 		if(!$this->getSrcSslKeyPub()){
-			throw new RuntimeException('srcSslKeyPub not set.', 2);
+			throw new RuntimeException('srcSslKeyPub not set.', 20);
+		}
+		if(!$this->getDstNodeId()){
+			throw new RuntimeException('dstNodeId not set.', 30);
+		}
+		if(!$this->getDstSslPubKey()){
+			throw new RuntimeException('dstSslPubKey not set.', 40);
 		}
 		if(!$this->getPassword()){
-			throw new RuntimeException('password not set.', 3);
+			throw new RuntimeException('password not set.', 50);
 		}
 		if(!$this->getChecksum()){
-			throw new RuntimeException('checksum not set.', 4);
+			throw new RuntimeException('checksum not set.', 60);
 		}
 		
 		$password = '';
@@ -389,8 +395,6 @@ class Msg{
 							$checksumHex = hash('sha512', hash('sha512', $fingerprintBin, true));
 							$checksumHex = substr($checksumHex, 0, 8); // 4 Bytes
 							$checksum = $fingerprintHex.$checksumHex;
-							
-							#print __CLASS__.'->'.__FUNCTION__.' checksum('.strlen($checksum).'): '.$checksum."\n";
 							
 							#print __CLASS__.'->'.__FUNCTION__.' checksum A ('.strlen($checksum).'): '.$checksum."\n";
 							#print __CLASS__.'->'.__FUNCTION__.' checksum B ('.strlen($this->getChecksum()).'): '.$this->getChecksum()."\n";
