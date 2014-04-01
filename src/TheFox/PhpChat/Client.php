@@ -759,6 +759,7 @@ class Client{
 						
 						if($msg->getDstNodeId() == $this->getLocalNode()->getIdHexStr()){
 							$msg->setDstSslPubKey($this->getLocalNode()->getSslKeyPub());
+							$msg->setSsl($this->getSsl());
 							
 							$text = '';
 							try{
