@@ -100,6 +100,7 @@ class Cronjob extends Thread{
 	
 	private function pingClosestNodes(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		$this->log->debug(__FUNCTION__);
 		$table = $this->getIpcKernelConnection()->execSync('getTable');
 		
 		$nodes = $table->getNodesClosest(20);
@@ -114,6 +115,8 @@ class Cronjob extends Thread{
 	}
 	
 	private function msgDbInit(){
+		$this->log->debug(__FUNCTION__);
+		
 		$this->msgDb = $this->getIpcKernelConnection()->execSync('getMsgDb');
 		$this->settings = $this->getIpcKernelConnection()->execSync('getSettings');
 		$this->table = $this->getIpcKernelConnection()->execSync('getTable');
@@ -126,6 +129,7 @@ class Cronjob extends Thread{
 	}
 	
 	private function msgDbInitNodes(){
+		$this->log->debug(__FUNCTION__);
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
@@ -171,6 +175,7 @@ class Cronjob extends Thread{
 	}
 	
 	private function msgDbSendAll(){
+		$this->log->debug(__FUNCTION__);
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		$processedMsgIds = array();
@@ -226,6 +231,7 @@ class Cronjob extends Thread{
 	}
 	
 	private function msgDbSendMsg(Msg $msg){
+		$this->log->debug(__FUNCTION__);
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		#ve($msg);
 		
@@ -247,6 +253,8 @@ class Cronjob extends Thread{
 			#print __CLASS__.'->'.__FUNCTION__.': node: '.$node->getIdHexStr().', "'.$node->getIp().'", "'.$node->getPort().'"'."\n";
 			
 			if($node->getIp() && $node->getPort() && !in_array($node->getIdHexStr(), $msg->getSentNodes())){
+				$this->log->debug(__FUNCTION__.': '.$node->getIp().':'.$node->getPort().', '.$msg->getId());
+				
 				$serverConnectArgs = array($node->getIp(), $node->getPort(), false, false, $msg->getId());
 				$rv = $this->getIpcKernelConnection()->execSync('serverConnect', $serverConnectArgs);
 				
