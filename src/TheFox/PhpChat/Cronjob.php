@@ -250,8 +250,6 @@ class Cronjob extends Thread{
 					
 					$msg->incForwardCycles();
 					
-					$this->getIpcKernelConnection()->execAsync('msgDbMsgUpdate', array($msg));
-					
 					$serverConnectArgs = array($node->getIp(), $node->getPort(), false, false, $msg->getId());
 					$rv = $this->getIpcKernelConnection()->execSync('serverConnect', $serverConnectArgs);
 					
@@ -259,6 +257,8 @@ class Cronjob extends Thread{
 				}
 				
 			}
+			
+			$this->getIpcKernelConnection()->execAsync('msgDbMsgUpdate', array($msg));
 		}
 	}
 	
