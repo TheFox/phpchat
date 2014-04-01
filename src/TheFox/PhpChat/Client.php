@@ -762,9 +762,8 @@ class Client{
 							$msg->setDstSslPubKey($this->getLocalNode()->getSslKeyPub());
 							$msg->setSsl($this->getSsl());
 							
-							$text = '';
 							try{
-								$text = $msg->decrypt();
+								$msg->decrypt();
 							}
 							catch(Exception $e){
 								print __CLASS__.'->'.__FUNCTION__.': could not decrypt msg: '.$e->getMessage()."\n"; # TODO
