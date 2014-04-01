@@ -143,11 +143,8 @@ class Kernel extends Thread{
 	}
 	
 	public function serverConnect($ip, $port, $isTalkRequest = false, $isPingOnly = false, $msgId = null){
-		print __CLASS__.'->'.__FUNCTION__.': '.$ip.':'.$port."\n";
-		#ve($msg === null);
-		
 		if($this->getServer() && $ip && $port){
-			#print __CLASS__.'->'.__FUNCTION__.' A'."\n";
+			print __CLASS__.'->'.__FUNCTION__.': '.$ip.':'.$port."\n";
 			
 			$clientActions = array();
 			if($isTalkRequest){

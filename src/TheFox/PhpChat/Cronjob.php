@@ -234,17 +234,12 @@ class Cronjob extends Thread{
 	
 	private function msgDbSendMsg(Msg $msg){
 		$this->log->debug(__FUNCTION__);
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		#ve($msg);
 		
 		$node = new Node();
 		$node->setIdHexStr($msg->getDstNodeId());
-		
 		$node = $this->table->nodeEnclose($node);
-		#ve($node);
 		
 		$nodes = $this->table->nodeFindClosest($node);
-		#ve($nodes);
 		
 		array_unshift($nodes, $node);
 		
@@ -265,10 +260,6 @@ class Cronjob extends Thread{
 				
 			}
 		}
-		
-		
-		
-		#print __CLASS__.'->'.__FUNCTION__.': done'."\n";
 	}
 	
 	public function shutdown(){
