@@ -25,6 +25,7 @@ class Msg{
 	private $relayCount = 0;
 	private $forwardCycles = 0;
 	private $encryptionMode = '';
+	private $status = '';
 	private $timeCreated = 0;
 	
 	private $ssl = null;
@@ -57,6 +58,7 @@ class Msg{
 			'relayCount',
 			'forwardCycles',
 			'encryptionMode',
+			'status',
 			'timeCreated',
 		);
 	}
@@ -190,6 +192,20 @@ class Msg{
 	
 	public function getEncryptionMode(){
 		return $this->encryptionMode;
+	}
+	
+	public function setStatus($status){
+		// U = unread, unsend
+		// O = origin
+		// S = sent
+		
+		#print __CLASS__.'->'.__FUNCTION__.': '.$status."\n";
+		$this->status = $status;
+		$this->setDataChanged(true);
+	}
+	
+	public function getStatus(){
+		return $this->status;
 	}
 	
 	public function setTimeCreated($timeCreated){

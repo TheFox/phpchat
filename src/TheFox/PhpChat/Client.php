@@ -755,6 +755,7 @@ class Client{
 						$msg->setChecksum($checksum);
 						$msg->setRelayCount($relayCount);
 						$msg->setEncryptionMode('D');
+						$msg->setStatus('U');
 						$msg->setTimeCreated($timeCreated);
 						
 						if($msg->getDstNodeId() == $this->getLocalNode()->getIdHexStr()){

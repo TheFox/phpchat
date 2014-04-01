@@ -38,6 +38,7 @@ class MsgDb extends YamlStorage{
 			$msgAr['relayCount'] = $msg->getRelayCount();
 			$msgAr['forwardCycles'] = $msg->getForwardCycles();
 			$msgAr['encryptionMode'] = $msg->getEncryptionMode();
+			$msgAr['status'] = $msg->getStatus();
 			$msgAr['timeCreated'] = $msg->getTimeCreated();
 			
 			$this->data['msgs'][$msgAr['id']] = $msgAr;
@@ -70,6 +71,7 @@ class MsgDb extends YamlStorage{
 					$msg->setRelayCount($msgAr['relayCount']);
 					$msg->setForwardCycles($msgAr['forwardCycles']);
 					$msg->setEncryptionMode($msgAr['encryptionMode']);
+					$msg->setStatus($msgAr['status']);
 					$msg->setTimeCreated($msgAr['timeCreated']);
 					
 					$msg->setMsgDb($this);
