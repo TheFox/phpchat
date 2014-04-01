@@ -142,6 +142,8 @@ class Server{
 	}
 	
 	public function run(){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': client '.count($this->clients)."\n";
 		
 		$readHandles = array();
 		$writeHandles = NULL; $exceptHandles = NULL;
@@ -154,6 +156,7 @@ class Server{
 			$readHandles[] = $client->getSocket()->getHandle();
 			
 			// Run client.
+			#print __CLASS__.'->'.__FUNCTION__.': client run'."\n";
 			$client->run();
 		}
 		$readHandlesNum = count($readHandles);
@@ -203,6 +206,7 @@ class Server{
 	
 	private function clientNew($socket){
 		$this->clientsId++;
+		#print __CLASS__.'->'.__FUNCTION__.': '.$this->clientsId."\n";
 		
 		$client = new Client();
 		$client->setSocket($socket);
@@ -224,6 +228,7 @@ class Server{
 		}
 		
 		$this->clients[$this->clientsId] = $client;
+		#print __CLASS__.'->'.__FUNCTION__.': '.count($this->clients)."\n";
 		
 		return $client;
 	}

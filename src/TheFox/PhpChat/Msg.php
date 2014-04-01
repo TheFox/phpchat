@@ -186,6 +186,7 @@ class Msg{
 		// S = with source node public key
 		// D = with destination node public key
 		
+		#print __CLASS__.'->'.__FUNCTION__.': '.$encryptionMode."\n";
 		$this->encryptionMode = $encryptionMode;
 		$this->setDataChanged(true);
 	}

@@ -243,6 +243,9 @@ class Cronjob extends Thread{
 		
 		array_unshift($nodes, $node);
 		
+		#print __CLASS__.'->'.__FUNCTION__.' sentNodes: '.count($msg->getSentNodes())."\n"; # TODO
+		#ve($msg->getSentNodes());
+		
 		if(count($msg->getSentNodes()) < static::MSG_FORWARD_TO_NODES && $msg->getForwardCycles() < static::MSG_FORWARD_CYCLES_MAX){
 			foreach($nodes as $nodeId => $node){
 				if($node->getIp() && $node->getPort() && !in_array($node->getIdHexStr(), $msg->getSentNodes())){
