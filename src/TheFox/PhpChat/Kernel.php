@@ -146,7 +146,7 @@ class Kernel extends Thread{
 		print __CLASS__.'->'.__FUNCTION__.': '.$ip.':'.$port."\n";
 		#ve($msg === null);
 		
-		if($this->getServer()){
+		if($this->getServer() && $ip && $port){
 			#print __CLASS__.'->'.__FUNCTION__.' A'."\n";
 			
 			$clientActions = array();
