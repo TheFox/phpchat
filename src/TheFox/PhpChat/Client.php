@@ -757,6 +757,21 @@ class Client{
 						$msg->setEncryptionMode('D');
 						$msg->setTimeCreated($timeCreated);
 						
+						if($msg->getDstNodeId() == $this->getLocalNode()->getIdHexStr()){
+							$msg->setDstSslPubKey($this->getLocalNode()->getSslKeyPub());
+							
+							$text = '';
+							try{
+								$text = $msg->decrypt();
+							}
+							catch(Exception $e){
+								print __CLASS__.'->'.__FUNCTION__.': could not decrypt msg'."\n"; # TODO
+							}
+						}
+						else{
+							print __CLASS__.'->'.__FUNCTION__.': msg not for me'."\n"; # TODO
+						}
+						
 						$this->getMsgDb()->msgAdd($msg);
 					}
 				}
