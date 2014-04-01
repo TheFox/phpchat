@@ -23,6 +23,7 @@ class Msg{
 	private $checksum = '';
 	private $sentNodes = array();
 	private $relayCount = 0;
+	private $forwardCycles = 0;
 	private $encryptionMode = '';
 	private $timeCreated = 0;
 	
@@ -53,6 +54,7 @@ class Msg{
 			'checksum',
 			'sentNodes',
 			'relayCount',
+			'forwardCycles',
 			'encryptionMode',
 			'timeCreated',
 		);
@@ -158,6 +160,19 @@ class Msg{
 	
 	public function getRelayCount(){
 		return((int)$this->relayCount);
+	}
+	
+	public function setForwardCycles($forwardCycles){
+		$this->forwardCycles = (int)$forwardCycles;
+	}
+	
+	public function incForwardCycles(){
+		#$this->setForwardCycles($this->getForwardCycles() + 1);
+		$this->forwardCycles++;
+	}
+	
+	public function getForwardCycles(){
+		return((int)$this->forwardCycles);
 	}
 	
 	public function setEncryptionMode($encryptionMode){

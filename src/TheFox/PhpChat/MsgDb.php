@@ -36,6 +36,7 @@ class MsgDb extends YamlStorage{
 			$msgAr['checksum'] = $msg->getChecksum();
 			$msgAr['sentNodes'] = $msg->getSentNodes();
 			$msgAr['relayCount'] = $msg->getRelayCount();
+			$msgAr['forwardCycles'] = $msg->getForwardCycles();
 			$msgAr['encryptionMode'] = $msg->getEncryptionMode();
 			$msgAr['timeCreated'] = $msg->getTimeCreated();
 			
@@ -67,6 +68,7 @@ class MsgDb extends YamlStorage{
 					$msg->setChecksum($msgAr['checksum']);
 					$msg->setSentNodes($msgAr['sentNodes']);
 					$msg->setRelayCount($msgAr['relayCount']);
+					$msg->setForwardCycles($msgAr['forwardCycles']);
 					$msg->setEncryptionMode($msgAr['encryptionMode']);
 					$msg->setTimeCreated($msgAr['timeCreated']);
 					

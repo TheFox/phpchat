@@ -14,6 +14,7 @@ class Cronjob extends Thread{
 	
 	#const LOOP_USLEEP = 100000;
 	const MSG_FORWARD_TO_NODES = 8;
+	const MSG_FORWARD_CYCLES_MAX = 10;
 	
 	private $log;
 	private $ipcKernelConnection = null;
@@ -247,10 +248,14 @@ class Cronjob extends Thread{
 		
 		array_unshift($nodes, $node);
 		
-		if($msg->getSentNodes() < static::MSG_FORWARD_TO_NODES){
+		if(count($msg->getSentNodes()) < static::MSG_FORWARD_TO_NODES && $msg->getForwardCycles() < static::MSG_FORWARD_CYCLES_MAX){
 			foreach($nodes as $nodeId => $node){
 				if($node->getIp() && $node->getPort() && !in_array($node->getIdHexStr(), $msg->getSentNodes())){
 					$this->log->debug(__FUNCTION__.': '.$node->getIp().':'.$node->getPort().', '.$msg->getId());
+					
+					$msg->incForwardCycles();
+					
+					$this->getIpcKernelConnection()->execAsync('msgDbMsgUpdate', array($msg));
 					
 					$serverConnectArgs = array($node->getIp(), $node->getPort(), false, false, $msg->getId());
 					$rv = $this->getIpcKernelConnection()->execSync('serverConnect', $serverConnectArgs);
