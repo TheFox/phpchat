@@ -1631,6 +1631,7 @@ class Client{
 		
 		$data = array(
 			'rid' => $rid,
+			
 			'version' => $msg->getVersion(),
 			'id' => $msg->getId(),
 			'srcNodeId' => $msg->getSrcNodeId(),
@@ -1638,6 +1639,8 @@ class Client{
 			'srcUserNickname' => $msg->getSrcUserNickname(),
 			'dstNodeId' => $msg->getDstNodeId(),
 			'text' => $msg->getText(),
+			'password' => $msg->getPassword(),
+			'checksum' => $msg->getChecksum(),
 			'relayCount' => (int)$msg->getRelayCount()+1,
 			'timeCreated' => (int)$msg->getTimeCreated(),
 		);
