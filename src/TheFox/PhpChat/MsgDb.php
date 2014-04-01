@@ -148,6 +148,11 @@ class MsgDb extends YamlStorage{
 				$msgOld->setRelayCount($msgNew->getRelayCount());
 				$this->setDataChanged(true);
 			}
+			if($msgOld->getForwardCycles() != $msgNew->getForwardCycles()){
+				print __CLASS__.'->'.__FUNCTION__.': changed: forwardCycles'."\n"; # TODO
+				$msgOld->setForwardCycles($msgNew->getForwardCycles());
+				$this->setDataChanged(true);
+			}
 			if($msgOld->getEncryptionMode() != $msgNew->getEncryptionMode()){
 				print __CLASS__.'->'.__FUNCTION__.': changed: encryptionMode'."\n"; # TODO
 				$msgOld->setEncryptionMode($msgNew->getEncryptionMode());
