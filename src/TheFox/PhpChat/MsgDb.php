@@ -72,6 +72,7 @@ class MsgDb extends YamlStorage{
 					$msg->setEncryptionMode($msgAr['encryptionMode']);
 					$msg->setTimeCreated($msgAr['timeCreated']);
 					
+					$msg->setMsgDb($this);
 					$this->msgs[$msg->getId()] = $msg;
 				}
 			}
@@ -84,6 +85,7 @@ class MsgDb extends YamlStorage{
 	}
 	
 	public function msgAdd(Msg $msg){
+		$msg->setMsgDb($this);
 		$this->msgs[$msg->getId()] = $msg;
 		$this->setDataChanged(true);
 	}

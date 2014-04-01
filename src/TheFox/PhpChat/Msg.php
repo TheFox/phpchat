@@ -28,6 +28,7 @@ class Msg{
 	private $timeCreated = 0;
 	
 	private $ssl = null;
+	private $msgDb = null;
 	
 	public function __construct($text = ''){
 		try{
@@ -184,6 +185,7 @@ class Msg{
 		// D = with destiation node public key
 		
 		$this->encryptionMode = $encryptionMode;
+		$this->setDataChanged(true);
 	}
 	
 	public function getEncryptionMode(){
@@ -213,6 +215,20 @@ class Msg{
 	
 	public function setSslKeyPrv($sslKeyPrv, $sslKeyPrvPass){
 		$this->setSsl(openssl_pkey_get_private($sslKeyPrv, $sslKeyPrvPass));
+	}
+	
+	public function setMsgDb(MsgDb $msgDb){
+		$this->msgDb = $msgDb;
+	}
+	
+	public function getMsgDb(){
+		return $this->msgDb;
+	}
+	
+	private function setDataChanged($changed = true){
+		if($this->getMsgDb()){
+			$this->getMsgDb()->setDataChanged($changed);
+		}
 	}
 	
 	public function encrypt(){
