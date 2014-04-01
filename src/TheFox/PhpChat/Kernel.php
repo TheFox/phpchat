@@ -193,9 +193,10 @@ class Kernel extends Thread{
 					$action = new ClientAction(ClientAction::CRITERION_AFTER_MSG_RESPONSE);
 					$action->functionSet(function($action, $client){
 						#print __CLASS__.'->'.__FUNCTION__.': shutdown'."\n";
+						$msg = $action->getVar('msg');
 						$client->sendQuit();
 						$client->shutdown();
-					});
+					}, array('msg' => $msg));
 					$clientActions[] = $action;
 				}
 			}
