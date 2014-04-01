@@ -182,7 +182,7 @@ class Msg{
 	
 	public function setEncryptionMode($encryptionMode){
 		// S = with source node public key
-		// D = with destiation node public key
+		// D = with destination node public key
 		
 		$this->encryptionMode = $encryptionMode;
 		$this->setDataChanged(true);
