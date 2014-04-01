@@ -13,6 +13,7 @@ use TheFox\Dht\Kademlia\Node;
 class Cronjob extends Thread{
 	
 	#const LOOP_USLEEP = 100000;
+	const MSG_FORWARD_TO_NODES = 8;
 	
 	private $log;
 	private $ipcKernelConnection = null;
@@ -246,22 +247,21 @@ class Cronjob extends Thread{
 		
 		array_unshift($nodes, $node);
 		
-		
-		foreach($nodes as $nodeId => $node){
-			#ve($node);
-			
-			#print __CLASS__.'->'.__FUNCTION__.': node: '.$node->getIdHexStr().', "'.$node->getIp().'", "'.$node->getPort().'"'."\n";
-			
-			if($node->getIp() && $node->getPort() && !in_array($node->getIdHexStr(), $msg->getSentNodes())){
-				$this->log->debug(__FUNCTION__.': '.$node->getIp().':'.$node->getPort().', '.$msg->getId());
+		if($msg->getSentNodes() < static::MSG_FORWARD_TO_NODES){
+			foreach($nodes as $nodeId => $node){
+				if($node->getIp() && $node->getPort() && !in_array($node->getIdHexStr(), $msg->getSentNodes())){
+					$this->log->debug(__FUNCTION__.': '.$node->getIp().':'.$node->getPort().', '.$msg->getId());
+					
+					$serverConnectArgs = array($node->getIp(), $node->getPort(), false, false, $msg->getId());
+					$rv = $this->getIpcKernelConnection()->execSync('serverConnect', $serverConnectArgs);
+					
+					#print __CLASS__.'->'.__FUNCTION__.': node: '.$node->getIdHexStr().', '. (int)$rv .''."\n";
+				}
 				
-				$serverConnectArgs = array($node->getIp(), $node->getPort(), false, false, $msg->getId());
-				$rv = $this->getIpcKernelConnection()->execSync('serverConnect', $serverConnectArgs);
-				
-				#print __CLASS__.'->'.__FUNCTION__.': node: '.$node->getIdHexStr().', '. (int)$rv .''."\n";
 			}
-			
 		}
+		
+		
 		
 		#print __CLASS__.'->'.__FUNCTION__.': done'."\n";
 	}
