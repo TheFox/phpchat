@@ -210,10 +210,13 @@ class Msg{
 		// O = origin, local node created the msg
 		// S = sent at least to one node
 		// D = delivered to destination node
+		// R = read
 		
 		#print __CLASS__.'->'.__FUNCTION__.': '.$status."\n";
-		$this->status = $status;
-		$this->setDataChanged(true);
+		if($status != 'D'){
+			$this->status = $status;
+			$this->setDataChanged(true);
+		}
 	}
 	
 	public function getStatus(){
