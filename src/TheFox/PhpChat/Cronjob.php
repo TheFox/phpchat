@@ -2,6 +2,7 @@
 
 namespace TheFox\PhpChat;
 
+use Exception;
 use RuntimeException;
 
 use TheFox\Logger\Logger;
@@ -13,7 +14,8 @@ use TheFox\Dht\Kademlia\Node;
 class Cronjob extends Thread{
 	
 	#const LOOP_USLEEP = 100000;
-	const MSG_FORWARD_TO_NODES = 8;
+	const MSG_FORWARD_TO_NODES_MIN = 8;
+	const MSG_FORWARD_TO_NODES_MAX = 20;
 	const MSG_FORWARD_CYCLES_MAX = 100;
 	
 	private $log;
@@ -118,21 +120,45 @@ class Cronjob extends Thread{
 	
 	private function msgDbInit(){
 		$this->log->debug(__FUNCTION__);
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
-		$this->msgDb = $this->getIpcKernelConnection()->execSync('getMsgDb');
+		$this->msgDb = $this->getIpcKernelConnection()->execSync('getMsgDb', array(), 10);
 		$this->settings = $this->getIpcKernelConnection()->execSync('getSettings');
 		$this->table = $this->getIpcKernelConnection()->execSync('getTable');
 		$this->localNode = $this->table->getLocalNode();
 		
 		#ve($this->table);
 		
-		$this->msgDbInitNodes();
-		$this->msgDbSendAll();
+		#print __CLASS__.'->'.__FUNCTION__.': msgDb A '.(int)($this->msgDb===null)."\n";
+		#ve($this->msgDb);
+		
+		try{
+			$this->msgDbInitNodes();
+			$this->msgDbSendAll();
+		}
+		catch(Exception $e){
+			$this->log->debug(__FUNCTION__.': '.$e->getMessage());
+			print __CLASS__.'->'.__FUNCTION__.': '.$e->getMessage()."\n";
+		}
+		
 	}
 	
 	private function msgDbInitNodes(){
 		$this->log->debug(__FUNCTION__);
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+		if(!$this->msgDb){
+			throw new RuntimeException('msgDb not set', 1);
+		}
+		if(!$this->settings){
+			throw new RuntimeException('settings not set', 2);
+		}
+		if(!$this->table){
+			throw new RuntimeException('table not set', 3);
+		}
+		if(!$this->localNode){
+			throw new RuntimeException('localNode not set', 4);
+		}
 		
 		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
 			if(
@@ -158,11 +184,11 @@ class Cronjob extends Thread{
 					#$text = $msg->decrypt();
 					
 					$msg->setText($msg->decrypt());
-					$msg->setEncryptionMode('D');
+					$msg->setEncryptionMode('D'); # TODO
 					$msg->setDstSslPubKey($onode->getSslKeyPub());
 					$msg->encrypt();
 					
-					$this->getIpcKernelConnection()->execAsync('msgDbMsgUpdate', array($msg));
+					$this->getIpcKernelConnection()->execAsync('msgDbMsgUpdate', array($msg)); # TODO
 					
 					#ve($text);
 					
@@ -171,46 +197,65 @@ class Cronjob extends Thread{
 			}
 		}
 		
-		$this->msgDb = $this->getIpcKernelConnection()->execSync('getMsgDb');
+		$this->msgDb = $this->getIpcKernelConnection()->execSync('getMsgDb', array(), 10);
 		
-		#print __CLASS__.'->'.__FUNCTION__.': done'."\n";
+		print __CLASS__.'->'.__FUNCTION__.': msgDb B '.(int)($this->msgDb===null)."\n";
+		#ve($this->msgDb);
+		
+		print __CLASS__.'->'.__FUNCTION__.': done'."\n";
 	}
 	
 	private function msgDbSendAll(){
 		$this->log->debug(__FUNCTION__);
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
-		$processedMsgIds = array();
+		if(!$this->msgDb){
+			throw new RuntimeException('msgDb not set', 1);
+		}
+		/*if(!$this->settings){
+			throw new RuntimeException('settings not set', 2);
+		}*/
+		if(!$this->table){
+			throw new RuntimeException('table not set', 3);
+		}
+		/*if(!$this->localNode){
+			throw new RuntimeException('localNode not set', 4);
+		}*/
 		
-		// Send own msgs.
-		print __CLASS__.'->'.__FUNCTION__.': own'."\n"; # TODO
+		$processedMsgIds = array();
+		$processedMsgs = array();
+		
+		// Send own unsent msgs.
+		print __CLASS__.'->'.__FUNCTION__.': unsent own'."\n"; # TODO
 		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
 			if(
 				!in_array($msg->getId(), $processedMsgIds)
 				&& $msg->getDstNodeId()
-				&& $msg->getSrcNodeId() == $this->localNode->getIdHexStr()
 				&& $msg->getEncryptionMode() == 'D'
+				&& $msg->getStatus() == 'O'
 			){
-				print __CLASS__.'->'.__FUNCTION__.': own '.$msg->getId()."\n"; # TODO
+				print __CLASS__.'->'.__FUNCTION__.': unsent own '.$msg->getId()."\n"; # TODO
 				
 				$processedMsgIds[] = $msg->getId();
-				$this->msgDbSendMsg($msg);
+				$processedMsgs[] = $msg;
+				#$this->msgDbSendMsg($msg);
 			}
 		}
 		
 		// Send foreign unsent msgs.
-		print __CLASS__.'->'.__FUNCTION__.': unsent'."\n"; # TODO
+		print __CLASS__.'->'.__FUNCTION__.': unsent foreign'."\n"; # TODO
 		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
 			if(
 				!in_array($msg->getId(), $processedMsgIds)
 				&& $msg->getDstNodeId()
-				&& $msg->getSrcNodeId() != $this->localNode->getIdHexStr()
 				&& $msg->getEncryptionMode() == 'D'
+				&& $msg->getStatus() == 'U'
 			){
-				print __CLASS__.'->'.__FUNCTION__.': unsent '.$msg->getId()."\n"; # TODO
+				print __CLASS__.'->'.__FUNCTION__.': unsent foreign '.$msg->getId()."\n"; # TODO
 				
 				$processedMsgIds[] = $msg->getId();
-				$this->msgDbSendMsg($msg);
+				$processedMsgs[] = $msg;
+				#$this->msgDbSendMsg($msg);
 			}
 		}
 		
@@ -221,48 +266,96 @@ class Cronjob extends Thread{
 				!in_array($msg->getId(), $processedMsgIds)
 				&& $msg->getDstNodeId()
 				&& $msg->getEncryptionMode() == 'D'
+				&& $msg->getStatus() == 'S'
 			){
 				print __CLASS__.'->'.__FUNCTION__.': other '.$msg->getId()."\n"; # TODO
 				
 				$processedMsgIds[] = $msg->getId();
-				$this->msgDbSendMsg($msg);
+				$processedMsgs[] = $msg;
+				#$this->msgDbSendMsg($msg);
 			}
 		}
 		
-		print __CLASS__.'->'.__FUNCTION__.': done'."\n"; # TODO
-	}
-	
-	private function msgDbSendMsg(Msg $msg){
-		$this->log->debug(__FUNCTION__);
+		$processedMsgs = array_unique($processedMsgs);
+		print __CLASS__.'->'.__FUNCTION__.': processedMsgs: '.count($processedMsgs)."\n"; # TODO
 		
-		$node = new Node();
-		$node->setIdHexStr($msg->getDstNodeId());
-		$node = $this->table->nodeEnclose($node);
 		
-		$nodes = $this->table->nodeFindClosest($node);
+		foreach($processedMsgs as $msgId => $msg){
+			#print __CLASS__.'->'.__FUNCTION__.': processedMsg A: '. $msg->getId() ."\n"; # TODO
+			
+			$sentNodesC = count($msg->getSentNodes());
+			$forwardCycles = $msg->getForwardCycles();
+			
+			if(
+				$sentNodesC >= static::MSG_FORWARD_TO_NODES_MIN
+					&& $forwardCycles >= static::MSG_FORWARD_CYCLES_MAX
+				
+				|| $sentNodesC >= static::MSG_FORWARD_TO_NODES_MAX
+				
+				|| in_array($msg->getDstNodeId(), $msg->getSentNodes())
+			){
+				print __CLASS__.'->'.__FUNCTION__.': set X: '. $msg->getId() ."\n"; # TODO
+				$this->getIpcKernelConnection()->execAsync('msgDbMsgSetStatusById', array($msg->getId(), 'X'));
+				unset($processedMsgs[$msgId]);
+			}
+		}
+		foreach($processedMsgs as $msgId => $msg){
+			print __CLASS__.'->'.__FUNCTION__.': processedMsg B: '. $msg->getId() .', '.$msg->getDstNodeId() ."\n"; # TODO
+			
+		}
 		
-		array_unshift($nodes, $node);
+		$dstNode = new Node();
+		$dstNode->setIdHexStr($msg->getDstNodeId());
+		$dstNode = $this->table->nodeEnclose($dstNode);
 		
-		#print __CLASS__.'->'.__FUNCTION__.' sentNodes: '.count($msg->getSentNodes())."\n"; # TODO
-		#ve($msg->getSentNodes());
+		$nodes = $this->table->nodeFindClosest($dstNode, static::MSG_FORWARD_TO_NODES_MAX);
 		
-		if(count($msg->getSentNodes()) < static::MSG_FORWARD_TO_NODES && $msg->getForwardCycles() < static::MSG_FORWARD_CYCLES_MAX){
-			foreach($nodes as $nodeId => $node){
-				if($node->getIp() && $node->getPort() && $node->getIdHexStr() != $msg->getRelayNodeId() && !in_array($node->getIdHexStr(), $msg->getSentNodes())){
-					$this->log->debug(__FUNCTION__.': '.$node->getIp().':'.$node->getPort().', '.$msg->getId());
-					
-					$msg->incForwardCycles();
-					
-					$serverConnectArgs = array($node->getIp(), $node->getPort(), false, false, $msg->getId());
-					$rv = $this->getIpcKernelConnection()->execSync('serverConnect', $serverConnectArgs);
-					
-					#print __CLASS__.'->'.__FUNCTION__.': node: '.$node->getIdHexStr().', '. (int)$rv .''."\n";
+		array_unshift($nodes, $dstNode);
+		
+		$updateMsgs = array();
+		foreach($nodes as $nodeId => $node){
+			print __CLASS__.'->'.__FUNCTION__.': node '. $node->getIdHexStr() ."\n";
+			
+			if($node->getIp() && $node->getPort()){
+				#print __CLASS__.'->'.__FUNCTION__.': node '. $node->getIdHexStr() ."\n";
+				
+				$msgs = array();
+				$msgIds = array();
+				
+				foreach($processedMsgs as $msgId => $msg){
+					if($msg->getRelayNodeId() != $node->getIdHexStr() && !in_array($node->getIdHexStr(), $msg->getSentNodes())){
+						print __CLASS__.'->'.__FUNCTION__.': processedMsg C: '. $msg->getId() .' to '.$msg->getDstNodeId() ."\n"; # TODO
+						
+						$msgs[] = $msg;
+						
+					}
 				}
 				
+				foreach($msgs as $msgId => $msg){
+					$msgIds[] = $msg->getId();
+					$updateMsgs[$msg->getId()] = $msg;
+				}
+				
+				print __CLASS__.'->'.__FUNCTION__.': msgIds'."\n";
+				ve($msgIds);
+				
+				if($msgs){
+					$serverConnectArgs = array($node->getIp(), $node->getPort(), false, false, $msgIds);
+					#$rv = $this->getIpcKernelConnection()->execSync('serverConnect', $serverConnectArgs);
+				}
+				
+				
 			}
-			
-			$this->getIpcKernelConnection()->execAsync('msgDbMsgUpdate', array($msg));
 		}
+		
+		$updateMsgs = array_unique($updateMsgs);
+		foreach($updateMsgs as $msgId => $msg){
+			print __CLASS__.'->'.__FUNCTION__.': update msg: '.$msg->getId()."\n"; # TODO
+			$this->getIpcKernelConnection()->execAsync('msgDbMsgIncForwardCyclesById', array($msg->getId()));
+		}
+		
+		
+		print __CLASS__.'->'.__FUNCTION__.': done'."\n"; # TODO
 	}
 	
 	public function shutdown(){
