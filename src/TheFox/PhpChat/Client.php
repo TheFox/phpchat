@@ -264,6 +264,7 @@ class Client{
 	}
 	
 	public function actionRemove(ClientAction $action){
+		#print __CLASS__.'->'.__FUNCTION__.': '.$action->getId()."\n";
 		unset($this->actions[$action->getId()]);
 	}
 	
@@ -272,6 +273,7 @@ class Client{
 		
 		$this->checkPingSend();
 		$this->checkPongTimeout();
+		$this->checkActions();
 	}
 	
 	private function checkPingSend(){

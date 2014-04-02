@@ -16,6 +16,12 @@ class ClientAction{
 	const CRITERION_AFTER_MSG_RESPONSE = 320;
 	const CRITERION_AFTER_HAS_SSL = 400;
 	
+	// After all previous actions in actions array.
+	const CRITERION_AFTER_PREVIOUS_ACTIONS = 900;
+	
+	// After ALL actions done. Can only be the last in the array.
+	//const CRITERION_AFTER_LAST_ACTION = 905;
+	
 	private $id = 0;
 	private $criteria = array();
 	private $objc = null;

@@ -173,8 +173,12 @@ class Kernel extends Thread{
 			if($isPingOnly){
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_OK);
 				$action->functionSet(function($action, $client){
-					#print __CLASS__.'->'.__FUNCTION__.': shutdown'."\n";
 					$client->sendQuit();
+				});
+				$clientActions[] = $action;
+				
+				$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
+				$action->functionSet(function($action, $client){
 					$client->shutdown();
 				});
 				$clientActions[] = $action;
@@ -190,7 +194,7 @@ class Kernel extends Thread{
 					}, array('msg' => $msg));
 					$clientActions[] = $action;
 					
-					$action = new ClientAction(ClientAction::CRITERION_AFTER_MSG_RESPONSE);
+					$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
 					$action->functionSet(function($action, $client){
 						#print __CLASS__.'->'.__FUNCTION__.': shutdown'."\n";
 						$msg = $action->getVar('msg');
