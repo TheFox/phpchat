@@ -211,9 +211,11 @@ class Msg{
 		// S = sent at least to one node
 		// D = delivered to destination node
 		// R = read
+		// X = reached MSG_FORWARD_TO_NODES_MIN or MSG_FORWARD_TO_NODES_MAX
+		//		or dstNodeId is in sentNodes array.
 		
 		#print __CLASS__.'->'.__FUNCTION__.': '.$status."\n";
-		if($status != 'D'){
+		if($this->status != 'D'){
 			$this->status = $status;
 			$this->setDataChanged(true);
 		}
