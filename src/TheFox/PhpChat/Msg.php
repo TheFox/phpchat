@@ -13,6 +13,7 @@ class Msg{
 	
 	private $version = 1;
 	private $id = '';
+	private $relayNodeId = '';
 	private $srcNodeId = '';
 	private $srcSslKeyPub = '';
 	private $srcUserNickname = '';
@@ -47,6 +48,7 @@ class Msg{
 		return array(
 			'version',
 			'id',
+			'relayNodeId',
 			'srcNodeId',
 			'srcSslKeyPub',
 			'srcUserNickname',
@@ -81,6 +83,14 @@ class Msg{
 	
 	public function getId(){
 		return $this->id;
+	}
+	
+	public function setRelayNodeId($relayNodeId){
+		$this->relayNodeId = $relayNodeId;
+	}
+	
+	public function getRelayNodeId(){
+		return $this->relayNodeId;
 	}
 	
 	public function setSrcNodeId($srcNodeId){

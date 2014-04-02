@@ -248,7 +248,7 @@ class Cronjob extends Thread{
 		
 		if(count($msg->getSentNodes()) < static::MSG_FORWARD_TO_NODES && $msg->getForwardCycles() < static::MSG_FORWARD_CYCLES_MAX){
 			foreach($nodes as $nodeId => $node){
-				if($node->getIp() && $node->getPort() && !in_array($node->getIdHexStr(), $msg->getSentNodes())){
+				if($node->getIp() && $node->getPort() && $node->getIdHexStr() != $msg->getRelayNodeId() && !in_array($node->getIdHexStr(), $msg->getSentNodes())){
 					$this->log->debug(__FUNCTION__.': '.$node->getIp().':'.$node->getPort().', '.$msg->getId());
 					
 					$msg->incForwardCycles();

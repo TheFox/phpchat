@@ -764,6 +764,7 @@ class Client{
 						$msg = new Msg();
 						$msg->setVersion($version);
 						$msg->setId($id);
+						$msg->setRelayNodeId($this->getNode()->getIdHexStr());
 						$msg->setSrcNodeId($srcNodeId);
 						$msg->setSrcSslKeyPub($srcSslKeyPub);
 						$msg->setDstNodeId($dstNodeId);
