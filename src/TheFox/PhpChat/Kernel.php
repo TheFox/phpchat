@@ -198,7 +198,13 @@ class Kernel extends Thread{
 					$action->functionSet(function($action, $client){
 						#print __CLASS__.'->'.__FUNCTION__.': shutdown'."\n";
 						$msg = $action->getVar('msg');
-						$msg->setStatus($msg->getStatus().'S');
+						
+						if($msg->getStatus() == 'O'){
+							$msg->setStatus('0S');
+						}
+						else{
+							$msg->setStatus('S');
+						}
 						
 						$client->sendQuit();
 						$client->shutdown();
