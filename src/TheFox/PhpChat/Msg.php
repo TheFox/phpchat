@@ -193,8 +193,8 @@ class Msg{
 	}
 	
 	public function setEncryptionMode($encryptionMode){
-		// S = with source node public key
-		// D = with destination node public key
+		// S = encrypted with source node public key
+		// D = encrypted with destination node public key
 		
 		#print __CLASS__.'->'.__FUNCTION__.': '.$encryptionMode."\n";
 		$this->encryptionMode = $encryptionMode;
@@ -208,7 +208,7 @@ class Msg{
 	public function setStatus($status){
 		// U = unread, got msg from another node
 		// O = origin, local node created the msg
-		// S = sent
+		// S = sent at least to one node
 		// D = delivered to destination node
 		
 		#print __CLASS__.'->'.__FUNCTION__.': '.$status."\n";
