@@ -14,7 +14,7 @@ class Cronjob extends Thread{
 	
 	#const LOOP_USLEEP = 100000;
 	const MSG_FORWARD_TO_NODES = 8;
-	const MSG_FORWARD_CYCLES_MAX = 10;
+	const MSG_FORWARD_CYCLES_MAX = 100;
 	
 	private $log;
 	private $ipcKernelConnection = null;
