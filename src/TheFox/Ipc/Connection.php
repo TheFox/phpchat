@@ -10,6 +10,7 @@ use Closure;
 class Connection{
 	
 	const LOOP_USLEEP = 100000;
+	const EXEC_USLEEP = 1000;
 	const EXEC_SYNC_TIMEOUT = 5;
 	
 	private $isServer = false;
@@ -142,7 +143,7 @@ class Connection{
 			while( time() - $timeout <= $start && $this->execs[$execsId]['clientsReturned'] < $clientsNum ){
 				#print __CLASS__.'->'.__FUNCTION__.': server: '.count($this->execs).', '.$this->execs[$execsId]['clientsReturned'].'/'.$clientsNum."\n";
 				$this->run();
-				usleep(static::LOOP_USLEEP);
+				usleep(static::EXEC_USLEEP);
 			}
 			
 			unset($this->execs[$execsId]);
@@ -156,7 +157,7 @@ class Connection{
 			$start = time();
 			while( time() - $timeout <= $start && !$this->execs[$execsId]['hasReturned'] ){
 				$this->run();
-				usleep(static::LOOP_USLEEP);
+				usleep(static::EXEC_USLEEP);
 			}
 			
 			$value = $this->execs[$execsId]['value'];

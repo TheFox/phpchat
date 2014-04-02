@@ -11,7 +11,7 @@ use TheFox\Ipc\StreamHandler as IpcStreamHandler;
 
 class Kernel extends Thread{
 	
-	const LOOP_USLEEP = 100000;
+	const LOOP_USLEEP = 10000;
 	
 	private $log;
 	private $settings;

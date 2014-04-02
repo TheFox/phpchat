@@ -106,6 +106,7 @@ class StreamHandler extends AbstractHandler{
 	}
 	
 	public function handleDataSend($handle, $data){
+		#print __CLASS__.'->'.__FUNCTION__.': '.strlen($data).''."\n";
 		$rv = @stream_socket_sendto($handle, $data);
 		
 		#print __CLASS__.'->'.__FUNCTION__.': '.(int)$rv.', "'.substr($data, 0, -1).'"'."\n";
@@ -114,10 +115,10 @@ class StreamHandler extends AbstractHandler{
 	public function handleDataRecv($handle){
 		#print __CLASS__.'->'.__FUNCTION__.': '.(int)($handle === null)."\n";
 		
-		$data = stream_socket_recvfrom($handle, 1500);
+		$data = stream_socket_recvfrom($handle, 4096);
 		$this->recv($handle, $data);
 		
-		#print __CLASS__.'->'.__FUNCTION__.': "'.$data.'"'."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': '.strlen($data).''."\n";
 	}
 	
 }
