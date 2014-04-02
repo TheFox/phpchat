@@ -199,6 +199,10 @@ class Kernel extends Thread{
 					$action->functionSet(function($action, $client){
 						$msg = $action->getVar('msg');
 						$msg->setStatus('S');
+						
+						if($client->getNode()->getIdHexStr() == $msg->getDstNodeId()){
+							$msg->setStatus('D');
+						}
 					}, array('msg' => $msg));
 					
 					$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
