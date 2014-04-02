@@ -206,9 +206,10 @@ class Msg{
 	}
 	
 	public function setStatus($status){
-		// U = unread, unsend
-		// O = origin
+		// U = unread, got msg from another node
+		// O = origin, local node created the msg
 		// S = sent
+		// D = delivered to destination node
 		
 		#print __CLASS__.'->'.__FUNCTION__.': '.$status."\n";
 		$this->status = $status;
