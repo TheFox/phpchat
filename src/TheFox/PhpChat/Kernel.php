@@ -199,12 +199,7 @@ class Kernel extends Thread{
 						#print __CLASS__.'->'.__FUNCTION__.': shutdown'."\n";
 						$msg = $action->getVar('msg');
 						
-						if($msg->getStatus() == 'O'){
-							$msg->setStatus('0S');
-						}
-						else{
-							$msg->setStatus('S');
-						}
+						$msg->setStatus('S');
 						
 						$client->sendQuit();
 						$client->shutdown();
