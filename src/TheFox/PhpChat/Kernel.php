@@ -102,6 +102,7 @@ class Kernel extends Thread{
 		$this->ipcCronjobConnection->functionAdd('tableNodeEnclose', $this, 'tableNodeEnclose');
 		$this->ipcCronjobConnection->functionAdd('getMsgDb', $this, 'getMsgDb');
 		$this->ipcCronjobConnection->functionAdd('msgDbMsgUpdate', $this, 'msgDbMsgUpdate');
+		$this->ipcCronjobConnection->functionAdd('msgDbMsgIncForwardCyclesById', $this, 'msgDbMsgIncForwardCyclesById');
 		$this->ipcCronjobConnection->functionAdd('serverConnect', $this, 'serverConnect');
 		$this->ipcCronjobConnection->functionAdd('save', $this, 'save');
 		$this->ipcCronjobConnection->connect();
@@ -281,6 +282,13 @@ class Kernel extends Thread{
 	
 	public function msgDbMsgUpdate(Msg $msg){
 		$this->getMsgDb()->msgUpdate($msg);
+	}
+	
+	public function msgDbMsgIncForwardCyclesById($msgId){
+		if(isset($this->msgDb[$msgId])){
+			$msg = $this->msgDb[$msgId];
+			$msg->incForwardCycles();
+		}
 	}
 	
 	public function getIpcConsoleConnection(){
