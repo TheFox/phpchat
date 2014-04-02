@@ -285,8 +285,9 @@ class Kernel extends Thread{
 	}
 	
 	public function msgDbMsgIncForwardCyclesById($msgId){
-		if(isset($this->msgDb[$msgId])){
-			$msg = $this->msgDb[$msgId];
+		$msgs = $this->getMsgDb()->getMsgs();
+		if(isset($msgs[$msgId])){
+			$msg = $msgs[$msgId];
 			$msg->incForwardCycles();
 		}
 	}
