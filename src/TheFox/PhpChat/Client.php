@@ -297,6 +297,21 @@ class Client{
 		}
 	}
 	
+	private function checkActions(){
+		#print __CLASS__.'->'.__FUNCTION__.': after actions'."\n";
+		$actions = $this->actionsGetByCriterion(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
+		foreach($actions as $actionsId => $action){
+			#print __CLASS__.'->'.__FUNCTION__.': after actions: '.$actionsId.', '. (int) array_search($action, $this->actions).'/'.count($this->actions)."\n";
+			
+			$actions = $this->actions;
+			$caction = array_shift($actions);
+			if($caction->getId() == $action->getId()){
+				$this->actionRemove($action);
+				$action->functionExec($this);
+			}
+		}
+	}
+	
 	public function dataRecv(){
 		$data = $this->getSocket()->read();
 		
