@@ -279,25 +279,25 @@ class Msg extends YamlStorage{
 			throw new RuntimeException('dstSslPubKey not set.', 2);
 		}
 		
-		#ve($this->getDstSslPubKey());
-		
-		$text = $this->text;
-		#$password = hash('sha512', mt_rand(0, 999999).'_'.time());
+		$text = $this->getText();
 		$password = base64_encode(Rand::data(256));
 		$passwordEncrypted = '';
+		$signAlgo = OPENSSL_ALGO_SHA1;
 		
-		if(openssl_sign($password, $sign, $this->getSsl(), OPENSSL_ALGO_SHA1)){
+		$signRv = true;
+		$signRv = openssl_sign($password, $sign, $this->getSsl(), $signAlgo);
+		if($signRv){
 			$sign = base64_encode($sign);
 			
-			if(openssl_public_encrypt($password, $cryped, $this->getDstSslPubKey())){
-				#ve($cryped);
-				#print __CLASS__.'->'.__FUNCTION__.' password: '.$cryped."\n";
+			$pubEncRv = openssl_public_encrypt($password, $cryped, $this->getDstSslPubKey());
+			if($pubEncRv){
 				$passwordBase64 = base64_encode($cryped);
 				$jsonStr = json_encode(array(
 					'password' => $passwordBase64,
 					'sign' => $sign,
+					'signAlgo' => $signAlgo,
 				));
-				#print __CLASS__.'->'.__FUNCTION__.' password: '.$jsonStr."\n";
+				
 				$gzdata = gzencode($jsonStr, 9);
 				$passwordEncrypted = base64_encode($gzdata);
 				
@@ -311,11 +311,9 @@ class Msg extends YamlStorage{
 			throw new RuntimeException('openssl_sign failed.', 102);
 		}
 		
-		#print __CLASS__.'->'.__FUNCTION__.' password('.strlen($password).'): '.$password."\n";
-		#print __CLASS__.'->'.__FUNCTION__.' passwordEncrypted: '.$passwordEncrypted."\n";
-		
 		if($passwordEncrypted){
-			if(openssl_sign($text, $sign, $this->getSsl(), OPENSSL_ALGO_SHA1)){
+			$signRv = openssl_sign($text, $sign, $this->getSsl(), $signAlgo);
+			if($signRv){
 				$sign = base64_encode($sign);
 				$textBase64 = base64_encode($text);
 				$srcUserNickname = base64_encode($this->getSrcUserNickname());
@@ -323,6 +321,7 @@ class Msg extends YamlStorage{
 				$jsonStr = json_encode(array(
 					'text' => $textBase64,
 					'sign' => $sign,
+					'signAlgo' => $signAlgo,
 					'srcUserNickname' => $srcUserNickname,
 				));
 				$data = gzencode($jsonStr, 9);
@@ -332,31 +331,23 @@ class Msg extends YamlStorage{
 				if($data !== false){
 					$iv = base64_encode($iv);
 					
-					#print __CLASS__.'->'.__FUNCTION__.' data('.strlen($data).'): '.$data."\n";
-					
 					$jsonStr = json_encode(array(
 						'data' => $data,
 						'iv' => $iv,
 					));
+					
 					$data = gzencode($jsonStr, 9);
 					$data = base64_encode($data);
 					
 					$this->setText($data);
 					
 					$checksumData = $this->getVersion().'_'.$this->getId().'_'.$this->getSrcNodeId().'_'.$this->getDstNodeId().'_'.base64_encode($this->getDstSslPubKey()).'_'.base64_encode($text).'_'.$this->getTimeCreated();
-					#print __CLASS__.'->'.__FUNCTION__.' checksumData('.strlen($checksumData).'): '.$checksumData."\n";
 					$checksumSha512Bin = hash_hmac('sha512', $checksumData, $password, true);
-					
-					#$checksumSha512Bin = hash('sha512', $keyBin, true);
 					$fingerprintHex = hash('ripemd160', $checksumSha512Bin, false);
 					$fingerprintBin = hash('ripemd160', $checksumSha512Bin, true);
-					
 					$checksumHex = hash('sha512', hash('sha512', $fingerprintBin, true));
 					$checksumHex = substr($checksumHex, 0, 8); // 4 Bytes
 					$checksum = $fingerprintHex.$checksumHex;
-					#$num = Hex::decode($fingerprintHex.$checksumHex);
-					
-					#print __CLASS__.'->'.__FUNCTION__.' checksum('.strlen($checksum).'): '.$checksum."\n";
 					
 					$this->setChecksum($checksum);
 					
@@ -368,9 +359,6 @@ class Msg extends YamlStorage{
 			throw new RuntimeException('Can\'t create password.', 103);
 		}
 		
-		#print __CLASS__.'->'.__FUNCTION__.' text: '.$this->getText()."\n";
-		#print __CLASS__.'->'.__FUNCTION__.' checksum: '.$this->getChecksum()."\n";
-		#print __CLASS__.'->'.__FUNCTION__.': done'."\n";
 		return $rv;
 	}
 	
@@ -403,16 +391,13 @@ class Msg extends YamlStorage{
 		$passwordData = gzdecode($passwordData);
 		
 		$json = json_decode($passwordData, true);
-		if($json && isset($json['password']) && isset($json['sign'])){
-			#ve($json);
-			
+		if($json && isset($json['password']) && isset($json['sign']) && isset($json['signAlgo'])){
 			$passwordData = base64_decode($json['password']);
 			$sign = base64_decode($json['sign']);
-			
-			#print __CLASS__.'->'.__FUNCTION__.': ssl = '.$this->getSsl()."\n";
+			$signAlgo = (int)$json['signAlgo'];
 			
 			if(openssl_private_decrypt($passwordData, $decrypted, $this->getSsl())){
-				if(openssl_verify($decrypted, $sign, $this->getSrcSslKeyPub(), OPENSSL_ALGO_SHA1)){
+				if(openssl_verify($decrypted, $sign, $this->getSrcSslKeyPub(), $signAlgo)){
 					$password = $decrypted;
 				}
 				else{
@@ -432,34 +417,24 @@ class Msg extends YamlStorage{
 			$data = base64_decode($data);
 			$data = gzdecode($data);
 			
-			#print __CLASS__.'->'.__FUNCTION__.' data: '.$data."\n";
-			
 			$json = json_decode($data, true);
 			if($json && isset($json['data']) && isset($json['iv'])){
-				#ve($json);
-				
 				$iv = base64_decode($json['iv']);
-				#$data = base64_decode($json['data']);
 				$data = $json['data'];
-				
-				#print __CLASS__.'->'.__FUNCTION__.' data: '.$data."\n";
 				
 				$data = openssl_decrypt($data, 'AES-256-CBC', $password, 0, $iv);
 				if($data !== false){
 					$data = gzdecode($data);
 					
-					#print __CLASS__.'->'.__FUNCTION__.' data: '.$data."\n";
-					
 					$json = json_decode($data, true);
-					if($json && isset($json['text']) && isset($json['sign']) && isset($json['srcUserNickname'])){
+					if($json && isset($json['text']) && isset($json['sign']) && isset($json['signAlgo']) && isset($json['srcUserNickname'])){
 						$text = base64_decode($json['text']);
 						$sign = base64_decode($json['sign']);
+						$signAlgo = (int)$json['signAlgo'];
 						$srcUserNickname = base64_decode($json['srcUserNickname']);
 						
-						if(openssl_verify($text, $sign, $this->getSrcSslKeyPub(), OPENSSL_ALGO_SHA1)){
+						if(openssl_verify($text, $sign, $this->getSrcSslKeyPub(), $signAlgo)){
 							$checksumData = $this->getVersion().'_'.$this->getId().'_'.$this->getSrcNodeId().'_'.$this->getDstNodeId().'_'.base64_encode($this->getDstSslPubKey()).'_'.base64_encode($text).'_'.$this->getTimeCreated();
-							#print __CLASS__.'->'.__FUNCTION__.' checksumData('.strlen($checksumData).'): '.$checksumData."\n";
-							#$checksum = hash_hmac('sha512', $checksumData, $password);
 							
 							$checksumSha512Bin = hash_hmac('sha512', $checksumData, $password, true);
 							$fingerprintHex = hash('ripemd160', $checksumSha512Bin, false);
@@ -467,9 +442,6 @@ class Msg extends YamlStorage{
 							$checksumHex = hash('sha512', hash('sha512', $fingerprintBin, true));
 							$checksumHex = substr($checksumHex, 0, 8); // 4 Bytes
 							$checksum = $fingerprintHex.$checksumHex;
-							
-							#print __CLASS__.'->'.__FUNCTION__.' checksum A ('.strlen($checksum).'): '.$checksum."\n";
-							#print __CLASS__.'->'.__FUNCTION__.' checksum B ('.strlen($this->getChecksum()).'): '.$this->getChecksum()."\n";
 							
 							if($checksum == $this->getChecksum()){
 								$this->setSrcUserNickname($srcUserNickname);
@@ -501,10 +473,6 @@ class Msg extends YamlStorage{
 		else{
 			throw new RuntimeException('no password set.', 201);
 		}
-		
-		#print __CLASS__.'->'.__FUNCTION__.' password('.strlen($password).'): '.$password."\n";
-		#print __CLASS__.'->'.__FUNCTION__.' password'."\n";
-		#ve($json);
 		
 		return $rv;
 	}
