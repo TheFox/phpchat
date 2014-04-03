@@ -24,25 +24,12 @@ class MsgDb extends YamlStorage{
 		
 		$this->data['msgs'] = array();
 		foreach($this->msgs as $msgId => $msg){
+			#print __CLASS__.'->'.__FUNCTION__.': '.$msgId."\n";
 			
-			$msgAr = array();
-			$msgAr['version'] = $msg->getVersion();
-			$msgAr['id'] = $msg->getId();
-			$msgAr['relayNodeId'] = $msg->getRelayNodeId();
-			$msgAr['srcNodeId'] = $msg->getSrcNodeId();
-			$msgAr['srcSslKeyPub'] = base64_encode($msg->getSrcSslKeyPub());
-			$msgAr['dstNodeId'] = $msg->getDstNodeId();
-			$msgAr['text'] = $msg->getText();
-			$msgAr['password'] = $msg->getPassword();
-			$msgAr['checksum'] = $msg->getChecksum();
-			$msgAr['sentNodes'] = $msg->getSentNodes();
-			$msgAr['relayCount'] = $msg->getRelayCount();
-			$msgAr['forwardCycles'] = $msg->getForwardCycles();
-			$msgAr['encryptionMode'] = $msg->getEncryptionMode();
-			$msgAr['status'] = $msg->getStatus();
-			$msgAr['timeCreated'] = $msg->getTimeCreated();
-			
-			$this->data['msgs'][$msgAr['id']] = $msgAr;
+			$this->data['msgs'][$msgId] = array(
+				'path' => $msg->getFilePath(),
+			);
+			$msg->save();
 		}
 		
 		$rv = parent::save();
@@ -56,28 +43,13 @@ class MsgDb extends YamlStorage{
 		
 		if(parent::load()){
 			
-			if(isset($this->data['msgs']) && $this->data['msgs']){
+			if(array_key_exists('msgs', $this->data) && $this->data['msgs']){
 				foreach($this->data['msgs'] as $msgId => $msgAr){
-					
-					$msg = new Msg();
-					$msg->setVersion($msgAr['version']);
-					$msg->setId($msgAr['id']);
-					$msg->setRelayNodeId($msgAr['relayNodeId']);
-					$msg->setSrcNodeId($msgAr['srcNodeId']);
-					$msg->setSrcSslKeyPub(base64_decode($msgAr['srcSslKeyPub']));
-					$msg->setDstNodeId($msgAr['dstNodeId']);
-					$msg->setText($msgAr['text']);
-					$msg->setPassword($msgAr['password']);
-					$msg->setChecksum($msgAr['checksum']);
-					$msg->setSentNodes($msgAr['sentNodes']);
-					$msg->setRelayCount($msgAr['relayCount']);
-					$msg->setForwardCycles($msgAr['forwardCycles']);
-					$msg->setEncryptionMode($msgAr['encryptionMode']);
-					$msg->setStatus($msgAr['status']);
-					$msg->setTimeCreated($msgAr['timeCreated']);
-					
-					$msg->setMsgDb($this);
-					$this->msgs[$msg->getId()] = $msg;
+					$msg = new Msg($msgAr['path']);
+					$msg->setDatadirBasePath($this->getDatadirBasePath());
+					if($msg->load()){
+						$this->msgs[$msg->getId()] = $msg;
+					}
 				}
 			}
 			unset($this->data['msgs']);
@@ -89,7 +61,10 @@ class MsgDb extends YamlStorage{
 	}
 	
 	public function msgAdd(Msg $msg){
+		$msg->setFilePath($this->getDatadirBasePath().'/msg_'.$msg->getId().'.yml');
+		$msg->setDatadirBasePath($this->getDatadirBasePath());
 		$msg->setMsgDb($this);
+		
 		$this->msgs[$msg->getId()] = $msg;
 		$this->setDataChanged(true);
 	}

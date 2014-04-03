@@ -7,61 +7,44 @@ use RuntimeException;
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
 
+use TheFox\Yaml\YamlStorage;
 use TheFox\Utilities\Rand;
 
-class Msg{
+class Msg extends YamlStorage{
 	
-	private $version = 1;
-	private $id = '';
-	private $relayNodeId = '';
-	private $srcNodeId = '';
 	private $srcSslKeyPub = '';
-	private $srcUserNickname = '';
-	private $dstNodeId = '';
 	private $dstSslPubKey = '';
-	private $text = '';
-	private $password = '';
-	private $checksum = '';
-	private $sentNodes = array();
-	private $relayCount = 0;
-	private $forwardCycles = 0;
-	private $encryptionMode = '';
-	private $status = '';
-	private $timeCreated = 0;
 	
 	private $ssl = null;
 	private $msgDb = null;
 	
-	public function __construct($text = ''){
-		try{
-			$this->setId((string)Uuid::uuid4());
-		}
-		catch(UnsatisfiedDependencyException $e){
-			# TODO
-		}
+	public function __construct($filePath = null){
+		parent::__construct($filePath);
 		
-		$this->setText($text);
-		$this->setTimeCreated(time());
+		$this->data['version'] = 1;
+		$this->data['id'] = '';
+		$this->data['relayNodeId'] = '';
+		$this->data['srcNodeId'] = '';
+		#$this->data['srcSslKeyPub'] = '';
+		$this->data['srcUserNickname'] = '';
+		$this->data['dstNodeId'] = '';
+		$this->data['text'] = '';
+		$this->data['password'] = ''; 
+		$this->data['checksum'] = '';
+		$this->data['sentNodes'] = array();
+		$this->data['relayCount'] = 0;
+		$this->data['forwardCycles'] = 0;
+		$this->data['encryptionMode'] = '';
+		$this->data['status'] = '';
+		$this->data['timeCreated'] = time();
+		
 	}
 	
 	public function __sleep(){
 		return array(
-			'version',
-			'id',
-			'relayNodeId',
-			'srcNodeId',
+			'data',
 			'srcSslKeyPub',
-			'srcUserNickname',
-			'dstNodeId',
-			'text',
-			'password',
-			'checksum',
-			'sentNodes',
-			'relayCount',
-			'forwardCycles',
-			'encryptionMode',
-			'status',
-			'timeCreated',
+			'dstSslPubKey',
 		);
 	}
 	
@@ -69,36 +52,63 @@ class Msg{
 		return __CLASS__.'->{'.$this->getId().'}';
 	}
 	
+	public function save(){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+		$this->data['srcSslKeyPub'] = base64_encode($this->srcSslKeyPub);
+		return parent::save();
+	}
+	
+	public function load(){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+		if(parent::load()){
+			$this->setSrcSslKeyPub(base64_decode($this->data['srcSslKeyPub']));
+			unset($this->data['srcSslKeyPub']);
+			
+			return true;
+		}
+		return false;
+	}
+	
 	public function setVersion($version){
-		$this->version = $version;
+		$this->data['version'] = $version;
 	}
 	
 	public function getVersion(){
-		return $this->version;
+		return $this->data['version'];
 	}
 	
 	public function setId($id){
-		$this->id = $id;
+		$this->data['id'] = $id;
 	}
 	
 	public function getId(){
-		return $this->id;
+		if(!isset($this->data['id'])){
+			try{
+				$this->data['id'] = (string)Uuid::uuid4();
+			}
+			catch(UnsatisfiedDependencyException $e){
+				# TODO
+			}
+		}
+		return $this->data['id'];
 	}
 	
 	public function setRelayNodeId($relayNodeId){
-		$this->relayNodeId = $relayNodeId;
+		$this->data['relayNodeId'] = $relayNodeId;
 	}
 	
 	public function getRelayNodeId(){
-		return $this->relayNodeId;
+		return $this->data['relayNodeId'];
 	}
 	
 	public function setSrcNodeId($srcNodeId){
-		$this->srcNodeId = $srcNodeId;
+		$this->data['srcNodeId'] = $srcNodeId;
 	}
 	
 	public function getSrcNodeId(){
-		return $this->srcNodeId;
+		return $this->data['srcNodeId'];
 	}
 	
 	public function setSrcSslKeyPub($srcSslKeyPub){
@@ -110,19 +120,19 @@ class Msg{
 	}
 	
 	public function setSrcUserNickname($srcUserNickname){
-		$this->srcUserNickname = $srcUserNickname;
+		$this->data['srcUserNickname'] = $srcUserNickname;
 	}
 	
 	public function getSrcUserNickname(){
-		return $this->srcUserNickname;
+		return $this->data['srcUserNickname'];
 	}
 	
 	public function setDstNodeId($dstNodeId){
-		$this->dstNodeId = $dstNodeId;
+		$this->data['dstNodeId'] = $dstNodeId;
 	}
 	
 	public function getDstNodeId(){
-		return $this->dstNodeId;
+		return $this->data['dstNodeId'];
 	}
 	
 	public function setDstSslPubKey($dstSslPubKey){
@@ -136,60 +146,60 @@ class Msg{
 	}
 	
 	public function setText($text){
-		$this->text = $text;
+		$this->data['text'] = $text;
 	}
 	
 	public function getText(){
-		return $this->text;
+		return $this->data['text'];
 	}
 	
 	public function setPassword($password){
-		$this->password = $password;
+		$this->data['password'] = $password;
 	}
 	
 	public function getPassword(){
-		return $this->password;
+		return $this->data['password'];
 	}
 	
 	public function setChecksum($checksum){
-		$this->checksum = $checksum;
+		$this->data['checksum'] = $checksum;
 	}
 	
 	public function getChecksum(){
-		return $this->checksum;
+		return $this->data['checksum'];
 	}
 	
 	public function setSentNodes($sentNodes){
-		$this->sentNodes = $sentNodes;
+		$this->data['sentNodes'] = $sentNodes;
 	}
 	
 	public function addSentNode($nodeId){
-		$this->sentNodes[] = $nodeId;
+		$this->data['sentNodes'][] = $nodeId;
 	}
 	
 	public function getSentNodes(){
-		return $this->sentNodes;
+		return $this->data['sentNodes'];
 	}
 	
 	public function setRelayCount($relayCount){
-		$this->relayCount = (int)$relayCount;
+		$this->data['relayCount'] = (int)$relayCount;
 	}
 	
 	public function getRelayCount(){
-		return((int)$this->relayCount);
+		return((int)$this->data['relayCount']);
 	}
 	
 	public function setForwardCycles($forwardCycles){
-		$this->forwardCycles = (int)$forwardCycles;
+		$this->data['forwardCycles'] = (int)$forwardCycles;
 	}
 	
 	public function incForwardCycles(){
 		#$this->setForwardCycles($this->getForwardCycles() + 1);
-		$this->forwardCycles++;
+		$this->data['forwardCycles']++;
 	}
 	
 	public function getForwardCycles(){
-		return((int)$this->forwardCycles);
+		return((int)$this->data['forwardCycles']);
 	}
 	
 	public function setEncryptionMode($encryptionMode){
@@ -197,12 +207,12 @@ class Msg{
 		// D = encrypted with destination node public key
 		
 		#print __CLASS__.'->'.__FUNCTION__.': '.$encryptionMode."\n";
-		$this->encryptionMode = $encryptionMode;
+		$this->data['encryptionMode'] = $encryptionMode;
 		$this->setDataChanged(true);
 	}
 	
 	public function getEncryptionMode(){
-		return $this->encryptionMode;
+		return $this->data['encryptionMode'];
 	}
 	
 	public function setStatus($status){
@@ -215,22 +225,22 @@ class Msg{
 		//		or dstNodeId is in sentNodes array.
 		
 		#print __CLASS__.'->'.__FUNCTION__.': '.$status."\n";
-		if($this->status != 'D'){
-			$this->status = $status;
+		if($this->data['status'] != 'D'){
+			$this->data['status'] = $status;
 			$this->setDataChanged(true);
 		}
 	}
 	
 	public function getStatus(){
-		return $this->status;
+		return $this->data['status'];
 	}
 	
 	public function setTimeCreated($timeCreated){
-		$this->timeCreated = (int)$timeCreated;
+		$this->data['timeCreated'] = (int)$timeCreated;
 	}
 	
 	public function getTimeCreated(){
-		return((int)$this->timeCreated);
+		return((int)$this->data['timeCreated']);
 	}
 	
 	
@@ -256,12 +266,6 @@ class Msg{
 	
 	public function getMsgDb(){
 		return $this->msgDb;
-	}
-	
-	private function setDataChanged($changed = true){
-		if($this->getMsgDb()){
-			$this->getMsgDb()->setDataChanged($changed);
-		}
 	}
 	
 	public function encrypt(){
