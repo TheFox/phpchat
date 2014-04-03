@@ -53,10 +53,11 @@ class Table extends YamlStorage{
 					$bucket = new Bucket($bucketAr['path']);
 					$bucket->setDatadirBasePath($this->getDatadirBasePath());
 					$bucket->setLocalNode($this->getLocalNode());
-					$bucket->load();
 					
-					$this->buckets[$bucketId] = $bucket;
-					$this->bucketsByMask[$bucket->getMask()] = $bucket;
+					if($bucket->load()){
+						$this->buckets[$bucketId] = $bucket;
+						$this->bucketsByMask[$bucket->getMask()] = $bucket;
+					}
 				}
 			}
 			

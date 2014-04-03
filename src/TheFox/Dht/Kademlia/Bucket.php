@@ -58,9 +58,9 @@ class Bucket extends YamlStorage{
 					
 					$node = new Node($nodeAr['path']);
 					$node->setDatadirBasePath($this->getDatadirBasePath());
-					$node->load();
-					
-					$this->nodes[$this->nodesId] = $node;
+					if($node->load()){
+						$this->nodes[$this->nodesId] = $node;
+					}
 					
 					#print __CLASS__.'->'.__FUNCTION__.': node '.$this->nodesId."\n";
 				}
