@@ -337,7 +337,7 @@ class Cronjob extends Thread{
 				}
 				
 				print __CLASS__.'->'.__FUNCTION__.': msgIds'."\n";
-				ve($msgIds);
+				#ve($msgIds);
 				
 				if($msgs){
 					$serverConnectArgs = array($node->getIp(), $node->getPort(), false, false, $msgIds);
