@@ -145,7 +145,7 @@ class Cronjob extends Thread{
 	
 	private function msgDbInitNodes(){
 		$this->log->debug(__FUNCTION__);
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		if(!$this->msgDb){
 			throw new RuntimeException('msgDb not set', 1);
@@ -199,10 +199,10 @@ class Cronjob extends Thread{
 		
 		$this->msgDb = $this->getIpcKernelConnection()->execSync('getMsgDb', array(), 10);
 		
-		print __CLASS__.'->'.__FUNCTION__.': msgDb B '.(int)($this->msgDb===null)."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': msgDb B '.(int)($this->msgDb===null)."\n";
 		#ve($this->msgDb);
 		
-		print __CLASS__.'->'.__FUNCTION__.': done'."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': done'."\n";
 	}
 	
 	private function msgDbSendAll(){

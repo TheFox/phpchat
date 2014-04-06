@@ -48,6 +48,7 @@ class MsgDb extends YamlStorage{
 					$msg = new Msg($msgAr['path']);
 					$msg->setDatadirBasePath($this->getDatadirBasePath());
 					if($msg->load()){
+						#print __CLASS__.'->'.__FUNCTION__.': '.$msg->getId().', '.$msg->getStatus()."\n";
 						$this->msgs[$msg->getId()] = $msg;
 					}
 				}
@@ -61,6 +62,9 @@ class MsgDb extends YamlStorage{
 	}
 	
 	public function msgAdd(Msg $msg){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': '.$msg->getId()."\n";
+		
 		$msg->setFilePath($this->getDatadirBasePath().'/msg_'.$msg->getId().'.yml');
 		$msg->setDatadirBasePath($this->getDatadirBasePath());
 		$msg->setMsgDb($this);
