@@ -84,9 +84,13 @@ class Msg extends YamlStorage{
 	}
 	
 	public function getId(){
-		if(!isset($this->data['id'])){
+		#print __CLASS__.'->'.__FUNCTION__.': "'.$this->data['id'].'"'."\n";
+		
+		if(!isset($this->data['id']) || !$this->data['id']){
+			#print __CLASS__.'->'.__FUNCTION__.': no set'."\n";
 			try{
 				$this->data['id'] = (string)Uuid::uuid4();
+				#print __CLASS__.'->'.__FUNCTION__.': new id: '.$this->data['id']."\n";
 			}
 			catch(UnsatisfiedDependencyException $e){
 				# TODO
