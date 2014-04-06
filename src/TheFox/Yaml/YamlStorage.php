@@ -9,7 +9,7 @@ class YamlStorage{
 	private $datadirBasePath = null;
 	private $filePath = null;
 	public $data = array();
-	private $dataChanged = false;
+	public $dataChanged = false;
 	private $isLoaded = false;
 	
 	public function __construct($filePath = null){

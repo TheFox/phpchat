@@ -43,6 +43,7 @@ class Msg extends YamlStorage{
 	public function __sleep(){
 		return array(
 			'data',
+			'dataChanged',
 			'srcSslKeyPub',
 			'dstSslPubKey',
 		);
