@@ -13,6 +13,7 @@ use TheFox\Utilities\Rand;
 class Msg extends YamlStorage{
 	
 	private $srcSslKeyPub = '';
+	private $srcUserNickname = '';
 	private $dstSslPubKey = '';
 	
 	private $ssl = null;
@@ -26,7 +27,7 @@ class Msg extends YamlStorage{
 		$this->data['relayNodeId'] = '';
 		$this->data['srcNodeId'] = '';
 		#$this->data['srcSslKeyPub'] = '';
-		$this->data['srcUserNickname'] = '';
+		#$this->data['srcUserNickname'] = '';
 		$this->data['dstNodeId'] = '';
 		$this->data['text'] = '';
 		$this->data['password'] = ''; 
@@ -45,6 +46,7 @@ class Msg extends YamlStorage{
 			'data',
 			'dataChanged',
 			'srcSslKeyPub',
+			'srcUserNickname',
 			'dstSslPubKey',
 		);
 	}
@@ -125,11 +127,11 @@ class Msg extends YamlStorage{
 	}
 	
 	public function setSrcUserNickname($srcUserNickname){
-		$this->data['srcUserNickname'] = $srcUserNickname;
+		$this->srcUserNickname = $srcUserNickname;
 	}
 	
 	public function getSrcUserNickname(){
-		return $this->data['srcUserNickname'];
+		return $this->srcUserNickname;
 	}
 	
 	public function setDstNodeId($dstNodeId){
