@@ -272,8 +272,7 @@ class Cronjob extends Thread{
 		}
 		
 		$processedMsgs = array_unique($processedMsgs);
-		print __CLASS__.'->'.__FUNCTION__.': processedMsgs: '.count($processedMsgs)."\n"; # TODO
-		
+		#print __CLASS__.'->'.__FUNCTION__.': processedMsgs: '.count($processedMsgs)."\n"; # TODO
 		
 		foreach($processedMsgs as $msgId => $msg){
 			#print __CLASS__.'->'.__FUNCTION__.': processedMsg A: '. $msg->getId() ."\n"; # TODO
@@ -298,10 +297,7 @@ class Cronjob extends Thread{
 				unset($processedMsgs[$msgId]);
 			}
 		}
-		foreach($processedMsgs as $msgId => $msg){
-			print __CLASS__.'->'.__FUNCTION__.': processedMsg B: '. $msg->getId() .', '.$msg->getDstNodeId() ."\n"; # TODO
-			
-		}
+		#foreach($processedMsgs as $msgId => $msg){ print __CLASS__.'->'.__FUNCTION__.': processedMsg B: '. $msg->getId() .', '.$msg->getDstNodeId() ."\n"; }
 		
 		$dstNode = new Node();
 		$dstNode->setIdHexStr($msg->getDstNodeId());
@@ -335,8 +331,7 @@ class Cronjob extends Thread{
 					$updateMsgs[$msg->getId()] = $msg;
 				}
 				
-				print __CLASS__.'->'.__FUNCTION__.': msgIds'."\n";
-				#ve($msgIds);
+				#print __CLASS__.'->'.__FUNCTION__.': msgIds'."\n"; ve($msgIds);
 				
 				if($msgs){
 					$serverConnectArgs = array($node->getIp(), $node->getPort(), false, false, $msgIds);
