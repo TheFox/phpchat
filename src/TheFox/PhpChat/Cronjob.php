@@ -177,21 +177,16 @@ class Cronjob extends Thread{
 					#print __CLASS__.'->'.__FUNCTION__.': found node'."\n";
 					#print __CLASS__.'->'.__FUNCTION__.': pub: '.$this->settings->data['node']['sslKeyPubPath']."\n";
 					
-					
 					$msg->setSrcSslKeyPub($this->localNode->getSslKeyPub());
 					$msg->setDstSslPubKey($this->localNode->getSslKeyPub());
 					$msg->setSslKeyPrvPath($this->settings->data['node']['sslKeyPrvPath'], $this->settings->data['node']['sslKeyPrvPass']);
-					#$text = $msg->decrypt();
 					
 					$msg->setText($msg->decrypt());
-					$msg->setEncryptionMode('D'); # TODO
+					$msg->setEncryptionMode('D');
 					$msg->setDstSslPubKey($onode->getSslKeyPub());
 					$msg->encrypt();
 					
-					$this->getIpcKernelConnection()->execAsync('msgDbMsgUpdate', array($msg)); # TODO
-					
-					#ve($text);
-					
+					$this->getIpcKernelConnection()->execAsync('msgDbMsgUpdate', array($msg));
 				}
 				
 			}

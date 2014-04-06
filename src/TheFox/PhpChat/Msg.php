@@ -26,8 +26,6 @@ class Msg extends YamlStorage{
 		$this->data['id'] = '';
 		$this->data['relayNodeId'] = '';
 		$this->data['srcNodeId'] = '';
-		#$this->data['srcSslKeyPub'] = '';
-		#$this->data['srcUserNickname'] = '';
 		$this->data['dstNodeId'] = '';
 		$this->data['text'] = '';
 		$this->data['password'] = ''; 
