@@ -291,11 +291,15 @@ class Cronjob extends Thread{
 					&& $forwardCycles >= static::MSG_FORWARD_CYCLES_MAX
 				
 				|| $sentNodesC >= static::MSG_FORWARD_TO_NODES_MAX
-				
-				|| in_array($msg->getDstNodeId(), $msg->getSentNodes())
 			){
 				print __CLASS__.'->'.__FUNCTION__.': set X: '. $msg->getId() ."\n"; # TODO
 				$this->getIpcKernelConnection()->execAsync('msgDbMsgSetStatusById', array($msg->getId(), 'X'));
+				unset($processedMsgs[$msgId]);
+			}
+			
+			elseif( in_array($msg->getDstNodeId(), $msg->getSentNodes()) ){
+				print __CLASS__.'->'.__FUNCTION__.': set D: '. $msg->getId() ."\n"; # TODO
+				$this->getIpcKernelConnection()->execAsync('msgDbMsgSetStatusById', array($msg->getId(), 'D'));
 				unset($processedMsgs[$msgId]);
 			}
 		}
