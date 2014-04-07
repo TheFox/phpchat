@@ -165,7 +165,7 @@ class Cronjob extends Thread{
 		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
 			if(
 				$msg->getDstNodeId()
-				&& $msg->getSrcNodeId() == $this->localNode->getIdHexStr()
+				&& $msg->getStatus() == 'O'
 				&& $msg->getEncryptionMode() == 'S'
 			){
 				#print __CLASS__.'->'.__FUNCTION__.': find node '.$msg->getId()."\n";
