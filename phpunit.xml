@@ -23,6 +23,7 @@
 		<testsuite name="My Test Suite">
 			<file>tests/BasicTest.php</file>
 			<file>tests/NodeTest.php</file>
+			<file>tests/MsgTest.php</file>
 		</testsuite>
 	</testsuites>
 </phpunit>
