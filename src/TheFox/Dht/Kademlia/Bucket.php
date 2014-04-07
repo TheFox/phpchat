@@ -58,6 +58,7 @@ class Bucket extends YamlStorage{
 					
 					$node = new Node($nodeAr['path']);
 					$node->setDatadirBasePath($this->getDatadirBasePath());
+					$node->setBucket($this);
 					if($node->load()){
 						$this->nodes[$this->nodesId] = $node;
 					}
