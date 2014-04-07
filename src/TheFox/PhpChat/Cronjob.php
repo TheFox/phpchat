@@ -172,10 +172,8 @@ class Cronjob extends Thread{
 				
 				$node = new Node();
 				$node->setIdHexStr($msg->getDstNodeId());
-				
-				$onode = $this->table->nodeEnclose($node);
-				
-				if($onode->getSslKeyPub()){
+				$onode = $this->table->nodeFindInBuckets($node);
+				if($onode && $onode->getSslKeyPub()){
 					#print __CLASS__.'->'.__FUNCTION__.': found node'."\n";
 					#print __CLASS__.'->'.__FUNCTION__.': pub: '.$this->settings->data['node']['sslKeyPubPath']."\n";
 					
@@ -306,6 +304,7 @@ class Cronjob extends Thread{
 		foreach($processedMsgs as $msgId => $msg){
 			$dstNode = new Node();
 			$dstNode->setIdHexStr($msg->getDstNodeId());
+			
 			$onode = $this->table->nodeFindInBuckets($dstNode);
 			if($onode){
 				$nodes[] = $onode;
