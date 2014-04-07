@@ -130,8 +130,12 @@ class Node extends YamlStorage{
 	
 	public static function genSslKeyFingerprint($key){
 		$key = str_replace("\r", '', $key);
-		$key = str_replace("-----BEGIN PUBLIC KEY-----\n", '', $key);
-		$key = str_replace("\n-----END PUBLIC KEY-----\n", '', $key);
+		$key = str_replace("\n", '', $key);
+		#$key = str_replace("-----BEGIN PUBLIC KEY-----\n", '', $key);
+		$key = str_replace("-----BEGIN PUBLIC KEY-----", '', $key);
+		#$key = str_replace("\n-----END PUBLIC KEY-----\n", '', $key);
+		$key = str_replace("-----END PUBLIC KEY-----", '', $key);
+		#ve($key);
 		
 		$keyBin = base64_decode($key);
 		$keyBinSha512Bin = hash('sha512', $keyBin, true);
