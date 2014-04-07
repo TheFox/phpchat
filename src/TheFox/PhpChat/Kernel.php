@@ -208,17 +208,14 @@ class Kernel extends Thread{
 				}, array('msgs' => $msgs));
 				$clientActions[] = $action;
 				
-				$action = new ClientAction(ClientAction::CRITERION_AFTER_MSG_RESPONSE);
-				$action->functionSet(function($action, $client){
-					$msgs = $action->getVar('msgs');
-					foreach($msgs as $msgId => $msg){
-						$msg->setStatus('S');
-						
-						if($client->getNode()->getIdHexStr() == $msg->getDstNodeId()){
-							$msg->setStatus('D');
-						}
-					}
-				}, array('msgs' => $msgs));
+				// Wait to get response. Don't disconnect instantly after sending.
+				foreach($msgs as $msgId => $msg){
+					$action = new ClientAction(ClientAction::CRITERION_AFTER_MSG_RESPONSE);
+					$action->functionSet(function($action, $client){
+						#print __CLASS__.'->'.__FUNCTION__.': CRITERION_AFTER_MSG_RESPONSE'."\n";
+					});
+					$clientActions[] = $action;
+				}
 				
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
 				$action->functionSet(function($action, $client){

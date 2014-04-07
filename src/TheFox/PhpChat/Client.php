@@ -823,7 +823,18 @@ class Client{
 				if($request){
 					#ve($request);
 					
-					$request['data']['msg']->addSentNode($this->getNode()->getIdHexStr());
+					$msg = $request['data']['msg'];
+					$msg->addSentNode($this->getNode()->getIdHexStr());
+					$msg->setStatus('S');
+					if($this->getNode()->getIdHexStr() == $msg->getDstNodeId()){
+						$msg->setStatus('D');
+					}
+					
+					$action = $this->actionGetByCriterion(ClientAction::CRITERION_AFTER_MSG_RESPONSE_SUCCESSFULL);
+					if($action){
+						$this->actionRemove($action);
+						$action->functionExec($this);
+					}
 				}
 				else{
 					$this->sendError(900, $msgName);
