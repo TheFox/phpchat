@@ -220,6 +220,17 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$this->assertTrue( strIsUuid($msg->getId()) );
 	}
 	
+	public function testStatus(){
+		$msg = new Msg();
+		
+		$msg->setStatus('R');
+		$this->assertEquals('R', $msg->getStatus());
+		
+		$msg->setStatus('D');
+		$msg->setStatus('U');
+		$this->assertEquals('D', $msg->getStatus());
+	}
+	
 	public function testSave(){
 		#$this->markTestIncomplete('This test has not been implemented yet.');
 		$msg = new Msg('data/test_msg.yml');
