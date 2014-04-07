@@ -65,18 +65,6 @@ class Cronjob extends Thread{
 		while(!$this->getExit()){
 			#print __CLASS__.'->'.__FUNCTION__.': '.$this->getExit().', '.$hours.', '.$minutes.', '.$seconds."\n";
 			
-			$seconds++;
-			if($seconds >= 60){
-				$seconds = 0;
-				$minutes++;
-				
-				print __CLASS__.'->'.__FUNCTION__.': '.$this->getExit().', '.$hours.', '.$minutes.', '.$seconds."\n";
-			}
-			if($minutes >= 60){
-				$minutes = 0;
-				$hours++;
-			}
-			
 			if($seconds == 0){
 				$this->msgDbInit();
 			}
@@ -96,10 +84,20 @@ class Cronjob extends Thread{
 			
 			$this->getIpcKernelConnection()->run();
 			
-			#usleep(static::LOOP_USLEEP);
+			
+			$seconds++;
+			if($seconds >= 60){
+				$seconds = 0;
+				$minutes++;
+				
+				print __CLASS__.'->'.__FUNCTION__.': '.$this->getExit().', '.$hours.', '.$minutes.', '.$seconds."\n";
+			}
+			if($minutes >= 60){
+				$minutes = 0;
+				$hours++;
+			}
 			sleep(1);
 			
-			#break; # TODO
 		}
 		
 		$this->shutdown();
