@@ -786,13 +786,14 @@ class Client{
 							
 							try{
 								$msg->decrypt();
+								#print __CLASS__.'->'.__FUNCTION__.': decrypt ok'."\n"; # TODO
 							}
 							catch(Exception $e){
-								print __CLASS__.'->'.__FUNCTION__.': could not decrypt msg: '.$e->getMessage()."\n"; # TODO
+								#print __CLASS__.'->'.__FUNCTION__.': could not decrypt msg: '.$e->getMessage()."\n"; # TODO
 							}
 						}
 						else{
-							print __CLASS__.'->'.__FUNCTION__.': msg not for me'."\n"; # TODO
+							#print __CLASS__.'->'.__FUNCTION__.': msg not for me'."\n"; # TODO
 						}
 						
 						$this->getMsgDb()->msgAdd($msg);

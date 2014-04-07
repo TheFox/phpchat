@@ -200,6 +200,8 @@ class Kernel extends Thread{
 				
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
 				$action->functionSet(function($action, $client){
+					#print __CLASS__.'->'.__FUNCTION__.': send msgs'."\n";
+					
 					$msgs = $action->getVar('msgs');
 					foreach($msgs as $msgId => $msg){
 						#print __CLASS__.'->'.__FUNCTION__.': send msg '.$msg->getId()."\n";
@@ -219,6 +221,8 @@ class Kernel extends Thread{
 				
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
 				$action->functionSet(function($action, $client){
+					#print __CLASS__.'->'.__FUNCTION__.': shutdown'."\n";
+					
 					$client->sendQuit();
 					$client->shutdown();
 				});
