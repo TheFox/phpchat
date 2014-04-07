@@ -16,10 +16,10 @@ class NodeTest extends PHPUnit_Framework_TestCase{
 	}
 	
 	public function testSave(){
-		$node = new Node('data/node_test.yml');
-		$node->setDataChanged(true);
+		$node = new Node('data/test_node.yml');
 		$node->setDatadirBasePath('.');
-		$node->setIdHexStr('cde86e58-c8dd-48d1-9d18-cb4d104636b0');
+		$node->setDataChanged(true);
+		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
 		
 		$node->setSslKeyPub('-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA2+wZQQSxQXaxUmL/bg7O
@@ -37,7 +37,7 @@ O5mYMzSLyuOXR5xhBhG7fjsCAwEAAQ==
 -----END PUBLIC KEY-----
 ');
 		
-		$this->assertEquals('cde86e58-c8dd-48d1-9d18-cb4d104636b0', $node->getIdHexStr());
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
 		$this->assertEquals('FC_BtK4HvbdX9wNQ6hGopSrFxs71SuuwMZra', $node->getSslKeyPubFingerprint());
 		
 		$this->assertTrue( (bool)$node->save() );
@@ -47,14 +47,14 @@ O5mYMzSLyuOXR5xhBhG7fjsCAwEAAQ==
 	* @depends testSave
 	*/
 	public function testLoad(){
-		$node = new Node('data/node_test.yml');
+		$node = new Node('data/test_node.yml');
 		$node->setDatadirBasePath('.');
 		
 		$this->assertTrue($node->load());
-		$this->assertEquals('cde86e58-c8dd-48d1-9d18-cb4d104636b0', $node->getIdHexStr());
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
 		$this->assertEquals('FC_BtK4HvbdX9wNQ6hGopSrFxs71SuuwMZra', $node->getSslKeyPubFingerprint());
 		
-		#unlink('data/node_test.yml');
+		#unlink('data/test_node.yml');
 	}
 	
 	public function testSslKeyPubFingerprintVerify(){
