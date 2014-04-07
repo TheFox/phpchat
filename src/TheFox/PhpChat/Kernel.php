@@ -202,7 +202,7 @@ class Kernel extends Thread{
 				$action->functionSet(function($action, $client){
 					$msgs = $action->getVar('msgs');
 					foreach($msgs as $msgId => $msg){
-						print __CLASS__.'->'.__FUNCTION__.': send msg '.$msg->getId()."\n";
+						#print __CLASS__.'->'.__FUNCTION__.': send msg '.$msg->getId()."\n";
 						$client->sendMsg($msg);
 					}
 				}, array('msgs' => $msgs));
