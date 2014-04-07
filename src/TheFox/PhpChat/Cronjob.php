@@ -70,6 +70,7 @@ class Cronjob extends Thread{
 			}
 			if($hours == 0 && $minutes == 0 && $seconds == 0){
 				$this->pingClosestNodes();
+				$this->msgDbInit();
 			}
 			elseif($hours == 0 && $minutes == 1 && $seconds == 0){
 				$this->pingClosestNodes();
