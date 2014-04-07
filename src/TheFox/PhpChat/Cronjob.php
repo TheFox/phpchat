@@ -309,7 +309,7 @@ class Cronjob extends Thread{
 		
 		$updateMsgs = array();
 		foreach($nodes as $nodeId => $node){
-			print __CLASS__.'->'.__FUNCTION__.': node '. $node->getIdHexStr() ."\n";
+			#print __CLASS__.'->'.__FUNCTION__.': node '. $node->getIdHexStr() ."\n";
 			
 			if($node->getIp() && $node->getPort()){
 				#print __CLASS__.'->'.__FUNCTION__.': node '. $node->getIdHexStr() ."\n";
@@ -319,7 +319,7 @@ class Cronjob extends Thread{
 				
 				foreach($processedMsgs as $msgId => $msg){
 					if($msg->getRelayNodeId() != $node->getIdHexStr() && !in_array($node->getIdHexStr(), $msg->getSentNodes())){
-						print __CLASS__.'->'.__FUNCTION__.': processedMsg C: '. $msg->getId() .' to '.$msg->getDstNodeId() ."\n"; # TODO
+						#print __CLASS__.'->'.__FUNCTION__.': '. $msg->getId() .' to '.$msg->getDstNodeId().' via '.$node->getIdHexStr() ."\n"; # TODO
 						
 						$msgs[] = $msg;
 						
@@ -335,7 +335,7 @@ class Cronjob extends Thread{
 				
 				if($msgs){
 					$serverConnectArgs = array($node->getIp(), $node->getPort(), false, false, $msgIds);
-					#$rv = $this->getIpcKernelConnection()->execSync('serverConnect', $serverConnectArgs);
+					$rv = $this->getIpcKernelConnection()->execSync('serverConnect', $serverConnectArgs);
 				}
 				
 				
