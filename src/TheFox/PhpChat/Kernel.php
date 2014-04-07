@@ -99,7 +99,6 @@ class Kernel extends Thread{
 		$this->ipcCronjobConnection->functionAdd('getSettings', $this, 'getSettings');
 		$this->ipcCronjobConnection->functionAdd('getLocalNode', $this, 'getLocalNode');
 		$this->ipcCronjobConnection->functionAdd('getTable', $this, 'getTable');
-		$this->ipcCronjobConnection->functionAdd('tableNodeEnclose', $this, 'tableNodeEnclose');
 		$this->ipcCronjobConnection->functionAdd('getMsgDb', $this, 'getMsgDb');
 		$this->ipcCronjobConnection->functionAdd('msgDbMsgUpdate', $this, 'msgDbMsgUpdate');
 		$this->ipcCronjobConnection->functionAdd('msgDbMsgIncForwardCyclesById', $this, 'msgDbMsgIncForwardCyclesById');
@@ -268,15 +267,6 @@ class Kernel extends Thread{
 	public function getTable(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		return $this->table;
-	}
-	
-	public function tableNodeEnclose(Node $node){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		#ve($node);
-		
-		$enode = $this->getTable()->nodeEnclose($node);
-		
-		#ve($enode);
 	}
 	
 	public function getAddressbook(){
