@@ -263,6 +263,16 @@ class Client{
 		return $rv;
 	}
 	
+	private function actionGetByCriterion($criterion){
+		foreach($this->actions as $actionsId => $action){
+			if($action->hasCriterion($criterion)){
+				return $action;
+			}
+		}
+		
+		return null;
+	}
+	
 	public function actionRemove(ClientAction $action){
 		#print __CLASS__.'->'.__FUNCTION__.': '.$action->getId()."\n";
 		unset($this->actions[$action->getId()]);
@@ -299,16 +309,13 @@ class Client{
 	
 	private function checkActions(){
 		#print __CLASS__.'->'.__FUNCTION__.': after actions'."\n";
-		$actions = $this->actionsGetByCriterion(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
-		foreach($actions as $actionsId => $action){
-			#print __CLASS__.'->'.__FUNCTION__.': after actions: '.$actionsId.', '. (int) array_search($action, $this->actions).'/'.count($this->actions)."\n";
-			
-			$actions = $this->actions;
-			$caction = array_shift($actions);
-			if($caction->getId() == $action->getId()){
-				$this->actionRemove($action);
-				$action->functionExec($this);
-			}
+		$action = $this->actionGetByCriterion(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
+		
+		$actions = $this->actions;
+		$caction = array_shift($actions);
+		if($caction->getId() == $action->getId()){
+			$this->actionRemove($action);
+			$action->functionExec($this);
 		}
 	}
 	
@@ -376,13 +383,10 @@ class Client{
 				}
 			}
 			
-			$actions = $this->actionsGetByCriterion(ClientAction::CRITERION_AFTER_HELLO);
-			foreach($actions as $actionsId => $action){
+			$action = $this->actionGetByCriterion(ClientAction::CRITERION_AFTER_HELLO);
+			if($action){
 				$this->actionRemove($action);
 				$action->functionExec($this);
-				
-				#print __CLASS__.'->'.__FUNCTION__.': action CRITERION_AFTER_HELLO'."\n";
-				#ve($action);
 			}
 			
 			$this->sendId();
@@ -501,8 +505,8 @@ class Client{
 			$this->log('debug', $this->getIpPort().' recv '.$msgName);
 			
 			if($this->getStatus('hasId')){
-				$actions = $this->actionsGetByCriterion(ClientAction::CRITERION_AFTER_ID_OK);
-				foreach($actions as $actionsId => $action){
+				$action = $this->actionGetByCriterion(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
+				if($action){
 					$this->actionRemove($action);
 					$action->functionExec($this);
 				}
@@ -829,8 +833,8 @@ class Client{
 				$this->sendError(100, $msgName);
 			}
 			
-			$actions = $this->actionsGetByCriterion(ClientAction::CRITERION_AFTER_MSG_RESPONSE);
-			foreach($actions as $actionsId => $action){
+			$action = $this->actionGetByCriterion(ClientAction::CRITERION_AFTER_MSG_RESPONSE);
+			if($action){
 				$this->actionRemove($action);
 				$action->functionExec($this);
 			}
@@ -1003,8 +1007,8 @@ class Client{
 							
 							$this->setStatus('hasSsl', true);
 							
-							$actions = $this->actionsGetByCriterion(ClientAction::CRITERION_AFTER_HAS_SSL);
-							foreach($actions as $actionsId => $action){
+							$action = $this->actionGetByCriterion(ClientAction::CRITERION_AFTER_HAS_SSL);
+							if($action){
 								$this->actionRemove($action);
 								$action->functionExec($this);
 							}
