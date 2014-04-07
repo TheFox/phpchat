@@ -193,7 +193,7 @@ class Cronjob extends Thread{
 				&& $msg->getStatus() == 'O'
 				&& $msg->getEncryptionMode() == 'S'
 			){
-				print __CLASS__.'->'.__FUNCTION__.': find node '.$msg->getDstNodeId()."\n";
+				#print __CLASS__.'->'.__FUNCTION__.': find node '.$msg->getDstNodeId()."\n";
 				
 				$node = new Node();
 				$node->setIdHexStr($msg->getDstNodeId());
