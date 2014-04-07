@@ -57,9 +57,12 @@ class Node extends YamlStorage{
 	}
 	
 	public function setIdHexStr($id){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
 		$this->id = array_fill(0, static::ID_LEN, 0);
 		
 		if(strIsUuid($id)){
+			#print __CLASS__.'->'.__FUNCTION__.': strIsUuid'."\n";
 			$this->data['id'] = $id;
 			
 			$id = str_replace('-', '', $id);
@@ -68,6 +71,7 @@ class Node extends YamlStorage{
 				$id = substr($id, 2);
 			}
 		}
+		#else{ print __CLASS__.'->'.__FUNCTION__.': strIsUuid FAILED: '.$id."\n"; }
 	}
 	
 	public function getIdHexStr(){
