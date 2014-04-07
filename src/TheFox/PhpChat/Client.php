@@ -311,11 +311,13 @@ class Client{
 		#print __CLASS__.'->'.__FUNCTION__.': after actions'."\n";
 		$action = $this->actionGetByCriterion(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
 		
-		$actions = $this->actions;
-		$caction = array_shift($actions);
-		if($caction->getId() == $action->getId()){
-			$this->actionRemove($action);
-			$action->functionExec($this);
+		if($action && count($this->actions)){
+			$actions = $this->actions;
+			$caction = array_shift($actions);
+			if($caction->getId() == $action->getId()){
+				$this->actionRemove($action);
+				$action->functionExec($this);
+			}
 		}
 	}
 	
