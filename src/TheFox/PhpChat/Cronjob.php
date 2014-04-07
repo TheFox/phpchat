@@ -299,46 +299,50 @@ class Cronjob extends Thread{
 		}
 		#foreach($processedMsgs as $msgId => $msg){ print __CLASS__.'->'.__FUNCTION__.': processedMsg B: '. $msg->getId() .', '.$msg->getDstNodeId() ."\n"; }
 		
-		$dstNode = new Node();
-		$dstNode->setIdHexStr($msg->getDstNodeId());
-		$dstNode = $this->table->nodeEnclose($dstNode);
 		
-		$nodes = $this->table->nodeFindClosest($dstNode, static::MSG_FORWARD_TO_NODES_MAX);
+		$nodes = array();
+		foreach($processedMsgs as $msgId => $msg){
+			$dstNode = new Node();
+			$dstNode->setIdHexStr($msg->getDstNodeId());
+			$onode = $this->table->nodeFindInBuckets($dstNode);
+			if($onode){
+				$nodes[] = $onode;
+			}
+			
+			$closestNodes = $this->table->nodeFindClosest($dstNode, static::MSG_FORWARD_TO_NODES_MAX);
+			foreach($closestNodes as $nodeId => $node){
+				$nodes[] = $node;
+			}
+		}
 		
-		array_unshift($nodes, $dstNode);
+		#print __CLASS__.'->'.__FUNCTION__.': nodes '. count($nodes) ."\n";
 		
 		$updateMsgs = array();
 		foreach($nodes as $nodeId => $node){
 			#print __CLASS__.'->'.__FUNCTION__.': node '. $node->getIdHexStr() ."\n";
 			
-			if($node->getIp() && $node->getPort()){
-				#print __CLASS__.'->'.__FUNCTION__.': node '. $node->getIdHexStr() ."\n";
-				
-				$msgs = array();
-				$msgIds = array();
-				
-				foreach($processedMsgs as $msgId => $msg){
-					if($msg->getRelayNodeId() != $node->getIdHexStr() && !in_array($node->getIdHexStr(), $msg->getSentNodes())){
-						#print __CLASS__.'->'.__FUNCTION__.': '. $msg->getId() .' to '.$msg->getDstNodeId().' via '.$node->getIdHexStr() ."\n"; # TODO
-						
-						$msgs[] = $msg;
-						
-					}
+			$msgs = array();
+			$msgIds = array();
+			
+			foreach($processedMsgs as $msgId => $msg){
+				if($msg->getRelayNodeId() != $node->getIdHexStr() && !in_array($node->getIdHexStr(), $msg->getSentNodes())){
+					#print __CLASS__.'->'.__FUNCTION__.': '. $msg->getId() .' to '.$msg->getDstNodeId().' via '.$node->getIdHexStr() ."\n"; # TODO
+					
+					$msgs[] = $msg;
+					
 				}
-				
-				foreach($msgs as $msgId => $msg){
-					$msgIds[] = $msg->getId();
-					$updateMsgs[$msg->getId()] = $msg;
-				}
-				
-				#print __CLASS__.'->'.__FUNCTION__.': msgIds'."\n"; ve($msgIds);
-				
-				if($msgs){
-					$serverConnectArgs = array($node->getIp(), $node->getPort(), false, false, $msgIds);
-					$rv = $this->getIpcKernelConnection()->execSync('serverConnect', $serverConnectArgs);
-				}
-				
-				
+			}
+			
+			foreach($msgs as $msgId => $msg){
+				$msgIds[] = $msg->getId();
+				$updateMsgs[$msg->getId()] = $msg;
+			}
+			
+			#print __CLASS__.'->'.__FUNCTION__.': msgIds'."\n"; ve($msgIds);
+			
+			if($msgs){
+				$serverConnectArgs = array($node->getIp(), $node->getPort(), false, false, $msgIds);
+				$rv = $this->getIpcKernelConnection()->execSync('serverConnect', $serverConnectArgs);
 			}
 		}
 		
