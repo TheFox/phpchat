@@ -36,12 +36,13 @@ class Hex{
 		return $rv;
 	}
 	
-	public static function dataEncode($data){
+	public static function dataEncode($data, $separator = ''){
 		$rv = '';
 		
+		$format = '%02x'.$separator;
 		$dataLen = strlen($data);
 		for($n = 0; $n < $dataLen; $n++){
-			$rv .= sprintf('%02x', ord($data[$n]));
+			$rv .= sprintf($format, ord($data[$n]));
 		}
 		
 		return $rv;
