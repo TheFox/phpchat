@@ -33,6 +33,33 @@ class Cronjob extends Thread{
 		$this->log->pushHandler(new LoggerStreamHandler('log/cronjob.log', Logger::DEBUG));
 	}
 	
+	public function setMsgDb($msgDb){
+		$this->msgDb = $msgDb;
+	}
+	
+	public function getMsgDb(){
+		return $this->msgDb;
+	}
+	
+	public function setSettings($settings){
+		$this->settings = $settings;
+	}
+	
+	public function getSettings(){
+		return $this->settings;
+	}
+	
+	public function setTable($table){
+		$this->table = $table;
+		if($this->table){
+			$this->localNode = $this->table->getLocalNode();
+		}
+	}
+	
+	public function getTable(){
+		return $this->table;
+	}
+	
 	private function setIpcKernelConnection($ipcKernelConnection){
 		$this->ipcKernelConnection = $ipcKernelConnection;
 	}
@@ -49,7 +76,6 @@ class Cronjob extends Thread{
 		if(!$this->getIpcKernelConnection()->connect()){
 			throw new RuntimeException('Could not connect to kernel process.');
 		}
-		
 	}
 	
 	public function run(){
@@ -126,8 +152,7 @@ class Cronjob extends Thread{
 		
 		$this->msgDb = $this->getIpcKernelConnection()->execSync('getMsgDb', array(), 10);
 		$this->settings = $this->getIpcKernelConnection()->execSync('getSettings');
-		$this->table = $this->getIpcKernelConnection()->execSync('getTable');
-		$this->localNode = $this->table->getLocalNode();
+		$this->setTable($this->getIpcKernelConnection()->execSync('getTable'));
 		
 		#ve($this->table);
 		
@@ -145,7 +170,7 @@ class Cronjob extends Thread{
 		
 	}
 	
-	private function msgDbInitNodes(){
+	public function msgDbInitNodes(){
 		$this->log->debug(__FUNCTION__);
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
@@ -168,13 +193,14 @@ class Cronjob extends Thread{
 				&& $msg->getStatus() == 'O'
 				&& $msg->getEncryptionMode() == 'S'
 			){
-				#print __CLASS__.'->'.__FUNCTION__.': find node '.$msg->getId()."\n";
+				print __CLASS__.'->'.__FUNCTION__.': find node '.$msg->getDstNodeId()."\n";
 				
 				$node = new Node();
 				$node->setIdHexStr($msg->getDstNodeId());
 				$onode = $this->table->nodeFindInBuckets($node);
+				#if($onode){ print __CLASS__.'->'.__FUNCTION__.': found node A: "'.$onode->getSslKeyPub().'"'."\n"; }
 				if($onode && $onode->getSslKeyPub()){
-					#print __CLASS__.'->'.__FUNCTION__.': found node'."\n";
+					#print __CLASS__.'->'.__FUNCTION__.': found node B'."\n";
 					#print __CLASS__.'->'.__FUNCTION__.': pub: '.$this->settings->data['node']['sslKeyPubPath']."\n";
 					
 					$msg->setSrcSslKeyPub($this->localNode->getSslKeyPub());
@@ -186,18 +212,18 @@ class Cronjob extends Thread{
 					$msg->setDstSslPubKey($onode->getSslKeyPub());
 					$msg->encrypt();
 					
-					$this->getIpcKernelConnection()->execAsync('msgDbMsgUpdate', array($msg));
+					if($this->getIpcKernelConnection()){
+						$this->getIpcKernelConnection()->execAsync('msgDbMsgUpdate', array($msg));
+					}
+					
 				}
 				
 			}
 		}
 		
-		$this->msgDb = $this->getIpcKernelConnection()->execSync('getMsgDb', array(), 10);
-		
-		#print __CLASS__.'->'.__FUNCTION__.': msgDb B '.(int)($this->msgDb===null)."\n";
-		#ve($this->msgDb);
-		
-		#print __CLASS__.'->'.__FUNCTION__.': done'."\n";
+		if($this->getIpcKernelConnection()){
+			$this->msgDb = $this->getIpcKernelConnection()->execSync('getMsgDb', array(), 10);
+		}
 	}
 	
 	private function msgDbSendAll(){
