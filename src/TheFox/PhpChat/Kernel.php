@@ -157,7 +157,7 @@ class Kernel extends Thread{
 				});
 				$clientActions[] = $action;
 				
-				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_OK);
+				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
 				$action->functionSet(function($action, $client){
 					$client->sendSslInit();
 				});
@@ -173,7 +173,7 @@ class Kernel extends Thread{
 			}
 			
 			if($isPingOnly){
-				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_OK);
+				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
 				$action->functionSet(function($action, $client){
 					$client->sendQuit();
 				});
@@ -198,7 +198,7 @@ class Kernel extends Thread{
 					}
 				}
 				
-				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_OK);
+				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
 				$action->functionSet(function($action, $client){
 					$msgs = $action->getVar('msgs');
 					foreach($msgs as $msgId => $msg){

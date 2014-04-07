@@ -668,7 +668,7 @@ class Client{
 							$this->log('debug', 'node found: ip ('.$ip.':'.$port.') ok');
 							
 							$clientActions = array();
-							$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_OK);
+							$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
 							$action->functionSet(function($action, $client){ $client->sendNodeFind($nodeId, $distanceOld, $nodesFoundIds); });
 							$clientActions[] = $action;
 							
