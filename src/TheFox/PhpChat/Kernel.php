@@ -144,7 +144,7 @@ class Kernel extends Thread{
 		return $this->server;
 	}
 	
-	public function serverConnect($ip, $port, $isTalkRequest = false, $isPingOnly = false, $msgId = null){
+	public function serverConnect($ip, $port, $isTalkRequest = false, $isPingOnly = false, $msgIds = array()){
 		if($this->getServer() && $ip && $port){
 			print __CLASS__.'->'.__FUNCTION__.': '.$ip.':'.$port."\n";
 			
@@ -186,33 +186,46 @@ class Kernel extends Thread{
 				$clientActions[] = $action;
 			}
 			
-			if($msgId !== null){
+			if($msgIds){
 				
-				$msg = $this->getMsgDb()->getMsgById($msgId);
-				if($msg){
-					$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_OK);
-					$action->functionSet(function($action, $client){
-						$client->sendMsg($action->getVar('msg'));
-					}, array('msg' => $msg));
-					$clientActions[] = $action;
-					
-					$action = new ClientAction(ClientAction::CRITERION_AFTER_MSG_RESPONSE);
-					$action->functionSet(function($action, $client){
-						$msg = $action->getVar('msg');
+				#print __CLASS__.'->'.__FUNCTION__.''."\n"; ve($msgIds);
+				
+				$msgs = array();
+				foreach($msgIds as $msgId){
+					$msg = $this->getMsgDb()->getMsgById($msgId);
+					if($msg){
+						$msgs[] = $msg;
+					}
+				}
+				
+				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_OK);
+				$action->functionSet(function($action, $client){
+					$msgs = $action->getVar('msgs');
+					foreach($msgs as $msgId => $msg){
+						print __CLASS__.'->'.__FUNCTION__.': send msg '.$msg->getId()."\n";
+						$client->sendMsg($msg);
+					}
+				}, array('msgs' => $msgs));
+				$clientActions[] = $action;
+				
+				$action = new ClientAction(ClientAction::CRITERION_AFTER_MSG_RESPONSE);
+				$action->functionSet(function($action, $client){
+					$msgs = $action->getVar('msgs');
+					foreach($msgs as $msgId => $msg){
 						$msg->setStatus('S');
 						
 						if($client->getNode()->getIdHexStr() == $msg->getDstNodeId()){
 							$msg->setStatus('D');
 						}
-					}, array('msg' => $msg));
-					
-					$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
-					$action->functionSet(function($action, $client){
-						$client->sendQuit();
-						$client->shutdown();
-					});
-					$clientActions[] = $action;
-				}
+					}
+				}, array('msgs' => $msgs));
+				
+				$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
+				$action->functionSet(function($action, $client){
+					$client->sendQuit();
+					$client->shutdown();
+				});
+				$clientActions[] = $action;
 			}
 			
 			return $this->getServer()->connect($ip, $port, $clientActions);
