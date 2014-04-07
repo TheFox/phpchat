@@ -228,6 +228,10 @@ class Node extends YamlStorage{
 		return $this->getIdHexStr() == $node->getIdHexStr();
 	}
 	
+	public function isInTable(){
+		return $this->getBucket() !== null;
+	}
+	
 	public static function idMinHexStr($hex_a, $hex_b){
 		if($hex_a == $hex_b){
 			return $hex_a;
