@@ -201,14 +201,6 @@ class Client{
 		return null;
 	}
 	
-	private function tableNodeEnclose(Node $node){
-		if($this->getTable()){
-			return $this->getTable()->nodeEnclose($node);
-		}
-		
-		return null;
-	}
-	
 	private function getMsgDb(){
 		if($this->getServer()){
 			return $this->getServer()->getMsgDb();
@@ -757,7 +749,7 @@ class Client{
 					
 					$srcNode = new Node();
 					$srcNode->setIdHexStr($srcNodeId);
-					$srcNode = $this->tableNodeEnclose($srcNode);
+					$srcNode = $this->getTable()->nodeEnclose($srcNode);
 					if($srcNode->getSslKeyPub()){
 						if($srcNode->getSslKeyPub() != $srcSslKeyPub){
 							$status = 3; // Error
