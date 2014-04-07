@@ -17,7 +17,7 @@ class NodeTest extends PHPUnit_Framework_TestCase{
 	
 	public function testSave(){
 		$node = new Node('data/test_node.yml');
-		$node->setDatadirBasePath('.');
+		$node->setDatadirBasePath('data');
 		$node->setDataChanged(true);
 		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
 		
@@ -48,7 +48,7 @@ O5mYMzSLyuOXR5xhBhG7fjsCAwEAAQ==
 	*/
 	public function testLoad(){
 		$node = new Node('data/test_node.yml');
-		$node->setDatadirBasePath('.');
+		$node->setDatadirBasePath('data');
 		
 		$this->assertTrue($node->load());
 		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
