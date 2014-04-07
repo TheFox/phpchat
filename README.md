@@ -35,6 +35,7 @@ Here's a list of dependencies needed for PHPChat:
 - IMAP-server interface.
 - ReSSL after period/number of msgs. Reset the SSL passwords.
 - SSL sign public key to prove peer holds the private key.
+- Renew ssl_key_pub_get and ssl_key_pub_put.
 
 ## Contribute
 You're welcome to contribute to this project. Fork this project at <https://github.com/TheFox/phpchat2>. You should read GitHub's [How to Fork a Repo](https://help.github.com/articles/fork-a-repo).
