@@ -413,7 +413,6 @@ class Client{
 					}
 					if(array_key_exists('sslKeyPub', $msgData)){
 						$strKeyPub = base64_decode($msgData['sslKeyPub']);
-						$strKeyPubFingerprint = Node::genSslKeyFingerprint($strKeyPub);
 					}
 					if(array_key_exists('isChannel', $msgData)){ // isChannelPeer
 						$isChannelPeer = (bool)$msgData['isChannel'];
@@ -457,7 +456,14 @@ class Client{
 										if($sslPubKeyDetails['bits'] >= Node::SSL_KEY_LEN_MIN){
 											#$this->log('debug', 'no old ssl public key found. good. set new.');
 											
-											$idOk = true;
+											$strKeyPubFingerprint = Node::genSslKeyFingerprint($strKeyPub);
+											$fpnode = $this->getTable()->nodeFindByKeyPubFingerprint($strKeyPubFingerprint);
+											if(!$fpnode){
+												$idOk = true;
+											}
+											else{
+												$this->sendError(235, $msgName);
+											}
 										}
 										else{
 											$this->sendError(220, $msgName);
@@ -1889,6 +1895,7 @@ class Client{
 			210 => 'SSL: you need a key with minimum length of '.Node::SSL_KEY_LEN_MIN.' bits',
 			220 => 'SSL: public key too short',
 			230 => 'SSL: public key changed since last handshake',
+			235 => 'SSL: public key already in table with different node id',
 			240 => 'SSL: invalid key',
 			250 => 'SSL: you already initialized ssl',
 			260 => 'SSL: you need to initialize ssl',
