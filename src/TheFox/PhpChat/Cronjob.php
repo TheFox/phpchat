@@ -227,7 +227,7 @@ class Cronjob extends Thread{
 		}
 	}
 	
-	private function msgDbSendAll(){
+	public function msgDbSendAll(){
 		$this->log->debug(__FUNCTION__);
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
@@ -310,14 +310,26 @@ class Cronjob extends Thread{
 				
 				|| $sentNodesC >= static::MSG_FORWARD_TO_NODES_MAX
 			){
-				print __CLASS__.'->'.__FUNCTION__.': set X: '. $msg->getId() ."\n"; # TODO
-				$this->getIpcKernelConnection()->execAsync('msgDbMsgSetStatusById', array($msg->getId(), 'X'));
+				#print __CLASS__.'->'.__FUNCTION__.': set X: '. $msg->getId() ."\n"; # TODO
+				
+				$msg->setStatus('X');
+				
+				if($this->getIpcKernelConnection()){
+					$this->getIpcKernelConnection()->execAsync('msgDbMsgSetStatusById', array($msg->getId(), 'X'));
+				}
+				
 				unset($processedMsgs[$msgId]);
 			}
 			
 			elseif( in_array($msg->getDstNodeId(), $msg->getSentNodes()) ){
-				print __CLASS__.'->'.__FUNCTION__.': set D: '. $msg->getId() ."\n"; # TODO
-				$this->getIpcKernelConnection()->execAsync('msgDbMsgSetStatusById', array($msg->getId(), 'D'));
+				#print __CLASS__.'->'.__FUNCTION__.': set D: '. $msg->getId() ."\n"; # TODO
+				
+				$msg->setStatus('D');
+				
+				if($this->getIpcKernelConnection()){
+					$this->getIpcKernelConnection()->execAsync('msgDbMsgSetStatusById', array($msg->getId(), 'D'));
+				}
+				
 				unset($processedMsgs[$msgId]);
 			}
 		}
@@ -365,20 +377,25 @@ class Cronjob extends Thread{
 			
 			#print __CLASS__.'->'.__FUNCTION__.': msgIds'."\n"; ve($msgIds);
 			
-			if($msgs){
+			if($msgs && $this->getIpcKernelConnection()){
 				$serverConnectArgs = array($node->getIp(), $node->getPort(), false, false, $msgIds);
-				$rv = $this->getIpcKernelConnection()->execSync('serverConnect', $serverConnectArgs);
+				$this->getIpcKernelConnection()->execSync('serverConnect', $serverConnectArgs);
 			}
 		}
 		
 		$updateMsgs = array_unique($updateMsgs);
 		foreach($updateMsgs as $msgId => $msg){
-			print __CLASS__.'->'.__FUNCTION__.': update msg: '.$msg->getId()."\n"; # TODO
-			$this->getIpcKernelConnection()->execAsync('msgDbMsgIncForwardCyclesById', array($msg->getId()));
+			#print __CLASS__.'->'.__FUNCTION__.': update msg: '.$msg->getId()."\n"; # TODO
+			
+			if($this->getIpcKernelConnection()){
+				$this->getIpcKernelConnection()->execAsync('msgDbMsgIncForwardCyclesById', array($msg->getId()));
+			}
 		}
 		
 		
 		#print __CLASS__.'->'.__FUNCTION__.': done'."\n"; # TODO
+		
+		return $updateMsgs;
 	}
 	
 	public function shutdown(){
