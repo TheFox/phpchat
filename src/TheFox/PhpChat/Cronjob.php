@@ -222,6 +222,7 @@ class Cronjob extends Thread{
 		}
 		
 		if($this->getIpcKernelConnection()){
+			#print __CLASS__.'->'.__FUNCTION__.': reset msgDb'."\n";
 			$this->msgDb = $this->getIpcKernelConnection()->execSync('getMsgDb', array(), 10);
 		}
 	}
@@ -247,7 +248,7 @@ class Cronjob extends Thread{
 		$processedMsgs = array();
 		
 		// Send own unsent msgs.
-		print __CLASS__.'->'.__FUNCTION__.': unsent own'."\n"; # TODO
+		#print __CLASS__.'->'.__FUNCTION__.': unsent own'."\n"; # TODO
 		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
 			if(
 				!in_array($msg->getId(), $processedMsgIds)
@@ -255,16 +256,15 @@ class Cronjob extends Thread{
 				&& $msg->getEncryptionMode() == 'D'
 				&& $msg->getStatus() == 'O'
 			){
-				print __CLASS__.'->'.__FUNCTION__.': unsent own '.$msg->getId()."\n"; # TODO
+				#print __CLASS__.'->'.__FUNCTION__.': unsent own '.$msg->getId()."\n"; # TODO
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
-				#$this->msgDbSendMsg($msg);
 			}
 		}
 		
 		// Send foreign unsent msgs.
-		print __CLASS__.'->'.__FUNCTION__.': unsent foreign'."\n"; # TODO
+		#print __CLASS__.'->'.__FUNCTION__.': unsent foreign'."\n"; # TODO
 		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
 			if(
 				!in_array($msg->getId(), $processedMsgIds)
@@ -272,16 +272,15 @@ class Cronjob extends Thread{
 				&& $msg->getEncryptionMode() == 'D'
 				&& $msg->getStatus() == 'U'
 			){
-				print __CLASS__.'->'.__FUNCTION__.': unsent foreign '.$msg->getId()."\n"; # TODO
+				#print __CLASS__.'->'.__FUNCTION__.': unsent foreign '.$msg->getId()."\n"; # TODO
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
-				#$this->msgDbSendMsg($msg);
 			}
 		}
 		
 		// Relay all other msgs.
-		print __CLASS__.'->'.__FUNCTION__.': other'."\n"; # TODO
+		#print __CLASS__.'->'.__FUNCTION__.': other'."\n"; # TODO
 		foreach($this->msgDb->getMsgs() as $msgId => $msg){
 			if(
 				!in_array($msg->getId(), $processedMsgIds)
@@ -289,11 +288,10 @@ class Cronjob extends Thread{
 				&& $msg->getEncryptionMode() == 'D'
 				&& $msg->getStatus() == 'S'
 			){
-				print __CLASS__.'->'.__FUNCTION__.': other '.$msg->getId()."\n"; # TODO
+				#print __CLASS__.'->'.__FUNCTION__.': other '.$msg->getId()."\n"; # TODO
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
-				#$this->msgDbSendMsg($msg);
 			}
 		}
 		
@@ -380,7 +378,7 @@ class Cronjob extends Thread{
 		}
 		
 		
-		print __CLASS__.'->'.__FUNCTION__.': done'."\n"; # TODO
+		#print __CLASS__.'->'.__FUNCTION__.': done'."\n"; # TODO
 	}
 	
 	public function shutdown(){

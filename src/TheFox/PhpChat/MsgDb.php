@@ -163,6 +163,7 @@ class MsgDb extends YamlStorage{
 	}
 	
 	public function getMsgs(){
+		#print __CLASS__.'->'.__FUNCTION__.': '.count($this->msgs).', "'.$pos.'"'."\n";
 		return $this->msgs;
 	}
 	
