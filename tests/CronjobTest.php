@@ -153,10 +153,12 @@ oBtclXATtUzixobkK04g4KMCAwEAAQ==
 		$this->assertEquals('S', $msgs['20000000-2000-4002-8002-200000001003']->getEncryptionMode());
 	}
 	
-	/*public function testMsgDbSendAll(){
-		$this->markTestIncomplete('This test has not been implemented yet.');
-		#$updateMsgs = self::$cronjob->msgDbSendAll();
+	public function testMsgDbSendAll(){
+		#$this->markTestIncomplete('This test has not been implemented yet.');
 		
-	}*/
+		$updateMsgs = self::$cronjob->msgDbSendAll();
+		ve($updateMsgs);
+		
+	}
 	
 }
