@@ -77,7 +77,7 @@ oBtclXATtUzixobkK04g4KMCAwEAAQ==
 		$msgDb = new MsgDb();
 		$msgDb->setDatadirBasePath($settings->data['datadir']);
 		
-		for($nodeNo = 1000; $nodeNo <= 1003; $nodeNo++){
+		for($nodeNo = 1000; $nodeNo <= 1004; $nodeNo++){
 			$msg = new Msg();
 			
 			$msg->setId('20000000-2000-4002-8002-20000000'.$nodeNo);
@@ -113,6 +113,9 @@ oBtclXATtUzixobkK04g4KMCAwEAAQ==
 		self::$msgs[1003]->setEncryptionMode('S');
 		self::$msgs[1003]->setDstSslPubKey($table->getLocalNode()->getSslKeyPub());
 		self::assertEquals('S', self::$msgs[1003]->getEncryptionMode());
+		
+		self::$msgs[1004]->setSentNodes(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+		self::assertEquals(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), self::$msgs[1004]->getSentNodes());
 		
 		self::$cronjob = new Cronjob();
 		self::$cronjob->setMsgDb($msgDb);
