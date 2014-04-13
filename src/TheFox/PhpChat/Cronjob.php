@@ -257,6 +257,7 @@ class Cronjob extends Thread{
 				&& $msg->getStatus() == 'O'
 			){
 				#print __CLASS__.'->'.__FUNCTION__.': unsent own '.$msg->getId()."\n"; # TODO
+				#print __METHOD__.': unsent own '.$msg->getId()."\n"; # TODO
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
@@ -273,6 +274,7 @@ class Cronjob extends Thread{
 				&& $msg->getStatus() == 'U'
 			){
 				#print __CLASS__.'->'.__FUNCTION__.': unsent foreign '.$msg->getId()."\n"; # TODO
+				#print __METHOD__.': unsent foreign '.$msg->getId()."\n"; # TODO
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
@@ -282,6 +284,8 @@ class Cronjob extends Thread{
 		// Relay all other msgs.
 		#print __CLASS__.'->'.__FUNCTION__.': other'."\n"; # TODO
 		foreach($this->msgDb->getMsgs() as $msgId => $msg){
+			#print __CLASS__.'->'.__FUNCTION__.': other '.$msg->getId().', '. (int)in_array($msg->getId(), $processedMsgIds) .', '.$msg->getDstNodeId().', '.$msg->getEncryptionMode().', '.$msg->getStatus() ."\n"; # TODO
+			
 			if(
 				!in_array($msg->getId(), $processedMsgIds)
 				&& $msg->getDstNodeId()
@@ -289,6 +293,7 @@ class Cronjob extends Thread{
 				&& $msg->getStatus() == 'S'
 			){
 				#print __CLASS__.'->'.__FUNCTION__.': other '.$msg->getId()."\n"; # TODO
+				#print __METHOD__.': other '.$msg->getId()."\n"; # TODO
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
