@@ -77,7 +77,7 @@ oBtclXATtUzixobkK04g4KMCAwEAAQ==
 		$msgDb = new MsgDb();
 		$msgDb->setDatadirBasePath($settings->data['datadir']);
 		
-		for($nodeNo = 1000; $nodeNo <= 1004; $nodeNo++){
+		for($nodeNo = 1000; $nodeNo <= 1009; $nodeNo++){
 			$msg = new Msg();
 			
 			$msg->setId('20000000-2000-4002-8002-20000000'.$nodeNo);
@@ -116,6 +116,23 @@ oBtclXATtUzixobkK04g4KMCAwEAAQ==
 		
 		self::$msgs[1004]->setSentNodes(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
 		self::assertEquals(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), self::$msgs[1004]->getSentNodes());
+		
+		self::$msgs[1005]->setStatus('U');
+		
+		self::$msgs[1006]->setStatus('S');
+		
+		self::$msgs[1007]->setStatus('S');
+		self::$msgs[1007]->setSentNodes(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+			12, 13, 14, 15, 16, 17, 18, 19, 20, 21));
+		
+		self::$msgs[1008]->setStatus('S');
+		self::$msgs[1008]->setForwardCycles(110);
+		self::$msgs[1008]->setSentNodes(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+		
+		self::$msgs[1009]->setStatus('S');
+		self::$msgs[1009]->setSentNodes(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, '10000000-1000-4001-8001-100000000000'));
+		
+		
 		
 		self::$cronjob = new Cronjob();
 		self::$cronjob->setMsgDb($msgDb);
@@ -162,6 +179,15 @@ oBtclXATtUzixobkK04g4KMCAwEAAQ==
 		
 		$updateMsgs = self::$cronjob->msgDbSendAll();
 		ve($updateMsgs);
+		
+		$this->assertFalse(array_key_exists('20000000-2000-4002-8002-200000001007', $updateMsgs));
+		$this->assertEquals('X', self::$msgs[1007]->getStatus());
+		
+		$this->assertFalse(array_key_exists('20000000-2000-4002-8002-200000001008', $updateMsgs));
+		$this->assertEquals('X', self::$msgs[1008]->getStatus());
+		
+		$this->assertFalse(array_key_exists('20000000-2000-4002-8002-200000001009', $updateMsgs));
+		$this->assertEquals('D', self::$msgs[1009]->getStatus());
 		
 	}
 	
