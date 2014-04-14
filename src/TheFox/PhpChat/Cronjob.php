@@ -357,6 +357,8 @@ class Cronjob extends Thread{
 			}
 		}
 		
+		$nodes = array_unique($nodes);
+		
 		#print __CLASS__.'->'.__FUNCTION__.': nodes '. count($nodes) ."\n";
 		
 		$updateMsgs = array();

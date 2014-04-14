@@ -32,6 +32,10 @@ class Node extends YamlStorage{
 		return array('data', 'id', 'sslKeyPub');
 	}
 	
+	public function __toString(){
+		return __CLASS__.'->{'.$this->getIdHexStr().'}';
+	}
+	
 	public function save(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
