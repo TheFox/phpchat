@@ -142,6 +142,8 @@ oBtclXATtUzixobkK04g4KMCAwEAAQ==
 	
 	public function testEncrpt(){
 		foreach(self::$msgs as $msgId => $msg){
+			#fwrite(STDOUT, __METHOD__.': '.$msgId."\n");
+			
 			$encrypted = false;
 			try{
 				$encrypted = $msg->encrypt();

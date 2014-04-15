@@ -256,8 +256,7 @@ class Cronjob extends Thread{
 				&& $msg->getEncryptionMode() == 'D'
 				&& $msg->getStatus() == 'O'
 			){
-				#print __CLASS__.'->'.__FUNCTION__.': unsent own '.$msg->getId()."\n"; # TODO
-				#print __METHOD__.': unsent own '.$msg->getId()."\n"; # TODO
+				#fwrite(STDOUT, __METHOD__.': unsent own '.$msg->getId()."\n");
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
@@ -273,8 +272,7 @@ class Cronjob extends Thread{
 				&& $msg->getEncryptionMode() == 'D'
 				&& $msg->getStatus() == 'U'
 			){
-				#print __CLASS__.'->'.__FUNCTION__.': unsent foreign '.$msg->getId()."\n"; # TODO
-				#print __METHOD__.': unsent foreign '.$msg->getId()."\n"; # TODO
+				#fwrite(STDOUT, __METHOD__.': unsent foreign '.$msg->getId()."\n");
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
@@ -292,8 +290,7 @@ class Cronjob extends Thread{
 				&& $msg->getEncryptionMode() == 'D'
 				&& $msg->getStatus() == 'S'
 			){
-				#print __CLASS__.'->'.__FUNCTION__.': other '.$msg->getId()."\n"; # TODO
-				#print __METHOD__.': other '.$msg->getId()."\n"; # TODO
+				#fwrite(STDOUT, __METHOD__.': other '.$msg->getId()."\n");
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
@@ -353,27 +350,26 @@ class Cronjob extends Thread{
 			
 			$closestNodes = $this->table->nodeFindClosest($dstNode, static::MSG_FORWARD_TO_NODES_MAX);
 			foreach($closestNodes as $nodeId => $node){
+				#fwrite(STDOUT, __METHOD__.' node: '.$node->getIdHexStr()."\n");
 				$nodes[] = $node;
 			}
 		}
 		
 		$nodes = array_unique($nodes);
 		
-		#print __CLASS__.'->'.__FUNCTION__.': nodes '. count($nodes) ."\n";
+		#fwrite(STDOUT, __METHOD__.' nodes: '.count($nodes)."\n");
 		
 		$updateMsgs = array();
 		foreach($nodes as $nodeId => $node){
-			#print __CLASS__.'->'.__FUNCTION__.': node '. $node->getIdHexStr() ."\n";
+			#fwrite(STDOUT, __METHOD__.' node: '.$node->getIdHexStr()."\n");
 			
 			$msgs = array();
 			$msgIds = array();
 			
 			foreach($processedMsgs as $msgId => $msg){
 				if($msg->getRelayNodeId() != $node->getIdHexStr() && !in_array($node->getIdHexStr(), $msg->getSentNodes())){
-					#print __CLASS__.'->'.__FUNCTION__.': '. $msg->getId() .' to '.$msg->getDstNodeId().' via '.$node->getIdHexStr() ."\n"; # TODO
-					
+					#fwrite(STDOUT, __METHOD__.'     msg: '.$msg->getId().', '.$msg->getDstNodeId()."\n");
 					$msgs[] = $msg;
-					
 				}
 			}
 			
