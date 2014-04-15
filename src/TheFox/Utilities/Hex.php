@@ -37,15 +37,15 @@ class Hex{
 	}
 	
 	public static function dataEncode($data, $separator = ''){
-		$rv = '';
+		$rv = array();
 		
-		$format = '%02x'.$separator;
+		$format = '%02x';
 		$dataLen = strlen($data);
 		for($n = 0; $n < $dataLen; $n++){
-			$rv .= sprintf($format, ord($data[$n]));
+			$rv[] = sprintf($format, ord($data[$n]));
 		}
 		
-		return $rv;
+		return join($separator, $rv);
 	}
 	
 	public static function dataDecode($hex){
