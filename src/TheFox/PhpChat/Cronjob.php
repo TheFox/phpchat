@@ -340,6 +340,8 @@ class Cronjob extends Thread{
 		
 		$nodes = array();
 		foreach($processedMsgs as $msgId => $msg){
+			#fwrite(STDOUT, __METHOD__.' msg: '.$msg->getId().', '.$msg->getDstNodeId()."\n");
+			
 			$dstNode = new Node();
 			$dstNode->setIdHexStr($msg->getDstNodeId());
 			
@@ -350,16 +352,19 @@ class Cronjob extends Thread{
 			
 			$closestNodes = $this->table->nodeFindClosest($dstNode, static::MSG_FORWARD_TO_NODES_MAX);
 			foreach($closestNodes as $nodeId => $node){
-				#fwrite(STDOUT, __METHOD__.' node: '.$node->getIdHexStr()."\n");
+				#fwrite(STDOUT, __METHOD__.'      node: '.$node->getIdHexStr()."\n");
 				$nodes[] = $node;
 			}
 		}
 		
+		$updateMsgs = array();
+		
+		/*
 		$nodes = array_unique($nodes);
 		
 		#fwrite(STDOUT, __METHOD__.' nodes: '.count($nodes)."\n");
 		
-		$updateMsgs = array();
+		
 		foreach($nodes as $nodeId => $node){
 			#fwrite(STDOUT, __METHOD__.' node: '.$node->getIdHexStr()."\n");
 			
@@ -394,7 +399,7 @@ class Cronjob extends Thread{
 				$this->getIpcKernelConnection()->execAsync('msgDbMsgIncForwardCyclesById', array($msg->getId()));
 			}
 		}
-		
+		*/
 		
 		#print __CLASS__.'->'.__FUNCTION__.': done'."\n"; # TODO
 		
