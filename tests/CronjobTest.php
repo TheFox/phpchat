@@ -169,6 +169,7 @@ oBtclXATtUzixobkK04g4KMCAwEAAQ==
 		$this->assertEquals(self::$msgs[1001], $msgs['20000000-2000-4002-8002-200000001001']);
 		$this->assertEquals(self::$msgs[1002], $msgs['20000000-2000-4002-8002-200000001002']);
 		$this->assertEquals(self::$msgs[1003], $msgs['20000000-2000-4002-8002-200000001003']);
+		$this->assertEquals(self::$msgs[1004], $msgs['20000000-2000-4002-8002-200000001004']);
 		
 		$this->assertEquals('D', $msgs['20000000-2000-4002-8002-200000001000']->getEncryptionMode());
 		$this->assertEquals('S', $msgs['20000000-2000-4002-8002-200000001001']->getEncryptionMode());
