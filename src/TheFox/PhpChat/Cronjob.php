@@ -193,12 +193,11 @@ class Cronjob extends Thread{
 				&& $msg->getStatus() == 'O'
 				&& $msg->getEncryptionMode() == 'S'
 			){
-				#print __CLASS__.'->'.__FUNCTION__.': find node '.$msg->getDstNodeId()."\n";
+				#fwrite(STDOUT, __METHOD__.' find node: '.$msg->getDstNodeId()."\n");
 				
 				$node = new Node();
 				$node->setIdHexStr($msg->getDstNodeId());
 				$onode = $this->table->nodeFindInBuckets($node);
-				#if($onode){ print __CLASS__.'->'.__FUNCTION__.': found node A: "'.$onode->getSslKeyPub().'"'."\n"; }
 				if($onode && $onode->getSslKeyPub()){
 					#print __CLASS__.'->'.__FUNCTION__.': found node B'."\n";
 					#print __CLASS__.'->'.__FUNCTION__.': pub: '.$this->settings->data['node']['sslKeyPubPath']."\n";
