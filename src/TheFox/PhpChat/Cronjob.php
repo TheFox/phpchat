@@ -312,7 +312,7 @@ class Cronjob extends Thread{
 				
 				|| $sentNodesC >= static::MSG_FORWARD_TO_NODES_MAX
 			){
-				#print __CLASS__.'->'.__FUNCTION__.': set X: '. $msg->getId() ."\n"; # TODO
+				#fwrite(STDOUT, __METHOD__.': set X: '.$msg->getId()."\n");
 				
 				$msg->setStatus('X');
 				
@@ -324,7 +324,7 @@ class Cronjob extends Thread{
 			}
 			
 			elseif( in_array($msg->getDstNodeId(), $msg->getSentNodes()) ){
-				#print __CLASS__.'->'.__FUNCTION__.': set D: '. $msg->getId() ."\n"; # TODO
+				#fwrite(STDOUT, __METHOD__.': set D: '.$msg->getId()."\n");
 				
 				$msg->setStatus('D');
 				
