@@ -37,6 +37,34 @@ kvgfS69CROdHHFmsZI8y0Lqlo6aC7JIEW5vtMWPNvBmc/GlsZDerK3I3R17JGnB0
 xs0c/uLAMzZRFhqwaH2lOsMrU9RD75dKDPF5o3hV7ZQ8knlkDXhk+5WCL6UK9SVQ
 oBtclXATtUzixobkK04g4KMCAwEAAQ==
 -----END PUBLIC KEY-----';
+	const NODE4_SSL_KEY_PUB = '-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAq9iZCsGcuwT1hVAwZ7ea
+ZMmpKgbANR9Sta0cjdhl6pKE27gX89d7jne1wSHvyQ8CF+Kfzn3UbEHHY9xI/Rr/
+CFS8PALZfQTXkw19Sp5cXheUFFV9tNctiZNM/ViCSKr8e52tvZB6atLYDyAziaE+
+w+cJgA86IxAj4Vh5tkH7Zn6ef71wZUUFp4oMag3z/rttktfToEi3AuTN/RqsbrhV
+nOmLqP+AXW4RP0mXIwsmdHg7+udCZNVy/Ye6suG9Cbzwc9aoX7BlfwzV2ujYF7ht
+LgYa+lhNAcjEkE4JbH27CHI1HK4FcAYvpiONhdX6ZkZUBO5F5rTMsuOzwk4LT2Hj
+8EjGyL7WETmCEGyDVOVBisln0fm6IrDt24b0zA4FVZG1dDyrRspNyj6oJIU1wfkx
+8mDKEaSI0QA4Rx9Gnjsax9T2Yflgn8KE+PIeKTjHVnxfiz3+CxYhkHgxiHqy9Qu/
+qDJlpPvhXQwxcanwpSS7LOe87NlIxyt2LMLr6VmOryeTcLdebPDZhUTaCxKdoqUy
+eCN5XntYsLIcE+zk4EgQoAEatFj2N72t0n///1Zprsps2CZEE6FWAfyvgp4sPKnf
+HpiAVgRN79aIegqfrjin0jTizJfpLhOMICpuRCBec2BthRbuBR5aXSPQ8LXyzJFN
+6Vo3RwyC0PBci/OQxABgUKkCAwEAAQ==
+-----END PUBLIC KEY-----';
+	const NODE5_SSL_KEY_PUB = '-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAs/VYhvwdV9ww8XQTlcCU
+BOa6fdKhcJ19tfedSZ/UxILRJdJIaO/vmgXlBg9+K8PagkxABgzz83OcZwp4XsS6
+B18WX1zRrCVyRXP3wMefRv44q+9qn2JN6U3siB2Vkh2ARG5QfFTzIyIJXgX7nU98
+HOuiy5zpwCH9fxypqFURVzsBQ0HxTvfHW0d4Td4mJeiNtd4aCquwCVxrzVBUaa+s
+YmXPHJ56RbeWGSypIlAvfPAq7oRO0JsPGZyVEYO6PWzNTwCEgZvdfoO/9ddCXd6X
+toP8RfIoR3SiVefzLeRBuR0jQ0o++hPMnRCCHm7BUpbE2aTTv6q63d9I43gB1nGH
+gl39CaEDn7IvLKkFu/ltaCA6jkZHV4izQXt7fhQGovV2mgsU60lqtThmWDuavV4I
+yD17OLI4tUP7dpv9yrTN3pNUjrHfDCC2QY2TYJw/iG+BjaR/5iyEBmNEHknHmgm3
+y9MvarGoDXg9JJ4ofZ6epysV2iW/JiPFzAmaVPgWEOaEh+WA+9WxFp5YAp9Uf8oh
+VLm/ARle/gLdp0/pra8B1AWSpvkaYbmCJEiOvuM8tzxLfX5O10UdcR67jooHdsU7
+KG43fr2B2ba/b77pCJZCB1/pDFYsViirsfqW0P4UAR6vIHKgcHYz1gvtrBuu61JO
+nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
+-----END PUBLIC KEY-----';
 	
 	protected static $cronjob = null;
 	protected static $nodes = array();
@@ -66,6 +94,14 @@ oBtclXATtUzixobkK04g4KMCAwEAAQ==
 		self::$nodes[3] = new Node();
 		self::$nodes[3]->setIdHexStr('10000000-1000-4001-8001-100000000003');
 		
+		self::$nodes[4] = new Node();
+		self::$nodes[4]->setIdHexStr('10000000-1000-4001-8001-100000000004');
+		self::$nodes[4]->setSslKeyPub(static::NODE4_SSL_KEY_PUB);
+		
+		self::$nodes[5] = new Node();
+		self::$nodes[5]->setIdHexStr('10000000-1000-4001-8001-100000000005');
+		self::$nodes[5]->setSslKeyPub(static::NODE5_SSL_KEY_PUB);
+		
 		$table = new Table();
 		$table->setDatadirBasePath($settings->data['datadir']);
 		$table->setLocalNode($localNode);
@@ -73,11 +109,13 @@ oBtclXATtUzixobkK04g4KMCAwEAAQ==
 		$table->nodeEnclose(self::$nodes[1]);
 		$table->nodeEnclose(self::$nodes[2]);
 		#$table->nodeEnclose(self::$nodes[3]); // Test not in table.
+		#$table->nodeEnclose(self::$nodes[4]);
+		#$table->nodeEnclose(self::$nodes[5]);
 		
 		$msgDb = new MsgDb();
 		$msgDb->setDatadirBasePath($settings->data['datadir']);
 		
-		for($nodeNo = 1000; $nodeNo <= 1009; $nodeNo++){
+		for($nodeNo = 1000; $nodeNo <= 1011; $nodeNo++){
 			$msg = new Msg();
 			
 			$msg->setId('20000000-2000-4002-8002-20000000'.$nodeNo);
