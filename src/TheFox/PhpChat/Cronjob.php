@@ -346,13 +346,24 @@ class Cronjob extends Thread{
 			
 			$onode = $this->table->nodeFindInBuckets($dstNode);
 			if($onode){
-				$nodes[] = $onode;
+				#fwrite(STDOUT, __METHOD__.'      dst node found in table'."\n");
+				
+				if(!isset($nodes[$onode->getIdHexStr()])){
+					$nodes[$onode->getIdHexStr()] = array();
+				}
+				$nodes[$onode->getIdHexStr()][] = $msg;
 			}
 			
 			$closestNodes = $this->table->nodeFindClosest($dstNode, static::MSG_FORWARD_TO_NODES_MAX);
 			foreach($closestNodes as $nodeId => $node){
-				#fwrite(STDOUT, __METHOD__.'      node: '.$node->getIdHexStr()."\n");
-				$nodes[] = $node;
+				if($msg->getRelayNodeId() != $node->getIdHexStr() && !in_array($node->getIdHexStr(), $msg->getSentNodes())){
+					#fwrite(STDOUT, __METHOD__.'      close node: '.$node->getIdHexStr()."\n");
+					
+					if(!isset($nodes[$node->getIdHexStr()])){
+						$nodes[$node->getIdHexStr()] = array();
+					}
+					$nodes[$node->getIdHexStr()][] = $msg;
+				}
 			}
 		}
 		
