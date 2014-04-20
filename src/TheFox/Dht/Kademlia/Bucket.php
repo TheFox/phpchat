@@ -54,16 +54,16 @@ class Bucket extends YamlStorage{
 			
 			if(array_key_exists('nodes', $this->data) && $this->data['nodes']){
 				foreach($this->data['nodes'] as $nodeId => $nodeAr){
-					$this->nodesId = $nodeId;
-					
-					$node = new Node($nodeAr['path']);
-					$node->setDatadirBasePath($this->getDatadirBasePath());
-					$node->setBucket($this);
-					if($node->load()){
-						$this->nodes[$this->nodesId] = $node;
+					if(file_exists($nodeAr['path'])){
+						$this->nodesId = $nodeId;
+						
+						$node = new Node($nodeAr['path']);
+						$node->setDatadirBasePath($this->getDatadirBasePath());
+						$node->setBucket($this);
+						if($node->load()){
+							$this->nodes[$this->nodesId] = $node;
+						}
 					}
-					
-					#print __CLASS__.'->'.__FUNCTION__.': node '.$this->nodesId."\n";
 				}
 			}
 			

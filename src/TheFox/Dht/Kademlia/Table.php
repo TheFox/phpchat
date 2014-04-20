@@ -50,13 +50,15 @@ class Table extends YamlStorage{
 			
 			if(isset($this->data['buckets']) && $this->data['buckets']){
 				foreach($this->data['buckets'] as $bucketId => $bucketAr){
-					$bucket = new Bucket($bucketAr['path']);
-					$bucket->setDatadirBasePath($this->getDatadirBasePath());
-					$bucket->setLocalNode($this->getLocalNode());
-					
-					if($bucket->load()){
-						$this->buckets[$bucketId] = $bucket;
-						$this->bucketsByMask[$bucket->getMask()] = $bucket;
+					if(file_exists($bucketAr['path'])){
+						$bucket = new Bucket($bucketAr['path']);
+						$bucket->setDatadirBasePath($this->getDatadirBasePath());
+						$bucket->setLocalNode($this->getLocalNode());
+						
+						if($bucket->load()){
+							$this->buckets[$bucketId] = $bucket;
+							$this->bucketsByMask[$bucket->getMask()] = $bucket;
+						}
 					}
 				}
 			}

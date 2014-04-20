@@ -45,11 +45,13 @@ class MsgDb extends YamlStorage{
 			
 			if(array_key_exists('msgs', $this->data) && $this->data['msgs']){
 				foreach($this->data['msgs'] as $msgId => $msgAr){
-					$msg = new Msg($msgAr['path']);
-					$msg->setDatadirBasePath($this->getDatadirBasePath());
-					if($msg->load()){
-						#print __CLASS__.'->'.__FUNCTION__.': '.$msg->getId().', '.$msg->getStatus()."\n";
-						$this->msgs[$msg->getId()] = $msg;
+					if(file_exists($msgAr['path'])){
+						$msg = new Msg($msgAr['path']);
+						$msg->setDatadirBasePath($this->getDatadirBasePath());
+						if($msg->load()){
+							#print __CLASS__.'->'.__FUNCTION__.': '.$msg->getId().', '.$msg->getStatus()."\n";
+							$this->msgs[$msg->getId()] = $msg;
+						}
 					}
 				}
 			}
