@@ -170,7 +170,11 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		self::$msgs[1009]->setStatus('S');
 		self::$msgs[1009]->setSentNodes(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, '10000000-1000-4001-8001-100000000000'));
 		
+		self::$msgs[1010]->setRelayNodeId('10000000-1000-4001-8001-100000000001');
 		
+		self::$msgs[1011]->setSrcNodeId( self::$nodes[4]->getIdHexStr() );
+		self::$msgs[1011]->setDstNodeId( self::$nodes[5]->getIdHexStr() );
+		self::$msgs[1011]->setStatus('U');
 		
 		self::$cronjob = new Cronjob();
 		self::$cronjob->setMsgDb($msgDb);
@@ -219,7 +223,15 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		#$this->markTestIncomplete('This test has not been implemented yet.');
 		
 		$updateMsgs = self::$cronjob->msgDbSendAll();
-		ve($updateMsgs);
+		#ve($updateMsgs);
+		
+		#fwrite(STDOUT, __METHOD__.': '.self::$msgs[1007]->getStatus()."\n");
+		
+		foreach($updateMsgs as $msgId => $msg){
+			fwrite(STDOUT, __METHOD__.': '.$msg->getId().', '.$msg->getStatus().', '.$msg->getDstNodeId()."\n");
+		}
+		
+		$this->assertTrue(true);
 		
 		$this->assertFalse(array_key_exists('20000000-2000-4002-8002-200000001007', $updateMsgs));
 		$this->assertEquals('X', self::$msgs[1007]->getStatus());
