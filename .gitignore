@@ -1,5 +1,6 @@
 vendor
-*.lock
+composer.lock
+composer.phar
 test
 log
 data
