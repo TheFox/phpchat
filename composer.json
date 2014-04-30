@@ -15,7 +15,8 @@
 		"monolog/monolog": "1.7.0",
 		"ulrichsg/getopt-php": "1.1.0",
 		"rhumsaa/uuid": "2.5.0",
-		"kevinlebrun/colors.php": "0.3.0"
+		"kevinlebrun/colors.php": "0.3.0",
+		"thefox/utilities": "1.0.*"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "4.0.14"
