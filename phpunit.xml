@@ -26,6 +26,7 @@
 			<file>tests/CronjobTest.php</file>
 			<file>tests/MsgTest.php</file>
 			<file>tests/NodeTest.php</file>
+			<file>tests/TableTest.php</file>
 		</testsuite>
 	</testsuites>
 </phpunit>
