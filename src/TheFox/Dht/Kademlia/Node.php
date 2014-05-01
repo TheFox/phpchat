@@ -136,9 +136,9 @@ class Node extends YamlStorage{
 		$key = str_replace("\r", '', $key);
 		$key = str_replace("\n", '', $key);
 		#$key = str_replace("-----BEGIN PUBLIC KEY-----\n", '', $key);
-		$key = str_replace("-----BEGIN PUBLIC KEY-----", '', $key);
+		$key = str_replace('-----BEGIN PUBLIC KEY-----', '', $key);
 		#$key = str_replace("\n-----END PUBLIC KEY-----\n", '', $key);
-		$key = str_replace("-----END PUBLIC KEY-----", '', $key);
+		$key = str_replace('-----END PUBLIC KEY-----', '', $key);
 		#ve($key);
 		
 		$keyBin = base64_decode($key);
@@ -233,7 +233,11 @@ class Node extends YamlStorage{
 	public function distanceHexStr(Node $node){
 		$distance = $this->distance($node);
 		
-		return sprintf('%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x', $distance[0], $distance[1], $distance[2], $distance[3], $distance[4], $distance[5], $distance[6], $distance[7], $distance[8], $distance[9], $distance[10], $distance[11], $distance[12], $distance[13], $distance[14], $distance[15]);
+		return sprintf('%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x',
+			$distance[0], $distance[1], $distance[2], $distance[3],
+			$distance[4], $distance[5], $distance[6], $distance[7],
+			$distance[8], $distance[9], $distance[10], $distance[11],
+			$distance[12], $distance[13], $distance[14], $distance[15]);
 	}
 	
 	public function isEqual(Node $node){

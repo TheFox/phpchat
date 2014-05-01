@@ -15,7 +15,8 @@ class Pbkdf2{
 	private $keyLength = 0;
 	private $salt = '';
 	
-	public function __construct($algo = Pbkdf2::PBKDF2_HASH_ALGORITHM, $iter = Pbkdf2::PBKDF2_ITERATIONS, $keyLength = Pbkdf2::PBKDF2_HASH_BYTE_SIZE){
+	public function __construct($algo = static::PBKDF2_HASH_ALGORITHM,
+		$iter = static::PBKDF2_ITERATIONS, $keyLength = static::PBKDF2_HASH_BYTE_SIZE){
 		$this->algo = $algo;
 		$this->iter = $iter;
 		$this->keyLength = $keyLength;
@@ -109,9 +110,11 @@ class Pbkdf2{
 	private function equals($a, $b){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
-		$diff = strlen($a) ^ strlen($b);
+		$aLen = strlen($a);
+		$bLen = strlen($b);
+		$diff = $aLen ^ $bLen;
 		#print __CLASS__.'->'.__FUNCTION__.': diff = '.$diff.''."\n";
-		for($i = 0; $i < strlen($a) && $i < strlen($b); $i++){
+		for($i = 0; $i < $aLen && $i < $bLen; $i++){
 			#print __CLASS__.'->'.__FUNCTION__.': '.$i.' = '.$diff.''."\n";
 			$diff |= ord($a[$i]) ^ ord($b[$i]);
 		}

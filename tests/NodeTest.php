@@ -87,9 +87,10 @@ O5mYMzSLyuOXR5xhBhG7fjsCAwEAAQ==
 		$this->assertEquals('00000000-0000-0000-0000-000000000002', $node_a->distanceHexStr($node_c));
 		$this->assertEquals('00000000-0000-0000-0000-000000000006', $node_c->distanceHexStr($node_d));
 		
-		$this->assertEquals('00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', $node_a->distanceBitStr($node_b));
-		$this->assertEquals('00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010', $node_a->distanceBitStr($node_c));
-		$this->assertEquals('00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000110', $node_c->distanceBitStr($node_d));
+		$zeros = str_repeat('0', 120);
+		$this->assertEquals($zeros.'00000000', $node_a->distanceBitStr($node_b));
+		$this->assertEquals($zeros.'00000010', $node_a->distanceBitStr($node_c));
+		$this->assertEquals($zeros.'00000110', $node_c->distanceBitStr($node_d));
 	}
 	
 }

@@ -22,13 +22,15 @@ abstract class AbstractHandler{
 	private $recvBuffer = array();
 	private $recvBufferTmp = '';
 	
-	
 	abstract public function connect();
-	abstract public function listen();
-	abstract public function run();
-	abstract public function handleDataSend($handle, $data);
-	abstract public function handleDataRecv($handle);
 	
+	abstract public function listen();
+	
+	abstract public function run();
+	
+	abstract public function handleDataSend($handle, $data);
+	
+	abstract public function handleDataRecv($handle);
 	
 	public function send($data, $clientId = null){
 		#print __CLASS__.'->'.__FUNCTION__.': all='.(int)($clientId === null).', "'.$data.'"'."\n";
@@ -117,7 +119,8 @@ abstract class AbstractHandler{
 					$data = substr($data, $separatorPos + 1);
 				}
 				
-			}while($data);
+			}
+			while($data);
 		}
 	}
 	
@@ -250,7 +253,8 @@ abstract class AbstractHandler{
 					$data = substr($data, $separatorPos + 1);
 				}
 				
-			}while($data);
+			}
+			while($data);
 		}
 	}
 	

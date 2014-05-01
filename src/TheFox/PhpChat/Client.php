@@ -330,7 +330,8 @@ class Client{
 				
 				$data = substr($data, $separatorPos + 1);
 			}
-		}while($data);
+		}
+		while($data);
 	}
 	
 	private function msgHandle($msgRaw){
@@ -355,7 +356,9 @@ class Client{
 		#print __CLASS__.'->'.__FUNCTION__.': "'.$msgName.'"'."\n";
 		#print __CLASS__.'->'.__FUNCTION__.': "'.$msgName.'", '.json_encode($msg['data'])."\n";
 		
-		if($msgName == 'nop'){}
+		if($msgName == 'nop'){
+			$nop = 90:
+		}
 		elseif($msgName == 'test'){
 			$len = 0;
 			$test_data = 'N/A';
@@ -365,8 +368,6 @@ class Client{
 			if(array_key_exists('test_data', $msgData)){
 				$test_data = $msgData['test_data'];
 			}
-			
-			#print __CLASS__.'->'.__FUNCTION__.': '.$msgName.', '.$len.' == '.strlen($test_data).', "'.substr($test_data, 0, 10).'", "'.substr($test_data, -10).'"'."\n";
 		}
 		elseif($msgName == 'hello'){
 			if(array_key_exists('ip', $msgData)){
@@ -488,7 +489,6 @@ class Client{
 						
 						$this->sendIdOk();
 						
-						#$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$id.', '.$port.', '.$node->getSslKeyPubFingerprint());
 						$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$id.', '.$port);
 					}
 					else{
@@ -522,10 +522,19 @@ class Client{
 				if($this->getServer() && $this->getServer()->getKernel()){
 					$contact = $this->getServer()->getKernel()->getAddressbook()->contactGetByNodeId($this->getNode()->getIdHexStr());
 					if($contact){
-						$this->consoleMsgAdd('You talked to '.$this->getNode()->getIdHexStr().' ('.$contact->getUserNickname().') once before.');
+						$text = 'You talked to ';
+						$text .= $this->getNode()->getIdHexStr().' ('.$contact->getUserNickname().')';
+						$text .= ' once before.';
+						$this->consoleMsgAdd($text);
 					}
 					else{
-						$this->consoleMsgAdd('You never talked to '.$this->getNode()->getIdHexStr().' before.'.PHP_EOL.'Verify the public keys with you conversation partner on another channel.'.PHP_EOL.'Public keys fingerprints:'.PHP_EOL.'  Yours: '.$this->getLocalNode()->getSslKeyPubFingerprint().PHP_EOL.'  Peers: '.$this->getNode()->getSslKeyPubFingerprint());
+						$text = '';
+						$text .= 'You never talked to '.$this->getNode()->getIdHexStr().' before.'.PHP_EOL;
+						$text .= 'Verify the public keys with you conversation partner on another channel.'.PHP_EOL;
+						$text .= 'Public keys fingerprints:'.PHP_EOL;
+						$text .= '  Yours: '.$this->getLocalNode()->getSslKeyPubFingerprint().PHP_EOL;
+						$text .= '  Peers: '.$this->getNode()->getSslKeyPubFingerprint();
+						$this->consoleMsgAdd($text);
 					}
 				}
 			}
@@ -600,8 +609,9 @@ class Client{
 						
 						$nodeId = $request['data']['nodeId'];
 						$nodesFoundIds = $request['data']['nodesFoundIds'];
-						$distanceOld =   $request['data']['distance'];
-						$ip = ''; $port = 0;
+						$distanceOld = $request['data']['distance'];
+						$ip = '';
+						$port = 0;
 						
 						if($nodes){
 							// Find the smallest distance.
@@ -627,7 +637,8 @@ class Client{
 								$this->log('debug', 'node found: '.$nodeArId.', '.$nodeAr['id'].', do='.$distanceOld.', dn='.$distanceNew);
 								
 								if(!$this->getLocalNode()->isEqual($node)){
-									if($this->getSettings()->data['node']['ipPub'] != $node->getIp() || $this->getLocalNode()->getPort() != $node->getPort()){
+									if($this->getSettings()->data['node']['ipPub'] != $node->getIp()
+										|| $this->getLocalNode()->getPort() != $node->getPort()){
 										if(!in_array($node->getIdHexStr(), $nodesFoundIds)){
 											
 											$nodesFoundIds[] = $nodeAr['id'];
@@ -637,14 +648,16 @@ class Client{
 											
 											if($nodeAr['id'] == $nodeId){
 												$this->log('debug', 'node found: find completed');
-												$ip = ''; $port = 0;
+												$ip = '';
+												$port = 0;
 											}
 											else{
 												if($distanceOld != $distanceNew){
 													$distanceMin = Node::idMinHexStr($distanceOld, $distanceNew);
 													if($distanceMin == $distanceNew){ // Is smaller then $distanceOld.
 														$distanceOld = $distanceNew;
-														$ip = $node->getIp(); $port = $node->getPort();
+														$ip = $node->getIp();
+														$port = $node->getPort();
 													}
 												}
 											}
@@ -671,7 +684,9 @@ class Client{
 							
 							$clientActions = array();
 							$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
-							$action->functionSet(function($action, $client){ $client->sendNodeFind($nodeId, $distanceOld, $nodesFoundIds); });
+							$action->functionSet(function($action, $client){
+								$client->sendNodeFind($nodeId, $distanceOld, $nodesFoundIds);
+							});
 							$clientActions[] = $action;
 							
 							$this->getServer()->connect($ip, $port, $clientActions);
@@ -882,8 +897,6 @@ class Client{
 			}
 		}
 		elseif($msgName == 'ssl_test'){
-			#print __CLASS__.'->'.__FUNCTION__.': "'.$msgName.'", '.(int)$this->getStatus('hasSslInitOk').', '.(int)$this->getStatus('hasSslTest').''."\n";
-			
 			if($this->getStatus('hasSslInitOk') && !$this->getStatus('hasSslTest')){
 				$msgData = $this->sslMsgDataPrivateDecrypt($msgData);
 				if($msgData){
@@ -1012,7 +1025,9 @@ class Client{
 					#print __CLASS__.'->'.__FUNCTION__.': '.$msgName.' SSL: password token: '.$token."\n";
 					
 					if($token){
-						if($this->sslPasswordToken && $token == hash('sha512', $this->sslPasswordToken.'_'.$this->getNode()->getSslKeyPubFingerprint())){
+						$testToken = hash('sha512',
+							$this->sslPasswordToken.'_'.$this->getNode()->getSslKeyPubFingerprint());
+						if($this->sslPasswordToken && $token == $testToken){
 							$this->log('debug', 'SSL: password verified');
 							
 							$this->setStatus('hasSsl', true);
@@ -1064,7 +1079,9 @@ class Client{
 					if($node){
 						$this->log('debug', $this->getIpPort().' recv '.$msgName.': found node');
 						
-						$this->sendSslKeyPubPut($rid, $node->getIdHexStr(), $node->getIp(), $node->getPort(), $node->getSslKeyPubFingerprint(), $node->getSslKeyPub());
+						$this->sendSslKeyPubPut($rid, $node->getIdHexStr(),
+							$node->getIp(), $node->getPort(),
+							$node->getSslKeyPubFingerprint(), $node->getSslKeyPub());
 					}
 					else{
 						// Not found.
@@ -1113,7 +1130,8 @@ class Client{
 					#$nodeSslKeyPubFingerprintByKeyPub = Node::genSslKeyFingerprint($nodeSslKeyPub);
 				}
 				
-				$this->log('debug', $this->getIpPort().' recv '.$msgName.': "'.$rid.'" "'.$nodeId.'" "'.$nodeIp.'" "'.$nodePort.'" "'.$nodeSslKeyPubFingerprint.'"');
+				$debugText = '"'.$rid.'" "'.$nodeId.'" "'.$nodeIp.':'.$nodePort.'" "'.$nodeSslKeyPubFingerprint.'"';
+				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$debugText);
 				
 				$request = $this->requestGetByRid($rid);
 				if($request){
@@ -1227,10 +1245,8 @@ class Client{
 						$this->requestRemove($request);
 						$this->log('debug', $this->getIpPort().' recv '.$msgName.': request ok');
 						
-						if($status == 0){
-							// Undefined
-						}
-						elseif($status == 1){
+						//if($status == 0){} // Undefined
+						if($status == 1){
 							// Accepted
 							$this->consoleMsgAdd('Talk request accepted.'.PHP_EOL.'Now talking to "'.$userNickname.'".');
 							$this->consoleSetModeChannel(true);
@@ -1287,7 +1303,8 @@ class Client{
 						$ignore = $msgData['ignore'];
 					}
 					
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$userNickname.', '. (int)$ignore .', '.$text);
+					$debugText = $rid.', '.$userNickname.', '.(int)$ignore.', '.$text;
+					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$debugText);
 					if(!$ignore){
 						$this->consoleTalkMsgAdd($rid, $userNickname, $text);
 					}
@@ -1524,7 +1541,7 @@ class Client{
 				if($data !== false){
 					$iv = base64_encode($iv);
 					
-					$data = gzencode( json_encode(array('data' => $data, 'iv' => $iv)) , 9);
+					$data = gzencode(json_encode(array('data' => $data, 'iv' => $iv)), 9);
 					$rv = base64_encode($data);
 					
 					return $rv;
@@ -1556,11 +1573,17 @@ class Client{
 				if(openssl_verify($data, $sign, $this->getNode()->getSslKeyPub(), OPENSSL_ALGO_SHA1)){
 					return $data;
 				}
-				else{ $this->log('warning', 'sslPasswordDecrypt openssl_verify failed'); }
+				else{
+					$this->log('warning', 'sslPasswordDecrypt openssl_verify failed');
+				}
 			}
-			else{ $this->log('warning', 'sslPasswordDecrypt openssl_decrypt failed'); }
+			else{
+				$this->log('warning', 'sslPasswordDecrypt openssl_decrypt failed');
+			}
 		}
-		else{ $this->log('warning', 'sslPasswordDecrypt no passwords set'); }
+		else{
+			$this->log('warning', 'sslPasswordDecrypt no passwords set');
+		}
 		
 		return null;
 	}
@@ -1673,7 +1696,7 @@ class Client{
 			'text' => $msg->getText(),
 			'password' => $msg->getPassword(),
 			'checksum' => $msg->getChecksum(),
-			'relayCount' => (int)$msg->getRelayCount()+1,
+			'relayCount' => (int)$msg->getRelayCount() + 1,
 			'timeCreated' => (int)$msg->getTimeCreated(),
 		);
 		$this->dataSend($this->msgCreate('msg', $data));
@@ -1797,7 +1820,8 @@ class Client{
 		$this->dataSend($this->msgCreate('ssl_key_pub_get', $data));
 	}
 	
-	private function sendSslKeyPubPut($rid, $nodeId = null, $nodeIp = null, $nodePort = null, $nodeSslKeyPubFingerprint = null, $nodeSslKeyPub = null){
+	private function sendSslKeyPubPut($rid,
+		$nodeId = null, $nodeIp = null, $nodePort = null, $nodeSslKeyPubFingerprint = null, $nodeSslKeyPub = null){
 		
 		$data = array(
 			'rid' => $rid,
@@ -1945,7 +1969,7 @@ class Client{
 			&& $this->getServer()->getKernel()
 			&& $this->getServer()->getKernel()->getIpcConsoleConnection()){
 			
-			$this->getServer()->getKernel()->getIpcConsoleConnection()->execAsync('talkRequestAdd', 
+			$this->getServer()->getKernel()->getIpcConsoleConnection()->execAsync('talkRequestAdd',
 				array($this, $rid, $userNickname));
 		}
 	}
@@ -1956,7 +1980,8 @@ class Client{
 			&& $this->getServer()->getKernel()
 			&& $this->getServer()->getKernel()->getIpcConsoleConnection()){
 			
-			$this->getServer()->getKernel()->getIpcConsoleConnection()->execAsync('talkMsgAdd', array($rid, $userNickname, $text));
+			$this->getServer()->getKernel()->getIpcConsoleConnection()
+					->execAsync('talkMsgAdd', array($rid, $userNickname, $text));
 		}
 	}
 	

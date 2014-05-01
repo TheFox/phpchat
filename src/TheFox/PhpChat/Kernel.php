@@ -66,7 +66,8 @@ class Kernel extends Thread{
 		$this->server->setKernel($this);
 		$this->server->setIp($this->settings->data['node']['ip']);
 		$this->server->setPort($this->settings->data['node']['port']);
-		$this->server->setSslPrv($this->settings->data['node']['sslKeyPrvPath'], $this->settings->data['node']['sslKeyPrvPass']);
+		$this->server->setSslPrv($this->settings->data['node']['sslKeyPrvPath'],
+			$this->settings->data['node']['sslKeyPrvPass']);
 		$init = $this->server->init();
 		$this->getLog()->info('setup server: done');
 		if(!$init){
@@ -82,7 +83,8 @@ class Kernel extends Thread{
 		$this->ipcConsoleConnection->functionAdd('serverConnect', $this, 'serverConnect');
 		$this->ipcConsoleConnection->functionAdd('serverTalkResponseSend', $this, 'serverTalkResponseSend');
 		$this->ipcConsoleConnection->functionAdd('serverTalkMsgSend', $this, 'serverTalkMsgSend');
-		$this->ipcConsoleConnection->functionAdd('serverTalkUserNicknameChangeSend', $this, 'serverTalkUserNicknameChangeSend');
+		$this->ipcConsoleConnection->functionAdd('serverTalkUserNicknameChangeSend', $this,
+			'serverTalkUserNicknameChangeSend');
 		$this->ipcConsoleConnection->functionAdd('serverTalkCloseSend', $this, 'serverTalkCloseSend');
 		$this->ipcConsoleConnection->functionAdd('getAddressbook', $this, 'getAddressbook');
 		$this->ipcConsoleConnection->functionAdd('addressbookContactAdd', $this, 'addressbookContactAdd');
@@ -353,7 +355,9 @@ class Kernel extends Thread{
 		$this->ipcCronjobConnection->execSync('shutdown');
 		#print __CLASS__.'->'.__FUNCTION__.': ipcCronjobConnection send done'."\n";
 		
-		$this->getLog()->debug('getNodesNum: '.(int)$this->getTable()->getNodesNum().', '.(int)$this->getSettings()->data['firstRun']);
+		$nodesNum = (int)$this->getTable()->getNodesNum();
+		$firstRun = (int)$this->getSettings()->data['firstRun'];
+		$this->getLog()->debug('getNodesNum: '.$nodesNum.', '.$firstRun);
 		$this->getSettings()->data['firstRun'] = $this->getTable()->getNodesNum() <= 0;
 		$this->getSettings()->setDataChanged(true);
 		

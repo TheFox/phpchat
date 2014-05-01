@@ -2,4 +2,6 @@
 
 namespace TheFox\Network;
 
-class Socket extends StreamSocket{}
+class Socket extends StreamSocket{
+	
+}

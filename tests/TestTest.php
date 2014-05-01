@@ -18,12 +18,12 @@ class TestTest extends PHPUnit_Framework_TestCase{
 	
 	public function testOne(){
 		fwrite(STDOUT, __METHOD__.''."\n");
-		$this->assertTrue(TRUE);
+		$this->assertTrue(true);
 	}
 	
 	public function testTwo(){
 		fwrite(STDOUT, __METHOD__.''."\n");
-		$this->assertTrue(FALSE);
+		$this->assertTrue(false);
 	}
 	
 	protected function assertPostConditions(){
@@ -63,7 +63,7 @@ class TestTest extends PHPUnit_Framework_TestCase{
 		#$this->assertEquals('foo', array_pop($stack));
 		#$this->assertEquals(0, count($stack));
 		
-		$this->assertTrue(TRUE, 'This should already work.');
+		$this->assertTrue(true, 'This should already work.');
 		
 		#$this->markTestSkipped('The MySQLi extension is not available.');
 	}*/

@@ -191,7 +191,7 @@ class Msg extends YamlStorage{
 	}
 	
 	public function getRelayCount(){
-		return((int)$this->data['relayCount']);
+		return ((int)$this->data['relayCount']);
 	}
 	
 	public function setForwardCycles($forwardCycles){
@@ -204,7 +204,7 @@ class Msg extends YamlStorage{
 	}
 	
 	public function getForwardCycles(){
-		return((int)$this->data['forwardCycles']);
+		return ((int)$this->data['forwardCycles']);
 	}
 	
 	public function setEncryptionMode($encryptionMode){
@@ -244,9 +244,8 @@ class Msg extends YamlStorage{
 	}
 	
 	public function getTimeCreated(){
-		return((int)$this->data['timeCreated']);
+		return ((int)$this->data['timeCreated']);
 	}
-	
 	
 	public function setSsl($ssl){
 		$this->ssl = $ssl;
@@ -345,7 +344,11 @@ class Msg extends YamlStorage{
 					
 					$this->setText($data);
 					
-					$checksumData = $this->getVersion().'_'.$this->getId().'_'.$this->getSrcNodeId().'_'.$this->getDstNodeId().'_'.base64_encode($this->getDstSslPubKey()).'_'.base64_encode($text).'_'.$this->getTimeCreated();
+					$checksumData = $this->getVersion().'_'.$this->getId();
+					$checksumData .= '_'.$this->getSrcNodeId();
+					$checksumData .= '_'.$this->getDstNodeId().'_'.base64_encode($this->getDstSslPubKey());
+					$checksumData .= '_'.base64_encode($text).'_'.$this->getTimeCreated();
+					
 					$checksumSha512Bin = hash_hmac('sha512', $checksumData, $password, true);
 					$fingerprintHex = hash('ripemd160', $checksumSha512Bin, false);
 					$fingerprintBin = hash('ripemd160', $checksumSha512Bin, true);
@@ -431,14 +434,18 @@ class Msg extends YamlStorage{
 					$data = gzdecode($data);
 					
 					$json = json_decode($data, true);
-					if($json && isset($json['text']) && isset($json['sign']) && isset($json['signAlgo']) && isset($json['srcUserNickname'])){
+					if($json && isset($json['text']) && isset($json['sign'])
+						&& isset($json['signAlgo']) && isset($json['srcUserNickname'])){
 						$text = base64_decode($json['text']);
 						$sign = base64_decode($json['sign']);
 						$signAlgo = (int)$json['signAlgo'];
 						$srcUserNickname = base64_decode($json['srcUserNickname']);
 						
 						if(openssl_verify($text, $sign, $this->getSrcSslKeyPub(), $signAlgo)){
-							$checksumData = $this->getVersion().'_'.$this->getId().'_'.$this->getSrcNodeId().'_'.$this->getDstNodeId().'_'.base64_encode($this->getDstSslPubKey()).'_'.base64_encode($text).'_'.$this->getTimeCreated();
+							$checksumData = $this->getVersion().'_'.$this->getId();
+							$checksumData .= '_'.$this->getSrcNodeId();
+							$checksumData .= '_'.$this->getDstNodeId().'_'.base64_encode($this->getDstSslPubKey());
+							$checksumData .= '_'.base64_encode($text).'_'.$this->getTimeCreated();
 							
 							$checksumSha512Bin = hash_hmac('sha512', $checksumData, $password, true);
 							$fingerprintHex = hash('ripemd160', $checksumSha512Bin, false);

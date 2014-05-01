@@ -18,9 +18,9 @@ use TheFox\Dht\Kademlia\Node;
 class Console extends Thread{
 	
 	const LOOP_USLEEP = 100000;
-	const CHAR_ESCAPE = "\033";
-	const CHAR_BACKSPACE = "\177";
-	const CHAR_EOF = "\004";
+	const CHAR_ESCAPE = "\x1b";
+	const CHAR_BACKSPACE = "\x7f";
+	const CHAR_EOF = "\x04";
 	const RANDOM_MSG_DELAY_MIN = 30;
 	const RANDOM_MSG_DELAY_MAX = 300;
 	const RANDOM_MSG_CHAR_SET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
@@ -56,7 +56,7 @@ class Console extends Thread{
 		$this->tlines = (int)exec('tput lines');
 		$this->log->debug('cols = '.$this->tcols.', lines = '.$this->tlines);
 		
-		$this->nextRandomMsg = time() + Console::RANDOM_MSG_DELAY_MIN;
+		$this->nextRandomMsg = time() + static::RANDOM_MSG_DELAY_MIN;
 		$this->randomMsgDebug();
 	}
 	
@@ -98,18 +98,18 @@ class Console extends Thread{
 	
 	public function printPs1($debug = ''){
 		if($this->getModeChannel()){
-			#print $debug.$this->settings['phpchat']['user']['nickname'].':> _'.$this->buffer.'_'; # TODO
+			#print $debug.$this->settings['phpchat']['user']['nickname'].':> _'.$this->buffer.'_';
 			print $this->userNickname.':> '.$this->buffer;
 		}
 		else{
-			#print $debug.' '.$this->getPs1().' _'.$this->buffer.'_'; # TODO
+			#print $debug.' '.$this->getPs1().' _'.$this->buffer.'_';
 			print $this->getPs1().$this->buffer;
 		}
 	}
 	
 	private function lineClear(){
 		#$this->log->debug('line clear');
-		print "\r".Console::CHAR_ESCAPE.'[K';
+		print "\r".static::CHAR_ESCAPE.'[K';
 	}
 	
 	private function linePrint($text){
@@ -214,14 +214,15 @@ class Console extends Thread{
 						$this->buffer = '';
 						$this->handleLine($line);
 					}
-					elseif($char == Console::CHAR_EOF){
+					elseif($char == static::CHAR_EOF){
 						$this->log->debug('break: EOF');
 						print "\nexit\n";
 						break;
 					}
-					elseif($char == Console::CHAR_BACKSPACE){
+					elseif($char == static::CHAR_BACKSPACE){
 						$this->log->debug('got backspace');
-						print chr(8).chr(8).chr(8).'   '.chr(8).chr(8).chr(8); flush();
+						print chr(8).chr(8).chr(8).'   '.chr(8).chr(8).chr(8);
+						flush();
 						if($this->buffer){
 							$this->buffer = substr($this->buffer, 0, -1);
 						}
@@ -242,21 +243,21 @@ class Console extends Thread{
 			if($line[0] == '/'){
 				$line = substr($line, 1);
 				if($line == 'help'){
-					print(
-						         "/connect <IP> <PORT>      - open a connection"
-						.PHP_EOL."/ab                       - address book: list nicks"
-						.PHP_EOL."/ab rem <ID>              - address book: remove contact"
-						.PHP_EOL."/talk <NICK|UUID>         - open a connection to a know nick"
-						.PHP_EOL."/request                  - list all talk requests"
-						.PHP_EOL."/request accept <ID>      - accept  a talk request"
-						.PHP_EOL."/request decline <ID>     - decline a talk request"
-						.PHP_EOL."/close                    - close talk"
-						.PHP_EOL."/msg <UUID>               - send a msg to a public key"
-						.PHP_EOL."/nick                     - print your nickname"
-						.PHP_EOL."/nick <NICK>              - set a new nickname"
-						.PHP_EOL."/exit                     - exit this programm"
-						.PHP_EOL.''
-					);
+					$help = '';
+					$help .= '/connect <IP> <PORT>      - open a connection'.PHP_EOL;
+					$help .= '/ab                       - address book: list nicks'.PHP_EOL;
+					$help .= '/ab rem <ID>              - address book: remove contact'.PHP_EOL;
+					$help .= '/talk <NICK|UUID>         - open a connection to a know nick'.PHP_EOL;
+					$help .= '/request                  - list all talk requests'.PHP_EOL;
+					$help .= '/request accept <ID>      - accept  a talk request'.PHP_EOL;
+					$help .= '/request decline <ID>     - decline a talk request'.PHP_EOL;
+					$help .= '/close                    - close talk'.PHP_EOL;
+					$help .= '/msg <UUID>               - send a msg to a public key'.PHP_EOL;
+					$help .= '/nick                     - print your nickname'.PHP_EOL;
+					$help .= '/nick <NICK>              - set a new nickname'.PHP_EOL;
+					$help .= '/exit                     - exit this programm'.PHP_EOL;
+					
+					print $help;
 					$this->printPs1('printMsgStack help');
 				}
 				elseif(substr($line, 0, 8) == 'connect '){
@@ -272,12 +273,13 @@ class Console extends Thread{
 					else{
 						$ip = substr($data, 0, $pos);
 						$port = (int)substr($data, $pos + 1);
+						$portMax = 0xffff;
 						
-						if($port <= 0xffff){
+						if($port <= $portMax){
 							$this->connect($ip, $port);
 						}
 						else{
-							print 'ERROR: Port can not be bigger than '. 0xffff .'.'.PHP_EOL;
+							print 'ERROR: Port can not be bigger than '.$portMax.'.'.PHP_EOL;
 							$this->printPs1('printMsgStack connect C');
 						}
 					}
@@ -330,7 +332,8 @@ class Console extends Thread{
 					else{
 						$contacts = $this->getIpcKernelConnection()->execSync('getAddressbook')->contactsGetByNick($data);
 						if(count($contacts) > 1){
-							print 'Found several nodes with nickname "'.$data.'". Delete old nodes or use UUID instead.'.PHP_EOL.PHP_EOL;
+							print 'Found several nodes with nickname "'.$data.'". ';
+							print 'Delete old nodes or use UUID instead.'.PHP_EOL.PHP_EOL;
 							print ' ID UUID                                  USERNAME'.PHP_EOL;
 							foreach($contacts as $contactId => $contact){
 								printf('%3d %36s  %s'.PHP_EOL, $contact->getId(), $contact->getNodeId(), $contact->getUserNickname());
@@ -361,12 +364,15 @@ class Console extends Thread{
 					}
 				}
 				elseif($line == 'request'){
+					$format = '%3d %36s  %s %s'.PHP_EOL;
 					print ' ID RID                                   IP:PORT               USERNAME'.PHP_EOL;
 					foreach($this->talkRequests as $talkRequestId => $request){
+						$rid = substr($request->getRid(), 0, 36);
 						$ipPortStr = $request->getClient()->getIp().':'.$request->getClient()->getPort();
 						$ipPortStrLen = strlen($ipPortStr);
+						$ip = $ipPortStr.str_repeat(' ', 21 - $ipPortStrLen);
 						
-						printf('%3d %36s  %s %s'.PHP_EOL, $request->getId(), substr($request->getRid(), 0, 36), $ipPortStr.str_repeat(' ', 21 - $ipPortStrLen), $request->getUserNickname());
+						printf($format, $request->getId(), $rid, $ip, $request->getUserNickname());
 					}
 					$this->printPs1('printMsgStack request');
 				}
@@ -388,7 +394,9 @@ class Console extends Thread{
 								if($action == 'accept'){
 									$talkRequest->setStatus(1);
 									
-									$this->msgAdd('Accepting talk request ID '.$talkRequest->getId().'.'.PHP_EOL.'Now talking to "'.$talkRequest->getUserNickname().'".');
+									$msgText = 'Accepting talk request ID '.$talkRequest->getId().'.'.PHP_EOL;
+									$msgText .= 'Now talking to "'.$talkRequest->getUserNickname().'".';
+									$this->msgAdd($msgText);
 									
 									$this->setModeChannel(true);
 									$this->setModeChannelClient($talkRequest->getClient());
@@ -464,7 +472,7 @@ class Console extends Thread{
 			else{
 				if($this->getModeChannel()){
 					$this->lineClear();
-					print Console::CHAR_ESCAPE.'[1A';
+					print static::CHAR_ESCAPE.'[1A';
 					$this->talkMsgAdd(0, $this->userNickname, $line);
 					$this->talkMsgSend($line);
 				}
@@ -534,7 +542,9 @@ class Console extends Thread{
 		
 		$this->talkRequests[$this->talkRequestsId] = $talkRequest;
 		
-		$this->msgAdd('User "'.$talkRequest->getUserNickname().'" wants to talk to you. Type "/request accept '.$talkRequest->getId().'" to get in touch.');
+		$msgText = 'User "'.$talkRequest->getUserNickname().'" wants to talk to you. ';
+		$msgText .= 'Type "/request accept '.$talkRequest->getId().'" to get in touch.';
+		$this->msgAdd($msgText);
 	}
 	
 	private function talkResponseSend(TalkRequest $talkRequest){
@@ -590,12 +600,12 @@ class Console extends Thread{
 			
 			$this->randomMsgSetNextTime();
 			
-			$charset = Console::RANDOM_MSG_CHAR_SET;
+			$charset = static::RANDOM_MSG_CHAR_SET;
 			
 			$text = '';
 			
 			for($n = mt_rand(mt_rand(0, 100), mt_rand(1024, 2048)); $n > 0; $n--){
-				$text .= $charset[mt_rand(0, Console::RANDOM_MSG_CHAR_SET_LEN - 1)];
+				$text .= $charset[mt_rand(0, static::RANDOM_MSG_CHAR_SET_LEN - 1)];
 			}
 			
 			$this->talkMsgSend($text, true);
@@ -605,7 +615,7 @@ class Console extends Thread{
 	}
 	
 	private function randomMsgSetNextTime(){
-		$this->nextRandomMsg = time() + mt_rand(Console::RANDOM_MSG_DELAY_MIN, Console::RANDOM_MSG_DELAY_MAX);
+		$this->nextRandomMsg = time() + mt_rand(static::RANDOM_MSG_DELAY_MIN, static::RANDOM_MSG_DELAY_MAX);
 	}
 	
 	private function randomMsgDebug(){

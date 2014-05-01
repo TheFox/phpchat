@@ -138,7 +138,8 @@ class Cronjob extends Thread{
 		
 		foreach($nodes as $nodeId => $node){
 			if($node->getIp() && $node->getPort()){
-				$this->getIpcKernelConnection()->execAsync('serverConnect', array($node->getIp(), $node->getPort(), false, true));
+				$this->getIpcKernelConnection()->execAsync('serverConnect',
+					array($node->getIp(), $node->getPort(), false, true));
 			}
 		}
 	}
@@ -200,7 +201,8 @@ class Cronjob extends Thread{
 					
 					$msg->setSrcSslKeyPub($this->localNode->getSslKeyPub());
 					$msg->setDstSslPubKey($this->localNode->getSslKeyPub());
-					$msg->setSslKeyPrvPath($this->settings->data['node']['sslKeyPrvPath'], $this->settings->data['node']['sslKeyPrvPass']);
+					$msg->setSslKeyPrvPath($this->settings->data['node']['sslKeyPrvPath'],
+						$this->settings->data['node']['sslKeyPrvPass']);
 					
 					$msg->setText($msg->decrypt());
 					$msg->setEncryptionMode('D');
@@ -243,7 +245,7 @@ class Cronjob extends Thread{
 		$processedMsgs = array();
 		
 		// Send own unsent msgs.
-		#print __CLASS__.'->'.__FUNCTION__.': unsent own'."\n"; # TODO
+		#print __CLASS__.'->'.__FUNCTION__.': unsent own'."\n";
 		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
 			if(
 				!in_array($msg->getId(), $processedMsgIds)
@@ -259,7 +261,7 @@ class Cronjob extends Thread{
 		}
 		
 		// Send foreign unsent msgs.
-		#print __CLASS__.'->'.__FUNCTION__.': unsent foreign'."\n"; # TODO
+		#print __CLASS__.'->'.__FUNCTION__.': unsent foreign'."\n";
 		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
 			if(
 				!in_array($msg->getId(), $processedMsgIds)
@@ -275,10 +277,8 @@ class Cronjob extends Thread{
 		}
 		
 		// Relay all other msgs.
-		#print __CLASS__.'->'.__FUNCTION__.': other'."\n"; # TODO
+		#print __CLASS__.'->'.__FUNCTION__.': other'."\n";
 		foreach($this->msgDb->getMsgs() as $msgId => $msg){
-			#print __CLASS__.'->'.__FUNCTION__.': other '.$msg->getId().', '. (int)in_array($msg->getId(), $processedMsgIds) .', '.$msg->getDstNodeId().', '.$msg->getEncryptionMode().', '.$msg->getStatus() ."\n"; # TODO
-			
 			if(
 				!in_array($msg->getId(), $processedMsgIds)
 				&& $msg->getDstNodeId()
@@ -293,10 +293,10 @@ class Cronjob extends Thread{
 		}
 		
 		$processedMsgs = array_unique($processedMsgs);
-		#print __CLASS__.'->'.__FUNCTION__.': processedMsgs: '.count($processedMsgs)."\n"; # TODO
+		#print __CLASS__.'->'.__FUNCTION__.': processedMsgs: '.count($processedMsgs)."\n";
 		
 		foreach($processedMsgs as $msgId => $msg){
-			#print __CLASS__.'->'.__FUNCTION__.': processedMsg A: '. $msg->getId() ."\n"; # TODO
+			#print __CLASS__.'->'.__FUNCTION__.': processedMsg A: '. $msg->getId() ."\n";
 			
 			$sentNodesC = count($msg->getSentNodes());
 			$forwardCycles = $msg->getForwardCycles();
@@ -330,7 +330,6 @@ class Cronjob extends Thread{
 				unset($processedMsgs[$msgId]);
 			}
 		}
-		#foreach($processedMsgs as $msgId => $msg){ print __CLASS__.'->'.__FUNCTION__.': processedMsg B: '. $msg->getId() .', '.$msg->getDstNodeId() ."\n"; }
 		
 		
 		$nodes = array();
@@ -384,8 +383,9 @@ class Cronjob extends Thread{
 			$msgIds = array();
 			
 			foreach($msgs as $msgId => $msg){
-				fwrite(STDOUT, __METHOD__.'      msg: '.$msg->getId().', '.$msg->getStatus().', '.$msg->getEncryptionMode().', direct='.
-					(int)($msg->getDstNodeId() == $node->getIdHexStr()) ."\n");
+				$tmp = $msg->getId().', '.$msg->getStatus().', '.$msg->getEncryptionMode(); # TODO
+				$tmp .= ', direct='.(int)($msg->getDstNodeId() == $node->getIdHexStr()); # TODO
+				fwrite(STDOUT, __METHOD__.'      msg: '.$tmp."\n"); # TODO
 				
 				$updateMsgs[$msg->getId()] = $msg;
 				$msgIds[] = $msg->getId();
@@ -398,7 +398,7 @@ class Cronjob extends Thread{
 		}
 		
 		foreach($updateMsgs as $msgId => $msg){
-			#fwrite(STDOUT, __METHOD__.': update msg: '.$msg->getId()."\n");
+			fwrite(STDOUT, __METHOD__.' update msg: '.$msg->getId()."\n");
 			if($this->getIpcKernelConnection()){
 				$this->getIpcKernelConnection()->execAsync('msgDbMsgIncForwardCyclesById', array($msg->getId()));
 			}

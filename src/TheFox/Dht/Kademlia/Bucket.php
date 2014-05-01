@@ -108,8 +108,6 @@ class Bucket extends YamlStorage{
 		return $this->getIsFull();
 	}
 	
-	
-	
 	public function getNodes(){
 		return $this->nodes;
 	}
@@ -125,8 +123,6 @@ class Bucket extends YamlStorage{
 	public function getLocalNode(){
 		return $this->localNode;
 	}
-	
-	
 	
 	public function nodeFind(Node $node){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -179,7 +175,5 @@ class Bucket extends YamlStorage{
 		
 		$this->setDataChanged(true);
 	}
-	
-	
 	
 }

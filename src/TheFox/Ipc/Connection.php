@@ -141,7 +141,6 @@ class Connection{
 			
 			$start = time();
 			while( time() - $timeout <= $start && $this->execs[$execsId]['clientsReturned'] < $clientsNum ){
-				#print __CLASS__.'->'.__FUNCTION__.': server: '.count($this->execs).', '.$this->execs[$execsId]['clientsReturned'].'/'.$clientsNum."\n";
 				$this->run();
 				usleep(static::EXEC_USLEEP);
 			}
@@ -175,7 +174,8 @@ class Connection{
 			$break = !count($this->execs);
 			
 			usleep(static::LOOP_USLEEP);
-		}while(!$break);
+		}
+		while(!$break);
 	}
 	
 	public function connect(){

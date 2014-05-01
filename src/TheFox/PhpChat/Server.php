@@ -49,8 +49,8 @@ class Server{
 	}
 	
 	public function kernelHasConsole(){
-		if($this->getKernel() && $this->getKernel()->getIpcConsoleConnection() && $this->getKernel()->getIpcConsoleConnection()->getHandler()){
-			
+		if($this->getKernel() && $this->getKernel()->getIpcConsoleConnection()
+			&& $this->getKernel()->getIpcConsoleConnection()->getHandler()){
 			return $this->getKernel()->getIpcConsoleConnection()->getHandler()->getClientsNum() > 0;
 		}
 		return false;
@@ -146,7 +146,8 @@ class Server{
 		#print __CLASS__.'->'.__FUNCTION__.': client '.count($this->clients)."\n";
 		
 		$readHandles = array();
-		$writeHandles = NULL; $exceptHandles = NULL;
+		$writeHandles = null;
+		$exceptHandles = null;
 		
 		if($this->isListening){
 			$readHandles[] = $this->socket->getHandle();

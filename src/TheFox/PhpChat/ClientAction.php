@@ -117,9 +117,7 @@ class ClientAction{
 			#print __CLASS__.'->'.__FUNCTION__.': exec objc'."\n";
 			return call_user_func_array(array($objc, $func), $args);
 		}
-		else{
-			#print __CLASS__.'->'.__FUNCTION__.': else'."\n";
-		}
+		#else{ print __CLASS__.'->'.__FUNCTION__.': else'."\n"; }
 	}
 	
 }
