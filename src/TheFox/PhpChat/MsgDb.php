@@ -3,6 +3,7 @@
 namespace TheFox\PhpChat;
 
 use TheFox\Yaml\YamlStorage;
+use TheFox\Dht\Kademlia\Node;
 
 class MsgDb extends YamlStorage{
 	
@@ -193,6 +194,19 @@ class MsgDb extends YamlStorage{
 		$rv = array();
 		foreach($this->msgs as $msgId => $msg){
 			if(!$msg->getSentNodes()){
+				$rv[$msgId] = $msg;
+			}
+		}
+		return $rv;
+	}
+	
+	public function getMsgsForDst(Node $node){
+		#print __CLASS__.'->'.__FUNCTION__.': dst '.$node->getIdHexStr()."\n";
+		
+		$rv = array();
+		foreach($this->msgs as $msgId => $msg){
+			#print __CLASS__.'->'.__FUNCTION__.': '.$msg->getId().', '.$msg->getDstNodeId()."\n";
+			if($msg->getDstNodeId() == $node->getIdHexStr()){
 				$rv[$msgId] = $msg;
 			}
 		}
