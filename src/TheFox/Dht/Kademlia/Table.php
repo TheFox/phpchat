@@ -79,7 +79,12 @@ class Table extends YamlStorage{
 		
 		$this->data['bucketsId']++;
 		
-		$bucket = new Bucket($this->getDatadirBasePath().'/bucket_'.$this->data['bucketsId'].'.yml');
+		$filePath = null;
+		if($this->getDatadirBasePath()){
+			$filePath = $this->getDatadirBasePath().'/bucket_'.$this->data['bucketsId'].'.yml';
+		}
+		
+		$bucket = new Bucket($filePath);
 		$bucket->setId($this->data['bucketsId']);
 		$bucket->setMask($mask);
 		$bucket->setDatadirBasePath($this->getDatadirBasePath());

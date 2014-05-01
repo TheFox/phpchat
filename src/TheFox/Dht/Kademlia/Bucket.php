@@ -143,7 +143,12 @@ class Bucket extends YamlStorage{
 		$onode = $this->nodeFind($node);
 		if(!$onode){
 			#print __CLASS__.'->'.__FUNCTION__.': old node'."\n";
-			$node->setFilePath($this->getDatadirBasePath().'/node_'.$node->getIdHexStr().'.yml');
+			$filePath = null;
+			if($this->getDatadirBasePath()){
+				$filePath = $this->getDatadirBasePath().'/node_'.$node->getIdHexStr().'.yml';
+			}
+			
+			$node->setFilePath($filePath);
 			$node->setDatadirBasePath($this->getDatadirBasePath());
 			$node->setBucket($this);
 			$node->setDataChanged(true);
