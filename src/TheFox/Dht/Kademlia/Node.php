@@ -90,7 +90,7 @@ class Node extends YamlStorage{
 			for($bits = 7; $bits >= 0; $bits--){
 				$rv .= $this->id[$idPos] & (1 << $bits) ? '1' : '0';
 			}
-			$rv .= ' ';
+			#$rv .= ' ';
 		}
 		return $rv;
 	}
@@ -239,6 +239,7 @@ class Node extends YamlStorage{
 			for($bits = 7; $bits >= 0; $bits--){
 				$rv .= $distance[$idPos] & (1 << $bits) ? '1' : '0';
 			}
+			#$rv .= ' ';
 		}
 		return $rv;
 	}
