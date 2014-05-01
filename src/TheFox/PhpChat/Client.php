@@ -792,7 +792,7 @@ class Client{
 						$msg->setEncryptionMode('D');
 						$msg->setStatus('U');
 						$msg->setTimeCreated($timeCreated);
-						$msg->setTimeReceive(time());
+						$msg->setTimeReceived(time());
 						
 						if($msg->getDstNodeId() == $this->getLocalNode()->getIdHexStr()){
 							$msg->setDstSslPubKey($this->getLocalNode()->getSslKeyPub());
