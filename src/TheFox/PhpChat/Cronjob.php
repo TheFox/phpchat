@@ -381,14 +381,15 @@ class Cronjob extends Thread{
 		$updateMsgs = array();
 		foreach($nodeIds as $nodeId => $msgs){
 			$node = $nodes[$nodeId];
-			fwrite(STDOUT, __METHOD__.' node: '.$node->getIdHexStr().', '.(int)isset($nodes[$nodeId])."\n");
+			fwrite(STDOUT, __METHOD__.' node: '.$node->getIdHexStr().', '.$node->getIpPort()."\n");
 			
 			$msgs = array_unique($msgs);
 			$msgIds = array();
 			
 			foreach($msgs as $msgId => $msg){
+				$direct = (int)($msg->getDstNodeId() == $node->getIdHexStr() && $node->getIp() && $node->getPort());
 				$tmp = $msg->getId().', '.$msg->getStatus().', '.$msg->getEncryptionMode(); # TODO
-				$tmp .= ', direct='.(int)($msg->getDstNodeId() == $node->getIdHexStr()); # TODO
+				$tmp .= ', direct='.$direct; # TODO
 				fwrite(STDOUT, __METHOD__.'      msg: '.$tmp."\n"); # TODO
 				
 				$updateMsgs[$msg->getId()] = $msg;
@@ -396,6 +397,8 @@ class Cronjob extends Thread{
 			}
 			
 			if($msgs && $this->getIpcKernelConnection()){
+				fwrite(STDOUT, __METHOD__.'      msgs: '.count($msgs)."\n"); # TODO
+				
 				$serverConnectArgs = array($node->getIp(), $node->getPort(), false, false, $msgIds);
 				$this->getIpcKernelConnection()->execSync('serverConnect', $serverConnectArgs);
 			}
