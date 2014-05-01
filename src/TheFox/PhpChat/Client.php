@@ -357,7 +357,7 @@ class Client{
 		#print __CLASS__.'->'.__FUNCTION__.': "'.$msgName.'", '.json_encode($msg['data'])."\n";
 		
 		if($msgName == 'nop'){
-			$nop = 90:
+			$nop = 0x90;
 		}
 		elseif($msgName == 'test'){
 			$len = 0;
