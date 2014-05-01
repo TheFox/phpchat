@@ -231,8 +231,6 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 			fwrite(STDOUT, __METHOD__.': '.$msg->getId().', '.$msg->getStatus().', '.$msg->getDstNodeId()."\n");
 		}
 		
-		$this->assertTrue(true);
-		
 		$this->assertFalse(array_key_exists('20000000-2000-4002-8002-200000001007', $updateMsgs));
 		$this->assertEquals('X', self::$msgs[1007]->getStatus());
 		
