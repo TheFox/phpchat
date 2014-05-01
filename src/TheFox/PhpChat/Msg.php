@@ -36,7 +36,7 @@ class Msg extends YamlStorage{
 		$this->data['encryptionMode'] = '';
 		$this->data['status'] = '';
 		$this->data['timeCreated'] = time();
-		
+		$this->data['timeReceive'] = 0;
 	}
 	
 	public function __sleep(){
@@ -245,6 +245,14 @@ class Msg extends YamlStorage{
 	
 	public function getTimeCreated(){
 		return ((int)$this->data['timeCreated']);
+	}
+	
+	public function setTimeReceive($timeReceive){
+		$this->data['timeReceive'] = (int)$timeReceive;
+	}
+	
+	public function getTimeReceive(){
+		return ((int)$this->data['timeReceive']);
 	}
 	
 	public function setSsl($ssl){
