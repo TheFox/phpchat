@@ -23,9 +23,9 @@
 		<testsuite name="My Test Suite">
 			<file>tests/BasicTest.php</file>
 			<!--<file>tests/ConsoleTest.php</file>//-->
-			<file>tests/NodeTest.php</file>
-			<file>tests/MsgTest.php</file>
 			<file>tests/CronjobTest.php</file>
+			<file>tests/MsgTest.php</file>
+			<file>tests/NodeTest.php</file>
 		</testsuite>
 	</testsuites>
 </phpunit>
