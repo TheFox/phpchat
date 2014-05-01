@@ -67,7 +67,12 @@ class MsgDb extends YamlStorage{
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		#print __CLASS__.'->'.__FUNCTION__.': '.$msg->getId()."\n";
 		
-		$msg->setFilePath($this->getDatadirBasePath().'/msg_'.$msg->getId().'.yml');
+		$filePath = null;
+		if($this->getDatadirBasePath()){
+			$filePath = $this->getDatadirBasePath().'/msg_'.$msg->getId().'.yml';
+		}
+		
+		$msg->setFilePath($filePath);
 		$msg->setDatadirBasePath($this->getDatadirBasePath());
 		$msg->setMsgDb($this);
 		
