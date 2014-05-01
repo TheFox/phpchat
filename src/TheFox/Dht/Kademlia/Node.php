@@ -26,6 +26,8 @@ class Node extends YamlStorage{
 		$this->data['sslKeyPubFingerprint'] = '';
 		$this->data['timeCreated'] = time();
 		$this->data['timeLastSeen'] = 0;
+		
+		$this->setIdHexStr($this->data['id']);
 	}
 	
 	public function __sleep(){
