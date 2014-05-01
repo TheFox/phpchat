@@ -84,7 +84,7 @@ class Kernel extends Thread{
 			'serverConnect', 'serverTalkResponseSend', 'serverTalkMsgSend', 'serverTalkUserNicknameChangeSend',
 				'serverTalkCloseSend',
 			'getAddressbook', 'addressbookContactAdd', 'addressbookContactRemove',
-			'msgDbMsgAdd', 'getSettings', 'getLocalNode', 'getTable', 'save', 
+			'getMsgDb', 'msgDbMsgAdd', 'msgDbMsgGetMsgsForDst', 'getSettings', 'getLocalNode', 'getTable', 'save', 
 		) as $functionName){
 			$this->ipcConsoleConnection->functionAdd($functionName, $this, $functionName);
 		}
@@ -286,6 +286,13 @@ class Kernel extends Thread{
 	
 	public function msgDbMsgUpdate(Msg $msg){
 		$this->getMsgDb()->msgUpdate($msg);
+	}
+	
+	public function msgDbMsgGetMsgsForDst($node = null){
+		if($node === null){
+			return $this->getMsgDb()->getMsgsForDst($this->getLocalNode());
+		}
+		return $this->getMsgDb()->getMsgsForDst($node);
 	}
 	
 	public function msgDbMsgIncForwardCyclesById($msgId){
