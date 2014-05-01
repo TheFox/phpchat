@@ -82,6 +82,17 @@ class Node extends YamlStorage{
 		return $this->data['id'];
 	}
 	
+	public function getIdBitStr(){
+		$rv = '';
+		for($idPos = 0; $idPos < static::ID_LEN; $idPos++){
+			for($bits = 7; $bits >= 0; $bits--){
+				$rv .= $this->id[$idPos] & (1 << $bits) ? '1' : '0';
+			}
+			$rv .= ' ';
+		}
+		return $rv;
+	}
+	
 	public function setIp($ip){
 		$this->data['ip'] = $ip;
 	}
