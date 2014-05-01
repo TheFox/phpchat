@@ -2,6 +2,7 @@
 
 namespace TheFox\PhpChat;
 
+use Exception;
 use RuntimeException;
 use DateTime;
 use DateTimeZone;
@@ -147,8 +148,7 @@ class Console extends Thread{
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		$this->log->debug('tty setup');
-		#system('stty -icanon && echo icanon ok');
-		system('stty -icanon');
+		$this->sttyEnterCanonMode();
 		
 		$this->stdin = fopen('php://stdin', 'r');
 		stream_set_blocking($this->stdin, 0);
@@ -159,6 +159,14 @@ class Console extends Thread{
 		$this->msgAdd('start');
 		
 		return true;
+	}
+	
+	private function sttyEnterCanonMode(){
+		system('stty -icanon');
+	}
+	
+	private function sttyExitCanonMode(){
+		system('stty sane');
 	}
 	
 	public function run(){
@@ -252,7 +260,9 @@ class Console extends Thread{
 					$help .= '/request accept <ID>      - accept  a talk request'.PHP_EOL;
 					$help .= '/request decline <ID>     - decline a talk request'.PHP_EOL;
 					$help .= '/close                    - close talk'.PHP_EOL;
-					$help .= '/msg <UUID>               - send a msg to a public key'.PHP_EOL;
+					$help .= '/msg                      - list msgs'.PHP_EOL;
+					$help .= '/msg new <UUID>           - send a msg to a uuid'.PHP_EOL;
+					$help .= '/msg read <NO|ID>         - read a msg'.PHP_EOL;
 					$help .= '/nick                     - print your nickname'.PHP_EOL;
 					$help .= '/nick <NICK>              - set a new nickname'.PHP_EOL;
 					$help .= '/exit                     - exit this programm'.PHP_EOL;
@@ -430,7 +440,17 @@ class Console extends Thread{
 					$this->setModeChannel(false);
 					$this->setModeChannelClient(null);
 				}
-				elseif($line == 'msg'){
+				elseif(substr($line, 0, 3) == 'msg'){
+					$this->handleCommandMsg($line);
+				}
+				elseif($line == 'tmsg'){
+					#$dstSslKeyPubFingerprint = 'FC_4NE6AZo3X5qPfNEZXcdHpv3TvYSUXoaXt';
+					
+					#$dstNodeId = '22379d3d-ffa3-4ab9-b0fa-0c6e15fce014';
+					$dstNodeId = '42785b21-011b-4093-b61d-2680ba0e208f';
+					
+					
+					
 				}
 				elseif($line == 'nick'){
 					$this->msgAdd('Your nickname: '.$this->userNickname);
@@ -486,6 +506,216 @@ class Console extends Thread{
 		}
 	}
 	
+	private function handleCommandMsg($line){
+		#print __CLASS__.'->'.__FUNCTION__.': "'.$line.'"'."\n";
+		$line = substr($line, 3);
+		
+		#print __CLASS__.'->'.__FUNCTION__.': get settings'."\n";
+		$settings = $this->getIpcKernelConnection()->execSync('getSettings');
+		
+		#print __CLASS__.'->'.__FUNCTION__.': get table'."\n";
+		$table = $this->getIpcKernelConnection()->execSync('getTable');
+		
+		#print __CLASS__.'->'.__FUNCTION__.': get msgDb'."\n";
+		#$msgDb = $this->getIpcKernelConnection()->execSync('getMsgDb');
+		$msgs = $this->getIpcKernelConnection()->execSync('msgDbMsgGetMsgsForDst');
+		$msgsByIndex = array_keys($msgs);
+		#ve($msgDb);
+		#ve($msgs);
+		#ve($msgsByIndex);
+		
+		/*
+		if(!$msgDb){
+			print __CLASS__.'->'.__FUNCTION__.': get msgDb failed'."\n";
+			return;
+		}*/
+		
+		if($line){
+			$line = substr($line, 1);
+			$args = preg_split('/ /', $line);
+			#ve($args);
+			
+			#$this->printPs1('handleCommandMsg A');
+			
+			if(($args[0] == 'new' || $args[0] == 'n')){
+				if(strIsUuid($args[1])){
+					print 'NOTE: end text with  <RETURN>.<RETURN>'.PHP_EOL;
+					
+					$text = '';
+					$this->sttyExitCanonMode();
+					stream_set_blocking($this->stdin, 1);
+					while(true){
+						$line = fgets($this->stdin, 1024);
+						
+						#print "line: '".substr($line, 0, -1)."'\n";
+						if(substr($line, 0, -1) == '.') break;
+						$text .= $line;
+						
+						sleep(1);
+					}
+					print 'Send msg? [Y/n] ';
+					
+					$text = substr($text, 0, -1);
+					
+					$answer = strtolower(substr(fgets($this->stdin, 100), 0, -1));
+					if(!$answer){
+						$answer = 'y';
+					}
+					print "Answer: '".$answer."'\n";
+					print "Text: '".$text."'\n";
+					
+					stream_set_blocking($this->stdin, 0);
+					$this->sttyEnterCanonMode();
+					
+					if($answer == 'y'){
+						$dstNodeId = $args[1];
+						#$dstNodeId = '42785b21-011b-4093-b61d-000000000001';
+						#$text = 'this is  a test. '.date('Y/m/d H:i:s');
+						
+						
+						$settings = $this->getIpcKernelConnection()->execSync('getSettings');
+						$table = $this->getIpcKernelConnection()->execSync('getTable');
+						
+						
+						$msg = new Msg();
+						$msg->setSrcNodeId($settings->data['node']['id']);
+						$msg->setSrcSslKeyPub($table->getLocalNode()->getSslKeyPub());
+						$msg->setSrcUserNickname($this->userNickname);
+						
+						$dstNode = new Node();
+						$dstNode->setIdHexStr($dstNodeId);
+						
+						$msg->setDstNodeId($dstNode->getIdHexStr());
+						if($oDstNode = $table->nodeFindInBuckets($dstNode)){
+							print 'found node in table'.PHP_EOL;
+							$msg->setDstSslPubKey($oDstNode->getSslKeyPub());
+						}
+						else{ print 'node not found'.PHP_EOL; }
+						
+						$msg->setText($text);
+						$msg->setSslKeyPrvPath($settings->data['node']['sslKeyPrvPath'], $settings->data['node']['sslKeyPrvPass']);
+						$msg->setStatus('O');
+						
+						$encrypted = false;
+						print 'DstSslPubKey: '.strlen($msg->getDstSslPubKey()).PHP_EOL;
+						if($msg->getDstSslPubKey()){
+							print 'use dst key'.PHP_EOL;
+							
+							$msg->setEncryptionMode('D');
+						}
+						else{
+							// Encrypt with own public key
+							// while destination public key is not available.
+							print 'use local key'.PHP_EOL;
+							
+							$msg->setEncryptionMode('S');
+							$msg->setDstSslPubKey($table->getLocalNode()->getSslKeyPub());
+						}
+						
+						try{
+							$encrypted = $msg->encrypt();
+						}
+						catch(Exception $e){
+							print 'ERROR: '.$e->getMessage().PHP_EOL;
+						}
+						
+						if($encrypted){
+							$this->getIpcKernelConnection()->execAsync('msgDbMsgAdd', array($msg));
+						}
+						else{
+							print 'ERROR: Could not encrypt msg.'.PHP_EOL;
+						}
+					}
+				}
+				else{
+					print 'ERROR: "'.$args[1].'" is not a UUID.'.PHP_EOL;
+				}
+				
+				
+				
+				
+				$this->printPs1('printMsgStack msg A');
+			}
+			elseif($args[0] == 'read' || $args[0] == 'r'){
+				if(isset($args[1])){
+					$msg = null;
+					if(strIsUuid($args[1])){
+						if(isset($msgs[$args[1]])){
+							$msg = $msgs[$args[1]];
+						}
+					}
+					else{
+						$no = (int)$args[1] - 1;
+						if(isset($msgsByIndex[$no])){
+							$msg = $msgs[$msgsByIndex[$no]];
+						}
+					}
+					if($msg){
+						
+						$msg->setDstSslPubKey($table->getLocalNode()->getSslKeyPub());
+						
+						$sslKeyPrvPath = $settings->data['node']['sslKeyPrvPath'];
+						$sslKeyPrvPass = $settings->data['node']['sslKeyPrvPass'];
+						$msg->setSslKeyPrvPath($sslKeyPrvPath, $sslKeyPrvPass);
+						
+						#ve($msg);
+						$text = null;
+						try{
+							$text = $msg->decrypt();
+						}
+						catch(Exception $e){
+							$text = null;
+							#print 'ERROR: decrypt: '.$e->getMessage().PHP_EOL;
+						}
+						
+						$dateCreated = new DateTime();
+						$dateCreated->setTimestamp($msg->getTimeCreated());
+						
+						$dateReceived = new DateTime();
+						$dateReceived->setTimestamp($msg->getTimeReceived());
+						
+						if(!$text){
+							print 'WARNING: could not decrypt text. Only meta data available.'.PHP_EOL;
+						}
+						print 'ID: '.$msg->getId().PHP_EOL;
+						print 'From: '.( $msg->getSrcUserNickname() ? $msg->getSrcUserNickname().' ' : '').'<'.$msg->getSrcNodeId().'>'.PHP_EOL;
+						print 'To: '.($table->getLocalNode()->getIdHexStr() == $msg->getDstNodeId() ? 'Me' : '').'<'.$msg->getDstNodeId().'>'.PHP_EOL;
+						print 'Status: '.$msg->getStatus().PHP_EOL;
+						print 'Date: '.$dateCreated->format('Y/m/d H:i:s').PHP_EOL;
+						
+						if($text){
+							print PHP_EOL;
+							print $text.PHP_EOL;
+						}
+						
+						$this->printPs1('handleCommandMsg Ac');
+					}
+					else{
+						print 'ERROR: could not read msg "'.$args[1].'"'.PHP_EOL;
+						$this->printPs1('handleCommandMsg Aa');
+					}
+				}
+				else{
+					print 'ERROR: you must specify a msg number or ID'.PHP_EOL;
+					$this->printPs1('handleCommandMsg Ab');
+				}
+			}
+		}
+		else{
+			$format = '%3d %36s  %s'.PHP_EOL;
+			print ' NO ID                                    STATUS'.PHP_EOL;
+			
+			$no = 0;
+			#foreach($msgDb->getMsgs() as $msgId => $msg){
+			foreach($msgs as $msgId => $msg){
+				$no++;
+				printf($format, $no, $msg->getId(), $msg->getStatus());
+			}
+			
+			$this->printPs1('handleCommandMsg B');
+		}
+	}
+	
 	private function printMsgStack(){
 		if($this->msgStack){
 			$this->lineClear();
@@ -504,7 +734,7 @@ class Console extends Thread{
 		fclose($this->stdin);
 		
 		$this->log->debug('tty restore');
-		system('stty sane');
+		$this->sttyExitCanonMode();
 		
 		if(!$this->ipcKernelShutdown){
 			$this->getIpcKernelConnection()->execSync('shutdown');
