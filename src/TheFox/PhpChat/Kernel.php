@@ -75,38 +75,31 @@ class Kernel extends Thread{
 			$this->setExit(1);
 		}
 		
+		// Console Connection
 		$this->ipcConsoleConnection = new ConnectionServer();
 		$this->ipcConsoleConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20000));
 		$this->ipcConsoleConnection->functionAdd('shutdown', $this, 'ipcConsoleShutdown');
-		$this->ipcConsoleConnection->functionAdd('getSettingsUserNickname', $this, 'getSettingsUserNickname');
-		$this->ipcConsoleConnection->functionAdd('setSettingsUserNickname', $this, 'setSettingsUserNickname');
-		$this->ipcConsoleConnection->functionAdd('serverConnect', $this, 'serverConnect');
-		$this->ipcConsoleConnection->functionAdd('serverTalkResponseSend', $this, 'serverTalkResponseSend');
-		$this->ipcConsoleConnection->functionAdd('serverTalkMsgSend', $this, 'serverTalkMsgSend');
-		$this->ipcConsoleConnection->functionAdd('serverTalkUserNicknameChangeSend', $this,
-			'serverTalkUserNicknameChangeSend');
-		$this->ipcConsoleConnection->functionAdd('serverTalkCloseSend', $this, 'serverTalkCloseSend');
-		$this->ipcConsoleConnection->functionAdd('getAddressbook', $this, 'getAddressbook');
-		$this->ipcConsoleConnection->functionAdd('addressbookContactAdd', $this, 'addressbookContactAdd');
-		$this->ipcConsoleConnection->functionAdd('addressbookContactRemove', $this, 'addressbookContactRemove');
-		$this->ipcConsoleConnection->functionAdd('msgDbMsgAdd', $this, 'msgDbMsgAdd');
-		$this->ipcConsoleConnection->functionAdd('getSettings', $this, 'getSettings');
-		$this->ipcConsoleConnection->functionAdd('getLocalNode', $this, 'getLocalNode');
-		$this->ipcConsoleConnection->functionAdd('getTable', $this, 'getTable');
-		$this->ipcConsoleConnection->functionAdd('save', $this, 'save');
+		foreach(array(
+			'getSettingsUserNickname', 'setSettingsUserNickname',
+			'serverConnect', 'serverTalkResponseSend', 'serverTalkMsgSend', 'serverTalkUserNicknameChangeSend',
+				'serverTalkCloseSend',
+			'getAddressbook', 'addressbookContactAdd', 'addressbookContactRemove',
+			'msgDbMsgAdd', 'getSettings', 'getLocalNode', 'getTable', 'save', 
+		) as $functionName){
+			$this->ipcConsoleConnection->functionAdd($functionName, $this, $functionName);
+		}
 		$this->ipcConsoleConnection->connect();
 		
+		// Cronjob Connection
 		$this->ipcCronjobConnection = new ConnectionServer();
 		$this->ipcCronjobConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20001));
-		$this->ipcCronjobConnection->functionAdd('getSettings', $this, 'getSettings');
-		$this->ipcCronjobConnection->functionAdd('getLocalNode', $this, 'getLocalNode');
-		$this->ipcCronjobConnection->functionAdd('getTable', $this, 'getTable');
-		$this->ipcCronjobConnection->functionAdd('getMsgDb', $this, 'getMsgDb');
-		$this->ipcCronjobConnection->functionAdd('msgDbMsgUpdate', $this, 'msgDbMsgUpdate');
-		$this->ipcCronjobConnection->functionAdd('msgDbMsgIncForwardCyclesById', $this, 'msgDbMsgIncForwardCyclesById');
-		$this->ipcCronjobConnection->functionAdd('msgDbMsgSetStatusById', $this, 'msgDbMsgSetStatusById');
-		$this->ipcCronjobConnection->functionAdd('serverConnect', $this, 'serverConnect');
-		$this->ipcCronjobConnection->functionAdd('save', $this, 'save');
+		foreach(array(
+			'getSettings', 'getLocalNode', 'getTable',
+			'getMsgDb', 'msgDbMsgUpdate', 'msgDbMsgIncForwardCyclesById', 'msgDbMsgSetStatusById',
+			'serverConnect', 'save', 
+		) as $functionName){
+			$this->ipcCronjobConnection->functionAdd($functionName, $this, $functionName);
+		}
 		$this->ipcCronjobConnection->connect();
 		
 		
