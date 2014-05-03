@@ -152,7 +152,7 @@ class Console extends Thread{
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		$this->log->debug('tty setup');
-		$this->sttyEnterCanonMode();
+		$this->sttyEnterIcanonMode();
 		
 		$this->stdin = fopen('php://stdin', 'r');
 		stream_set_blocking($this->stdin, 0);
@@ -165,11 +165,11 @@ class Console extends Thread{
 		return true;
 	}
 	
-	private function sttyEnterCanonMode(){
+	private function sttyEnterIcanonMode(){
 		system('stty -icanon');
 	}
 	
-	private function sttyExitCanonMode(){
+	private function sttyExitIcanonMode(){
 		system('stty sane');
 	}
 	
@@ -546,7 +546,7 @@ class Console extends Thread{
 					print 'NOTE: end text with  <RETURN>.<RETURN>'.PHP_EOL;
 					
 					$text = '';
-					$this->sttyExitCanonMode();
+					$this->sttyExitIcanonMode();
 					stream_set_blocking($this->stdin, 1);
 					while(true){
 						$line = fgets($this->stdin, 1024);
@@ -569,7 +569,7 @@ class Console extends Thread{
 					print "Text: '".$text."'\n";
 					
 					stream_set_blocking($this->stdin, 0);
-					$this->sttyEnterCanonMode();
+					$this->sttyEnterIcanonMode();
 					
 					if($answer == 'y'){
 						$dstNodeId = $args[1];
@@ -738,7 +738,7 @@ class Console extends Thread{
 		fclose($this->stdin);
 		
 		$this->log->debug('tty restore');
-		$this->sttyExitCanonMode();
+		$this->sttyExitIcanonMode();
 		
 		if(!$this->ipcKernelShutdown){
 			$this->getIpcKernelConnection()->execSync('shutdown');
