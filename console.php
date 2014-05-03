@@ -4,8 +4,15 @@ require_once __DIR__.'/bootstrap.php';
 
 use TheFox\PhpChat\Console;
 
+$console = null;
 
-$console = new Console();
+try{
+	$console = new Console();
+}
+catch(Exception $e){
+	$log->error('console create: '.$e->getMessage());
+	exit(1);
+}
 
 $log->info('signal handler setup');
 declare(ticks = 1);
