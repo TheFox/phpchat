@@ -149,8 +149,7 @@ class Console extends Thread{
 		
 		$this->userNickname = $this->getIpcKernelConnection()->execSync('getSettingsUserNickname');
 		
-		$this->stdin = fopen('php://stdin', 'r');
-		stream_set_blocking($this->stdin, 0);
+		#stream_set_blocking(STDIN, 0);
 		
 		print PHP_EOL."Type '/help' for help.".PHP_EOL;
 		
@@ -216,14 +215,15 @@ class Console extends Thread{
 	}
 	
 	private function readStdin(){
-		$read = array($this->stdin);
+		$read = array(STDIN);
 		$write = array();
 		$except = array();
 		$streamsChanged = stream_select($read, $write, $except, 0);
 		if($streamsChanged){
 			
+			#print "fgets\n";
 			#$this->log->debug('fgets');
-			$buffer = fgets($this->stdin, 1024);
+			$buffer = fgets(STDIN, 1024);
 			if($buffer === false){
 				$this->log->error('buffer is false');
 			}
@@ -563,10 +563,10 @@ class Console extends Thread{
 					print 'NOTE: end text with  <RETURN>.<RETURN>'.PHP_EOL;
 					
 					$text = '';
-					$this->sttyExitIcanonMode();
-					stream_set_blocking($this->stdin, 1);
+					#$this->sttyExitIcanonMode();
+					#stream_set_blocking(STDIN, 1);
 					while(true){
-						$line = fgets($this->stdin, 1024);
+						$line = fgets(STDIN, 1024);
 						
 						#print "line: '".substr($line, 0, -1)."'\n";
 						if(substr($line, 0, -1) == '.') break;
@@ -578,15 +578,15 @@ class Console extends Thread{
 					
 					$text = substr($text, 0, -1);
 					
-					$answer = strtolower(substr(fgets($this->stdin, 100), 0, -1));
+					$answer = strtolower(substr(fgets(STDIN, 100), 0, -1));
 					if(!$answer){
 						$answer = 'y';
 					}
 					print "Answer: '".$answer."'\n";
 					print "Text: '".$text."'\n";
 					
-					stream_set_blocking($this->stdin, 0);
-					$this->sttyEnterIcanonMode();
+					#stream_set_blocking(STDIN, 0);
+					#$this->sttyEnterIcanonMode();
 					
 					if($answer == 'y'){
 						$dstNodeId = $args[1];
@@ -752,9 +752,9 @@ class Console extends Thread{
 		#print __CLASS__.'->'.__FUNCTION__.': '.(int)$this->ipcKernelShutdown."\n";
 		$this->getLog()->info('shutdown');
 		
-		fclose($this->stdin);
-		
 		$this->sttyReset();
+		
+		#fclose(STDIN);
 		
 		if(!$this->ipcKernelShutdown){
 			$this->getIpcKernelConnection()->execSync('shutdown');
