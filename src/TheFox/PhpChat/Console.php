@@ -686,7 +686,7 @@ class Console extends Thread{
 						}
 						print 'ID: '.$msg->getId().PHP_EOL;
 						print 'From: '.( $msg->getSrcUserNickname() ? $msg->getSrcUserNickname().' ' : '').'<'.$msg->getSrcNodeId().'>'.PHP_EOL;
-						print 'To: '.($table->getLocalNode()->getIdHexStr() == $msg->getDstNodeId() ? 'Me' : '').'<'.$msg->getDstNodeId().'>'.PHP_EOL;
+						print 'To: '.($table->getLocalNode()->getIdHexStr() == $msg->getDstNodeId() ? 'Me ' : '').'<'.$msg->getDstNodeId().'>'.PHP_EOL;
 						print 'Status: '.$msg->getStatus().PHP_EOL;
 						print 'Date: '.$dateCreated->format('Y/m/d H:i:s').PHP_EOL;
 						
