@@ -42,6 +42,7 @@ class Console extends Thread{
 	private $talkRequestsId = 0;
 	private $talkRequests = array();
 	private $nextRandomMsg = 0;
+	private $sttySettings = '';
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -58,11 +59,6 @@ class Console extends Thread{
 		$this->log->pushHandler(new LoggerStreamHandler('log/console.log', Logger::DEBUG));
 		
 		$this->log->info('start');
-		
-		$this->log->debug('tput setup');
-		$this->tcols = (int)exec('tput cols');
-		$this->tlines = (int)exec('tput lines');
-		$this->log->debug('cols = '.$this->tcols.', lines = '.$this->tlines);
 		
 		$this->nextRandomMsg = time() + static::RANDOM_MSG_DELAY_MIN;
 		$this->randomMsgDebug();
@@ -150,12 +146,9 @@ class Console extends Thread{
 			throw new RuntimeException('Could not connect to kernel process.');
 		}
 		
+		$this->sttySetup();
+		
 		$this->userNickname = $this->getIpcKernelConnection()->execSync('getSettingsUserNickname');
-		
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
-		$this->log->debug('tty setup');
-		$this->sttyEnterIcanonMode();
 		
 		$this->stdin = fopen('php://stdin', 'r');
 		stream_set_blocking($this->stdin, 0);
@@ -168,12 +161,34 @@ class Console extends Thread{
 		return true;
 	}
 	
+	private function sttySetup(){
+		$this->log->debug('stty setup');
+		
+		$this->sttySettings = exec('stty -g');
+		print "settings: '".$this->sttySettings."'\n";
+		
+		$this->log->debug('tput setup');
+		$this->tcols = (int)exec('tput cols');
+		$this->tlines = (int)exec('tput lines');
+		$this->log->debug('cols = '.$this->tcols.', lines = '.$this->tlines);
+		
+		#$this->sttyEnterIcanonMode();
+	}
+	
+	private function sttyReset(){
+		$this->log->debug('tty restore');
+		
+		#$this->sttyExitIcanonMode();
+		
+		exec('stty '.$this->sttySettings);
+	}
+	
 	private function sttyEnterIcanonMode(){
 		system('stty -icanon');
 	}
 	
 	private function sttyExitIcanonMode(){
-		system('stty sane');
+		system('stty icanon');
 	}
 	
 	public function run(){
@@ -740,8 +755,7 @@ class Console extends Thread{
 		
 		fclose($this->stdin);
 		
-		$this->log->debug('tty restore');
-		$this->sttyExitIcanonMode();
+		$this->sttyReset();
 		
 		if(!$this->ipcKernelShutdown){
 			$this->getIpcKernelConnection()->execSync('shutdown');
