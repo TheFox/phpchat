@@ -46,8 +46,11 @@ class Console extends Thread{
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
+		if(!posix_isatty(STDIN)){
+			throw new RuntimeException('STDIN: Invalid TTY.', 1);
+		}
 		if(!posix_isatty(STDOUT)){
-			throw new RuntimeException('Invalid TTY.', 1);
+			throw new RuntimeException('STDOUT: Invalid TTY.', 1);
 		}
 		
 		$this->log = new Logger('console');
