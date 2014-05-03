@@ -33,7 +33,6 @@ class Console extends Thread{
 	private $ps1 = 'phpchat:> ';
 	private $tcols = 0;
 	private $tlines = 0;
-	private $stdin = null;
 	private $msgStack = array();
 	private $buffer = '';
 	private $modeChannel = false;
