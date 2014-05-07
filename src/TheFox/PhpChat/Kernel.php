@@ -159,9 +159,9 @@ class Kernel extends Thread{
 				
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
 				$action->functionSet(function($action, $client){
-					$this->ipcConsoleMsgSend('Sening talk request to '.$client->getIpPort().' ...');
+					$this->ipcConsoleMsgSend('Sening talk request to '.$client->getIpPort().' ...', true, false);
 					$client->sendTalkRequest($this->getSettingsUserNickname());
-					$this->ipcConsoleMsgSend('Talk request sent to '.$client->getIpPort().'. Waiting for response ...');
+					$this->ipcConsoleMsgSend('Talk request sent to '.$client->getIpPort().'. Waiting for response ...', true, true);
 				});
 				$clientActions[] = $action;
 			}
@@ -371,9 +371,9 @@ class Kernel extends Thread{
 		$this->ipcConsoleShutdown = true;
 	}
 	
-	public function ipcConsoleMsgSend($msgText){
+	public function ipcConsoleMsgSend($msgText = '', $showDate = false, $printPs1 = false, $clearLine = false){
 		if($this->getIpcConsoleConnection()){
-			$this->getIpcConsoleConnection()->execAsync('msgAdd', array($msgText));
+			$this->getIpcConsoleConnection()->execAsync('msgAdd', array($msgText, $showDate, $printPs1, $clearLine));
 		}
 	}
 	

@@ -278,7 +278,7 @@ class Server{
 		if($client->getStatus('isChannelLocal') || $client->getStatus('isChannelPeer')){
 			$this->consoleSetModeChannel(false);
 			$this->consoleSetModeChannelClient(null);
-			$this->consoleMsgAdd('Connection to '.$client->getIpPort().' closed.');
+			$this->consoleMsgAdd('Connection to '.$client->getIpPort().' closed.', true, true);
 		}
 		
 		$client->shutdown();
@@ -315,9 +315,10 @@ class Server{
 		return false;
 	}
 	
-	public function consoleMsgAdd($msgText){
+	public function consoleMsgAdd($msgText = '', $showDate = false, $printPs1 = false, $clearLine = false){
 		if($this->getKernel() && $this->getKernel()->getIpcConsoleConnection()){
-			$this->getKernel()->getIpcConsoleConnection()->execAsync('msgAdd', array($msgText));
+			$this->getKernel()->getIpcConsoleConnection()->execAsync('msgAdd',
+				array($msgText, $showDate, $printPs1, $clearLine));
 		}
 	}
 	

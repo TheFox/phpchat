@@ -515,7 +515,7 @@ class Client{
 			}
 			
 			if($this->getStatus('isChannelPeer')){
-				$this->consoleMsgAdd('New incoming channel connection from '.$this->getIpPort().'.');
+				$this->consoleMsgAdd('New incoming channel connection from '.$this->getIpPort().'.', true, true);
 			}
 			
 			if($this->getStatus('isChannelPeer') || $this->getStatus('isChannelLocal')){
@@ -525,16 +525,14 @@ class Client{
 						$text = 'You talked to ';
 						$text .= $this->getNode()->getIdHexStr().' ('.$contact->getUserNickname().')';
 						$text .= ' once before.';
-						$this->consoleMsgAdd($text);
+						$this->consoleMsgAdd($text, true, false);
 					}
 					else{
-						$text = '';
-						$text .= 'You never talked to '.$this->getNode()->getIdHexStr().' before.'.PHP_EOL;
-						$text .= 'Verify the public keys with you conversation partner on another channel.'.PHP_EOL;
-						$text .= 'Public keys fingerprints:'.PHP_EOL;
-						$text .= '  Yours: '.$this->getLocalNode()->getSslKeyPubFingerprint().PHP_EOL;
-						$text .= '  Peers: '.$this->getNode()->getSslKeyPubFingerprint();
-						$this->consoleMsgAdd($text);
+						$this->consoleMsgAdd('You never talked to '.$this->getNode()->getIdHexStr().' before.', true, false);
+						$this->consoleMsgAdd('Verify the public keys with you conversation partner on another channel.', true, false);
+						$this->consoleMsgAdd('Public keys fingerprints:', true, false);
+						$this->consoleMsgAdd('  Yours: '.$this->getLocalNode()->getSslKeyPubFingerprint(), true, false);
+						$this->consoleMsgAdd('  Peers: '.$this->getNode()->getSslKeyPubFingerprint(), true, false);
 					}
 				}
 			}
@@ -800,14 +798,14 @@ class Client{
 							
 							try{
 								$msg->decrypt();
-								#print __CLASS__.'->'.__FUNCTION__.': decrypt ok'."\n"; # TODO
+								print __CLASS__.'->'.__FUNCTION__.': decrypt ok'."\n"; # TODO
 							}
 							catch(Exception $e){
-								#print __CLASS__.'->'.__FUNCTION__.': could not decrypt msg: '.$e->getMessage()."\n"; # TODO
+								print __CLASS__.'->'.__FUNCTION__.': not decrypt msg: '.$e->getMessage()."\n"; # TODO
 							}
 						}
 						else{
-							#print __CLASS__.'->'.__FUNCTION__.': msg not for me'."\n"; # TODO
+							print __CLASS__.'->'.__FUNCTION__.': msg not for me'."\n"; # TODO
 						}
 						
 						$this->getMsgDb()->msgAdd($msg);
@@ -1249,7 +1247,9 @@ class Client{
 						//if($status == 0){} // Undefined
 						if($status == 1){
 							// Accepted
-							$this->consoleMsgAdd('Talk request accepted.'.PHP_EOL.'Now talking to "'.$userNickname.'".');
+							$this->consoleMsgAdd('Talk request accepted.', true, false);
+							$this->consoleMsgAdd('Now talking to "'.$userNickname.'".', true, true);
+							
 							$this->consoleSetModeChannel(true);
 							$this->consoleSetModeChannelClient($this);
 							
@@ -1264,15 +1264,15 @@ class Client{
 						}
 						elseif($status == 2){
 							// Declined
-							$this->consoleMsgAdd('Talk request declined.');
+							$this->consoleMsgAdd('Talk request declined.', true, true);
 						}
 						elseif($status == 3){
 							// Timeout
-							$this->consoleMsgAdd('Talk request timed-out.');
+							$this->consoleMsgAdd('Talk request timed-out.', true, true);
 						}
 						elseif($status == 4){
 							// No console, standalone server.
-							$this->consoleMsgAdd($this->getIpPort().' has no user interface. Can\'t talk to you.');
+							$this->consoleMsgAdd($this->getIpPort().' has no user interface. Can\'t talk to you.', true, true);
 						}
 					}
 					else{
@@ -1340,7 +1340,8 @@ class Client{
 					}
 					
 					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$userNicknameOld.', '.$userNicknameNew);
-					$this->consoleMsgAdd('User "'.$userNicknameOld.'" is now known as "'.$userNicknameNew.'".');
+					$this->consoleMsgAdd('User "'.$userNicknameOld.'" is now known as "'.$userNicknameNew.'".',
+						true, true, true);
 				}
 			}
 		}
@@ -1361,7 +1362,7 @@ class Client{
 					
 					$this->sendQuit();
 					
-					$this->consoleMsgAdd('Talk closed by "'.$userNickname.'".');
+					$this->consoleMsgAdd('Talk closed by "'.$userNickname.'".', true, true, true);
 					$this->consoleSetModeChannel(false);
 					$this->consoleSetModeChannelClient(null);
 				}
@@ -1958,9 +1959,9 @@ class Client{
 		}
 	}
 	
-	private function consoleMsgAdd($msgText){
+	private function consoleMsgAdd($msgText = '', $showDate = true, $printPs1 = true, $clearLine = false){
 		if($this->getServer()){
-			$this->getServer()->consoleMsgAdd($msgText);
+			$this->getServer()->consoleMsgAdd($msgText, $showDate, $printPs1, $clearLine);
 		}
 	}
 	
