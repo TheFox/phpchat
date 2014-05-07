@@ -40,7 +40,15 @@ release:
 		composer.json \
 		bootstrap.php \
 		console.php cronjob.php functions.php kernel.php \
-		src vendor
+		src \
+		vendor/autoload.php \
+		vendor/composer \
+		vendor/monolog \
+		vendor/psr \
+		vendor/rhumsaa \
+		vendor/symfony \
+		vendor/thefox \
+		vendor/ulrichsg
 	$(GZIP) -9 -f $(RELEASE_NAME)-$(RELEASE_VERSION).tar
 	$(MV) ${RELEASE_NAME}-${RELEASE_VERSION}.tar.gz releases
 
