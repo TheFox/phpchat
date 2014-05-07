@@ -98,6 +98,10 @@ class Cronjob extends Thread{
 			elseif($hours == 0 && $minutes == 1 && $seconds == 0){
 				$this->pingClosestNodes();
 			}
+			
+			if($seconds == 0){
+				$this->msgDbInit();
+			}
 			if($minutes % 5 == 0 && $seconds == 0){
 				print __CLASS__.'->'.__FUNCTION__.': save'."\n";
 				$this->getIpcKernelConnection()->execAsync('save');
