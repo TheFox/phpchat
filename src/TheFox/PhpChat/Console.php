@@ -149,10 +149,6 @@ class Console extends Thread{
 		if($this->msgStack){
 			$this->log->debug('printMsgStack begin '.(int)$this->msgStackPrintPs1);
 			
-			if($this->msgStackPrintPs1){
-				#print PHP_EOL;
-			}
-			
 			$this->msgStackPrintPs1 = true;
 			foreach($this->msgStack as $msgId => $msg){
 				$this->log->debug('msg '.(int)$msg['printPs1'].' '.(int)$msg['clearLine'].' "'.$msg['text'].'"');
@@ -168,7 +164,7 @@ class Console extends Thread{
 				$this->printPs1('printMsgStack');
 			}
 			
-			$this->log->debug('printMsgStack begin '.(int)$this->msgStackPrintPs1);
+			$this->log->debug('printMsgStack end '.(int)$this->msgStackPrintPs1);
 		}
 	}
 	
@@ -280,10 +276,10 @@ class Console extends Thread{
 			if(time() - $s >= 5 && $a){ # TODO
 				$a = false;
 				
-				#$this->log->debug('auto msg');
-				#$this->msgAdd('auto line A');
-				#$this->msgAdd('auto line B');
-				#$this->msgAdd('auto line C');
+				$this->log->debug('auto msg');
+				$this->msgAdd('auto line A', true, false, true);
+				$this->msgAdd('auto line B', true, false);
+				$this->msgAdd('auto line C', true, true);
 			}
 			
 			usleep(static::LOOP_USLEEP);
@@ -416,7 +412,7 @@ class Console extends Thread{
 					$this->handleCommandConnect($line);
 				}
 				elseif($line == 'ab'){ # TODO
-					$format = '%3d %36s  %s'.PHP_EOL;
+					$format = '%3d %36s  %s';
 					
 					$this->msgAdd(' ID UUID                                  USERNAME', false, false);
 					foreach($this->getIpcKernelConnection()->execSync('getAddressbook')->getContacts() as $contactId => $contact){
@@ -434,7 +430,7 @@ class Console extends Thread{
 					$this->handleCommandTalk($line);
 				}
 				elseif($line == 'request'){ # TODO
-					$format = '%3d %36s  %s %s'.PHP_EOL;
+					$format = '%3d %36s  %s %s';
 					
 					$this->msgAdd(' ID RID                                   IP:PORT               USERNAME', false, false);
 					foreach($this->talkRequests as $talkRequestId => $request){
@@ -466,6 +462,7 @@ class Console extends Thread{
 					$this->handleCommandSave();
 				}
 				elseif($line == 'exit'){
+					$this->msgAdd();
 					$this->setExit(1);
 				}
 				elseif($line == 't'){
@@ -477,7 +474,7 @@ class Console extends Thread{
 					#$this->lineClear();
 					#$this->printPs1('handleLine else C');
 					
-					print PHP_EOL;
+					$this->msgAdd();
 					$this->msgAdd('ERROR: Command "'.$line.'" not found.', false, true);
 				}
 			}
@@ -494,7 +491,7 @@ class Console extends Thread{
 					#$this->lineClear();
 					#$this->printPs1('handleLine else B');
 					
-					print PHP_EOL;
+					$this->msgAdd();
 					$this->msgAdd('ERROR: Command "'.$line.'" not found.', false, true);
 				}
 			}
@@ -532,6 +529,7 @@ class Console extends Thread{
 		
 		$pos = strpos($data, ' ');
 		if($pos === false){
+			$this->msgAdd();
 			$this->msgAdd('Usage: /connect <IP> <PORT>', false, false);
 			$this->msgAdd('       /connect 192.168.241.10 25000', false, true);
 		}
@@ -544,6 +542,7 @@ class Console extends Thread{
 				$this->connect($ip, $port);
 			}
 			else{
+				$this->msgAdd();
 				$this->msgAdd('ERROR: Port can not be bigger than '.$portMax.'.', false, true);
 			}
 		}
@@ -551,6 +550,8 @@ class Console extends Thread{
 	
 	private function handleCommandAddressbook($line){
 		$data = substr($line, 3);
+		
+		$this->msgAdd();
 		
 		$pos = strpos($data, ' ');
 		if($pos === false){
@@ -584,8 +585,9 @@ class Console extends Thread{
 		else{
 			$contacts = $this->getIpcKernelConnection()->execSync('getAddressbook')->contactsGetByNick($data);
 			if(count($contacts) > 1){
-				$format = '%3d %36s  %s'.PHP_EOL;
+				$format = '%3d %36s  %s';
 				
+				$this->msgAdd();
 				$this->msgAdd('Found several nodes with nickname "'.$data.'". ', false, false);
 				$this->msgAdd('Delete old nodes or use UUID instead.', false, false);
 				$this->msgAdd(' ID UUID                                  USERNAME', false, false);
@@ -599,6 +601,7 @@ class Console extends Thread{
 				$uuid = $contact->getNodeId();
 			}
 			else{
+				$this->msgAdd();
 				$this->msgAdd('ERROR: Nick "'.$data.'" not found.', false, true);
 			}
 		}
@@ -611,6 +614,7 @@ class Console extends Thread{
 				$this->connect($onode->getIp(), $onode->getPort());
 			}
 			else{
+				$this->msgAdd();
 				$this->msgAdd('ERROR: Node '.$node->getIdHexStr().' not found.', false, true);
 			}
 		}
@@ -621,6 +625,7 @@ class Console extends Thread{
 		
 		$pos = strpos($data, ' ');
 		if($pos === false){
+			$this->msgAdd();
 			$this->msgAdd('Usage: /request accept <ID>', false, false);
 			$this->msgAdd('       /request decline <ID>', false, true);
 		}
@@ -635,6 +640,7 @@ class Console extends Thread{
 					if($action == 'accept'){
 						$talkRequest->setStatus(1);
 						
+						$this->msgAdd();
 						$this->msgAdd('Accepting talk request ID '.$talkRequest->getId().'.', true, false);
 						$this->msgAdd('Now talking to "'.$talkRequest->getUserNickname().'".', true, true);
 						
@@ -643,23 +649,27 @@ class Console extends Thread{
 					}
 					else{
 						$talkRequest->getStatus(2);
+						$this->msgAdd();
 						$this->msgAdd('Declining talk request ID '.$id.'.', true, true);
 					}
 					
 					$this->talkResponseSend($talkRequest);
 				}
 				elseif($talkRequest->getStatus() == 1){
+					$this->msgAdd();
 					$this->msgAdd('You already accepted this talk request.', true, true);
 				}
 				elseif($talkRequest->getStatus() == 2){
+					$this->msgAdd();
 					$this->msgAdd('You already declined this talk request.', true, true);
 				}
 				elseif($talkRequest->getStatus() == 3){
+					$this->msgAdd();
 					$this->msgAdd('Talk request ID '.$id.' timed-out.', true, true);
 				}
 			}
 			else{
-				#print $this->getDate()..PHP_EOL;
+				$this->msgAdd();
 				$this->msgAdd('Talk request ID '.$id.' not found.', true, true);
 			}
 		}
@@ -796,14 +806,15 @@ class Console extends Thread{
 							else{
 								print 'ERROR: Could not encrypt msg.'.PHP_EOL;
 							}
+							
+							$this->printPs1('handleCommandMsg B');
 						}
 					}
 				}
 				else{
-					print 'ERROR: "'.$args[1].'" is not a UUID.'.PHP_EOL;
+					$this->msgAdd();
+					$this->msgAdd('ERROR: "'.$args[1].'" is not a UUID.', false, true);
 				}
-				
-				$this->printPs1('handleCommandMsg B');
 			}
 			elseif($args[0] == 'read' || $args[0] == 'r'){
 				if(isset($args[1])){
@@ -855,9 +866,11 @@ class Console extends Thread{
 						}
 						$toLine .= '<'.$msg->getDstNodeId().'>';
 						
+						$this->msgAdd();
 						if(!$text){
 							$this->msgAdd('WARNING: could not decrypt text. Only meta data available.', false, false);
 						}
+						$this->msgAdd('----- MESSAGE BEGIN -----');
 						$this->msgAdd('Msg ID: '.$msg->getId(), false, false);
 						$this->msgAdd('From: '.$fromLine, false, false);
 						$this->msgAdd('To: '.$toLine, false, false);
@@ -866,24 +879,28 @@ class Console extends Thread{
 						
 						if($text){
 							$this->msgAdd();
-							$this->msgAdd($text, false, true);
+							$this->msgAdd($text, false, false);
 							
 							$msg->setStatus('R');
 							$this->getIpcKernelConnection()->execAsync('msgDbMsgUpdate', array($msg));
 						}
-						$this->msgAdd('END OF MESSAGE', false, true);
+						$this->msgAdd('----- MESSAGE END -----', false, true);
 					}
 					else{
+						$this->msgAdd();
 						$this->msgAdd('ERROR: could not read msg "'.$args[1].'".', false, true);
 					}
 				}
 				else{
+					$this->msgAdd();
 					$this->msgAdd('ERROR: you must specify a msg number or ID.', false, true);
 				}
 			}
 		}
 		else{
-			$format = '%3d %36s  %s'.PHP_EOL;
+			$format = '%3d %36s  %s';
+			
+			$this->msgAdd();
 			$this->msgAdd(' NO ID                                    STATUS', false, true);
 			
 			$no = 0;
@@ -906,6 +923,7 @@ class Console extends Thread{
 			
 			$this->getIpcKernelConnection()->execAsync('setSettingsUserNickname', array($this->userNickname));
 			
+			$this->msgAdd();
 			$this->msgAdd('New nickname: '.$this->userNickname, true, true);
 			
 			if($this->getModeChannel()){
@@ -927,7 +945,6 @@ class Console extends Thread{
 		$this->linePrint('line B');
 		$this->linePrint('line C');*/
 		
-		$this->msgAdd();
 		#$this->msgAdd();
 		$this->msgAdd('line A');
 		$this->msgAdd('line B');
@@ -960,6 +977,7 @@ class Console extends Thread{
 	
 	public function connect($ip, $port){
 		$ipPort = $ip.':'.$port;
+		$this->msgAdd();
 		$this->msgAdd('Connecting to '.$ipPort.' ...', true, false);
 		$connected = $this->getIpcKernelConnection()->execSync('serverConnect', array($ip, $port, true));
 		$this->msgAdd('Connection to '.$ipPort.' '.($connected ? 'established' : 'failed').'.', true, false);
@@ -976,7 +994,7 @@ class Console extends Thread{
 		
 		$this->talkRequests[$this->talkRequestsId] = $talkRequest;
 		
-		$this->msgAdd('User "'.$talkRequest->getUserNickname().'" wants to talk to you.', true, false);
+		$this->msgAdd('User "'.$talkRequest->getUserNickname().'" wants to talk to you.', true, false, true);
 		$this->msgAdd('Type "/request accept '.$talkRequest->getId().'" to get in touch.', true, true);
 	}
 	
