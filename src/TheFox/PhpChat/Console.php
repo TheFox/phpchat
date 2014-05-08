@@ -936,6 +936,7 @@ class Console extends Thread{
 			}
 		}
 		else{
+			$this->msgAdd();
 			$this->msgAdd('Your nickname: '.$this->userNickname, true, true);
 		}
 	}
