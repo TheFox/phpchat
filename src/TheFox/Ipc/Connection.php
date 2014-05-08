@@ -200,7 +200,7 @@ class Connection{
 	}
 	
 	private function msgHandle($msg, $clientId = null){
-		#print __CLASS__.'->'.__FUNCTION__.': "'.$msg.'"'."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': '.(int)$clientId.' "'.$msg.'"'."\n";
 		
 		if($msg == 'ID'){
 			$this->handler->sendIdOk($clientId);
