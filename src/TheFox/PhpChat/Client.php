@@ -1361,6 +1361,7 @@ class Client{
 					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$userNickname);
 					
 					$this->sendQuit();
+					$this->shutdown();
 					
 					$this->consoleMsgAdd('Talk closed by "'.$userNickname.'".', true, true, true);
 					$this->consoleSetModeChannel(false);
