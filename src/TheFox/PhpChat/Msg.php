@@ -294,6 +294,7 @@ class Msg extends YamlStorage{
 	
 	public function encrypt(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': "'.$this->getPassword().'"'."\n";
 		$rv = false;
 		
 		if(!$this->getSsl()){
