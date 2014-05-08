@@ -157,6 +157,11 @@ class MsgDb extends YamlStorage{
 				$msgOld->setEncryptionMode($msgNew->getEncryptionMode());
 				$this->setDataChanged(true);
 			}
+			if($msgOld->getStatus() != $msgNew->getStatus()){
+				print __CLASS__.'->'.__FUNCTION__.': changed: status'."\n";
+				$msgOld->setStatus($msgNew->getStatus());
+				$this->setDataChanged(true);
+			}
 			if($msgOld->getTimeCreated() != $msgNew->getTimeCreated()){
 				#print __CLASS__.'->'.__FUNCTION__.': changed: timeCreated'."\n";
 				$msgOld->setTimeCreated($msgNew->getTimeCreated());
