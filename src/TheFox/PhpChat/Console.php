@@ -956,13 +956,15 @@ class Console extends Thread{
 		#print __CLASS__.'->'.__FUNCTION__.': '.(int)$this->ipcKernelShutdown."\n";
 		$this->getLog()->info('shutdown');
 		
-		$this->sttyReset();
-		
-		#fclose(STDIN);
+		if($this->getModeChannel()){
+			$this->talkCloseSend();
+		}
 		
 		if(!$this->ipcKernelShutdown){
 			#$this->getIpcKernelConnection()->execSync('shutdown'); # TODO
 		}
+		
+		$this->sttyReset();
 	}
 	
 	public function ipcKernelShutdown(){
