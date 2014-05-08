@@ -198,6 +198,8 @@ class Table extends YamlStorage{
 		if( !$this->getLocalNode()->isEqual($node) ){
 			$distance = $this->getLocalNode()->distance($node);
 			
+			# TODO: also search node by nodeFindByKeyPubFingerprint()
+			
 			$onode = $this->nodeFindInBuckets($node);
 			if($onode){
 				#print __CLASS__.'->'.__FUNCTION__.': old node'."\n";
