@@ -824,6 +824,7 @@ class Client{
 						else{
 							print __CLASS__.'->'.__FUNCTION__.': msg not for me'."\n"; # TODO
 							$this->log('debug', 'msg '.$id.' not for me');
+							$this->getMsgDb()->msgAdd($msg);
 						}
 					}
 				}
