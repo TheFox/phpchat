@@ -276,10 +276,12 @@ class Console extends Thread{
 			if(time() - $s >= 5 && $a){ # TODO
 				$a = false;
 				
+				/*
 				$this->log->debug('auto msg');
 				$this->msgAdd('auto line A', true, false, true);
 				$this->msgAdd('auto line B', true, false);
 				$this->msgAdd('auto line C', true, true);
+				*/
 			}
 			
 			usleep(static::LOOP_USLEEP);
