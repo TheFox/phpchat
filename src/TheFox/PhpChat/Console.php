@@ -884,7 +884,7 @@ class Console extends Thread{
 						$this->msgAdd('Msg ID: '.$msg->getId(), false, false);
 						$this->msgAdd('From: '.$fromLine, false, false);
 						$this->msgAdd('To: '.$toLine, false, false);
-						$this->msgAdd('Status: '.$msg->getStatus(), false, false);
+						$this->msgAdd('Status: '.$msg->getStatusText(), false, false);
 						$this->msgAdd('Date: '.$dateCreated->format('Y/m/d H:i:s'), false, false);
 						
 						if($text){
@@ -916,7 +916,7 @@ class Console extends Thread{
 			$no = 0;
 			foreach($msgs as $msgId => $msg){
 				$no++;
-				$this->msgAdd(sprintf($format, $no, $msg->getId(), $msg->getStatus()), false, false);
+				$this->msgAdd(sprintf($format, $no, $msg->getId(), $msg->getStatusText()), false, false);
 			}
 			$this->msgAdd('END OF LIST', false, true);
 		}
