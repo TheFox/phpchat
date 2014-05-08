@@ -805,14 +805,22 @@ class Console extends Thread{
 									
 									if($encrypted){
 										$this->getIpcKernelConnection()->execAsync('msgDbMsgAdd', array($msg));
-										print 'OK'.PHP_EOL;
+										
+										$this->msgAdd('OK: created msg '.$msg->getId(), true, true);
+									}
+									else{
+										$this->msgAdd('ERROR: could not encrypt message.', true, true);
 									}
 								}
 								catch(Exception $e){
-									print 'ERROR: '.$e->getMessage().PHP_EOL;
+									$this->msgAdd('ERROR: '.$e->getMessage(), true, true);
 								}
 								
-								$this->printPs1('handleCommandMsg B');
+								#$this->printPs1('handleCommandMsg B');
+							}
+							else{
+								print 'Nothing created, nothing sent.'.PHP_EOL;
+								$this->printPs1('handleCommandMsg C');
 							}
 						}
 					}
