@@ -515,7 +515,7 @@ class Client{
 			}
 			
 			if($this->getStatus('isChannelPeer')){
-				$this->consoleMsgAdd('New incoming channel connection from '.$this->getIpPort().'.', true, true);
+				$this->consoleMsgAdd('New incoming channel connection from '.$this->getIpPort().'.', true, true, true);
 			}
 			
 			if($this->getStatus('isChannelPeer') || $this->getStatus('isChannelLocal')){

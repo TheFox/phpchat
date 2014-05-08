@@ -278,6 +278,8 @@ class Server{
 		if($client->getStatus('isChannelLocal') || $client->getStatus('isChannelPeer')){
 			$this->consoleSetModeChannel(false);
 			$this->consoleSetModeChannelClient(null);
+			
+			$this->consoleMsgAdd();
 			$this->consoleMsgAdd('Connection to '.$client->getIpPort().' closed.', true, true);
 		}
 		
