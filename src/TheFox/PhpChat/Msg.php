@@ -274,7 +274,14 @@ class Msg extends YamlStorage{
 	}
 	
 	public function setSslKeyPrv($sslKeyPrv, $sslKeyPrvPass){
-		$this->setSsl(openssl_pkey_get_private($sslKeyPrv, $sslKeyPrvPass));
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		$ssl = openssl_pkey_get_private($sslKeyPrv, $sslKeyPrvPass);
+		if($ssl){
+			$this->setSsl($ssl);
+		}
+		else{
+			throw new RuntimeException("SSL: openssl_pkey_get_private failed. Maybe it's not a private key.", 1);
+		}
 	}
 	
 	public function setMsgDb(MsgDb $msgDb){
