@@ -297,6 +297,79 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$this->assertTrue( (bool)$msg->save() );
 	}
 	
+	public function testEncryption1(){
+		$msg = new Msg();
+		
+		$msg->setVersion(1);
+		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+		$msg->setSrcUserNickname('thefox');
+		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+		$msg->setText('hello world! this is a test');
+		$msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+		
+		$this->assertTrue( $msg->encrypt() );
+		$text = $msg->getText();
+		$password = $msg->getPassword();
+		$checksum = $msg->getChecksum();
+		
+		
+		$msg = new Msg();
+		$msg->setVersion(1);
+		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+		$msg->setText($text);
+		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+		$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+		$msg->setPassword($password);
+		$msg->setChecksum($checksum);
+		
+		$this->assertEquals('hello world! this is a test', $msg->decrypt());
+		$this->assertEquals('thefox', $msg->getSrcUserNickname());
+		$this->assertEquals(false, $msg->getIgnore());
+	}
+	
+	public function testEncryption2(){
+		$msg = new Msg();
+		
+		$msg->setVersion(1);
+		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+		$msg->setSrcUserNickname('thefox21');
+		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+		$msg->setText('hello world! this is a test2');
+		$msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+		$msg->setIgnore(true);
+		
+		$this->assertTrue( $msg->encrypt() );
+		$text = $msg->getText();
+		$password = $msg->getPassword();
+		$checksum = $msg->getChecksum();
+		
+		
+		$msg = new Msg();
+		$msg->setVersion(1);
+		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+		$msg->setText($text);
+		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+		$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+		$msg->setPassword($password);
+		$msg->setChecksum($checksum);
+		
+		$this->assertEquals('hello world! this is a test2', $msg->decrypt());
+		$this->assertEquals('thefox21', $msg->getSrcUserNickname());
+		$this->assertEquals(true, $msg->getIgnore());
+	}
+	
 	/**
 	* @depends testSave
 	*/
