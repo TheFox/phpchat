@@ -349,21 +349,7 @@ class Console extends Thread{
 						}
 						$this->log->debug('buffer '.$this->bufferCursorPos.', '.strlen($this->buffer).' "'.$this->buffer.'"');
 					}
-					elseif($char == "\x1b" && $buffer[$bufferIndex + 1] == "\x5b"
-							&& $buffer[$bufferIndex + 2] == "\x41"
-							&& $buffer[$bufferIndex + 3] == "\x7e"
-						){
-						$bufferIndex += 3;
-						$this->log->debug('got delete B');
-						
-						if($this->buffer){
-							#print chr(static::CHAR_DELETE);
-							print static::CHAR_DELETE;
-							$this->buffer = substr($this->buffer, 0, -1);
-							$this->bufferCursorPos--;
-						}
-						$this->log->debug('buffer '.$this->bufferCursorPos.', '.strlen($this->buffer).' "'.$this->buffer.'"');
-					}
+					
 					elseif($char == "\x1b" && $buffer[$bufferIndex + 1] == "\x5b"
 						&& $buffer[$bufferIndex + 2] == "\x41"){
 						$bufferIndex += 2;
@@ -384,6 +370,23 @@ class Console extends Thread{
 						$bufferIndex += 2;
 						$this->log->debug('got arrow left');
 					}
+					
+					elseif($char == "\x1b" && $buffer[$bufferIndex + 1] == "\x5b"
+							&& $buffer[$bufferIndex + 2] == "\x41"
+							&& $buffer[$bufferIndex + 3] == "\x7e"
+						){
+						$bufferIndex += 3;
+						$this->log->debug('got delete B');
+						
+						if($this->buffer){
+							#print chr(static::CHAR_DELETE);
+							print static::CHAR_DELETE;
+							$this->buffer = substr($this->buffer, 0, -1);
+							$this->bufferCursorPos--;
+						}
+						$this->log->debug('buffer '.$this->bufferCursorPos.', '.strlen($this->buffer).' "'.$this->buffer.'"');
+					}
+					
 					else{
 						print $char;
 						$this->buffer .= $char;
