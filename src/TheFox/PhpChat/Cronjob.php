@@ -91,11 +91,7 @@ class Cronjob extends Thread{
 		while(!$this->getExit()){
 			#print __CLASS__.'->'.__FUNCTION__.': '.$this->getExit().', '.$hours.', '.$minutes.', '.$seconds."\n";
 			
-			if($hours == 0 && $minutes == 0 && $seconds == 0){
-				#$this->pingClosestNodes();
-				$this->msgDbInit();
-			}
-			elseif($hours == 0 && $minutes == 1 && $seconds == 0){
+			if($hours == 0 && $minutes == 1 && $seconds == 0){
 				$this->pingClosestNodes();
 			}
 			
