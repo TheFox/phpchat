@@ -720,100 +720,105 @@ class Console extends Thread{
 			
 			if(($args[0] == 'new' || $args[0] == 'n')){
 				if(strIsUuid($args[1])){
-					print PHP_EOL.'NOTE: end text with  <RETURN>.<RETURN>'.PHP_EOL;
-					
-					$this->sttyExitIcanonMode();
-					$this->sttyEchoOn();
-					stream_set_blocking(STDIN, 1);
-					
-					$text = '';
-					while(!$this->getExit()){
-						$line = fgets(STDIN, 1024);
+					if($args[1] != $table->getLocalNode()->getIdHexStr()){
+						print PHP_EOL.'Enter the text to send to '.$args[1].'.'.PHP_EOL;
+						print 'NOTE: end text with  <RETURN>.<RETURN>'.PHP_EOL;
 						
-						print "line: '".substr($line, 0, -1)."'\n";
-						if(substr($line, 0, -1) == '.') break;
-						$text .= $line;
+						$this->sttyExitIcanonMode();
+						$this->sttyEchoOn();
+						stream_set_blocking(STDIN, 1);
 						
-						sleep(1);
+						$text = '';
+						while(!$this->getExit()){
+							$line = fgets(STDIN, 1024);
+							
+							#print "line: '".substr($line, 0, -1)."'\n";
+							if(substr($line, 0, -1) == '.') break;
+							$text .= $line;
+							
+							sleep(1);
+						}
+						
+						if(!$this->getExit()){
+							print 'Send msg? [Y/n] ';
+							
+							$text = substr($text, 0, -1);
+							
+							$answer = strtolower(substr(fgets(STDIN, 100), 0, -1));
+							if(!$answer){
+								$answer = 'y';
+							}
+							print "Answer: '".$answer."'\n";
+							#print "Text: '".$text."'\n";
+							
+							stream_set_blocking(STDIN, 0);
+							$this->sttyEnterIcanonMode();
+							$this->sttyEchoOff();
+							
+							if($answer == 'y'){
+								$dstNodeId = $args[1];
+								#$dstNodeId = '42785b21-011b-4093-b61d-000000000001';
+								#$text = 'this is  a test. '.date('Y/m/d H:i:s');
+								
+								
+								$settings = $this->getIpcKernelConnection()->execSync('getSettings');
+								$table = $this->getIpcKernelConnection()->execSync('getTable');
+								
+								
+								$msg = new Msg();
+								$msg->setSrcNodeId($settings->data['node']['id']);
+								$msg->setSrcSslKeyPub($table->getLocalNode()->getSslKeyPub());
+								$msg->setSrcUserNickname($this->userNickname);
+								
+								$dstNode = new Node();
+								$dstNode->setIdHexStr($dstNodeId);
+								
+								$msg->setDstNodeId($dstNode->getIdHexStr());
+								if($oDstNode = $table->nodeFindInBuckets($dstNode)){
+									#print 'found node in table'.PHP_EOL;
+									$msg->setDstSslPubKey($oDstNode->getSslKeyPub());
+								}
+								#else{ print 'node not found'.PHP_EOL; }
+								
+								$msg->setText($text);
+								$msg->setSslKeyPrvPath($settings->data['node']['sslKeyPrvPath'], $settings->data['node']['sslKeyPrvPass']);
+								$msg->setStatus('O');
+								
+								$encrypted = false;
+								#print 'DstSslPubKey: '.strlen($msg->getDstSslPubKey()).PHP_EOL;
+								if($msg->getDstSslPubKey()){
+									#print 'use dst key'.PHP_EOL;
+									
+									$msg->setEncryptionMode('D');
+								}
+								else{
+									// Encrypt with own public key
+									// while destination public key is not available.
+									#print 'use local key'.PHP_EOL;
+									
+									$msg->setEncryptionMode('S');
+									$msg->setDstSslPubKey($table->getLocalNode()->getSslKeyPub());
+								}
+								
+								try{
+									$encrypted = $msg->encrypt();
+									
+									if($encrypted){
+										$this->getIpcKernelConnection()->execAsync('msgDbMsgAdd', array($msg));
+										print 'OK'.PHP_EOL;
+									}
+								}
+								catch(Exception $e){
+									print 'ERROR: '.$e->getMessage().PHP_EOL;
+								}
+								
+								$this->printPs1('handleCommandMsg B');
+							}
+						}
 					}
-					
-					if(!$this->getExit()){
-						print 'Send msg? [Y/n] ';
-						
-						$text = substr($text, 0, -1);
-						
-						$answer = strtolower(substr(fgets(STDIN, 100), 0, -1));
-						if(!$answer){
-							$answer = 'y';
-						}
-						print "Answer: '".$answer."'\n";
-						print "Text: '".$text."'\n";
-						
-						stream_set_blocking(STDIN, 0);
-						$this->sttyEnterIcanonMode();
-						$this->sttyEchoOff();
-						
-						if($answer == 'y'){
-							$dstNodeId = $args[1];
-							#$dstNodeId = '42785b21-011b-4093-b61d-000000000001';
-							#$text = 'this is  a test. '.date('Y/m/d H:i:s');
-							
-							
-							$settings = $this->getIpcKernelConnection()->execSync('getSettings');
-							$table = $this->getIpcKernelConnection()->execSync('getTable');
-							
-							
-							$msg = new Msg();
-							$msg->setSrcNodeId($settings->data['node']['id']);
-							$msg->setSrcSslKeyPub($table->getLocalNode()->getSslKeyPub());
-							$msg->setSrcUserNickname($this->userNickname);
-							
-							$dstNode = new Node();
-							$dstNode->setIdHexStr($dstNodeId);
-							
-							$msg->setDstNodeId($dstNode->getIdHexStr());
-							if($oDstNode = $table->nodeFindInBuckets($dstNode)){
-								print 'found node in table'.PHP_EOL;
-								$msg->setDstSslPubKey($oDstNode->getSslKeyPub());
-							}
-							else{ print 'node not found'.PHP_EOL; }
-							
-							$msg->setText($text);
-							$msg->setSslKeyPrvPath($settings->data['node']['sslKeyPrvPath'], $settings->data['node']['sslKeyPrvPass']);
-							$msg->setStatus('O');
-							
-							$encrypted = false;
-							print 'DstSslPubKey: '.strlen($msg->getDstSslPubKey()).PHP_EOL;
-							if($msg->getDstSslPubKey()){
-								print 'use dst key'.PHP_EOL;
-								
-								$msg->setEncryptionMode('D');
-							}
-							else{
-								// Encrypt with own public key
-								// while destination public key is not available.
-								print 'use local key'.PHP_EOL;
-								
-								$msg->setEncryptionMode('S');
-								$msg->setDstSslPubKey($table->getLocalNode()->getSslKeyPub());
-							}
-							
-							try{
-								$encrypted = $msg->encrypt();
-							}
-							catch(Exception $e){
-								print 'ERROR: '.$e->getMessage().PHP_EOL;
-							}
-							
-							if($encrypted){
-								$this->getIpcKernelConnection()->execAsync('msgDbMsgAdd', array($msg));
-							}
-							else{
-								print 'ERROR: Could not encrypt msg.'.PHP_EOL;
-							}
-							
-							$this->printPs1('handleCommandMsg B');
-						}
+					else{
+						$this->msgAdd();
+						$this->msgAdd('Send a message to yourself?', false, true);
 					}
 				}
 				else{
@@ -952,7 +957,7 @@ class Console extends Thread{
 		$this->linePrint('line C');*/
 		
 		#$this->msgAdd();
-		$this->msgAdd('line A');
+		#$this->msgAdd('line A', false, false, true);
 		$this->msgAdd('line B');
 		$this->msgAdd('line C', false, true);
 		
