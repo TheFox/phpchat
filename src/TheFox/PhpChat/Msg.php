@@ -309,31 +309,37 @@ class Msg extends YamlStorage{
 		$passwordEncrypted = '';
 		$signAlgo = OPENSSL_ALGO_SHA1;
 		
-		$signRv = true;
-		$signRv = openssl_sign($password, $sign, $this->getSsl(), $signAlgo);
-		if($signRv){
-			$sign = base64_encode($sign);
-			
-			$pubEncRv = openssl_public_encrypt($password, $cryped, $this->getDstSslPubKey());
-			if($pubEncRv){
-				$passwordBase64 = base64_encode($cryped);
-				$jsonStr = json_encode(array(
-					'password' => $passwordBase64,
-					'sign' => $sign,
-					'signAlgo' => $signAlgo,
-				));
-				
-				$gzdata = gzencode($jsonStr, 9);
-				$passwordEncrypted = base64_encode($gzdata);
-				
-				$this->setPassword($passwordEncrypted);
-			}
-			else{
-				throw new RuntimeException('openssl_public_encrypt failed: "'.openssl_error_string().'"', 101);
-			}
+		#fwrite(STDOUT, 'password: '.$password."\n");
+		
+		if($this->getPassword()){
+			$passwordEncrypted = $this->getPassword();
 		}
 		else{
-			throw new RuntimeException('openssl_sign failed.', 102);
+			$signRv = openssl_sign($password, $sign, $this->getSsl(), $signAlgo);
+			if($signRv){
+				$sign = base64_encode($sign);
+				
+				$pubEncRv = openssl_public_encrypt($password, $cryped, $this->getDstSslPubKey());
+				if($pubEncRv){
+					$passwordBase64 = base64_encode($cryped);
+					$jsonStr = json_encode(array(
+						'password' => $passwordBase64,
+						'sign' => $sign,
+						'signAlgo' => $signAlgo,
+					));
+					
+					$gzdata = gzencode($jsonStr, 9);
+					$passwordEncrypted = base64_encode($gzdata);
+					
+					$this->setPassword($passwordEncrypted);
+				}
+				else{
+					throw new RuntimeException('openssl_public_encrypt failed: "'.openssl_error_string().'"', 101);
+				}
+			}
+			else{
+				throw new RuntimeException('openssl_sign failed.', 102);
+			}
 		}
 		
 		if($passwordEncrypted){
