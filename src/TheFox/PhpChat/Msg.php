@@ -35,6 +35,7 @@ class Msg extends YamlStorage{
 		$this->data['forwardCycles'] = 0;
 		$this->data['encryptionMode'] = '';
 		$this->data['status'] = '';
+		$this->data['ignore'] = false;
 		$this->data['timeCreated'] = time();
 		$this->data['timeReceived'] = 0;
 	}
@@ -245,6 +246,14 @@ class Msg extends YamlStorage{
 		return $text[$this->getStatus()];
 	}
 	
+	public function setIgnore($ignore){
+		$this->data['ignore'] = (bool)$ignore;
+	}
+	
+	public function getIgnore(){
+		return $this->data['ignore'];
+	}
+	
 	public function setTimeCreated($timeCreated){
 		$this->data['timeCreated'] = (int)$timeCreated;
 	}
@@ -354,6 +363,7 @@ class Msg extends YamlStorage{
 					'sign' => $sign,
 					'signAlgo' => $signAlgo,
 					'srcUserNickname' => $srcUserNickname,
+					'ignore' => $this->getIgnore(),
 				));
 				$data = gzencode($jsonStr, 9);
 				
@@ -462,6 +472,7 @@ class Msg extends YamlStorage{
 						$sign = base64_decode($json['sign']);
 						$signAlgo = (int)$json['signAlgo'];
 						$srcUserNickname = base64_decode($json['srcUserNickname']);
+						$ignore = (bool)$json['ignore'];
 						
 						if(openssl_verify($text, $sign, $this->getSrcSslKeyPub(), $signAlgo)){
 							$checksum = $this->createCheckSum(
@@ -474,6 +485,7 @@ class Msg extends YamlStorage{
 							
 							if($checksum == $this->getChecksum()){
 								$this->setSrcUserNickname($srcUserNickname);
+								$this->setIgnore($ignore);
 								
 								$rv = $text;
 							}
