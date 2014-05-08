@@ -221,13 +221,6 @@ class Msg extends YamlStorage{
 	}
 	
 	public function setStatus($status){
-		// U = unread, got msg from another node
-		// O = origin, local node created the msg
-		// S = sent at least to one node
-		// D = delivered to destination node
-		// R = read
-		// X = reached MSG_FORWARD_TO_NODES_MIN or MSG_FORWARD_TO_NODES_MAX
-		
 		#print __CLASS__.'->'.__FUNCTION__.': '.$status."\n";
 		if($this->data['status'] != 'D'){
 			$this->data['status'] = $status;
@@ -237,6 +230,19 @@ class Msg extends YamlStorage{
 	
 	public function getStatus(){
 		return $this->data['status'];
+	}
+	
+	public function getStatusText(){
+		$text = array(
+			'U' => 'unread, got msg from another node',
+			'O' => 'origin, local node created the msg',
+			'S' => 'sent at least to one node',
+			'D' => 'delivered to destination node',
+			'R' => 'read',
+			'X' => 'reached MSG_FORWARD_TO_NODES_MIN or MSG_FORWARD_TO_NODES_MAX',
+		);
+		
+		return $text[$this->getStatus()];
 	}
 	
 	public function setTimeCreated($timeCreated){
