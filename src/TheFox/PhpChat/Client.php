@@ -801,7 +801,7 @@ class Client{
 									print __CLASS__.'->'.__FUNCTION__.': decrypt ok'."\n"; # TODO
 									$this->log('debug', 'msg '.$id.' decrypt ok');
 									
-									if(!$this->getIgnore()){
+									if(!$msg->getIgnore()){
 										print __CLASS__.'->'.__FUNCTION__.': add to db'."\n"; # TODO
 										$this->log('debug', 'msg '.$id.' add to db');
 										$this->getMsgDb()->msgAdd($msg);
