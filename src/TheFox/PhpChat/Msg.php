@@ -372,17 +372,11 @@ class Msg extends YamlStorage{
 					
 					$this->setText($data);
 					
-					$checksumData = $this->getVersion().'_'.$this->getId();
-					$checksumData .= '_'.$this->getSrcNodeId();
-					$checksumData .= '_'.$this->getDstNodeId().'_'.base64_encode($this->getDstSslPubKey());
-					$checksumData .= '_'.base64_encode($text).'_'.$this->getTimeCreated();
-					
-					$checksumSha512Bin = hash_hmac('sha512', $checksumData, $password, true);
-					$fingerprintHex = hash('ripemd160', $checksumSha512Bin, false);
-					$fingerprintBin = hash('ripemd160', $checksumSha512Bin, true);
-					$checksumHex = hash('sha512', hash('sha512', $fingerprintBin, true));
-					$checksumHex = substr($checksumHex, 0, 8); // 4 Bytes
-					$checksum = $fingerprintHex.$checksumHex;
+					$checksum = $this->createCheckSum(
+								$this->getVersion(), $this->getId(),
+								$this->getSrcNodeId(),
+								$this->getDstNodeId(), $this->getDstSslPubKey(), $text,
+								$this->getTimeCreated(), $password);
 					
 					$this->setChecksum($checksum);
 					
@@ -470,17 +464,13 @@ class Msg extends YamlStorage{
 						$srcUserNickname = base64_decode($json['srcUserNickname']);
 						
 						if(openssl_verify($text, $sign, $this->getSrcSslKeyPub(), $signAlgo)){
-							$checksumData = $this->getVersion().'_'.$this->getId();
-							$checksumData .= '_'.$this->getSrcNodeId();
-							$checksumData .= '_'.$this->getDstNodeId().'_'.base64_encode($this->getDstSslPubKey());
-							$checksumData .= '_'.base64_encode($text).'_'.$this->getTimeCreated();
+							$checksum = $this->createCheckSum(
+								$this->getVersion(), $this->getId(),
+								$this->getSrcNodeId(),
+								$this->getDstNodeId(), $this->getDstSslPubKey(), $text,
+								$this->getTimeCreated(), $password);
 							
-							$checksumSha512Bin = hash_hmac('sha512', $checksumData, $password, true);
-							$fingerprintHex = hash('ripemd160', $checksumSha512Bin, false);
-							$fingerprintBin = hash('ripemd160', $checksumSha512Bin, true);
-							$checksumHex = hash('sha512', hash('sha512', $fingerprintBin, true));
-							$checksumHex = substr($checksumHex, 0, 8); // 4 Bytes
-							$checksum = $fingerprintHex.$checksumHex;
+							#fwrite(STDOUT, 'checksum: '.$checksum."\n");
 							
 							if($checksum == $this->getChecksum()){
 								$this->setSrcUserNickname($srcUserNickname);
@@ -514,6 +504,29 @@ class Msg extends YamlStorage{
 		}
 		
 		return $rv;
+	}
+	
+	private function createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey, $text, $timeCreated, $password){
+		$checksumData = json_encode(array(
+			'version' => $version,
+			'id' => $id,
+			'srcNodeId' => $srcNodeId,
+			'dstNodeId' => $dstNodeId,
+			'dstSslPubKey' => base64_encode($dstSslPubKey),
+			'text' => base64_encode($text),
+			'timeCreated' => $timeCreated,
+		));
+		
+		#fwrite(STDOUT, 'checksumData: '.$checksumData."\n");
+		
+		$checksumSha512Bin = hash_hmac('sha512', $checksumData, $password, true);
+		$fingerprintHex = hash('ripemd160', $checksumSha512Bin, false);
+		$fingerprintBin = hash('ripemd160', $checksumSha512Bin, true);
+		$checksumHex = hash('sha512', hash('sha512', $fingerprintBin, true));
+		$checksumHex = substr($checksumHex, 0, 8); // 4 Bytes
+		$checksum = $fingerprintHex.$checksumHex;
+		
+		return $checksum;
 	}
 	
 }
