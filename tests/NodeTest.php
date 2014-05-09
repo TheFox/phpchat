@@ -93,4 +93,20 @@ O5mYMzSLyuOXR5xhBhG7fjsCAwEAAQ==
 		$this->assertEquals($zeros.'00000110', $node_c->distanceBitStr($node_d));
 	}
 	
+	public function testSetSslKeyPub(){
+		$node = new Node();
+		$this->assertTrue($node->setSslKeyPub(static::SSL_KEY_PUB));
+		$this->assertFalse($node->setSslKeyPub(static::SSL_KEY_PUB));
+	}
+	
+	/**
+	 * @expectedException RuntimeException
+	 */
+	public function testSetSslKeyPubRuntimeException(){
+		$node = new Node();
+		$node->setSslKeyPub('invalid');
+		#$node->setSslKeyPub(static::SSL_KEY_PUB);
+		#$node->setSslKeyPub('abc', true);
+	}
+	
 }
