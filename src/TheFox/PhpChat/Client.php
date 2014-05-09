@@ -761,6 +761,8 @@ class Client{
 					$srcNode = new Node();
 					$srcNode->setIdHexStr($srcNodeId);
 					$srcNode = $this->getTable()->nodeEnclose($srcNode);
+					print __CLASS__.'->'.__FUNCTION__.': srcNode: '.$srcNode->getIdHexStr()."\n"; # TODO
+					$this->log('debug', 'msg '.$id.' decrypt ok');
 					if($srcNode->getSslKeyPub()){
 						if($srcNode->getSslKeyPub() != $srcSslKeyPub){
 							$status = 3; // Error
