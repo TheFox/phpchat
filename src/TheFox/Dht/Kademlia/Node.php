@@ -128,6 +128,9 @@ class Node extends YamlStorage{
 					return true;
 				}
 			}
+			else{
+				throw new RuntimeException('SSL: openssl_pkey_get_public failed.', 1);
+			}
 		}
 		
 		return false;
