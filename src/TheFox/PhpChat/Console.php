@@ -956,7 +956,8 @@ class Console extends Thread{
 	
 	private function handleCommandSave(){
 		$this->getIpcKernelConnection()->execAsync('save');
-		$this->printPs1('handleCommandSave');
+		$this->msgAdd();
+		$this->msgAdd('Saved.', true, true);
 	}
 	
 	private function handleCommandTest(){
