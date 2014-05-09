@@ -254,7 +254,7 @@ class Cronjob extends Thread{
 				&& $msg->getStatus() == 'O'
 				&& $msg->getSrcNodeId() == $this->localNode->getIdHexStr()
 			){
-				fwrite(STDOUT, __METHOD__.': unsent own '.$msg->getId()."\n");
+				fwrite(STDOUT, __METHOD__.' unsent own: '.$msg->getId()."\n");
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
@@ -271,7 +271,7 @@ class Cronjob extends Thread{
 				&& $msg->getStatus() == 'U'
 				&& $msg->getDstNodeId() != $this->localNode->getIdHexStr()
 			){
-				fwrite(STDOUT, __METHOD__.': unsent foreign '.$msg->getId()."\n");
+				fwrite(STDOUT, __METHOD__.' unsent foreign: '.$msg->getId()."\n");
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
@@ -287,7 +287,7 @@ class Cronjob extends Thread{
 				&& $msg->getEncryptionMode() == 'D'
 				&& $msg->getStatus() == 'S'
 			){
-				fwrite(STDOUT, __METHOD__.': other '.$msg->getId()."\n");
+				fwrite(STDOUT, __METHOD__.' other: '.$msg->getId()."\n");
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
