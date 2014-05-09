@@ -105,8 +105,6 @@ O5mYMzSLyuOXR5xhBhG7fjsCAwEAAQ==
 	public function testSetSslKeyPubRuntimeException(){
 		$node = new Node();
 		$node->setSslKeyPub('invalid');
-		#$node->setSslKeyPub(static::SSL_KEY_PUB);
-		#$node->setSslKeyPub('abc', true);
 	}
 	
 }
