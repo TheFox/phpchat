@@ -769,8 +769,8 @@ class Client{
 						}
 					}
 					else{
-						if(!$srcNode->setSslKeyPub($srcSslKeyPub)){
-							$status = 3; // Error
+						if($srcNode->setSslKeyPub($srcSslKeyPub)){
+							$srcNode->setDataChanged(true);
 						}
 					}
 					
