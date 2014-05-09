@@ -16,5 +16,4 @@ print "   Public key fingerprint: ".$localNode->getSslKeyPubFingerprint()."\n";
 print "   Last public IP: ".$settings->data['node']['ipPub']."\n";
 print "   Listen IP:Port: ".$settings->data['node']['ip'].':'.$settings->data['node']['port']."\n";
 print "   Nickname: ".$settings->data['user']['nickname']."\n";
-print "   SSL Public Key:\n".$localNode->getSslKeyPub()."\n";
 print "--------\n";
