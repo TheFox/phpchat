@@ -804,7 +804,6 @@ class Client{
 									if(!$msg->getIgnore()){
 										print __CLASS__.'->'.__FUNCTION__.': add to db'."\n"; # TODO
 										$this->log('debug', 'msg '.$id.' add to db');
-										$this->getMsgDb()->msgAdd($msg);
 									}
 									else{
 										print __CLASS__.'->'.__FUNCTION__.': ignore'."\n"; # TODO
@@ -824,8 +823,9 @@ class Client{
 						else{
 							print __CLASS__.'->'.__FUNCTION__.': msg not for me'."\n"; # TODO
 							$this->log('debug', 'msg '.$id.' not for me');
-							$this->getMsgDb()->msgAdd($msg);
 						}
+						
+						$this->getMsgDb()->msgAdd($msg); // Add all messages.
 					}
 				}
 				else{
