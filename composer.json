@@ -11,7 +11,7 @@
 	],
 	"require": {
 		"php": ">=5.3",
-		"symfony/yaml": "2.3.10",
+		"symfony/yaml": "2.4.*",
 		"monolog/monolog": "1.7.0",
 		"ulrichsg/getopt-php": "1.1.0",
 		"rhumsaa/uuid": "2.5.0",
