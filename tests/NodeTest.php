@@ -23,6 +23,39 @@ O5mYMzSLyuOXR5xhBhG7fjsCAwEAAQ==
 -----END PUBLIC KEY-----
 ';
 	
+	// A: with new line at the end.
+	const SSL_KEY_PUB2_A = '-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAwrX73etzvLFRell4nfIT
+3YFOuqAwCU6w1N1uipV+e96fx00ZsKQHvugyhwSP85a5TZ4qfQQie3kyRrwwL91s
+dXECxskfOXtO94k9CENZGihkacnLUp8eAPJ3dJNHcM9AZm+gFVhVU7XmcQxXex6p
+k3nWpCyrrK4ZUeg+D858Tadgd4w+uOgKozUyARrWU5AVVY27X/u97a3DkKbNZhuC
+h3gSkBD/d8rjwe6d9siHb6aqiw6DBYXL3AlsDoN/lGvnV1U3wY9zRQ5BuebBzt7Q
+ndAqKC9ZdCEK/JFBXkjJsiNOlKmc0AJpf41SyOqvkLvpBxwPvbTp4VLoGwMty+nT
+8ke/REypXS9scFDlE6k71xAMi9OBthiVP5lszptPEn3cfhG0YRLuzkLOpcV5Gm0r
+egQS+y0TFEu25vUbGcWKKjrWxG+TkWgyKkiylJoXdPRXxDrHA8KEY651x8vs/gsy
+rdhoXy/EI+fxI9ytf7JLnc2OP2eh8qdUhcLMMs9mUOy9hojaxBYMAXRqJK53Lsgd
+kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
+4GoZlLrIR/xaI76pSJLH2FBfHWiLS/Cbpgw8IEcKJFJVIqi7qjHw7MaoXMIqxZVT
+2JGsj8q54He5gnVI01MEWr0CAwEAAQ==
+-----END PUBLIC KEY-----
+';
+	
+	// B: without a new line at the end.
+	const SSL_KEY_PUB2_B = '-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAwrX73etzvLFRell4nfIT
+3YFOuqAwCU6w1N1uipV+e96fx00ZsKQHvugyhwSP85a5TZ4qfQQie3kyRrwwL91s
+dXECxskfOXtO94k9CENZGihkacnLUp8eAPJ3dJNHcM9AZm+gFVhVU7XmcQxXex6p
+k3nWpCyrrK4ZUeg+D858Tadgd4w+uOgKozUyARrWU5AVVY27X/u97a3DkKbNZhuC
+h3gSkBD/d8rjwe6d9siHb6aqiw6DBYXL3AlsDoN/lGvnV1U3wY9zRQ5BuebBzt7Q
+ndAqKC9ZdCEK/JFBXkjJsiNOlKmc0AJpf41SyOqvkLvpBxwPvbTp4VLoGwMty+nT
+8ke/REypXS9scFDlE6k71xAMi9OBthiVP5lszptPEn3cfhG0YRLuzkLOpcV5Gm0r
+egQS+y0TFEu25vUbGcWKKjrWxG+TkWgyKkiylJoXdPRXxDrHA8KEY651x8vs/gsy
+rdhoXy/EI+fxI9ytf7JLnc2OP2eh8qdUhcLMMs9mUOy9hojaxBYMAXRqJK53Lsgd
+kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
+4GoZlLrIR/xaI76pSJLH2FBfHWiLS/Cbpgw8IEcKJFJVIqi7qjHw7MaoXMIqxZVT
+2JGsj8q54He5gnVI01MEWr0CAwEAAQ==
+-----END PUBLIC KEY-----';
+	
 	public function testId(){
 		$id = (string)Uuid::uuid4();
 		
@@ -56,6 +89,7 @@ O5mYMzSLyuOXR5xhBhG7fjsCAwEAAQ==
 		$this->assertTrue($node->load());
 		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
 		$this->assertEquals('FC_BtK4HvbdX9wNQ6hGopSrFxs71SuuwMZra', $node->getSslKeyPubFingerprint());
+		$this->assertEquals(static::SSL_KEY_PUB1, $node->getSslKeyPub());
 		
 		#unlink('data/test_node.yml');
 	}
@@ -105,6 +139,26 @@ O5mYMzSLyuOXR5xhBhG7fjsCAwEAAQ==
 	public function testSetSslKeyPubRuntimeException(){
 		$node = new Node();
 		$node->setSslKeyPub('invalid');
+	}
+	
+	public function testSslKey1(){
+		$this->assertFalse(static::SSL_KEY_PUB2_A == static::SSL_KEY_PUB2_B);
+	}
+	
+	public function testSslKey2(){
+		$node = new Node();
+		$node->setSslKeyPub(static::SSL_KEY_PUB2_A);
+		
+		$this->assertEquals('FC_5zk4NskvcrQdJJLYQFb4V6fai8bzMV82G', $node->getSslKeyPubFingerprint());
+		$this->assertEquals(static::SSL_KEY_PUB2_A, $node->getSslKeyPub());
+	}
+	
+	public function testSslKey3(){
+		$node = new Node();
+		$node->setSslKeyPub(static::SSL_KEY_PUB2_B);
+		
+		$this->assertEquals('FC_5zk4NskvcrQdJJLYQFb4V6fai8bzMV82G', $node->getSslKeyPubFingerprint());
+		$this->assertEquals(static::SSL_KEY_PUB2_A, $node->getSslKeyPub());
 	}
 	
 }
