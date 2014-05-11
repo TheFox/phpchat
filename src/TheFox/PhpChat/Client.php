@@ -730,7 +730,7 @@ class Client{
 						$srcNodeId = $msgData['srcNodeId'];
 					}
 					if(array_key_exists('srcSslKeyPub', $msgData)){
-						$srcSslKeyPub = $msgData['srcSslKeyPub'];
+						$srcSslKeyPub = base64_decode($msgData['srcSslKeyPub']);
 					}
 					if(array_key_exists('dstNodeId', $msgData)){
 						$dstNodeId = $msgData['dstNodeId'];
@@ -1712,7 +1712,7 @@ class Client{
 			'version' => $msg->getVersion(),
 			'id' => $msg->getId(),
 			'srcNodeId' => $msg->getSrcNodeId(),
-			'srcSslKeyPub' => $msg->getSrcSslKeyPub(),
+			'srcSslKeyPub' => base64_encode($msg->getSrcSslKeyPub()),
 			'srcUserNickname' => $msg->getSrcUserNickname(),
 			'dstNodeId' => $msg->getDstNodeId(),
 			'text' => $msg->getText(),
