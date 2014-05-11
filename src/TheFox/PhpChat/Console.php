@@ -22,6 +22,7 @@ class Console extends Thread{
 	const CHAR_ESCAPE = "\x1b";
 	const VT100_CHAR_CONTROL_H = "\x08";
 	const VT100_CHAR_BACKSPACE = "\x7f";
+	const VT100_CHAR_DELETE = "\x5b";
 	const CHAR_EOF = "\x04";
 	const RANDOM_MSG_DELAY_MIN = 30;
 	const RANDOM_MSG_DELAY_MAX = 300;
@@ -126,6 +127,18 @@ class Console extends Thread{
 	
 	private function cursorJumpToTop(){
 		print static::CHAR_ESCAPE.'[1;1f';
+	}
+	
+	private function cursorJumpToColumn($column = 1){
+		print static::CHAR_ESCAPE.'['.$column.'G';
+	}
+	
+	private function cursorRight($offset = 1){
+		print static::CHAR_ESCAPE.'['.$offset.'C';
+	}
+	
+	private function cursorLeft($offset = 1){
+		print static::CHAR_ESCAPE.'['.$offset.'D';
 	}
 	
 	private function lineClear(){
@@ -343,11 +356,11 @@ class Console extends Thread{
 			if($buffer !== false){
 				$bufferLen = strlen($buffer);
 				
-				#print "buffer: ".$bufferLen." '".substr($buffer, 0, -1)."'\n";
+				#$this->log->debug('user input: '.$bufferLen);
 				
 				#$this->log->debug('buffer: '.ord($buffer[0]));
-				$bufferHex = ''; for($n = 0; $n < $bufferLen; $n++){ $bufferHex .= sprintf('%02x ', ord($buffer[$n])); }
-				$this->log->debug('user input raw: '.$bufferHex.'');
+				#$bufferHex = ''; for($n = 0; $n < $bufferLen; $n++){ $bufferHex .= sprintf('%02x ', ord($buffer[$n])); }
+				#$this->log->debug('user input raw: '.$bufferHex.'');
 				
 				for($bufferIndex = 0; $bufferIndex < $bufferLen && !$this->getExit(); $bufferIndex++){
 					$char = $buffer[$bufferIndex];
@@ -364,25 +377,32 @@ class Console extends Thread{
 						print "\nexit\n";
 						break;
 					}
-					elseif($char == static::CHAR_BACKSPACE){
+					elseif($char == static::VT100_CHAR_BACKSPACE){
 						$this->log->debug('got backspace');
 						
 						if($this->buffer){
-							#print chr(static::CHAR_BACKSPACE);
-							print static::CHAR_BACKSPACE;
-							$this->buffer = substr($this->buffer, 0, -1);
+							$this->buffer = substr($this->buffer, 0, $this->bufferCursorPos - 1).substr($this->buffer, $this->bufferCursorPos);
 						}
+						
+						$this->lineClear();
+						$this->printPs1();
+						$this->cursorJumpToColumn(strlen($this->getPs1()) + $this->bufferCursorPos);
+						$this->bufferCursorPos--;
+						
 						$this->log->debug('buffer '.$this->bufferCursorPos.', '.strlen($this->buffer).' "'.$this->buffer.'"');
 					}
-					elseif($char == static::CHAR_DELETE){
-						$this->log->debug('got delete A');
+					elseif($char == static::VT100_CHAR_CONTROL_H){
+						$this->log->debug('got control h');
 						
 						if($this->buffer){
-							#print chr(static::CHAR_DELETE);
-							print static::CHAR_DELETE;
-							$this->buffer = substr($this->buffer, 0, -1);
-							$this->bufferCursorPos--;
+							$this->buffer = substr($this->buffer, 0, $this->bufferCursorPos - 1).substr($this->buffer, $this->bufferCursorPos);
 						}
+						
+						$this->lineClear();
+						$this->printPs1();
+						$this->cursorJumpToColumn(strlen($this->getPs1()) + $this->bufferCursorPos);
+						$this->bufferCursorPos--;
+						
 						$this->log->debug('buffer '.$this->bufferCursorPos.', '.strlen($this->buffer).' "'.$this->buffer.'"');
 					}
 					
@@ -399,36 +419,53 @@ class Console extends Thread{
 					elseif($char == "\x1b" && $buffer[$bufferIndex + 1] == "\x5b"
 						&& $buffer[$bufferIndex + 2] == "\x43"){
 						$bufferIndex += 2;
-						$this->log->debug('got arrow right');
+						
+						if($this->bufferCursorPos < strlen($this->buffer)){
+							$this->cursorRight();
+							$this->bufferCursorPos++;
+						}
+						
+						$this->log->debug('got arrow right: '.$this->bufferCursorPos);
 					}
 					elseif($char == "\x1b" && $buffer[$bufferIndex + 1] == "\x5b"
 						&& $buffer[$bufferIndex + 2] == "\x44"){
 						$bufferIndex += 2;
-						$this->log->debug('got arrow left');
+						
+						if($this->bufferCursorPos > 0){
+							$this->cursorLeft();
+							$this->bufferCursorPos--;
+						}
+						
+						$this->log->debug('got arrow left:  '.$this->bufferCursorPos);
 					}
 					
 					elseif($char == "\x1b" && $buffer[$bufferIndex + 1] == "\x5b"
-							&& $buffer[$bufferIndex + 2] == "\x41"
+							&& $buffer[$bufferIndex + 2] == "\x33"
 							&& $buffer[$bufferIndex + 3] == "\x7e"
 						){
 						$bufferIndex += 3;
-						$this->log->debug('got delete B');
+						$this->log->debug('got delete');
 						
 						if($this->buffer){
-							#print chr(static::CHAR_DELETE);
-							print static::CHAR_DELETE;
-							$this->buffer = substr($this->buffer, 0, -1);
-							$this->bufferCursorPos--;
+							$this->buffer = substr($this->buffer, 0, $this->bufferCursorPos).substr($this->buffer, $this->bufferCursorPos + 1);
 						}
+						
+						$this->lineClear();
+						$this->printPs1();
+						$this->cursorJumpToColumn(strlen($this->getPs1()) + $this->bufferCursorPos + 1);
+						
 						$this->log->debug('buffer '.$this->bufferCursorPos.', '.strlen($this->buffer).' "'.$this->buffer.'"');
 					}
 					
 					else{
+						$this->log->debug('user input raw: '.sprintf('%02x ', ord($char)).'');
+						
 						print $char;
-						$this->buffer .= $char;
+						#$this->buffer .= $char;
+						$this->buffer = substr($this->buffer, 0, $this->bufferCursorPos).$char.substr($this->buffer, $this->bufferCursorPos);
 						$this->bufferCursorPos++;
-						$this->log->debug('buffer '.$this->bufferCursorPos.', '.strlen($this->buffer));
-						#$this->log->debug('buffer "'.$this->buffer.'"');
+						#$this->log->debug('buffer '.$this->bufferCursorPos.', '.strlen($this->buffer).' "'.$this->buffer.'"');
+						#$this->log->debug('"'.$this->buffer.'"');
 					}
 				}
 			}
