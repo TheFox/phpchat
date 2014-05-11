@@ -751,7 +751,10 @@ class Client{
 						$timeCreated = (int)$msgData['timeCreated'];
 					}
 					
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$id.'');
+					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$id);
+					
+					print __CLASS__.'->'.__FUNCTION__.' text: '.$text."\n"; # TODO
+					$this->log('debug', 'msg '.$id.' text: '.$text);
 					
 					$status = 1; // New
 					if($this->getMsgDb()->getMsgById($id)){
@@ -761,8 +764,10 @@ class Client{
 					$srcNode = new Node();
 					$srcNode->setIdHexStr($srcNodeId);
 					$srcNode = $this->getTable()->nodeEnclose($srcNode);
+					
 					print __CLASS__.'->'.__FUNCTION__.': srcNode: '.$srcNode->getIdHexStr()."\n"; # TODO
-					$this->log('debug', 'msg '.$id.' decrypt ok');
+					$this->log('debug', 'msg '.$id.' srcNode: '.$srcNode->getIdHexStr());
+					
 					if($srcNode->getSslKeyPub()){
 						if($srcNode->getSslKeyPub() != $srcSslKeyPub){
 							$status = 3; // Error
