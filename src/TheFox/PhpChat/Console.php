@@ -20,8 +20,8 @@ class Console extends Thread{
 	
 	const LOOP_USLEEP = 10000;
 	const CHAR_ESCAPE = "\x1b";
-	const CHAR_DELETE = "\x7f";
-	const CHAR_BACKSPACE = "\x08";
+	const VT100_CHAR_CONTROL_H = "\x08";
+	const VT100_CHAR_BACKSPACE = "\x7f";
 	const CHAR_EOF = "\x04";
 	const RANDOM_MSG_DELAY_MIN = 30;
 	const RANDOM_MSG_DELAY_MAX = 300;
@@ -47,6 +47,9 @@ class Console extends Thread{
 	private $nextRandomMsg = 0;
 	private $sttySettings = '';
 	private $history = array();
+	private $historyCursorPos = 0;
+	private $charControlH;
+	private $charBackspace;
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -197,6 +200,7 @@ class Console extends Thread{
 		}
 		
 		$this->sttySetup();
+		$this->keybindingsSetup();
 		
 		$this->userNickname = $this->getIpcKernelConnection()->execSync('getSettingsUserNickname');
 		
@@ -222,6 +226,38 @@ class Console extends Thread{
 		
 		$this->sttyEnterIcanonMode();
 		$this->sttyEchoOff();
+	}
+	
+	private function keybindingsSetup(){
+		// Default
+		$this->charControlH = static::VT100_CHAR_CONTROL_H;
+		$this->backspace = static::VT100_CHAR_BACKSPACE;
+		
+		
+		$keys = array();
+		exec('infocmp', $lines);
+		foreach($lines as $line){
+			
+			if($line[0] == "\t"){
+				#print "line '".substr($line, 1)."'\n";
+				#ve(\TheFox\Utilities\Hex::dataEncode($line));
+				$items = preg_split('/, ?/', substr($line, 1));
+				foreach($items as $item){
+					#print "item '$item'\n";
+					$pos = strpos($item, '=');
+					if($pos !== false){
+						$keys[substr($item, 0, $pos)] = substr($item, $pos + 1);
+					}
+				}
+			}
+			
+			#break;
+		}
+		
+		#ve($keys);
+		ve($keys['kbs']);
+		ve($keys['kdch1']);
+		#exit();
 	}
 	
 	private function sttyReset(){
