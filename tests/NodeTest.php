@@ -7,7 +7,7 @@ use TheFox\Dht\Kademlia\Node;
 
 class NodeTest extends PHPUnit_Framework_TestCase{
 	
-	const SSL_KEY_PUB = '-----BEGIN PUBLIC KEY-----
+	const SSL_KEY_PUB1 = '-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA2+wZQQSxQXaxUmL/bg7O
 gA7fOuw4Kk6/UtEntvM4O1Ll75l0ptgalwkO8DFhwRmWxDd0BYd/RxsbWrii3/1R
 6+HSQdjyeeY3gQFdL7r65RRvXkYTtNSsFDeqcVQC+c6lFqRozQDNnAtxmy1Fhc0z
@@ -37,8 +37,8 @@ O5mYMzSLyuOXR5xhBhG7fjsCAwEAAQ==
 		$node->setDataChanged(true);
 		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
 		
-		$node->setSslKeyPub(static::SSL_KEY_PUB);
-		$this->assertFalse( $node->setSslKeyPub(static::SSL_KEY_PUB) );
+		$node->setSslKeyPub(static::SSL_KEY_PUB1);
+		$this->assertFalse( $node->setSslKeyPub(static::SSL_KEY_PUB1) );
 		
 		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
 		$this->assertEquals('FC_BtK4HvbdX9wNQ6hGopSrFxs71SuuwMZra', $node->getSslKeyPubFingerprint());
@@ -95,8 +95,8 @@ O5mYMzSLyuOXR5xhBhG7fjsCAwEAAQ==
 	
 	public function testSetSslKeyPub(){
 		$node = new Node();
-		$this->assertTrue($node->setSslKeyPub(static::SSL_KEY_PUB));
-		$this->assertFalse($node->setSslKeyPub(static::SSL_KEY_PUB));
+		$this->assertTrue($node->setSslKeyPub(static::SSL_KEY_PUB1));
+		$this->assertFalse($node->setSslKeyPub(static::SSL_KEY_PUB1));
 	}
 	
 	/**
