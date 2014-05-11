@@ -124,7 +124,7 @@ class Node extends YamlStorage{
 				$sslPubKeyDetails = openssl_pkey_get_details($sslPubKey);
 				
 				if($sslPubKeyDetails['bits'] >= static::SSL_KEY_LEN_MIN){
-					$this->sslKeyPub = $strKeyPub;
+					$this->sslKeyPub = $sslPubKeyDetails['key'];
 					$this->setSslKeyPubFingerprint(static::genSslKeyFingerprint($strKeyPub));
 					
 					return true;
