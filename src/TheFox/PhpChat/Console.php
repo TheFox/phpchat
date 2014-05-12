@@ -371,33 +371,39 @@ class Console extends Thread{
 						print "\nexit\n";
 						break;
 					}
-					elseif($char == static::VT100_CHAR_BACKSPACE){
-						$this->log->debug('got backspace');
+					elseif($char == static::VT100_CHAR_BACKSPACE || $char == static::VT100_CHAR_CONTROL_H){
+						#$this->log->debug('got backspace');
 						
-						if($this->bufferCursorPos){
+						if($this->historyCursorPos == count($this->history)){
+							$this->buffer = substr($this->buffer, 0, -1);
+							
+							sleep(1);
+							$this->cursorLeft();
+							
+							sleep(1);
+							$this->lineClearRight();
+							
+						}
+						elseif($this->bufferCursorPos){
 							$this->buffer = substr($this->buffer, 0, $this->bufferCursorPos - 1).substr($this->buffer, $this->bufferCursorPos);
-							$this->lineClear();
-							$this->printPs1();
+							
+							sleep(1);
+							$this->cursorLeft();
+							
+							sleep(1);
+							$this->lineClearRight();
+							
+							sleep(1);
+							print substr($this->buffer, $this->bufferCursorPos - 1);
+							
+							sleep(1);
 							$this->cursorJumpToColumn(strlen($this->getPs1()) + $this->bufferCursorPos);
+							
 							$this->bufferCursorPos--;
 						}
 						
 						$this->log->debug('buffer '.$this->bufferCursorPos.', '.strlen($this->buffer).' "'.$this->buffer.'"');
 					}
-					elseif($char == static::VT100_CHAR_CONTROL_H){
-						$this->log->debug('got control h');
-						
-						if($this->buffer){
-							$this->buffer = substr($this->buffer, 0, $this->bufferCursorPos - 1).substr($this->buffer, $this->bufferCursorPos);
-							$this->lineClear();
-							$this->printPs1();
-							$this->cursorJumpToColumn(strlen($this->getPs1()) + $this->bufferCursorPos);
-							$this->bufferCursorPos--;
-						}
-						
-						$this->log->debug('buffer '.$this->bufferCursorPos.', '.strlen($this->buffer).' "'.$this->buffer.'"');
-					}
-					
 					elseif($char == "\x1b" && $buffer[$bufferIndex + 1] == "\x5b"
 						&& $buffer[$bufferIndex + 2] == "\x41"){
 						$bufferIndex += 2;
@@ -410,17 +416,15 @@ class Console extends Thread{
 							$this->historyCursorPos++;
 							
 							#sleep(1);
-							$this->lineClear();
-							
-							#sleep(1);
-							$this->printPs1(false);
+							$this->cursorJumpToColumn(strlen($this->getPs1()) + 1);
 							
 							#sleep(1);
 							$this->buffer = $this->history[$this->historyCursorPos];
 							$this->bufferCursorPos = strlen($this->buffer);
 							print $this->buffer;
 							
-							
+							#sleep(1);
+							$this->lineClearRight();
 						}
 						
 						$this->log->debug('got arrow u: '.$this->historyCursorPos);
@@ -433,10 +437,7 @@ class Console extends Thread{
 							$this->historyCursorPos--;
 							
 							#sleep(1);
-							$this->lineClear();
-							
-							#sleep(1);
-							$this->printPs1(false);
+							$this->cursorJumpToColumn(strlen($this->getPs1()) + 1);
 							
 							#sleep(1);
 							if($this->historyCursorPos == -1){
@@ -447,6 +448,9 @@ class Console extends Thread{
 							}
 							$this->bufferCursorPos = strlen($this->buffer);
 							print $this->buffer;
+							
+							#sleep(1);
+							$this->lineClearRight();
 						}
 						
 						$this->log->debug('got arrow d: '.$this->historyCursorPos);
@@ -481,26 +485,52 @@ class Console extends Thread{
 						$bufferIndex += 3;
 						$this->log->debug('got delete');
 						
-						if($this->buffer){
+						if($this->bufferCursorPos < strlen($this->buffer)){
 							$this->buffer = substr($this->buffer, 0, $this->bufferCursorPos).substr($this->buffer, $this->bufferCursorPos + 1);
+							
+							#sleep(1);
+							$this->lineClearRight();
+							
+							#sleep(1);
+							print substr($this->buffer, $this->bufferCursorPos);
+							
+							#sleep(1);
+							$this->cursorJumpToColumn(strlen($this->getPs1()) + $this->bufferCursorPos + 1);
 						}
-						
-						$this->lineClear();
-						$this->printPs1();
-						$this->cursorJumpToColumn(strlen($this->getPs1()) + $this->bufferCursorPos + 1);
 						
 						$this->log->debug('buffer '.$this->bufferCursorPos.', '.strlen($this->buffer).' "'.$this->buffer.'"');
 					}
 					
 					else{
-						$this->log->debug('user input raw: '.sprintf('%02x ', ord($char)).'');
+						#$this->log->debug('user input raw: '.sprintf('%02x ', ord($char)).'');
 						
-						print $char;
-						#$this->buffer .= $char;
-						$this->buffer = substr($this->buffer, 0, $this->bufferCursorPos).$char.substr($this->buffer, $this->bufferCursorPos);
+						
+						$end = '';
+						if($this->bufferCursorPos == strlen($this->buffer)){
+							$end = 'end';
+							
+							print $char;
+							$this->buffer .= $char;
+						}
+						else{
+							$end = 'NOT end';
+							
+							$this->buffer = substr($this->buffer, 0, $this->bufferCursorPos).$char.substr($this->buffer, $this->bufferCursorPos);
+							
+							#sleep(1);
+							$this->lineClearRight();
+							
+							#sleep(1);
+							print substr($this->buffer, $this->bufferCursorPos);
+							
+							#sleep(1);
+							$this->cursorJumpToColumn(strlen($this->getPs1()) + $this->bufferCursorPos + 2);
+							
+						}
+						
 						$this->bufferCursorPos++;
-						#$this->log->debug('buffer '.$this->bufferCursorPos.', '.strlen($this->buffer).' "'.$this->buffer.'"');
-						#$this->log->debug('"'.$this->buffer.'"');
+						$this->log->debug('buffer '.$this->bufferCursorPos.', '.$end.', '.strlen($this->buffer).' "'.$this->buffer.'"');
+						
 					}
 				}
 			}
