@@ -2,6 +2,7 @@
 	"name": "thefox/phpchat2",
 	"description": "A decentralized, peer-to-peer, encrypted chat in PHP.",
 	"license": "GPLv3",
+	"type": "project",
 	"authors": [
 		{
 			"name": "Christian Mayer",
