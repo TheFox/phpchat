@@ -267,10 +267,6 @@ class Console extends Thread{
 			#break;
 		}
 		
-		#ve($keys);
-		ve($keys['kbs']);
-		ve($keys['kdch1']);
-		#exit();
 	}
 	
 	private function sttyReset(){
@@ -305,9 +301,6 @@ class Console extends Thread{
 			throw new RuntimeException('You must first run init().');
 		}
 		
-		$s = time();
-		$a = true;
-		
 		while(!$this->getExit()){
 			#$this->log->debug('run');
 			
@@ -318,19 +311,6 @@ class Console extends Thread{
 			if(!$this->getIpcKernelConnection()->run()){
 				$this->log->info('Connection to kernel process end unexpected.');
 				$this->setExit(1);
-			}
-			
-			#print __CLASS__.'->'.__FUNCTION__.': '.$this->getExit()."\n";
-			
-			if(time() - $s >= 5 && $a){ # TODO
-				$a = false;
-				
-				/*
-				$this->log->debug('auto msg');
-				$this->msgAdd('auto line A', true, false, true);
-				$this->msgAdd('auto line B', true, false);
-				$this->msgAdd('auto line C', true, true);
-				*/
 			}
 			
 			usleep(static::LOOP_USLEEP);
