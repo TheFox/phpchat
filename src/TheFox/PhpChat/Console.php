@@ -152,6 +152,11 @@ class Console extends Thread{
 		print "\r".static::CHAR_ESCAPE.'[K';
 	}
 	
+	private function lineClearRight(){
+		#$this->log->debug('line clear');
+		print static::CHAR_ESCAPE.'[J';
+	}
+	
 	private function scrollUp(){
 		#$this->log->debug('scrollUp');
 		print static::CHAR_ESCAPE.'[S';
