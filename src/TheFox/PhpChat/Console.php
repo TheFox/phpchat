@@ -108,17 +108,22 @@ class Console extends Thread{
 		return $this->modeChannelClient;
 	}
 	
-	public function printPs1($debug = ''){
+	public function printPs1($printBuffer = true, $debug = ''){
 		#$this->log->debug('printPs1');
 		
+		$output = '';
 		if($this->getModeChannel()){
-			#print '"'.$debug.'"" '.$this->settings['phpchat']['user']['nickname'].':> _'.$this->buffer.'_';
-			print $this->userNickname.':> '.$this->buffer;
+			$output .= $this->userNickname.':> ';
 		}
 		else{
-			#print '"'.$debug.'" '.$this->getPs1().' _'.$this->buffer.'_';
-			print $this->getPs1().$this->buffer;
+			$output .= $this->getPs1();
 		}
+		
+		if($printBuffer){
+			$output .= $this->buffer;
+		}
+		
+		print $output;
 	}
 	
 	private function cursorUp(){
@@ -177,7 +182,7 @@ class Console extends Thread{
 			$this->msgStack = array();
 			
 			if($this->msgStackPrintPs1){
-				$this->printPs1('printMsgStack');
+				$this->printPs1(true, 'printMsgStack');
 			}
 			
 			$this->log->debug('printMsgStack end '.(int)$this->msgStackPrintPs1);
@@ -530,7 +535,7 @@ class Console extends Thread{
 					$this->log->debug('do nothing C');
 					
 					#$this->lineClear();
-					#$this->printPs1('handleLine else C');
+					#$this->printPs1(true, 'handleLine else C');
 					
 					$this->msgAdd();
 					$this->msgAdd('ERROR: Command "'.$line.'" not found.', false, true);
@@ -547,7 +552,7 @@ class Console extends Thread{
 					$this->log->debug('do nothing B');
 					
 					#$this->lineClear();
-					#$this->printPs1('handleLine else B');
+					#$this->printPs1(true, 'handleLine else B');
 					
 					$this->msgAdd();
 					$this->msgAdd('ERROR: Command "'.$line.'" not found.', false, true);
@@ -558,7 +563,7 @@ class Console extends Thread{
 			#$this->log->debug('do nothing A');
 			
 			print PHP_EOL;
-			$this->printPs1('handleLine else A');
+			$this->printPs1(true, 'handleLine else A');
 		}
 	}
 	
@@ -769,7 +774,7 @@ class Console extends Thread{
 			$args = preg_split('/ /', $line);
 			#ve($args);
 			
-			#$this->printPs1('handleCommandMsg A');
+			#$this->printPs1(true, 'handleCommandMsg A');
 			
 			if(($args[0] == 'new' || $args[0] == 'n')){
 				if(strIsUuid($args[1])){
@@ -869,11 +874,11 @@ class Console extends Thread{
 									$this->msgAdd('ERROR: '.$e->getMessage(), true, true);
 								}
 								
-								#$this->printPs1('handleCommandMsg B');
+								#$this->printPs1(true, 'handleCommandMsg B');
 							}
 							else{
 								print 'Nothing created, nothing sent.'.PHP_EOL;
-								$this->printPs1('handleCommandMsg C');
+								$this->printPs1(true, 'handleCommandMsg C');
 							}
 						}
 					}
