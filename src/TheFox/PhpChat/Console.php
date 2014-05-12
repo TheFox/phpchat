@@ -372,26 +372,26 @@ class Console extends Thread{
 						if($this->historyCursorPos == count($this->history)){
 							$this->buffer = substr($this->buffer, 0, -1);
 							
-							sleep(1);
+							#sleep(1);
 							$this->cursorLeft();
 							
-							sleep(1);
+							#sleep(1);
 							$this->lineClearRight();
 							
 						}
 						elseif($this->bufferCursorPos){
 							$this->buffer = substr($this->buffer, 0, $this->bufferCursorPos - 1).substr($this->buffer, $this->bufferCursorPos);
 							
-							sleep(1);
+							#sleep(1);
 							$this->cursorLeft();
 							
-							sleep(1);
+							#sleep(1);
 							$this->lineClearRight();
 							
-							sleep(1);
+							#sleep(1);
 							print substr($this->buffer, $this->bufferCursorPos - 1);
 							
-							sleep(1);
+							#sleep(1);
 							$this->cursorJumpToColumn(strlen($this->getPs1()) + $this->bufferCursorPos);
 							
 							$this->bufferCursorPos--;
