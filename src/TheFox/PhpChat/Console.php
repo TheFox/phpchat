@@ -356,6 +356,7 @@ class Console extends Thread{
 						$line = $this->buffer;
 						$this->buffer = '';
 						$this->bufferOriginal = '';
+						$this->bufferCursorPos = 0;
 						$this->historyCursorPos = -1;
 						$this->handleLine($line);
 					}
@@ -383,12 +384,11 @@ class Console extends Thread{
 						
 						if($this->buffer){
 							$this->buffer = substr($this->buffer, 0, $this->bufferCursorPos - 1).substr($this->buffer, $this->bufferCursorPos);
+							$this->lineClear();
+							$this->printPs1();
+							$this->cursorJumpToColumn(strlen($this->getPs1()) + $this->bufferCursorPos);
+							$this->bufferCursorPos--;
 						}
-						
-						$this->lineClear();
-						$this->printPs1();
-						$this->cursorJumpToColumn(strlen($this->getPs1()) + $this->bufferCursorPos);
-						$this->bufferCursorPos--;
 						
 						$this->log->debug('buffer '.$this->bufferCursorPos.', '.strlen($this->buffer).' "'.$this->buffer.'"');
 					}
