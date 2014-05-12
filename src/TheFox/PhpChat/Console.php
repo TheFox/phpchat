@@ -90,6 +90,9 @@ class Console extends Thread{
 	}
 	
 	private function getPs1(){
+		if($this->getModeChannel()){
+			return $this->userNickname.':> ';
+		}
 		return $this->ps1;
 	}
 	
@@ -112,18 +115,10 @@ class Console extends Thread{
 	public function printPs1($printBuffer = true, $debug = ''){
 		#$this->log->debug('printPs1');
 		
-		$output = '';
-		if($this->getModeChannel()){
-			$output .= $this->userNickname.':> ';
-		}
-		else{
-			$output .= $this->getPs1();
-		}
-		
+		$output = $this->getPs1();
 		if($printBuffer){
 			$output .= $this->buffer;
 		}
-		
 		print $output;
 	}
 	
