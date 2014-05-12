@@ -39,6 +39,7 @@ class Console extends Thread{
 	private $msgStack = array();
 	private $msgStackPrintPs1 = true;
 	private $buffer = '';
+	private $bufferOriginal = '';
 	private $bufferCursorPos = 0;
 	private $modeChannel = false;
 	private $modeChannelClient = null;
@@ -48,7 +49,7 @@ class Console extends Thread{
 	private $nextRandomMsg = 0;
 	private $sttySettings = '';
 	private $history = array();
-	private $historyCursorPos = 0;
+	private $historyCursorPos = -1;
 	private $charControlH;
 	private $charBackspace;
 	
@@ -354,6 +355,8 @@ class Console extends Thread{
 						#$this->log->debug('EOL');
 						$line = $this->buffer;
 						$this->buffer = '';
+						$this->bufferOriginal = '';
+						$this->historyCursorPos = -1;
 						$this->handleLine($line);
 					}
 					elseif($char == static::CHAR_EOF){
@@ -394,12 +397,55 @@ class Console extends Thread{
 					elseif($char == "\x1b" && $buffer[$bufferIndex + 1] == "\x5b"
 						&& $buffer[$bufferIndex + 2] == "\x41"){
 						$bufferIndex += 2;
-						$this->log->debug('got arrow up');
+						
+						if($this->historyCursorPos == -1){
+							$this->bufferOriginal = $this->buffer;
+						}
+						
+						if($this->historyCursorPos < count($this->history) - 1){
+							$this->historyCursorPos++;
+							
+							#sleep(1);
+							$this->lineClear();
+							
+							#sleep(1);
+							$this->printPs1(false);
+							
+							#sleep(1);
+							$this->buffer = $this->history[$this->historyCursorPos];
+							$this->bufferCursorPos = strlen($this->buffer);
+							print $this->buffer;
+							
+							
+						}
+						
+						$this->log->debug('got arrow u: '.$this->historyCursorPos);
 					}
 					elseif($char == "\x1b" && $buffer[$bufferIndex + 1] == "\x5b"
 						&& $buffer[$bufferIndex + 2] == "\x42"){
 						$bufferIndex += 2;
-						$this->log->debug('got arrow down');
+						
+						if($this->historyCursorPos > -1){
+							$this->historyCursorPos--;
+							
+							#sleep(1);
+							$this->lineClear();
+							
+							#sleep(1);
+							$this->printPs1(false);
+							
+							#sleep(1);
+							if($this->historyCursorPos == -1){
+								$this->buffer = $this->bufferOriginal;
+							}
+							else{
+								$this->buffer = $this->history[$this->historyCursorPos];
+							}
+							$this->bufferCursorPos = strlen($this->buffer);
+							print $this->buffer;
+						}
+						
+						$this->log->debug('got arrow d: '.$this->historyCursorPos);
 					}
 					elseif($char == "\x1b" && $buffer[$bufferIndex + 1] == "\x5b"
 						&& $buffer[$bufferIndex + 2] == "\x43"){
@@ -461,6 +507,8 @@ class Console extends Thread{
 	private function handleLine($line){
 		if($line){
 			$this->log->debug('user input line: "'.$line.'"');
+			
+			$this->historyAdd($line);
 			
 			if($line[0] == '/'){
 				$line = substr($line, 1);
@@ -524,6 +572,9 @@ class Console extends Thread{
 				elseif($line == 'save'){
 					$this->handleCommandSave();
 				}
+				elseif($line == 'history'){
+					$this->handleCommandHistory();
+				}
 				elseif($line == 'exit'){
 					$this->msgAdd();
 					$this->setExit(1);
@@ -582,6 +633,7 @@ class Console extends Thread{
 		$this->msgAdd('/msg read <NO|ID>         - read a msg', false, false);
 		$this->msgAdd('/nick                     - print your nickname', false, false);
 		$this->msgAdd('/nick <NICK>              - set a new nickname', false, false);
+		$this->msgAdd('/history                  - print history', false, true);
 		$this->msgAdd('/exit                     - exit this programm', false, true);
 	}
 	
@@ -1018,6 +1070,14 @@ class Console extends Thread{
 		$this->msgAdd('Saved.', true, true);
 	}
 	
+	private function handleCommandHistory(){
+		$this->msgAdd();
+		foreach(array_reverse($this->history) as $line){
+			$this->msgAdd($line, false, false);
+		}
+		$this->msgAdd('END OF LIST', false, true);
+	}
+	
 	private function handleCommandTest(){
 		/*$this->linePrint('line A');
 		$this->linePrint('line B');
@@ -1154,6 +1214,14 @@ class Console extends Thread{
 		$dt->setTimestamp($this->nextRandomMsg);
 		
 		$this->log->debug('next random msg: '.$dt->format('Y/m/d H:i:s'));
+	}
+	
+	private function historyAdd($line){
+		if(count($this->history) >= static::HISTORY_MAX){
+			array_pop($this->history);
+		}
+		
+		array_unshift($this->history, $line);
 	}
 	
 }
