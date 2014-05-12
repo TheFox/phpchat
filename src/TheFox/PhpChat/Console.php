@@ -368,14 +368,13 @@ class Console extends Thread{
 					elseif($char == static::VT100_CHAR_BACKSPACE){
 						$this->log->debug('got backspace');
 						
-						if($this->buffer){
+						if($this->bufferCursorPos){
 							$this->buffer = substr($this->buffer, 0, $this->bufferCursorPos - 1).substr($this->buffer, $this->bufferCursorPos);
+							$this->lineClear();
+							$this->printPs1();
+							$this->cursorJumpToColumn(strlen($this->getPs1()) + $this->bufferCursorPos);
+							$this->bufferCursorPos--;
 						}
-						
-						$this->lineClear();
-						$this->printPs1();
-						$this->cursorJumpToColumn(strlen($this->getPs1()) + $this->bufferCursorPos);
-						$this->bufferCursorPos--;
 						
 						$this->log->debug('buffer '.$this->bufferCursorPos.', '.strlen($this->buffer).' "'.$this->buffer.'"');
 					}
