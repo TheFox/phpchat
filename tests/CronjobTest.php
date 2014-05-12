@@ -71,7 +71,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 	protected static $msgs = array();
 	
 	public static function setUpBeforeClass(){
-		fwrite(STDOUT, __METHOD__.''."\n");
+		#fwrite(STDOUT, __METHOD__.''."\n");
 		
 		$settings = new Settings('./settings.yml');
 		
@@ -227,9 +227,9 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		
 		#fwrite(STDOUT, __METHOD__.': '.self::$msgs[1007]->getStatus()."\n");
 		
-		foreach($updateMsgs as $msgId => $msg){
-			fwrite(STDOUT, __METHOD__.': '.$msg->getId().', '.$msg->getStatus().', '.$msg->getDstNodeId()."\n");
-		}
+		#foreach($updateMsgs as $msgId => $msg){
+		#	fwrite(STDOUT, __METHOD__.': '.$msg->getId().', '.$msg->getStatus().', '.$msg->getDstNodeId()."\n");
+		#}
 		
 		$this->assertFalse(array_key_exists('20000000-2000-4002-8002-200000001007', $updateMsgs));
 		$this->assertEquals('X', self::$msgs[1007]->getStatus());
