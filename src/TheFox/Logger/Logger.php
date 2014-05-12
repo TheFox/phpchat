@@ -92,4 +92,8 @@ class Logger{
 		$this->addRecord(static::EMERGENCY, $message);
 	}
 	
+	public static function getLevelNameByNumber($number){
+		return static::$levels[$number];
+	}
+	
 }
