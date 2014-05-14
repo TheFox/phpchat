@@ -459,7 +459,7 @@ class Console extends Thread{
 							$this->bufferCursorPos++;
 						}
 						
-						$this->log->debug('got arrow right: '.$this->bufferCursorPos);
+						$this->log->debug('got arrow r: '.$this->bufferCursorPos);
 					}
 					elseif($char == "\x1b" && $buffer[$bufferIndex + 1] == "\x5b"
 						&& $buffer[$bufferIndex + 2] == "\x44"){
@@ -470,7 +470,7 @@ class Console extends Thread{
 							$this->bufferCursorPos--;
 						}
 						
-						$this->log->debug('got arrow left:  '.$this->bufferCursorPos);
+						$this->log->debug('got arrow l: '.$this->bufferCursorPos);
 					}
 					
 					elseif($char == "\x1b" && $buffer[$bufferIndex + 1] == "\x5b"
