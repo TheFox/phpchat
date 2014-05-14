@@ -11,7 +11,7 @@ PHPCS = vendor/bin/phpcs
 PHPUNIT = vendor/bin/phpunit
 
 
-default: install tests
+all: install tests
 
 install: composer.phar
 
