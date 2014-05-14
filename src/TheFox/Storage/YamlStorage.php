@@ -1,6 +1,6 @@
 <?php
 
-namespace TheFox\Yaml;
+namespace TheFox\Storage;
 
 use Symfony\Component\Yaml\Yaml;
 

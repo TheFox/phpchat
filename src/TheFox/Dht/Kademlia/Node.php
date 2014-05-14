@@ -4,7 +4,7 @@ namespace TheFox\Dht\Kademlia;
 
 use RuntimeException;
 
-use TheFox\Yaml\YamlStorage;
+use TheFox\Storage\YamlStorage;
 use TheFox\Utilities\Hex;
 use TheFox\Utilities\Base58;
 

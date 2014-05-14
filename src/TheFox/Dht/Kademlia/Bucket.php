@@ -2,7 +2,7 @@
 
 namespace TheFox\Dht\Kademlia;
 
-use TheFox\Yaml\YamlStorage;
+use TheFox\Storage\YamlStorage;
 
 class Bucket extends YamlStorage{
 	

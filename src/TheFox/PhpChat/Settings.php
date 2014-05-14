@@ -2,7 +2,7 @@
 
 namespace TheFox\PhpChat;
 
-use TheFox\Yaml\YamlStorage;
+use TheFox\Storage\YamlStorage;
 
 class Settings extends YamlStorage{
 	

@@ -7,7 +7,7 @@ use RuntimeException;
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
 
-use TheFox\Yaml\YamlStorage;
+use TheFox\Storage\YamlStorage;
 use TheFox\Utilities\Rand;
 
 class Msg extends YamlStorage{

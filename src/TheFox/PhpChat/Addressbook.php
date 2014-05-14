@@ -2,7 +2,7 @@
 
 namespace TheFox\PhpChat;
 
-use TheFox\Yaml\YamlStorage;
+use TheFox\Storage\YamlStorage;
 
 class Addressbook extends YamlStorage{
 	

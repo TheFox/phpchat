@@ -5,7 +5,7 @@ namespace TheFox\Dht\Kademlia;
 use Exception;
 use RuntimeException;
 
-use TheFox\Yaml\YamlStorage;
+use TheFox\Storage\YamlStorage;
 
 class Table extends YamlStorage{
 	
