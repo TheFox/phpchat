@@ -1,5 +1,5 @@
 {
-	"name": "thefox/phpchat2",
+	"name": "thefox/phpchat",
 	"description": "A decentralized, peer-to-peer, encrypted chat in PHP.",
 	"license": "GPLv3",
 	"type": "project",

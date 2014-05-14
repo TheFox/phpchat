@@ -2,7 +2,7 @@
 	"folders":[
 		{
 			"path": ".",
-			"name": "PHPChat2",
+			"name": "PHPChat",
 			"folder_exclude_patterns": [ ],
 			"file_exclude_patterns": [
 				"*.swp", "*.sublime-workspace", "composer.lock"

@@ -1,4 +1,4 @@
-# PHPChat2
+# PHPChat
 A decentralized, peer-to-peer, encrypted chat in PHP.
 
 ## Features
@@ -11,9 +11,9 @@ A decentralized, peer-to-peer, encrypted chat in PHP.
 ## Install
 1. Clone
 
-	`git clone https://github.com/TheFox/phpchat2.git`
+	`git clone https://github.com/TheFox/phpchat.git`
 
-2. Change to your `phpchat2` directory and run
+2. Change to your `phpchat` directory and run
 
 	`composer install`
 
@@ -38,7 +38,7 @@ Here's a list of dependencies needed for PHPChat:
 - Renew ssl_key_pub_get and ssl_key_pub_put.
 
 ## Contribute
-You're welcome to contribute to this project. Fork this project at <https://github.com/TheFox/phpchat2>. You should read GitHub's [How to Fork a Repo](https://help.github.com/articles/fork-a-repo).
+You're welcome to contribute to this project. Fork this project at <https://github.com/TheFox/phpchat>. You should read GitHub's [How to Fork a Repo](https://help.github.com/articles/fork-a-repo).
 
 ## License
 Copyright (C) 2014 Christian Mayer (<thefox21at@gmail.com> - <http://fox21.at>)
