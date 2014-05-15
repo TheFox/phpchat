@@ -16,7 +16,7 @@ all: install tests
 install: composer.phar
 
 update: composer.phar
-	./composer.phar update
+	./composer.phar update -vv --profile
 
 composer.phar:
 	curl -sS https://getcomposer.org/installer | php
