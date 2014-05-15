@@ -24,4 +24,4 @@ if(function_exists('pcntl_signal')){
 	pcntl_signal(SIGINT, 'signalHandler');
 }
 
-$kernel->run();
+$kernel->loop();

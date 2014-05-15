@@ -318,18 +318,17 @@ class Kernel extends Thread{
 	}
 	
 	public function run(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
+		$this->server->run();
+		$this->ipcConsoleConnection->run();
+		$this->ipcCronjobConnection->run();
+		$this->ipcMailServerConnection->run();
+	}
+	
+	public function loop(){
 		while(!$this->getExit()){
-			#print __CLASS__.'->'.__FUNCTION__.': '.$this->getExit()."\n";
-			
-			$this->server->run();
-			$this->ipcConsoleConnection->run();
-			$this->ipcCronjobConnection->run();
-			
+			$this->run();
 			usleep(static::LOOP_USLEEP);
 		}
-		
 		$this->shutdown();
 	}
 	
