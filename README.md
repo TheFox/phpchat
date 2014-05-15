@@ -30,7 +30,6 @@ Here's a list of dependencies needed for PHPChat:
 
 ## ToDo
 - Hashcash on connect. [link_1](http://en.wikipedia.org/wiki/Hashcash) | [link_2](https://en.bitcoin.it/wiki/Hashcash)
-- Forward msgs to a uuid through another node. (relay)
 - Supernode over HTTP: no active process; just a http request, json interface. No GUI.
 - IMAP-server interface.
 - ReSSL after period/number of msgs. Reset the SSL passwords.
