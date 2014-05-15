@@ -76,6 +76,7 @@ class Kernel extends Thread{
 		}
 		
 		// Console Connection
+		$this->getLog()->info('setup console connection');
 		$this->ipcConsoleConnection = new ConnectionServer();
 		$this->ipcConsoleConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20000));
 		$this->ipcConsoleConnection->functionAdd('shutdown', $this, 'ipcConsoleShutdown');
@@ -91,6 +92,7 @@ class Kernel extends Thread{
 		$this->ipcConsoleConnection->connect();
 		
 		// Cronjob Connection
+		$this->getLog()->info('setup cronjob connection');
 		$this->ipcCronjobConnection = new ConnectionServer();
 		$this->ipcCronjobConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20001));
 		foreach(array(

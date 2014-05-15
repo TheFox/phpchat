@@ -31,6 +31,8 @@ class Cronjob extends Thread{
 		$this->log = new Logger('cronjob');
 		$this->log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::ERROR));
 		$this->log->pushHandler(new LoggerStreamHandler('log/cronjob.log', Logger::DEBUG));
+		
+		$this->log->info('start');
 	}
 	
 	public function setMsgDb($msgDb){
@@ -69,6 +71,8 @@ class Cronjob extends Thread{
 	}
 	
 	public function init(){
+		$this->log->info('init');
+		
 		$this->setIpcKernelConnection(new ConnectionClient());
 		$this->getIpcKernelConnection()->setHandler(new IpcStreamHandler('127.0.0.1', 20001));
 		$this->getIpcKernelConnection()->functionAdd('shutdown', $this, 'ipcKernelShutdown');
@@ -79,7 +83,7 @@ class Cronjob extends Thread{
 	}
 	
 	public function run(){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		if(!$this->getIpcKernelConnection()){
 			throw new RuntimeException('You must first run init().');
 		}
