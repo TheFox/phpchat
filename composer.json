@@ -19,7 +19,7 @@
 		"ulrichsg/getopt-php": "2.1.*",
 		"rhumsaa/uuid": "2.7.*",
 		"kevinlebrun/colors.php": "0.3.0",
-		"thefox/utilities": "1.0.*"
+		"thefox/utilities": "1.1.*"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "4.1.*",
