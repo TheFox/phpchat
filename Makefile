@@ -18,10 +18,12 @@ install: composer.phar
 update: composer.phar
 	./composer.phar self-update
 	./composer.phar update -vv
+	php bootstrap.php
 
 composer.phar:
 	curl -sS https://getcomposer.org/installer | php
 	./composer.phar install
+	php bootstrap.php
 
 $(PHPCS): composer.phar
 
