@@ -40,7 +40,7 @@ Here's a list of dependencies needed for PHPChat:
 You're welcome to contribute to this project. Fork this project at <https://github.com/TheFox/phpchat>. You should read GitHub's [How to Fork a Repo](https://help.github.com/articles/fork-a-repo).
 
 ## License
-Copyright (C) 2014 Christian Mayer (<thefox21at@gmail.com> - <http://fox21.at>)
+Copyright (C) 2014 Christian Mayer <http://fox21.at>
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
