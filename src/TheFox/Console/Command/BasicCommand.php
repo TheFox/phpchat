@@ -70,8 +70,6 @@ class BasicCommand extends Command{
 		$this->pidFile = new PidFile(new ProcessManager(), $this->getPidfilePath());
 		$this->pidFile->acquireLock();
 		$this->pidFile->setPid(getmypid());
-		
-		$this->log->info('start');
 	}
 	
 	public function executePost(){
@@ -93,7 +91,37 @@ class BasicCommand extends Command{
 	}
 	
 	public function signalHandler($signal){
-		$this->log->notice('basic main abort ['.$this->exit.']: '.$signal);
+		$this->exit++;
+		
+		switch($signal){
+			case SIGTERM:
+				$this->log->notice('signal: SIGTERM');
+				break;
+			case SIGINT:
+				#print "\n";
+				$this->log->notice('signal: SIGINT');
+				break;
+			case SIGHUP:
+				$this->log->notice('signal: SIGHUP');
+				break;
+			case SIGQUIT:
+				$this->log->notice('signal: SIGQUIT');
+				break;
+			case SIGKILL:
+				$this->log->notice('signal: SIGKILL');
+				break;
+			case SIGUSR1:
+				$this->log->notice('signal: SIGUSR1');
+				break;
+			default:
+				$this->log->notice('signal: N/A');
+		}
+		
+		$this->log->notice('main abort ['.$this->exit.']');
+		
+		if($this->exit >= 2){
+			exit(1);
+		}
 	}
 	
 	private function stdStreamsSetup(){

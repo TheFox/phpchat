@@ -41,7 +41,7 @@ class KernelCommand extends BasicCommand{
 				$this->log->notice('signal: SIGTERM');
 				break;
 			case SIGINT:
-				#print "\n";
+				print "\n";
 				$this->log->notice('signal: SIGINT');
 				break;
 			case SIGHUP:
