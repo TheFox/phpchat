@@ -15,9 +15,11 @@ class Thread{
 	
 	public function setExit($exit = 1){
 		$this->exit = $exit;
+		#print __CLASS__.'->'.__FUNCTION__.': '.$this->exit."\n";
 	}
 	
 	public function getExit(){
+		#print __CLASS__.'->'.__FUNCTION__.': '.$this->exit."\n";
 		return (int)$this->exit;
 	}
 	
