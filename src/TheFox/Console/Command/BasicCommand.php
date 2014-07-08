@@ -142,8 +142,8 @@ class BasicCommand extends Command{
 		fclose(STDOUT);
 		fclose(STDERR);
 		$STDIN = fopen('/dev/null', 'r');
-		$STDOUT = fopen('log/application.out.log', 'wb');
-		$STDERR = fopen('log/application.err.log', 'wb');
+		$STDOUT = fopen('/dev/null', 'wb');
+		$STDERR = fopen('/dev/null', 'wb');
 		
 		#$this->log->info('stdStreamsSetup done');
 	}
