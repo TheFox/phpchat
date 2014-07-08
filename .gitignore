@@ -3,6 +3,7 @@ composer.lock
 composer.phar
 test
 log
+pid
 data
 id_rsa*
 settings.yml
