@@ -31,6 +31,7 @@ class KernelCommand extends BasicCommand{
 		$this->kernel->loop();
 		
 		$this->executePost();
+		$this->log->info('exit');
 	}
 	
 	public function signalHandler($signal){

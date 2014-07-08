@@ -17,7 +17,16 @@ class BasicCommand extends Command{
 	
 	public $log;
 	public $exit = 0;
-	public $pidFile;
+	private $pidFile;
+	private $settings;
+	
+	public function setSettings($settings){
+		$this->settings = $settings;
+	}
+	
+	public function getSettings(){
+		return $this->settings;
+	}
 	
 	public function executePre(InputInterface $input, OutputInterface $output){
 		$this->log = new Logger('application');
@@ -74,7 +83,7 @@ class BasicCommand extends Command{
 	
 	public function executePost(){
 		$this->pidFile->releaseLock();
-		$this->log->info('exit');
+		#$this->log->info('exit');
 	}
 	
 	public function signalHandlerSetup(){
@@ -98,7 +107,7 @@ class BasicCommand extends Command{
 				$this->log->notice('signal: SIGTERM');
 				break;
 			case SIGINT:
-				#print "\n";
+				print "\n";
 				$this->log->notice('signal: SIGINT');
 				break;
 			case SIGHUP:

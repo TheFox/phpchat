@@ -11,7 +11,12 @@ use TheFox\Console\Command\CronjobCommand;
 
 
 $application = new Application('PHPChat', '0.3.x-dev');
-$application->add(new KernelCommand());
-$application->add(new ConsoleCommand());
-$application->add(new CronjobCommand());
+foreach(array(
+	new KernelCommand(),
+	new ConsoleCommand(),
+	new CronjobCommand(),
+) as $obj){
+	$obj->setSettings($settings);
+	$application->add($obj);
+}
 $application->run();

@@ -51,6 +51,7 @@ class ConsoleCommand extends BasicCommand{
 		}
 		
 		$this->executePost();
+		$this->log->info('exit');
 	}
 	
 	public function signalHandler($signal){
