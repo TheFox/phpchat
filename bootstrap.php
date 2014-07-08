@@ -78,10 +78,9 @@ $log->pushHandler(new StreamHandler('log/bootstrap.log', Logger::DEBUG));
 
 $settings = new Settings(__DIR__.'/settings.yml');
 
-if( isset($settings->data['datadir']) && !file_exists($settings->data['datadir'])){
+if(isset($settings->data['datadir']) && !file_exists($settings->data['datadir'])){
 	$log->info('create datadir: '.$settings->data['datadir']);
-	mkdir($settings->data['datadir']);
-	chmod($settings->data['datadir'], 0700);
+	$filesystem->mkdir($settings->data['datadir'], 0700);
 }
 
 if(!$settings->data['node']['id']){
@@ -146,7 +145,7 @@ if(!file_exists($settings->data['node']['sslKeyPrvPath'])){
 				if($decrypted == 'test my keys'){
 					$log->info('ssl: test keys ok');
 					file_put_contents($settings->data['node']['sslKeyPubPath'], $keyPub);
-					chmod($settings->data['node']['sslKeyPubPath'], 0400);
+					$filesystem->chmod($settings->data['node']['sslKeyPubPath'], 0400);
 				}
 				else{
 					$log->critical('ssl: test keys failed');
@@ -169,7 +168,7 @@ if(!file_exists($settings->data['node']['sslKeyPrvPath'])){
 	}
 	
 	if(file_exists($settings->data['node']['sslKeyPrvPath'])){
-		chmod($settings->data['node']['sslKeyPrvPath'], 0400);
+		$filesystem->chmod($settings->data['node']['sslKeyPrvPath'], 0400);
 	}
 	
 	openssl_pkey_free($ssl);
