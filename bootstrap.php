@@ -61,16 +61,16 @@ require_once __DIR__.'/functions.php';
 
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
+use Symfony\Component\Filesystem\Filesystem;
 
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler;
 use TheFox\Phpchat\Settings;
 
 
-if(!file_exists(__DIR__.'/log')){
-	mkdir(__DIR__.'/log');
-	chmod(__DIR__.'/log', 0700);
-}
+$filesystem = new Filesystem();
+$filesystem->mkdir('log', 0700);
+$filesystem->mkdir('pid', 0700);
 
 $log = new Logger('main');
 $log->pushHandler(new StreamHandler('php://stdout', Logger::INFO));
