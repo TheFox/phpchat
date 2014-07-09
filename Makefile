@@ -16,7 +16,7 @@ all: install tests
 install: composer.phar
 
 update: composer.phar
-	./composer.phar self-update
+	./composer.phar selfupdate
 	./composer.phar update -vv
 	php bootstrap.php
 
@@ -40,18 +40,18 @@ release:
 	$(MKDIR) releases
 	$(TAR) -cpf $(RELEASE_NAME)-$(RELEASE_VERSION).tar \
 		README.md \
+		application.php \
 		composer.json \
 		bootstrap.php \
-		console.php cronjob.php functions.php kernel.php \
+		functions.php \
 		src \
 		vendor/autoload.php \
 		vendor/composer \
-		vendor/monolog \
-		vendor/psr \
+		vendor/liip \
 		vendor/rhumsaa \
+		vendor/sebastian \
 		vendor/symfony \
-		vendor/thefox \
-		vendor/ulrichsg
+		vendor/thefox
 	$(GZIP) -9 -f $(RELEASE_NAME)-$(RELEASE_VERSION).tar
 	$(MV) ${RELEASE_NAME}-${RELEASE_VERSION}.tar.gz releases
 
