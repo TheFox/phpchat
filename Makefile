@@ -1,6 +1,6 @@
 
 RELEASE_VERSION = 0.3.0-dev
-RELEASE_NAME = phpchat2
+RELEASE_NAME = phpchat
 
 DELETE = rm -rf
 MKDIR = mkdir -p
