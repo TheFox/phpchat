@@ -11,6 +11,7 @@ use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
 use TheFox\Utilities\Hex;
 use TheFox\Network\AbstractSocket;
 use TheFox\Dht\Kademlia\Node;
+use TheFox\Pow\Hashcash;
 
 class Client{
 	
