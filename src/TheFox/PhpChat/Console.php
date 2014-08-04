@@ -551,7 +551,7 @@ class Console extends Thread{
 				elseif(substr($line, 0, 8) == 'connect '){
 					$this->handleCommandConnect($line);
 				}
-				elseif($line == 'ab'){ # TODO
+				elseif($line == 'ab'){ # TODO: in eigenstaendige funktion
 					$format = '%3d %36s  %s';
 					
 					$this->msgAdd(' ID UUID                                  USERNAME', false, false);
@@ -563,13 +563,13 @@ class Console extends Thread{
 				elseif(substr($line, 0, 3) == 'ab '){
 					$this->handleCommandAddressbook($line);
 				}
-				elseif($line == 'talk' || $line == 'talk '){ # TODO
+				elseif($line == 'talk' || $line == 'talk '){ # TODO: in eigenstaendige funktion
 					$this->msgAdd('Usage: /talk <NICK|UUID>', false, true);
 				}
 				elseif(substr($line, 0, 5) == 'talk '){
 					$this->handleCommandTalk($line);
 				}
-				elseif($line == 'request'){ # TODO
+				elseif($line == 'request'){ # TODO: in eigenstaendige funktion
 					$format = '%3d %36s  %s %s';
 					
 					$this->msgAdd(' ID RID                                   IP:PORT               USERNAME', false, false);
@@ -1187,6 +1187,7 @@ class Console extends Thread{
 	
 	private function talkMsgSend($text, $ignore = false){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		$this->log->debug('send msg: i='.(int)($ignore));
 		
 		$rid = (string)Uuid::uuid4();
 		
@@ -1216,6 +1217,7 @@ class Console extends Thread{
 	
 	private function sendRandomMsg(){
 		if($this->getModeChannel() && $this->nextRandomMsg <= time()){
+			$this->log->debug('send random msg begin');
 			#print __CLASS__.'->'.__FUNCTION__.''."\n";
 			
 			$this->randomMsgSetNextTime();
@@ -1229,6 +1231,7 @@ class Console extends Thread{
 			}
 			
 			$this->talkMsgSend($text, true);
+			$this->log->debug('send random msg end');
 			
 			$this->randomMsgDebug();
 		}
