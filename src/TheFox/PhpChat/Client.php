@@ -356,8 +356,8 @@ class Client{
 		#print __CLASS__.'->'.__FUNCTION__.': "'.$msgName.'"'."\n";
 		#print __CLASS__.'->'.__FUNCTION__.': "'.$msgName.'", '.json_encode($msg['data'])."\n";
 		
-		if($msgName == 'nop'){
-			$nop = 0x90;
+		if($msgName == 'noop'){
+			$noop = 0x90;
 		}
 		elseif($msgName == 'test'){
 			$len = 0;
@@ -1615,10 +1615,10 @@ class Client{
 		return null;
 	}
 	
-	public function sendNop(){
+	public function sendNoop(){
 		$data = array(
 		);
-		$this->dataSend($this->msgCreate('nop', $data));
+		$this->dataSend($this->msgCreate('noop', $data));
 	}
 	
 	public function sendTest(){
