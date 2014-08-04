@@ -321,7 +321,7 @@ class Kernel extends Thread{
 		$this->server->run();
 		$this->ipcConsoleConnection->run();
 		$this->ipcCronjobConnection->run();
-		$this->ipcMailServerConnection->run();
+		#$this->ipcMailServerConnection->run();
 	}
 	
 	public function loop(){
