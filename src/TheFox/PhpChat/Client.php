@@ -633,7 +633,7 @@ class Client{
 				
 				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$nodeId.', '.(int)($this->getNode() != null));
 				
-				if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MAX)){
+				if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MIN)){
 					if($nodeId){
 						$node = new Node();
 						$node->setIdHexStr($nodeId);
@@ -1799,7 +1799,7 @@ class Client{
 			'rid'       => $rid,
 			'num'       => static::NODE_FIND_NUM,
 			'nodeId'    => $nodeId,
-			'hashcash'  => $this->hashcashMint(static::HASHCASH_BITS_MAX),
+			'hashcash'  => $this->hashcashMint(static::HASHCASH_BITS_MIN),
 		);
 		$this->dataSend($this->msgCreate('node_find', $data));
 	}
