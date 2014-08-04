@@ -603,6 +603,7 @@ class Client{
 				$rid = '';
 				$num = static::NODE_FIND_NUM;
 				$nodeId = '';
+				$hashcash = '';
 				if(array_key_exists('rid', $msgData)){
 					$rid = $msgData['rid'];
 				}
@@ -612,36 +613,44 @@ class Client{
 				if(array_key_exists('nodeId', $msgData)){
 					$nodeId = $msgData['nodeId'];
 				}
+				if(array_key_exists('hashcash', $msgData)){
+					$hashcash = $msgData['hashcash'];
+				}
 				
 				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$nodeId);
 				
-				if($nodeId){
-					$node = new Node();
-					$node->setIdHexStr($nodeId);
-					
-					if( $node->isEqual($this->getLocalNode()) ){
-						$this->log('debug', 'node find: find myself');
+				if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr())){
+					if($nodeId){
+						$node = new Node();
+						$node->setIdHexStr($nodeId);
 						
-						$this->sendNodeFound($rid);
-					}
-					elseif( !$node->isEqual($this->getNode()) && $onode = $this->getTable()->nodeFindInBuckets($node) ){
-						$this->log('debug', 'node find: find in buckets');
-						
-						$this->sendNodeFound($rid, array($onode));
-					}
-					else{
-						$this->log('debug', 'node find: closest to "'.$node->getIdHexStr().'"');
-						
-						$nodes = $this->getTable()->nodeFindClosest($node, $num);
-						foreach($nodes as $cnodeId => $cnode){
-							if($cnode->isEqual($this->getNode())){
-								unset($nodes[$cnodeId]);
-								break;
-							}
+						if( $node->isEqual($this->getLocalNode()) ){
+							$this->log('debug', 'node find: find myself');
+							
+							$this->sendNodeFound($rid);
 						}
-						
-						$this->sendNodeFound($rid, $nodes);
+						elseif( !$node->isEqual($this->getNode()) && $onode = $this->getTable()->nodeFindInBuckets($node) ){
+							$this->log('debug', 'node find: find in buckets');
+							
+							$this->sendNodeFound($rid, array($onode));
+						}
+						else{
+							$this->log('debug', 'node find: closest to "'.$node->getIdHexStr().'"');
+							
+							$nodes = $this->getTable()->nodeFindClosest($node, $num);
+							foreach($nodes as $cnodeId => $cnode){
+								if($cnode->isEqual($this->getNode())){
+									unset($nodes[$cnodeId]);
+									break;
+								}
+							}
+							
+							$this->sendNodeFound($rid, $nodes);
+						}
 					}
+				}
+				else{
+					$this->sendError(400, $msgName);
 				}
 			}
 			else{
@@ -811,6 +820,9 @@ class Client{
 					if(array_key_exists('timeCreated', $msgData)){
 						$timeCreated = (int)$msgData['timeCreated'];
 					}
+					if(array_key_exists('hashcash', $msgData)){
+						$hashcash = $msgData['hashcash'];
+					}
 					
 					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$id);
 					
@@ -843,57 +855,62 @@ class Client{
 					
 					$this->sendMsgResponse($rid, $status);
 					
-					if($status == 1){
-						$msg = new Msg();
-						$msg->setVersion($version);
-						$msg->setId($id);
-						$msg->setRelayNodeId($this->getNode()->getIdHexStr());
-						$msg->setSrcNodeId($srcNodeId);
-						$msg->setSrcSslKeyPub($srcSslKeyPub);
-						$msg->setDstNodeId($dstNodeId);
-						$msg->setText($text);
-						$msg->setPassword($password);
-						$msg->setChecksum($checksum);
-						$msg->setRelayCount($relayCount);
-						$msg->setEncryptionMode('D');
-						$msg->setStatus('U');
-						$msg->setTimeCreated($timeCreated);
-						$msg->setTimeReceived(time());
-						
-						if($msg->getDstNodeId() == $this->getLocalNode()->getIdHexStr()){
-							$msg->setDstSslPubKey($this->getLocalNode()->getSslKeyPub());
-							$msg->setSsl($this->getSsl());
+					if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr())){
+						if($status == 1){
+							$msg = new Msg();
+							$msg->setVersion($version);
+							$msg->setId($id);
+							$msg->setRelayNodeId($this->getNode()->getIdHexStr());
+							$msg->setSrcNodeId($srcNodeId);
+							$msg->setSrcSslKeyPub($srcSslKeyPub);
+							$msg->setDstNodeId($dstNodeId);
+							$msg->setText($text);
+							$msg->setPassword($password);
+							$msg->setChecksum($checksum);
+							$msg->setRelayCount($relayCount);
+							$msg->setEncryptionMode('D');
+							$msg->setStatus('U');
+							$msg->setTimeCreated($timeCreated);
+							$msg->setTimeReceived(time());
 							
-							try{
-								if($msg->decrypt()){
-									print __CLASS__.'->'.__FUNCTION__.': decrypt ok'."\n"; # TODO
-									$this->log('debug', 'msg '.$id.' decrypt ok');
-									
-									if(!$msg->getIgnore()){
-										print __CLASS__.'->'.__FUNCTION__.': add to db'."\n"; # TODO
-										$this->log('debug', 'msg '.$id.' add to db');
+							if($msg->getDstNodeId() == $this->getLocalNode()->getIdHexStr()){
+								$msg->setDstSslPubKey($this->getLocalNode()->getSslKeyPub());
+								$msg->setSsl($this->getSsl());
+								
+								try{
+									if($msg->decrypt()){
+										print __CLASS__.'->'.__FUNCTION__.': decrypt ok'."\n"; # TODO
+										$this->log('debug', 'msg '.$id.' decrypt ok');
+										
+										if(!$msg->getIgnore()){
+											print __CLASS__.'->'.__FUNCTION__.': add to db'."\n"; # TODO
+											$this->log('debug', 'msg '.$id.' add to db');
+										}
+										else{
+											print __CLASS__.'->'.__FUNCTION__.': ignore'."\n"; # TODO
+											$this->log('debug', 'msg '.$id.' ignore');
+										}
 									}
 									else{
-										print __CLASS__.'->'.__FUNCTION__.': ignore'."\n"; # TODO
-										$this->log('debug', 'msg '.$id.' ignore');
+										print __CLASS__.'->'.__FUNCTION__.': decrypt failed B'."\n"; # TODO
+										$this->log('debug', 'msg '.$id.' decrypt failed B');
 									}
 								}
-								else{
-									print __CLASS__.'->'.__FUNCTION__.': decrypt failed B'."\n"; # TODO
-									$this->log('debug', 'msg '.$id.' decrypt failed B');
+								catch(Exception $e){
+									print __CLASS__.'->'.__FUNCTION__.': decrypt failed A: '.$e->getMessage()."\n"; # TODO
+									$this->log('debug', 'msg '.$id.' decrypt failed A: '.$e->getMessage());
 								}
 							}
-							catch(Exception $e){
-								print __CLASS__.'->'.__FUNCTION__.': decrypt failed A: '.$e->getMessage()."\n"; # TODO
-								$this->log('debug', 'msg '.$id.' decrypt failed A: '.$e->getMessage());
+							else{
+								print __CLASS__.'->'.__FUNCTION__.': msg not for me'."\n"; # TODO
+								$this->log('debug', 'msg '.$id.' not for me');
 							}
+							
+							$this->getMsgDb()->msgAdd($msg); // Add all messages.
 						}
-						else{
-							print __CLASS__.'->'.__FUNCTION__.': msg not for me'."\n"; # TODO
-							$this->log('debug', 'msg '.$id.' not for me');
-						}
-						
-						$this->getMsgDb()->msgAdd($msg); // Add all messages.
+					}
+					else{
+						$this->sendError(400, $msgName);
 					}
 				}
 				else{
@@ -953,11 +970,21 @@ class Client{
 			if($this->getSsl()){
 				if($this->getStatus('hasId')){
 					if(!$this->getStatus('hasSslInit')){
+						$hashcash = '';
+						if(array_key_exists('hashcash', $msgData)){
+							$hashcash = $msgData['hashcash'];
+						}
+						
 						$this->log('debug', 'SSL: init');
 						
-						$this->setStatus('hasSslInit', true);
-						$this->sendSslInit();
-						$this->sendSslInitOk();
+						if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr())){
+							$this->setStatus('hasSslInit', true);
+							$this->sendSslInit();
+							$this->sendSslInitOk();
+						}
+						else{
+							$this->sendError(400, $msgName);
+						}
 					}
 				}
 				else{
@@ -1275,25 +1302,34 @@ class Client{
 				if($msgData){
 					$rid = '';
 					$userNickname = '';
+					$hashcash = '';
 					if(array_key_exists('rid', $msgData)){
 						$rid = $msgData['rid'];
 					}
 					if(array_key_exists('userNickname', $msgData)){
 						$userNickname = $msgData['userNickname'];
 					}
+					if(array_key_exists('hashcash', $msgData)){
+						$hashcash = $msgData['hashcash'];
+					}
 					
 					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$userNickname);
 					
-					if($rid){
-						if($this->getServer() && $this->getServer()->kernelHasConsole()){
-							$this->consoleTalkRequestAdd($rid, $userNickname);
+					if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr())){
+						if($rid){
+							if($this->getServer() && $this->getServer()->kernelHasConsole()){
+								$this->consoleTalkRequestAdd($rid, $userNickname);
+							}
+							else{
+								$this->sendTalkResponse($rid, 4);
+							}
 						}
 						else{
-							$this->sendTalkResponse($rid, 4);
+							$this->sendError(900, $msgName);
 						}
 					}
 					else{
-						$this->sendError(900, $msgName);
+						$this->sendError(400, $msgName);
 					}
 				}
 				else{
@@ -1740,6 +1776,7 @@ class Client{
 			'rid'       => $rid,
 			'num'       => static::NODE_FIND_NUM,
 			'nodeId'    => $nodeId,
+			'hashcash'  => $this->hashcashMint(),
 		);
 		$this->dataSend($this->msgCreate('node_find', $data));
 	}
@@ -1787,6 +1824,7 @@ class Client{
 			'checksum' => $msg->getChecksum(),
 			'relayCount' => (int)$msg->getRelayCount() + 1,
 			'timeCreated' => (int)$msg->getTimeCreated(),
+			'hashcash' => $this->hashcashMint(),
 		);
 		$this->dataSend($this->msgCreate('msg', $data));
 	}
@@ -1811,6 +1849,7 @@ class Client{
 			$this->setStatus('hasSendSslInit', true);
 			
 			$data = array(
+				'hashcash' => $this->hashcashMint(),
 			);
 			$this->dataSend($this->msgCreate('ssl_init', $data));
 		}
@@ -1933,6 +1972,7 @@ class Client{
 		$data = array(
 			'rid' => $rid,
 			'userNickname' => $userNickname,
+			'hashcash' => $this->hashcashMint(),
 		);
 		$this->dataSend($this->sslMsgCreatePasswordEncrypt('talk_request', $data));
 	}
