@@ -11,7 +11,9 @@ PHPCS = vendor/bin/phpcs
 PHPUNIT = vendor/bin/phpunit
 
 
-all: install tests
+.PHONY: all install update
+
+all: install tests tests test_phpcs test_phpunit release clean
 
 install: composer.phar
 
