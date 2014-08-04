@@ -20,7 +20,8 @@ class Client{
 	const NODE_FIND_MAX_NODE_IDS = 1024;
 	const PING_TTL = 25;
 	const PONG_TTL = 30;
-	const HASHCASH_BITS_MIN = 19;
+	const HASHCASH_BITS_MIN = 18;
+	const HASHCASH_BITS_MAX = 20;
 	const HASHCASH_EXPIRATION = 172800; // 2 days
 	
 	private $id = 0;
@@ -220,13 +221,18 @@ class Client{
 		return null;
 	}
 	
-	private function hashcashMint(){
-		$hashcash = new Hashcash(static::HASHCASH_BITS_MIN, $this->getLocalNode()->getIdHexStr());
+	private function hashcashMint($bits = null){
+		if($bits === null){
+			$bits = static::HASHCASH_BITS_MIN;
+		}
+		$hashcash = new Hashcash($bits, $this->getLocalNode()->getIdHexStr());
 		$hashcash->setDate(date(Hashcash::DATE_FORMAT12));
 		#$hashcash->setMintAttemptsMax(10);
 		
 		try{
+			$this->log('debug', 'hashcash: mint');
 			$stamp = $hashcash->mint();
+			$this->log('debug', 'hashcash: '.$stamp);
 			return $stamp;
 		}
 		catch(Exception $e){
@@ -1752,7 +1758,7 @@ class Client{
 			'port'      => $this->getLocalNode()->getPort(),
 			'sslKeyPub' => $sslKeyPub,
 			'isChannel' => $this->getStatus('isChannelLocal'),
-			'hashcash'  => $this->hashcashMint(),
+			'hashcash'  => $this->hashcashMint(static::HASHCASH_BITS_MAX),
 		);
 		$this->dataSend($this->msgCreate('id', $data));
 	}
