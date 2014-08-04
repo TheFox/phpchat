@@ -466,7 +466,7 @@ class Client{
 						$isChannelPeer = (bool)$msgData['isChannel'];
 					}
 					if(array_key_exists('hashcash', $msgData)){
-						$hashcash = (bool)$msgData['hashcash'];
+						$hashcash = $msgData['hashcash'];
 					}
 					
 					if($isChannelPeer){
