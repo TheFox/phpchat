@@ -8,6 +8,7 @@ use TheFox\Dht\Kademlia\Table;
 use TheFox\Dht\Kademlia\Node;
 use TheFox\Ipc\ConnectionServer;
 use TheFox\Ipc\StreamHandler as IpcStreamHandler;
+use TheFox\Pow\HashcashDb;
 
 class Kernel extends Thread{
 	
@@ -19,6 +20,7 @@ class Kernel extends Thread{
 	private $table;
 	private $addressbook;
 	private $msgDb;
+	private $hashcashDb;
 	private $server;
 	private $ipcConsoleConnection = null;
 	private $ipcConsoleShutdown = false;
@@ -60,6 +62,12 @@ class Kernel extends Thread{
 		$this->msgDb->setDatadirBasePath($this->settings->data['datadir']);
 		$load = $this->msgDb->load();
 		$this->getLog()->info('setup msgDb: done ('.(int)$load.')');
+		
+		$this->getLog()->info('setup hashcashDb');
+		$this->hashcashDb = new HashcashDb($this->settings->data['datadir'].'/hashcashdb.yml');
+		$this->hashcashDb->setDatadirBasePath($this->settings->data['datadir']);
+		$load = $this->hashcashDb->load();
+		$this->getLog()->info('setup hashcashDb: done ('.(int)$load.')');
 		
 		$this->getLog()->info('setup server');
 		$this->server = new Server();
@@ -313,6 +321,10 @@ class Kernel extends Thread{
 		}
 	}
 	
+	public function getHashcashDb(){
+		return $this->hashcashDb;
+	}
+	
 	public function getIpcConsoleConnection(){
 		return $this->ipcConsoleConnection;
 	}
@@ -337,6 +349,8 @@ class Kernel extends Thread{
 		$this->getAddressbook()->save();
 		$this->getMsgDb()->setDataChanged(true);
 		$this->getMsgDb()->save();
+		$this->getHashcashDb()->setDataChanged(true);
+		$this->getHashcashDb()->save();
 		$this->getSettings()->save();
 	}
 	
