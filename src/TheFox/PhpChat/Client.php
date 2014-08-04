@@ -218,7 +218,7 @@ class Client{
 		return null;
 	}
 	
-	private function hashcashDbMint(){
+	private function hashcashMint(){
 		$hashcash = new Hashcash(static::HASHCASH_BITS_MIN, $this->getLocalNode()->getIdHexStr());
 		#$hashcash->setMintAttemptsMax(10);
 		
@@ -233,14 +233,14 @@ class Client{
 		return null;
 	}
 	
-	private function hashcashDbVerify($hashcashStr, $nodeId){
+	private function hashcashVerify($hashcashStr, $resource){
 		$this->log('debug', 'hashcash: '.$hashcashStr);
 		
 		$hashcash = new Hashcash();
 		try{
 			if($hashcash->verify($hashcashStr)){
 				$this->log('debug', 'bits: '.$hashcashStr.', '.$hashcash->getBits());
-				if($hashcash->getVersion() >= 1 && $hashcash->getBits() >= static::HASHCASH_BITS_MIN && $hashcash->getResource() == $nodeId && $this->getHashcashDb()->addHashcash($hashcash)){
+				if($hashcash->getVersion() >= 1 && $hashcash->getBits() >= static::HASHCASH_BITS_MIN && $hashcash->getResource() == $resource && $added = $this->getHashcashDb()->addHashcash($hashcash)){
 					$this->log('debug', 'hashcash: '.$hashcashStr.' OK');
 					return true;
 				}
