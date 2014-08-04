@@ -244,6 +244,7 @@ class Client{
 		try{
 			if($hashcash->verify($hashcashStr)){
 				$this->log('debug', 'bits: '.$hashcash->getBits());
+				$added = false;
 				if($hashcash->getVersion() >= 1 && $hashcash->getBits() >= static::HASHCASH_BITS_MIN && $hashcash->getResource() == $resource && $added = $this->getHashcashDb()->addHashcash($hashcash)){
 					$this->log('debug', 'hashcash: OK');
 					return true;
