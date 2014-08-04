@@ -20,8 +20,8 @@ class Client{
 	const NODE_FIND_MAX_NODE_IDS = 1024;
 	const PING_TTL = 25;
 	const PONG_TTL = 30;
-	const HASHCASH_BITS_MIN = 18;
-	const HASHCASH_BITS_MAX = 20;
+	const HASHCASH_BITS_MIN = 17;
+	const HASHCASH_BITS_MAX = 19;
 	const HASHCASH_EXPIRATION = 172800; // 2 days
 	
 	private $id = 0;
