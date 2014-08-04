@@ -244,6 +244,12 @@ class Client{
 					$this->log('debug', 'hashcash: '.$hashcashStr.' OK');
 					return true;
 				}
+				else{
+					$this->log('debug', 'hashcash version: '.$hashcash->getVersion());
+					$this->log('debug', 'hashcash bit: '.$hashcash->getBits().' (min: '.static::HASHCASH_BITS_MIN.')');
+					$this->log('debug', 'hashcash resource: '.$hashcash->getResource().' ('.$resource.')');
+					$this->log('debug', 'hashcash added: '.($added ? 'yes' : 'no'));
+				}
 			}
 		}
 		catch(Exception $e){
