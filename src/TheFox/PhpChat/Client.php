@@ -627,7 +627,7 @@ class Client{
 					$hashcash = $msgData['hashcash'];
 				}
 				
-				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$nodeId);
+				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$nodeId.', '.(int)($this->getNode() != null));
 				
 				if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr())){
 					if($nodeId){
