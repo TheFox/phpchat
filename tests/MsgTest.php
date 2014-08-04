@@ -448,7 +448,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$this->assertEquals('', $msg->getSrcUserNickname());
 	}
 	
-	public function testChecksum(){
+	public function testChecksum1(){
 		$version = 1;
 		$id = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
 		$srcNodeId = 'cafed00d-2331-4159-8e11-0b4dbadb1738';
@@ -460,6 +460,20 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$checksum = Msg::createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey, $text, $timeCreated, $password);
 		
 		$this->assertEquals('7c4459a9bc0ec4b19ebae6d9ded536aa6ee55ba13552dc81', $checksum);
+	}
+	
+	public function testChecksum2(){
+		$version = 1;
+		$id = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
+		$srcNodeId = 'cafed00d-2331-4159-8e11-0b4dbadb1738';
+		$dstNodeId = 'cafed00d-2531-4159-8e11-0b4dbadb1738';
+		$dstSslPubKey = static::DST1_SSL_KEY_PUB;
+		$text = 'hello world!';
+		$timeCreated = '540892800';
+		$password = 'password1';
+		$checksum = Msg::createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey, $text, $timeCreated, $password);
+		
+		$this->assertEquals('1c870e54257e6eb594724508a0a9c616b1905c2aed25de8a', $checksum);
 	}
 	
 }
