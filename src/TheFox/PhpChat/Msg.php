@@ -378,12 +378,26 @@ class Msg extends YamlStorage{
 					$this->setText($data);
 					
 					$checksum = $this->createCheckSum(
-								$this->getVersion(), $this->getId(),
-								$this->getSrcNodeId(),
-								$this->getDstNodeId(), $this->getDstSslPubKey(), $text,
-								$this->getTimeCreated(), $password);
+						$this->getVersion(),
+						$this->getId(),
+						$this->getSrcNodeId(),
+						$this->getDstNodeId(),
+						$this->getDstSslPubKey(),
+						$text,
+						$this->getTimeCreated(),
+						$password);
 					
 					$this->setChecksum($checksum);
+					
+					#fwrite(STDOUT, 'checksum: /'.$checksum.'/'."\n");
+					#fwrite(STDOUT, 'version: /'.$this->getVersion().'/'."\n");
+					#fwrite(STDOUT, 'id: /'.$this->getId().'/'."\n");
+					#fwrite(STDOUT, 'src node id: /'.$this->getSrcNodeId().'/'."\n");
+					#fwrite(STDOUT, 'dst node id: /'.$this->getDstNodeId().'/'."\n");
+					#fwrite(STDOUT, 'dst ssl pub key: /'.$this->getDstSslPubKey().'/'."\n");
+					#fwrite(STDOUT, 'text: /'.$text.'/'."\n");
+					#fwrite(STDOUT, 'time created: /'.$this->getTimeCreated().'/'."\n");
+					#fwrite(STDOUT, 'password: /'.$password.'/'."\n");
 					
 					$rv = true;
 				}
@@ -471,10 +485,14 @@ class Msg extends YamlStorage{
 						
 						if(openssl_verify($text, $sign, $this->getSrcSslKeyPub(), $signAlgo)){
 							$checksum = $this->createCheckSum(
-								$this->getVersion(), $this->getId(),
+								$this->getVersion(),
+								$this->getId(),
 								$this->getSrcNodeId(),
-								$this->getDstNodeId(), $this->getDstSslPubKey(), $text,
-								$this->getTimeCreated(), $password);
+								$this->getDstNodeId(),
+								$this->getDstSslPubKey(),
+								$text,
+								$this->getTimeCreated(),
+								$password);
 							
 							#fwrite(STDOUT, 'checksum: '.$checksum."\n");
 							
@@ -485,7 +503,17 @@ class Msg extends YamlStorage{
 								$rv = $text;
 							}
 							else{
-								throw new RuntimeException('msg checksum does not match.', 206);
+								$errorMsg = 'msg checksum does not match.';
+								$errorMsg .= "\n".'    checksum: /'.$checksum.'/ != /'.$this->getChecksum().'/';
+								$errorMsg .= "\n".'    version: /'.$this->getVersion().'/';
+								$errorMsg .= "\n".'    id: /'.$this->getId().'/';
+								$errorMsg .= "\n".'    src node id: /'.$this->getSrcNodeId().'/';
+								$errorMsg .= "\n".'    dst node id: /'.$this->getDstNodeId().'/';
+								$errorMsg .= "\n".'    dst ssl pub key: /'.$this->getDstSslPubKey().'/';
+								$errorMsg .= "\n".'    text: /'.$text.'/';
+								$errorMsg .= "\n".'    time created: /'.$this->getTimeCreated().'/';
+								$errorMsg .= "\n".'    password: /'.$password.'/';
+								throw new RuntimeException($errorMsg, 206);
 							}
 						}
 						else{
@@ -513,7 +541,7 @@ class Msg extends YamlStorage{
 		return $rv;
 	}
 	
-	private function createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey, $text, $timeCreated, $password){
+	public static function createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey, $text, $timeCreated, $password){
 		$checksumData = json_encode(array(
 			'version' => $version,
 			'id' => $id,

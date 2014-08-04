@@ -312,6 +312,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		
 		$this->assertTrue( $msg->encrypt() );
 		$text = $msg->getText();
+		$timeCreated = $msg->getTimeCreated();
 		$password = $msg->getPassword();
 		$checksum = $msg->getChecksum();
 		
@@ -325,6 +326,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
 		$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
 		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+		$msg->setTimeCreated($timeCreated);
 		$msg->setPassword($password);
 		$msg->setChecksum($checksum);
 		
@@ -349,6 +351,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		
 		$this->assertTrue( $msg->encrypt() );
 		$text = $msg->getText();
+		$timeCreated = $msg->getTimeCreated();
 		$password = $msg->getPassword();
 		$checksum = $msg->getChecksum();
 		
@@ -362,6 +365,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
 		$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
 		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+		$msg->setTimeCreated($timeCreated);
 		$msg->setPassword($password);
 		$msg->setChecksum($checksum);
 		
@@ -371,8 +375,8 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 	}
 	
 	/**
-	* @depends testSave
-	*/
+	 * @depends testSave
+	 */
 	public function testLoad(){
 		#$this->markTestIncomplete('This test has not been implemented yet.');
 		$msg = new Msg('data/test_msg.yml');
@@ -395,8 +399,8 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 	}
 	
 	/**
-	* @depends testLoad
-	*/
+	 * @depends testLoad
+	 */
 	public function testLoadDst1(){
 		#$this->markTestIncomplete('This test has not been implemented yet.');
 		$msg = new Msg('data/test_msg.yml');
@@ -420,8 +424,8 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 	}
 	
 	/**
-	* @depends testLoad
-	*/
+	 * @depends testLoad
+	 */
 	public function testLoadDst2(){
 		#$this->markTestIncomplete('This test has not been implemented yet.');
 		$msg = new Msg('data/test_msg.yml');
@@ -442,6 +446,20 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		
 		$this->assertEquals('FAILED OK', $text);
 		$this->assertEquals('', $msg->getSrcUserNickname());
+	}
+	
+	public function testChecksum(){
+		$version = 1;
+		$id = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
+		$srcNodeId = 'cafed00d-2331-4159-8e11-0b4dbadb1738';
+		$dstNodeId = 'cafed00d-2431-4159-8e11-0b4dbadb1738';
+		$dstSslPubKey = static::DST1_SSL_KEY_PUB;
+		$text = 'hello world! this is a test';
+		$timeCreated = '1407137420';
+		$password = 'tt9M/WdvXyChAWthKDFaP/tUAG6bZsdalTOxrFNsYX+4NgTNQ7iNCUng0jDPNzoMOYVuDdV/ZVnja5pamipawuw71wyIa6vDGoJKJ1yOUbVkH9YO34gZTRVz6MfZu2BQ680YIJou5J3aPMTcet5jYU2b2ffJSPkYqaEmV2DzLQr/M0bGn3rHml4OovKgX9m1vN7XlTQL+EwW5MCLqPYsethgoKahKh2O17oZ6VDGVa/b2P4KzM3d41NzUXz/s31Bce+blR2o6oM+nKIbXNoxs9dZbbCSqDzLk8AZ1+dGI2ZX7hovL+XSv0Ta7S0lgEf44zwDttGvdWpIaFvW+uL70w==';
+		$checksum = Msg::createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey, $text, $timeCreated, $password);
+		
+		$this->assertEquals('7c4459a9bc0ec4b19ebae6d9ded536aa6ee55ba13552dc81', $checksum);
 	}
 	
 }
