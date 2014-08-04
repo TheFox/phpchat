@@ -1996,7 +1996,7 @@ class Client{
 		$data = array(
 			'rid' => $rid,
 			'userNickname' => $userNickname,
-			'hashcash' => $this->hashcashMint(),
+			'hashcash' => $this->hashcashMint(static::HASHCASH_BITS_MAX),
 		);
 		$this->dataSend($this->sslMsgCreatePasswordEncrypt('talk_request', $data));
 	}
