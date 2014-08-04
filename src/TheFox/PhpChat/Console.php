@@ -1191,8 +1191,14 @@ class Console extends Thread{
 		
 		$rid = (string)Uuid::uuid4();
 		
-		$args = array($this->getModeChannelClient(), $rid, $this->userNickname, $text, $ignore);
-		$this->getIpcKernelConnection()->execAsync('serverTalkMsgSend', $args);
+		$client = $this->getModeChannelClient();
+		if($client){
+			$args = array($this->getModeChannelClient(), $rid, $this->userNickname, $text, $ignore);
+			$this->getIpcKernelConnection()->execAsync('serverTalkMsgSend', $args);
+		}
+		else{
+			$this->log->error('no mode channel client set');
+		}
 	}
 	
 	public function talkMsgAdd($rid = '', $userNickname, $text){
