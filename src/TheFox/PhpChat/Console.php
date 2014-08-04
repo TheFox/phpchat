@@ -1217,12 +1217,12 @@ class Console extends Thread{
 		
 		$rid = (string)Uuid::uuid4();
 		
-		$args = array( $this->getModeChannelClient(), $rid, $this->userNickname);
+		$args = array($this->getModeChannelClient(), $rid, $this->userNickname);
 		$this->getIpcKernelConnection()->execAsync('serverTalkCloseSend', $args);
 	}
 	
 	private function sendRandomMsg(){
-		if($this->getModeChannel() && $this->nextRandomMsg <= time()){
+		if($this->getModeChannel() && $this->getModeChannelClient() && $this->nextRandomMsg <= time()){
 			$this->log->debug('send random msg begin');
 			#print __CLASS__.'->'.__FUNCTION__.''."\n";
 			
