@@ -448,6 +448,7 @@ class Client{
 					$strKeyPub = '';
 					$strKeyPubFingerprint = '';
 					$isChannelPeer = false;
+					$hashcash = '';
 					if(array_key_exists('release', $msgData)){
 						$release = (int)$msgData['release'];
 					}
@@ -463,6 +464,9 @@ class Client{
 					if(array_key_exists('isChannel', $msgData)){ // isChannelPeer
 						$isChannelPeer = (bool)$msgData['isChannel'];
 					}
+					if(array_key_exists('hashcash', $msgData)){
+						$hashcash = (bool)$msgData['hashcash'];
+					}
 					
 					if($isChannelPeer){
 						$this->setStatus('isChannelPeer', true);
@@ -473,55 +477,60 @@ class Client{
 					
 					if(strIsUuid($id)){
 						if($strKeyPub){
-							$node->setIdHexStr($id);
-							$node->setIp($this->getIp());
-							$node->setPort($port);
-							$node->setTimeLastSeen(time());
-							
-							$node = $this->getTable()->nodeEnclose($node);
-							
-							if(! $this->getLocalNode()->isEqual($node)){
-								if($node->getSslKeyPub()){
-									#$this->log('debug', 'found old ssl public key');
-									
-									if( $node->getSslKeyPub() == $strKeyPub ){
-										#$this->log('debug', 'ssl public key ok');
+							if($hashcash && $this->hashcashVerify($hashcash, $id)){
+								$node->setIdHexStr($id);
+								$node->setIp($this->getIp());
+								$node->setPort($port);
+								$node->setTimeLastSeen(time());
+								
+								$node = $this->getTable()->nodeEnclose($node);
+								
+								if(! $this->getLocalNode()->isEqual($node)){
+									if($node->getSslKeyPub()){
+										#$this->log('debug', 'found old ssl public key');
 										
-										$idOk = true;
+										if( $node->getSslKeyPub() == $strKeyPub ){
+											#$this->log('debug', 'ssl public key ok');
+											
+											$idOk = true;
+										}
+										else{
+											$this->sendError(230, $msgName);
+											#$this->log('warning', 'ssl public key changed since last handshake');
+										}
 									}
 									else{
-										$this->sendError(230, $msgName);
-										#$this->log('warning', 'ssl public key changed since last handshake');
-									}
-								}
-								else{
-									$sslPubKey = openssl_pkey_get_public($strKeyPub);
-									if($sslPubKey !== false){
-										$sslPubKeyDetails = openssl_pkey_get_details($sslPubKey);
-										
-										if($sslPubKeyDetails['bits'] >= Node::SSL_KEY_LEN_MIN){
-											#$this->log('debug', 'no old ssl public key found. good. set new.');
+										$sslPubKey = openssl_pkey_get_public($strKeyPub);
+										if($sslPubKey !== false){
+											$sslPubKeyDetails = openssl_pkey_get_details($sslPubKey);
 											
-											$strKeyPubFingerprint = Node::genSslKeyFingerprint($strKeyPub);
-											$fpnode = $this->getTable()->nodeFindByKeyPubFingerprint($strKeyPubFingerprint);
-											if(!$fpnode){
-												$idOk = true;
+											if($sslPubKeyDetails['bits'] >= Node::SSL_KEY_LEN_MIN){
+												#$this->log('debug', 'no old ssl public key found. good. set new.');
+												
+												$strKeyPubFingerprint = Node::genSslKeyFingerprint($strKeyPub);
+												$fpnode = $this->getTable()->nodeFindByKeyPubFingerprint($strKeyPubFingerprint);
+												if(!$fpnode){
+													$idOk = true;
+												}
+												else{
+													$this->sendError(235, $msgName);
+												}
 											}
 											else{
-												$this->sendError(235, $msgName);
+												$this->sendError(220, $msgName);
 											}
 										}
 										else{
-											$this->sendError(220, $msgName);
+											$this->sendError(240, $msgName);
 										}
 									}
-									else{
-										$this->sendError(240, $msgName);
-									}
+								}
+								else{
+									$this->sendError(120, $msgName);
 								}
 							}
 							else{
-								$this->sendError(120, $msgName);
+								$this->sendError(400, $msgName);
 							}
 						}
 						else{
@@ -1702,6 +1711,7 @@ class Client{
 			'port'      => $this->getLocalNode()->getPort(),
 			'sslKeyPub' => $sslKeyPub,
 			'isChannel' => $this->getStatus('isChannelLocal'),
+			'hashcash'  => $this->hashcashMint(),
 		);
 		$this->dataSend($this->msgCreate('id', $data));
 	}
@@ -1997,6 +2007,9 @@ class Client{
 			280 => 'SSL: verification failed',
 			290 => 'SSL: password verification failed',
 			390 => 'SSL: invalid setup',
+			
+			// 400-500: Hashcash
+			400 => 'Hashcash: verification failed',
 			
 			// 900-999: Misc
 			900 => 'Invalid data',
