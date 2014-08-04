@@ -240,9 +240,9 @@ class Client{
 		$hashcash = new Hashcash();
 		try{
 			if($hashcash->verify($hashcashStr)){
-				$this->log('debug', 'bits: '.$hashcashStr.', '.$hashcash->getBits());
+				$this->log('debug', 'bits: '.$hashcash->getBits());
 				if($hashcash->getVersion() >= 1 && $hashcash->getBits() >= static::HASHCASH_BITS_MIN && $hashcash->getResource() == $resource && $added = $this->getHashcashDb()->addHashcash($hashcash)){
-					$this->log('debug', 'hashcash: '.$hashcashStr.' OK');
+					$this->log('debug', 'hashcash: OK');
 					return true;
 				}
 				else{
