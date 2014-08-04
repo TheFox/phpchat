@@ -1163,6 +1163,7 @@ class Client{
 							$this->sslPasswordToken.'_'.$this->getNode()->getSslKeyPubFingerprint());
 						if($this->sslPasswordToken && $token == $testToken){
 							$this->log('debug', 'SSL: password verified');
+							$this->log('debug', 'SSL: OK');
 							
 							$this->setStatus('hasSsl', true);
 							
