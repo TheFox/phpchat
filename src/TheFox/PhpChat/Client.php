@@ -21,6 +21,7 @@ class Client{
 	const PING_TTL = 25;
 	const PONG_TTL = 30;
 	const HASHCASH_BITS_MIN = 19;
+	const HASHCASH_EXPIRATION = 172800; // 2 days
 	
 	private $id = 0;
 	private $status = array();
@@ -221,6 +222,7 @@ class Client{
 	
 	private function hashcashMint(){
 		$hashcash = new Hashcash(static::HASHCASH_BITS_MIN, $this->getLocalNode()->getIdHexStr());
+		$hashcash->setDate(date(Hashcash::DATE_FORMAT12));
 		#$hashcash->setMintAttemptsMax(10);
 		
 		try{
@@ -238,6 +240,7 @@ class Client{
 		$this->log('debug', 'hashcash: '.$hashcashStr);
 		
 		$hashcash = new Hashcash();
+		$hashcash->setExpiration(static::HASHCASH_EXPIRATION);
 		try{
 			if($hashcash->verify($hashcashStr)){
 				$this->log('debug', 'bits: '.$hashcash->getBits());
