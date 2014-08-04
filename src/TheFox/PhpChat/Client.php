@@ -230,9 +230,9 @@ class Client{
 		#$hashcash->setMintAttemptsMax(10);
 		
 		try{
-			$this->log('debug', 'hashcash: mint');
+			$this->log('debug', 'hashcash: mint '.$bits.' bits');
 			$stamp = $hashcash->mint();
-			$this->log('debug', 'hashcash: '.$stamp);
+			$this->log('debug', 'hashcash minted: '.$stamp);
 			return $stamp;
 		}
 		catch(Exception $e){
