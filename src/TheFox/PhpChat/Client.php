@@ -19,7 +19,7 @@ class Client{
 	const NODE_FIND_NUM = 8;
 	const NODE_FIND_MAX_NODE_IDS = 1024;
 	const PING_TTL = 25;
-	const PONG_TTL = 30;
+	const PONG_TTL = 300;
 	const HASHCASH_BITS_MIN = 17;
 	const HASHCASH_BITS_MAX = 19;
 	const HASHCASH_EXPIRATION = 172800; // 2 days
@@ -242,8 +242,12 @@ class Client{
 		return null;
 	}
 	
-	private function hashcashVerify($hashcashStr, $resource){
+	private function hashcashVerify($hashcashStr, $resource, $bits = null){
 		$this->log('debug', 'hashcash: '.$hashcashStr);
+		
+		if($bits === null){
+			$bits = static::HASHCASH_BITS_MIN;
+		}
 		
 		$hashcash = new Hashcash();
 		$hashcash->setExpiration(static::HASHCASH_EXPIRATION);
@@ -251,13 +255,13 @@ class Client{
 			if($hashcash->verify($hashcashStr)){
 				$this->log('debug', 'bits: '.$hashcash->getBits());
 				$added = false;
-				if($hashcash->getVersion() >= 1 && $hashcash->getBits() >= static::HASHCASH_BITS_MIN && $hashcash->getResource() == $resource && $added = $this->getHashcashDb()->addHashcash($hashcash)){
+				if($hashcash->getVersion() >= 1 && $hashcash->getBits() >= $bits && $hashcash->getResource() == $resource && $added = $this->getHashcashDb()->addHashcash($hashcash)){
 					$this->log('debug', 'hashcash: OK');
 					return true;
 				}
 				else{
 					$this->log('debug', 'hashcash version: '.$hashcash->getVersion());
-					$this->log('debug', 'hashcash bit: '.$hashcash->getBits().' (min: '.static::HASHCASH_BITS_MIN.')');
+					$this->log('debug', 'hashcash bit: '.$hashcash->getBits().' (min: '.$bits.')');
 					$this->log('debug', 'hashcash resource: '.$hashcash->getResource().' ('.$resource.')');
 					$this->log('debug', 'hashcash added: '.($added ? 'yes' : 'no'));
 				}
@@ -475,9 +479,9 @@ class Client{
 					if(array_key_exists('isChannel', $msgData)){ // isChannelPeer
 						$isChannelPeer = (bool)$msgData['isChannel'];
 					}
-					if(array_key_exists('hashcash', $msgData)){
-						$hashcash = $msgData['hashcash'];
-					}
+					#if(array_key_exists('hashcash', $msgData)){
+					#	$hashcash = $msgData['hashcash'];
+					#}
 					
 					if($isChannelPeer){
 						$this->setStatus('isChannelPeer', true);
@@ -488,7 +492,7 @@ class Client{
 					
 					if(strIsUuid($id)){
 						if($strKeyPub){
-							if($hashcash && $this->hashcashVerify($hashcash, $id)){
+							#if($hashcash && $this->hashcashVerify($hashcash, $id, static::HASHCASH_BITS_MIN)){
 								$node->setIdHexStr($id);
 								$node->setIp($this->getIp());
 								$node->setPort($port);
@@ -539,10 +543,10 @@ class Client{
 								else{
 									$this->sendError(120, $msgName);
 								}
-							}
-							else{
-								$this->sendError(400, $msgName);
-							}
+							#}
+							#else{
+							#	$this->sendError(400, $msgName);
+							#}
 						}
 						else{
 							$this->sendError(200, $msgName);
@@ -629,7 +633,7 @@ class Client{
 				
 				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$nodeId.', '.(int)($this->getNode() != null));
 				
-				if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr())){
+				if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MAX)){
 					if($nodeId){
 						$node = new Node();
 						$node->setIdHexStr($nodeId);
@@ -671,11 +675,15 @@ class Client{
 			if($this->getStatus('hasId')){
 				$rid = '';
 				$nodes = array();
+				$hashcash = '';
 				if(array_key_exists('rid', $msgData)){
 					$rid = $msgData['rid'];
 				}
 				if(array_key_exists('nodes', $msgData)){
 					$nodes = $msgData['nodes'];
+				}
+				if(array_key_exists('hashcash', $msgData)){
+					$hashcash = $msgData['hashcash'];
 				}
 				
 				if($rid){
@@ -683,91 +691,96 @@ class Client{
 					
 					$request = $this->requestGetByRid($rid);
 					if($request){
-						$this->requestRemove($request);
-						
-						$nodeId = $request['data']['nodeId'];
-						$nodesFoundIds = $request['data']['nodesFoundIds'];
-						$distanceOld = $request['data']['distance'];
-						$ip = '';
-						$port = 0;
-						
-						if($nodes){
-							// Find the smallest distance.
-							foreach($nodes as $nodeArId => $nodeAr){
-								
-								$node = new Node();
-								if(isset($nodeAr['id'])){
-									$node->setIdHexStr($nodeAr['id']);
-								}
-								if(isset($nodeAr['ip'])){
-									$node->setIp($nodeAr['ip']);
-								}
-								if(isset($nodeAr['port'])){
-									$node->setPort($nodeAr['port']);
-								}
-								if(isset($nodeAr['sslKeyPub'])){
-									$node->setSslKeyPub(base64_decode($nodeAr['sslKeyPub']));
-								}
-								$node->setTimeLastSeen(time());
-								
-								$distanceNew = $this->getLocalNode()->distanceHexStr($node);
-								
-								$this->log('debug', 'node found: '.$nodeArId.', '.$nodeAr['id'].', do='.$distanceOld.', dn='.$distanceNew);
-								
-								if(!$this->getLocalNode()->isEqual($node)){
-									if($this->getSettings()->data['node']['ipPub'] != $node->getIp()
-										|| $this->getLocalNode()->getPort() != $node->getPort()){
-										if(!in_array($node->getIdHexStr(), $nodesFoundIds)){
-											
-											$nodesFoundIds[] = $nodeAr['id'];
-											if(count($nodesFoundIds) > static::NODE_FIND_MAX_NODE_IDS){
-												array_shift($nodesFoundIds);
-											}
-											
-											if($nodeAr['id'] == $nodeId){
-												$this->log('debug', 'node found: find completed');
-												$ip = '';
-												$port = 0;
-											}
-											else{
-												if($distanceOld != $distanceNew){
-													$distanceMin = Node::idMinHexStr($distanceOld, $distanceNew);
-													if($distanceMin == $distanceNew){ // Is smaller then $distanceOld.
-														$distanceOld = $distanceNew;
-														$ip = $node->getIp();
-														$port = $node->getPort();
+						if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MAX)){
+							$this->requestRemove($request);
+							
+							$nodeId = $request['data']['nodeId'];
+							$nodesFoundIds = $request['data']['nodesFoundIds'];
+							$distanceOld = $request['data']['distance'];
+							$ip = '';
+							$port = 0;
+							
+							if($nodes){
+								// Find the smallest distance.
+								foreach($nodes as $nodeArId => $nodeAr){
+									
+									$node = new Node();
+									if(isset($nodeAr['id'])){
+										$node->setIdHexStr($nodeAr['id']);
+									}
+									if(isset($nodeAr['ip'])){
+										$node->setIp($nodeAr['ip']);
+									}
+									if(isset($nodeAr['port'])){
+										$node->setPort($nodeAr['port']);
+									}
+									if(isset($nodeAr['sslKeyPub'])){
+										$node->setSslKeyPub(base64_decode($nodeAr['sslKeyPub']));
+									}
+									$node->setTimeLastSeen(time());
+									
+									$distanceNew = $this->getLocalNode()->distanceHexStr($node);
+									
+									$this->log('debug', 'node found: '.$nodeArId.', '.$nodeAr['id'].', do='.$distanceOld.', dn='.$distanceNew);
+									
+									if(!$this->getLocalNode()->isEqual($node)){
+										if($this->getSettings()->data['node']['ipPub'] != $node->getIp()
+											|| $this->getLocalNode()->getPort() != $node->getPort()){
+											if(!in_array($node->getIdHexStr(), $nodesFoundIds)){
+												
+												$nodesFoundIds[] = $nodeAr['id'];
+												if(count($nodesFoundIds) > static::NODE_FIND_MAX_NODE_IDS){
+													array_shift($nodesFoundIds);
+												}
+												
+												if($nodeAr['id'] == $nodeId){
+													$this->log('debug', 'node found: find completed');
+													$ip = '';
+													$port = 0;
+												}
+												else{
+													if($distanceOld != $distanceNew){
+														$distanceMin = Node::idMinHexStr($distanceOld, $distanceNew);
+														if($distanceMin == $distanceNew){ // Is smaller then $distanceOld.
+															$distanceOld = $distanceNew;
+															$ip = $node->getIp();
+															$port = $node->getPort();
+														}
 													}
 												}
+												
+												$this->getTable()->nodeEnclose($node);
 											}
-											
-											$this->getTable()->nodeEnclose($node);
+											else{
+												$this->log('debug', 'node found: already known');
+											}
 										}
 										else{
-											$this->log('debug', 'node found: already known');
+											$this->log('debug', 'node found: myself, ip:port equal ('.$node->getIp().':'.$node->getPort().')');
 										}
 									}
 									else{
-										$this->log('debug', 'node found: myself, ip:port equal ('.$node->getIp().':'.$node->getPort().')');
+										$this->log('debug', 'node found: myself, node equal');
 									}
 								}
-								else{
-									$this->log('debug', 'node found: myself, node equal');
-								}
+							}
+							
+							if($ip){
+								// Further search at the nearest node.
+								$this->log('debug', 'node found: ip ('.$ip.':'.$port.') ok');
+								
+								$clientActions = array();
+								$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
+								$action->functionSet(function($action, $client){
+									$client->sendNodeFind($nodeId, $distanceOld, $nodesFoundIds);
+								});
+								$clientActions[] = $action;
+								
+								$this->getServer()->connect($ip, $port, $clientActions);
 							}
 						}
-						
-						if($ip){
-							// Further search at the nearest node.
-							$this->log('debug', 'node found: ip ('.$ip.':'.$port.') ok');
-							
-							$clientActions = array();
-							$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
-							$action->functionSet(function($action, $client){
-								$client->sendNodeFind($nodeId, $distanceOld, $nodesFoundIds);
-							});
-							$clientActions[] = $action;
-							
-							$this->getServer()->connect($ip, $port, $clientActions);
+						else{
+							$this->sendError(400, $msgName);
 						}
 					}
 					else{
@@ -865,7 +878,7 @@ class Client{
 					
 					$this->sendMsgResponse($rid, $status);
 					
-					if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr())){
+					if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MAX)){
 						if($status == 1){
 							$msg = new Msg();
 							$msg->setVersion($version);
@@ -987,7 +1000,7 @@ class Client{
 						
 						$this->log('debug', 'SSL: init');
 						
-						if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr())){
+						if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MIN)){
 							$this->setStatus('hasSslInit', true);
 							$this->sendSslInit();
 							$this->sendSslInitOk();
@@ -1325,7 +1338,7 @@ class Client{
 					
 					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$userNickname);
 					
-					if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr())){
+					if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MAX)){
 						if($rid){
 							if($this->getServer() && $this->getServer()->kernelHasConsole()){
 								$this->consoleTalkRequestAdd($rid, $userNickname);
@@ -1758,7 +1771,7 @@ class Client{
 			'port'      => $this->getLocalNode()->getPort(),
 			'sslKeyPub' => $sslKeyPub,
 			'isChannel' => $this->getStatus('isChannelLocal'),
-			'hashcash'  => $this->hashcashMint(static::HASHCASH_BITS_MAX),
+			#'hashcash'  => $this->hashcashMint(static::HASHCASH_BITS_MIN),
 		);
 		$this->dataSend($this->msgCreate('id', $data));
 	}
@@ -1786,7 +1799,7 @@ class Client{
 			'rid'       => $rid,
 			'num'       => static::NODE_FIND_NUM,
 			'nodeId'    => $nodeId,
-			'hashcash'  => $this->hashcashMint(),
+			'hashcash'  => $this->hashcashMint(static::HASHCASH_BITS_MAX),
 		);
 		$this->dataSend($this->msgCreate('node_find', $data));
 	}
@@ -1809,6 +1822,7 @@ class Client{
 		$data = array(
 			'rid'       => $rid,
 			'nodes'     => $nodesOut,
+			'hashcash'  => $this->hashcashMint(static::HASHCASH_BITS_MAX),
 		);
 		$this->dataSend($this->msgCreate('node_found', $data));
 	}
@@ -1834,7 +1848,7 @@ class Client{
 			'checksum' => $msg->getChecksum(),
 			'relayCount' => (int)$msg->getRelayCount() + 1,
 			'timeCreated' => (int)$msg->getTimeCreated(),
-			'hashcash' => $this->hashcashMint(),
+			'hashcash' => $this->hashcashMint(static::HASHCASH_BITS_MAX),
 		);
 		$this->dataSend($this->msgCreate('msg', $data));
 	}
@@ -1859,7 +1873,7 @@ class Client{
 			$this->setStatus('hasSendSslInit', true);
 			
 			$data = array(
-				'hashcash' => $this->hashcashMint(),
+				'hashcash' => $this->hashcashMint(static::HASHCASH_BITS_MIN),
 			);
 			$this->dataSend($this->msgCreate('ssl_init', $data));
 		}
