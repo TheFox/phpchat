@@ -107,6 +107,14 @@ class Server{
 		return null;
 	}
 	
+	public function getHashcashDb(){
+		if($this->getKernel()){
+			return $this->getKernel()->getHashcashDb();
+		}
+		
+		return null;
+	}
+	
 	public function init(){
 		if($this->ip && $this->port){
 			$this->log->notice('listen on '.$this->ip.':'.$this->port);

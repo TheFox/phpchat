@@ -19,6 +19,7 @@ class Client{
 	const NODE_FIND_MAX_NODE_IDS = 1024;
 	const PING_TTL = 25;
 	const PONG_TTL = 30;
+	const HASHCASH_BITS_MIN = 19;
 	
 	private $id = 0;
 	private $status = array();
@@ -207,6 +208,50 @@ class Client{
 		}
 		
 		return null;
+	}
+	
+	private function getHashcashDb(){
+		if($this->getServer()){
+			return $this->getServer()->getHashcashDb();
+		}
+		
+		return null;
+	}
+	
+	private function hashcashDbMint(){
+		$hashcash = new Hashcash(static::HASHCASH_BITS_MIN, $this->getLocalNode()->getIdHexStr());
+		#$hashcash->setMintAttemptsMax(10);
+		
+		try{
+			$stamp = $hashcash->mint();
+			return $stamp;
+		}
+		catch(Exception $e){
+			$this->log('error', $e->getMessage());
+		}
+		
+		return null;
+	}
+	
+	private function hashcashDbVerify($hashcashStr, $nodeId){
+		$this->log('debug', 'hashcash: '.$hashcashStr);
+		
+		$hashcash = new Hashcash();
+		try{
+			if($hashcash->verify($hashcashStr)){
+				$this->log('debug', 'bits: '.$hashcashStr.', '.$hashcash->getBits());
+				if($hashcash->getVersion() >= 1 && $hashcash->getBits() >= static::HASHCASH_BITS_MIN && $hashcash->getResource() == $nodeId && $this->getHashcashDb()->addHashcash($hashcash)){
+					$this->log('debug', 'hashcash: '.$hashcashStr.' OK');
+					return true;
+				}
+			}
+		}
+		catch(Exception $e){
+			$this->log('warning', $e->getMessage());
+		}
+		
+		$this->log('debug', 'hashcash: '.$hashcashStr.' failed');
+		return false;
 	}
 	
 	private function requestAdd($name, $rid, $data = array()){
