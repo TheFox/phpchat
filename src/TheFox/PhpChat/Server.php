@@ -344,4 +344,39 @@ class Server{
 		}
 	}
 	
+	public function imapMailAdd(Msg $msg, $decryptedText){
+		if($this->getKernel() && $this->getKernel()->getIpcImapConnection()){
+			
+			$version = $msg->getVersion();
+			$id = $msg->getId();
+			$srcNodeId = $msg->getSrcNodeId();
+			$srcUserNickname = $msg->getSrcUserNickname();
+			$dstNodeId = $msg->getDstNodeId();
+			#$text = $msg->getText();
+			$text = $decryptedText;
+			$checksum = $msg->getChecksum();
+			$relayCount = $msg->getRelayCount();
+			$encryptionMode = $msg->getEncryptionMode();
+			$status = $msg->getStatus();
+			$timeCreated = $msg->getTimeCreated();
+			$timeReceived = $msg->getTimeReceived();
+			
+			$args = array();
+			$args[] = $version;
+			$args[] = $id;
+			$args[] = $srcNodeId;
+			$args[] = $srcUserNickname;
+			$args[] = $dstNodeId;
+			$args[] = $text;
+			$args[] = $checksum;
+			$args[] = $relayCount;
+			$args[] = $encryptionMode;
+			$args[] = $status;
+			$args[] = $timeCreated;
+			$args[] = $timeReceived;
+			
+			$this->getKernel()->getIpcImapConnection()->execAsync('mailAdd', $args);
+		}
+	}
+	
 }

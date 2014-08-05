@@ -20,6 +20,22 @@ class BasicCommand extends Command{
 	private $pidFile;
 	private $settings;
 	
+	public function setExit($exit){
+		$this->exit = $exit;
+	}
+	
+	public function getExit(){
+		return $this->exit;
+	}
+	
+	public function getLogfilePath(){
+		return 'log/application.log';
+	}
+	
+	public function getPidfilePath(){
+		return 'pid/application.pid';
+	}
+	
 	public function setSettings($settings){
 		$this->settings = $settings;
 	}
@@ -29,9 +45,9 @@ class BasicCommand extends Command{
 	}
 	
 	public function executePre(InputInterface $input, OutputInterface $output){
-		$this->log = new Logger('application');
+		$this->log = new Logger($this->getName());
 		$this->log->pushHandler(new StreamHandler('php://stdout', Logger::DEBUG));
-		$this->log->pushHandler(new StreamHandler('log/application.log', Logger::DEBUG));
+		$this->log->pushHandler(new StreamHandler($this->getLogfilePath(), Logger::DEBUG));
 		
 		if($input->hasOption('shutdown') && $input->getOption('shutdown')){
 			if(file_exists($this->getPidfilePath())){
