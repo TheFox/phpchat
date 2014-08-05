@@ -901,31 +901,33 @@ class Client{
 								$msg->setSsl($this->getSsl());
 								
 								try{
-									if($msg->decrypt()){
-										print __CLASS__.'->'.__FUNCTION__.': decrypt ok'."\n"; # TODO
+									$decryptedText = $msg->decrypt();
+									if($decryptedText){
+										print __CLASS__.'->'.__FUNCTION__.': decrypt ok'."\n"; # TODO: remove this line
 										$this->log('debug', 'msg '.$id.' decrypt ok');
 										
 										if(!$msg->getIgnore()){
-											print __CLASS__.'->'.__FUNCTION__.': add to db'."\n"; # TODO
+											print __CLASS__.'->'.__FUNCTION__.': add to db'."\n"; # TODO: remove this line
 											$this->log('debug', 'msg '.$id.' add to db');
+											$this->getServer()->imapMailAdd($msg, $decryptedText);
 										}
 										else{
-											print __CLASS__.'->'.__FUNCTION__.': ignore'."\n"; # TODO
+											print __CLASS__.'->'.__FUNCTION__.': ignore'."\n"; # TODO: remove this line
 											$this->log('debug', 'msg '.$id.' ignore');
 										}
 									}
 									else{
-										print __CLASS__.'->'.__FUNCTION__.': decrypt failed B'."\n"; # TODO
+										print __CLASS__.'->'.__FUNCTION__.': decrypt failed B'."\n"; # TODO: remove this line
 										$this->log('debug', 'msg '.$id.' decrypt failed B');
 									}
 								}
 								catch(Exception $e){
-									print __CLASS__.'->'.__FUNCTION__.': decrypt failed A: '.$e->getMessage()."\n"; # TODO
+									print __CLASS__.'->'.__FUNCTION__.': decrypt failed A: '.$e->getMessage()."\n"; # TODO: remove this line
 									$this->log('debug', 'msg '.$id.' decrypt failed A: '.$e->getMessage());
 								}
 							}
 							else{
-								print __CLASS__.'->'.__FUNCTION__.': msg not for me'."\n"; # TODO
+								print __CLASS__.'->'.__FUNCTION__.': msg not for me'."\n"; # TODO: remove this line
 								$this->log('debug', 'msg '.$id.' not for me');
 							}
 							

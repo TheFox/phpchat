@@ -26,7 +26,7 @@ class CronjobCommand extends BasicCommand{
 	protected function execute(InputInterface $input, OutputInterface $output){
 		$this->executePre($input, $output);
 		
-		$this->log->info('cronjob');
+		$this->log->info('cronjob start');
 		$this->cronjob = new Cronjob();
 
 		try{

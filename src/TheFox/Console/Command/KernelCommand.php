@@ -26,7 +26,7 @@ class KernelCommand extends BasicCommand{
 	protected function execute(InputInterface $input, OutputInterface $output){
 		$this->executePre($input, $output);
 		
-		$this->log->info('kernel');
+		$this->log->info('kernel start');
 		$this->kernel = new Kernel();
 		$this->kernel->loop();
 		

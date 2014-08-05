@@ -26,7 +26,7 @@ class ConsoleCommand extends BasicCommand{
 		$this->executePre($input, $output);
 		
 		try{
-			$this->log->info('console');
+			$this->log->info('console start');
 			$this->console = new Console();
 		}
 		catch(Exception $e){

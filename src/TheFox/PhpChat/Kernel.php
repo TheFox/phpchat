@@ -34,6 +34,8 @@ class Kernel extends Thread{
 		$this->log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::ERROR));
 		$this->log->pushHandler(new LoggerStreamHandler('log/kernel.log', Logger::DEBUG));
 		
+		$this->getLog()->info('start');
+		
 		$this->getLog()->info('setup settings');
 		$this->settings = new Settings(getcwd().'/settings.yml');
 		$this->getLog()->info('setup settings: done');
@@ -353,10 +355,12 @@ class Kernel extends Thread{
 	}
 	
 	public function loop(){
+		$this->getLog()->info('loop start');
 		while(!$this->getExit()){
 			$this->run();
 			usleep(static::LOOP_USLEEP);
 		}
+		$this->getLog()->info('loop end');
 		$this->shutdown();
 	}
 	
@@ -371,10 +375,9 @@ class Kernel extends Thread{
 	}
 	
 	public function shutdown(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		$this->getLog()->info('shutdown');
 		
+		$this->getLog()->info('IPC Console send shutdown');
 		if($this->ipcConsoleShutdown){
 			$this->ipcConsoleConnection->execAsync('shutdown');
 		}
@@ -382,21 +385,23 @@ class Kernel extends Thread{
 			$this->ipcConsoleConnection->execSync('shutdown');
 		}
 		
-		#print __CLASS__.'->'.__FUNCTION__.': ipcCronjobConnection send shutdown'."\n";
+		$this->getLog()->info('IPC Cronjob send shutdown');
 		$this->ipcCronjobConnection->execSync('shutdown');
 		
 		$this->getLog()->info('IPC IMAP send shutdown');
 		$this->ipcImapServerConnection->execSync('shutdown');
-		#print __CLASS__.'->'.__FUNCTION__.': ipcCronjobConnection send done'."\n";
+		
 		
 		$nodesNum = (int)$this->getTable()->getNodesNum();
 		$firstRun = (int)$this->getSettings()->data['firstRun'];
-		$this->getLog()->debug('getNodesNum: '.$nodesNum.', '.$firstRun);
+		$this->getLog()->debug('nodes num: '.$nodesNum.', '.$firstRun);
 		$this->getSettings()->data['firstRun'] = $this->getTable()->getNodesNum() <= 0;
 		$this->getSettings()->setDataChanged(true);
 		
 		$this->getServer()->shutdown();
 		$this->save();
+		
+		$this->getLog()->info('end');
 	}
 	
 	public function ipcConsoleShutdown(){
