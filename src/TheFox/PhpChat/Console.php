@@ -77,14 +77,6 @@ class Console extends Thread{
 		return $this->log;
 	}
 	
-	private function setIpcKernelConnection($ipcKernelConnection){
-		$this->ipcKernelConnection = $ipcKernelConnection;
-	}
-	
-	private function getIpcKernelConnection(){
-		return $this->ipcKernelConnection;
-	}
-	
 	private function setPs1($ps1){
 		$this->ps1 = $ps1;
 	}
@@ -204,24 +196,30 @@ class Console extends Thread{
 		return $dt->format('H:i:s');
 	}
 	
-	public function init(){
-		$this->setIpcKernelConnection(new ConnectionClient());
-		$this->getIpcKernelConnection()->setHandler(new IpcStreamHandler('127.0.0.1', 20000));
-		$this->getIpcKernelConnection()->functionAdd('shutdown', $this, 'ipcKernelShutdown');
-		$this->getIpcKernelConnection()->functionAdd('msgAdd', $this, 'msgAdd');
-		$this->getIpcKernelConnection()->functionAdd('talkRequestAdd', $this, 'talkRequestAdd');
-		$this->getIpcKernelConnection()->functionAdd('talkMsgAdd', $this, 'talkMsgAdd');
-		$this->getIpcKernelConnection()->functionAdd('setModeChannel', $this, 'setModeChannel');
-		$this->getIpcKernelConnection()->functionAdd('setModeChannelClient', $this, 'setModeChannelClient');
+	private function initIpcKernelConnection(){
+		$this->ipcKernelConnection = new ConnectionClient();
+		$this->ipcKernelConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20000));
+		$this->ipcKernelConnection->functionAdd('shutdown', $this, 'ipcKernelShutdown');
+		foreach(array(
+			'msgAdd',
+			'talkRequestAdd', 'talkMsgAdd',
+			'setModeChannel', 'setModeChannelClient',
+		) as $functionName){
+			$this->ipcKernelConnection->functionAdd($functionName, $this, $functionName);
+		}
 		
-		if(!$this->getIpcKernelConnection()->connect()){
+		if(!$this->ipcKernelConnection->connect()){
 			throw new RuntimeException('Could not connect to kernel process.');
 		}
+	}
+	
+	public function init(){
+		$this->initIpcKernelConnection();
 		
 		$this->sttySetup();
 		$this->keybindingsSetup();
 		
-		$this->userNickname = $this->getIpcKernelConnection()->execSync('getSettingsUserNickname');
+		$this->userNickname = $this->ipcKernelConnection->execSync('getSettingsUserNickname');
 		
 		print PHP_EOL."Type '/help' for help.".PHP_EOL;
 		
@@ -303,7 +301,7 @@ class Console extends Thread{
 	public function run(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
-		if(!$this->getIpcKernelConnection()){
+		if(!$this->ipcKernelConnection){
 			throw new RuntimeException('You must first run init().');
 		}
 		
@@ -314,7 +312,7 @@ class Console extends Thread{
 			$this->printMsgStack();
 			$this->sendRandomMsg();
 			
-			if(!$this->getIpcKernelConnection()->run()){
+			if(!$this->ipcKernelConnection->run()){
 				$this->log->info('Connection to kernel process end unexpected.');
 				$this->setExit(1);
 			}
@@ -555,7 +553,7 @@ class Console extends Thread{
 					$format = '%3d %36s  %s';
 					
 					$this->msgAdd(' ID UUID                                  USERNAME', false, false);
-					foreach($this->getIpcKernelConnection()->execSync('getAddressbook')->getContacts() as $contactId => $contact){
+					foreach($this->ipcKernelConnection->execSync('getAddressbook')->getContacts() as $contactId => $contact){
 						$this->msgAdd(sprintf($format, $contact->getId(), $contact->getNodeId(), $contact->getUserNickname()), false, false);
 					}
 					$this->msgAdd('END OF LIST', false, true);
@@ -706,7 +704,7 @@ class Console extends Thread{
 			$id = substr($data, $pos + 1);
 			
 			if($action == 'rem'){
-				if($this->getIpcKernelConnection()->execSync('addressbookContactRemove', array($id))){
+				if($this->ipcKernelConnection->execSync('addressbookContactRemove', array($id))){
 					$this->msgAdd('Removed '.$id.' from addressbook.', true, true);
 				}
 				else{
@@ -727,7 +725,7 @@ class Console extends Thread{
 			$uuid = $data;
 		}
 		else{
-			$contacts = $this->getIpcKernelConnection()->execSync('getAddressbook')->contactsGetByNick($data);
+			$contacts = $this->ipcKernelConnection->execSync('getAddressbook')->contactsGetByNick($data);
 			if(count($contacts) > 1){
 				$format = '%3d %36s  %s';
 				
@@ -754,7 +752,7 @@ class Console extends Thread{
 			$node = new Node();
 			$node->setIdHexStr($uuid);
 			
-			if($onode = $this->getIpcKernelConnection()->execSync('getTable')->nodeFindInBuckets($node)){
+			if($onode = $this->ipcKernelConnection->execSync('getTable')->nodeFindInBuckets($node)){
 				$this->connect($onode->getIp(), $onode->getPort());
 			}
 			else{
@@ -831,14 +829,14 @@ class Console extends Thread{
 		$line = substr($line, 3);
 		
 		#print __CLASS__.'->'.__FUNCTION__.': get settings'."\n";
-		$settings = $this->getIpcKernelConnection()->execSync('getSettings');
+		$settings = $this->ipcKernelConnection->execSync('getSettings');
 		
 		#print __CLASS__.'->'.__FUNCTION__.': get table'."\n";
-		$table = $this->getIpcKernelConnection()->execSync('getTable');
+		$table = $this->ipcKernelConnection->execSync('getTable');
 		
 		#print __CLASS__.'->'.__FUNCTION__.': get msgDb'."\n";
-		#$msgDb = $this->getIpcKernelConnection()->execSync('getMsgDb');
-		$msgs = $this->getIpcKernelConnection()->execSync('msgDbMsgGetMsgsForDst');
+		#$msgDb = $this->ipcKernelConnection->execSync('getMsgDb');
+		$msgs = $this->ipcKernelConnection->execSync('msgDbMsgGetMsgsForDst');
 		$msgsByIndex = array_keys($msgs);
 		#ve($msgDb);
 		#ve($msgs);
@@ -900,8 +898,8 @@ class Console extends Thread{
 								#$text = 'this is  a test. '.date('Y/m/d H:i:s');
 								
 								
-								$settings = $this->getIpcKernelConnection()->execSync('getSettings');
-								$table = $this->getIpcKernelConnection()->execSync('getTable');
+								$settings = $this->ipcKernelConnection->execSync('getSettings');
+								$table = $this->ipcKernelConnection->execSync('getTable');
 								
 								
 								$msg = new Msg();
@@ -943,7 +941,7 @@ class Console extends Thread{
 									$encrypted = $msg->encrypt();
 									
 									if($encrypted){
-										$this->getIpcKernelConnection()->execAsync('msgDbMsgAdd', array($msg));
+										$this->ipcKernelConnection->execAsync('msgDbMsgAdd', array($msg));
 										
 										$this->msgAdd('OK: created msg '.$msg->getId(), true, true);
 									}
@@ -1039,7 +1037,7 @@ class Console extends Thread{
 							$this->msgAdd($text, false, false);
 							
 							$msg->setStatus('R');
-							$this->getIpcKernelConnection()->execAsync('msgDbMsgUpdate', array($msg));
+							$this->ipcKernelConnection->execAsync('msgDbMsgUpdate', array($msg));
 						}
 						$this->msgAdd('----- MESSAGE END -----', false, true);
 					}
@@ -1078,7 +1076,7 @@ class Console extends Thread{
 			$userNicknameOld = $this->userNickname;
 			$this->userNickname = $tmp;
 			
-			$this->getIpcKernelConnection()->execAsync('setSettingsUserNickname', array($this->userNickname));
+			$this->ipcKernelConnection->execAsync('setSettingsUserNickname', array($this->userNickname));
 			
 			$this->msgAdd();
 			$this->msgAdd('New nickname: '.$this->userNickname, true, true);
@@ -1094,7 +1092,7 @@ class Console extends Thread{
 	}
 	
 	private function handleCommandSave(){
-		$this->getIpcKernelConnection()->execAsync('save');
+		$this->ipcKernelConnection->execAsync('save');
 		$this->msgAdd();
 		$this->msgAdd('Saved.', true, true);
 	}
@@ -1128,7 +1126,7 @@ class Console extends Thread{
 		}
 		
 		if(!$this->ipcKernelShutdown){
-			#$this->getIpcKernelConnection()->execSync('shutdown'); # TODO
+			#$this->ipcKernelConnection->execSync('shutdown'); # TODO
 		}
 		
 		$this->sttyReset();
@@ -1148,7 +1146,7 @@ class Console extends Thread{
 		$ipPort = $ip.':'.$port;
 		$this->msgAdd();
 		$this->msgAdd('Connecting to '.$ipPort.' ...', true, false);
-		$connected = $this->getIpcKernelConnection()->execSync('serverConnect', array($ip, $port, true));
+		$connected = $this->ipcKernelConnection->execSync('serverConnect', array($ip, $port, true));
 		$this->msgAdd('Connection to '.$ipPort.' '.($connected ? 'established' : 'failed').'.', true, false);
 	}
 	
@@ -1178,10 +1176,10 @@ class Console extends Thread{
 			$contact = new Contact();
 			$contact->setNodeId($talkRequest->getClient()->getNode()->getIdHexStr());
 			$contact->setUserNickname($talkRequest->getUserNickname());
-			$this->getIpcKernelConnection()->execAsync('addressbookContactAdd', array($contact));
+			$this->ipcKernelConnection->execAsync('addressbookContactAdd', array($contact));
 		}
 		
-		$this->getIpcKernelConnection()->execAsync('serverTalkResponseSend',
+		$this->ipcKernelConnection->execAsync('serverTalkResponseSend',
 			array($talkRequest->getClient(), $talkRequest->getRid(), $talkRequest->getStatus(), $userNickname));
 	}
 	
@@ -1194,7 +1192,7 @@ class Console extends Thread{
 		$client = $this->getModeChannelClient();
 		if($client){
 			$args = array($this->getModeChannelClient(), $rid, $this->userNickname, $text, $ignore);
-			$this->getIpcKernelConnection()->execAsync('serverTalkMsgSend', $args);
+			$this->ipcKernelConnection->execAsync('serverTalkMsgSend', $args);
 		}
 		else{
 			$this->log->error('no mode channel client set');
@@ -1208,7 +1206,7 @@ class Console extends Thread{
 	}
 	
 	private function talkUserNicknameChangeSend($userNicknameOld, $userNicknameNew){
-		$this->getIpcKernelConnection()->execAsync('serverTalkUserNicknameChangeSend',
+		$this->ipcKernelConnection->execAsync('serverTalkUserNicknameChangeSend',
 			array($this->getModeChannelClient(), $userNicknameOld, $userNicknameNew));
 	}
 	
@@ -1218,7 +1216,7 @@ class Console extends Thread{
 		$rid = (string)Uuid::uuid4();
 		
 		$args = array($this->getModeChannelClient(), $rid, $this->userNickname);
-		$this->getIpcKernelConnection()->execAsync('serverTalkCloseSend', $args);
+		$this->ipcKernelConnection->execAsync('serverTalkCloseSend', $args);
 	}
 	
 	private function sendRandomMsg(){
