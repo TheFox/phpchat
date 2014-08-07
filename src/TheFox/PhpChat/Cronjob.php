@@ -76,6 +76,7 @@ class Cronjob extends Thread{
 		$this->setIpcKernelConnection(new ConnectionClient());
 		$this->getIpcKernelConnection()->setHandler(new IpcStreamHandler('127.0.0.1', 20001));
 		$this->getIpcKernelConnection()->functionAdd('shutdown', $this, 'ipcKernelShutdown');
+		$this->getIpcKernelConnection()->functionAdd('msgDbInit', $this, 'msgDbInit');
 		
 		if(!$this->getIpcKernelConnection()->connect()){
 			throw new RuntimeException('Could not connect to kernel process.');
@@ -148,7 +149,7 @@ class Cronjob extends Thread{
 		}
 	}
 	
-	private function msgDbInit(){
+	public function msgDbInit(){
 		$this->log->debug(__FUNCTION__);
 		print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
@@ -169,7 +170,6 @@ class Cronjob extends Thread{
 			$this->log->debug(__FUNCTION__.': '.$e->getMessage());
 			print __CLASS__.'->'.__FUNCTION__.': '.$e->getMessage()."\n";
 		}
-		
 	}
 	
 	public function msgDbInitNodes(){

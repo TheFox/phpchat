@@ -306,6 +306,7 @@ class Kernel extends Thread{
 	
 	public function msgDbMsgAdd(Msg $msg){
 		$this->getMsgDb()->msgAdd($msg);
+		$this->ipcCronjobConnection->execAsync('msgDbInit');
 	}
 	
 	public function msgDbMsgUpdate(Msg $msg){
