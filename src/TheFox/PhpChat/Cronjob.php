@@ -26,7 +26,7 @@ class Cronjob extends Thread{
 	private $localNode;
 	
 	public function __construct(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __FUNCTION__.''."\n";
 		
 		$this->log = new Logger('cronjob');
 		$this->log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::ERROR));
@@ -84,7 +84,7 @@ class Cronjob extends Thread{
 	}
 	
 	public function run(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __FUNCTION__.''."\n";
 		if(!$this->getIpcKernelConnection()){
 			throw new RuntimeException('You must first run init().');
 		}
@@ -94,7 +94,7 @@ class Cronjob extends Thread{
 		$seconds = 0;
 		
 		while(!$this->getExit()){
-			#print __CLASS__.'->'.__FUNCTION__.': '.$this->getExit().', '.$hours.', '.$minutes.', '.$seconds."\n";
+			#print __FUNCTION__.': '.$this->getExit().', '.$hours.', '.$minutes.', '.$seconds."\n";
 			
 			if($hours == 0 && $minutes == 1 && $seconds == 0){
 				$this->pingClosestNodes();
@@ -104,7 +104,7 @@ class Cronjob extends Thread{
 				$this->msgDbInit();
 			}
 			if($minutes % 5 == 0 && $seconds == 0){
-				print __CLASS__.'->'.__FUNCTION__.': save'."\n";
+				print __FUNCTION__.': save'."\n";  # TODO
 				$this->getIpcKernelConnection()->execAsync('save');
 			}
 			if($minutes % 15 == 0 && $seconds == 0){
@@ -119,7 +119,7 @@ class Cronjob extends Thread{
 				$seconds = 0;
 				$minutes++;
 				
-				print __CLASS__.'->'.__FUNCTION__.': '.$this->getExit().', '.$hours.', '.$minutes.', '.$seconds."\n";
+				print __FUNCTION__.': '.$this->getExit().', '.$hours.', '.$minutes.', '.$seconds."\n";  # TODO
 			}
 			if($minutes >= 60){
 				$minutes = 0;
@@ -133,7 +133,7 @@ class Cronjob extends Thread{
 	}
 	
 	private function pingClosestNodes(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __FUNCTION__.''."\n";
 		$this->log->debug(__FUNCTION__);
 		$table = $this->getIpcKernelConnection()->execSync('getTable');
 		
@@ -151,7 +151,7 @@ class Cronjob extends Thread{
 	
 	public function msgDbInit(){
 		$this->log->debug(__FUNCTION__);
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		print __FUNCTION__.''."\n"; # TODO
 		
 		$this->msgDb = $this->getIpcKernelConnection()->execSync('getMsgDb', array(), 10);
 		$this->settings = $this->getIpcKernelConnection()->execSync('getSettings');
@@ -159,7 +159,7 @@ class Cronjob extends Thread{
 		
 		#ve($this->table);
 		
-		#print __CLASS__.'->'.__FUNCTION__.': msgDb A '.(int)($this->msgDb===null)."\n";
+		#print __FUNCTION__.': msgDb A '.(int)($this->msgDb===null)."\n";
 		#ve($this->msgDb);
 		
 		try{
@@ -168,13 +168,13 @@ class Cronjob extends Thread{
 		}
 		catch(Exception $e){
 			$this->log->debug(__FUNCTION__.': '.$e->getMessage());
-			print __CLASS__.'->'.__FUNCTION__.': '.$e->getMessage()."\n";
+			print __FUNCTION__.': '.$e->getMessage()."\n";  # TODO
 		}
 	}
 	
 	public function msgDbInitNodes(){
 		$this->log->debug(__FUNCTION__);
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __FUNCTION__.''."\n";
 		
 		if(!$this->msgDb){
 			throw new RuntimeException('msgDb not set', 1);
@@ -223,14 +223,14 @@ class Cronjob extends Thread{
 		}
 		
 		if($this->getIpcKernelConnection()){
-			#print __CLASS__.'->'.__FUNCTION__.': reset msgDb'."\n";
+			#print __FUNCTION__.': reset msgDb'."\n";
 			$this->msgDb = $this->getIpcKernelConnection()->execSync('getMsgDb', array(), 10);
 		}
 	}
 	
 	public function msgDbSendAll(){
 		$this->log->debug(__FUNCTION__);
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#print __FUNCTION__.''."\n";
 		
 		if(!$this->msgDb){
 			throw new RuntimeException('msgDb not set', 1);
@@ -249,7 +249,7 @@ class Cronjob extends Thread{
 		$processedMsgs = array();
 		
 		// Send own unsent msgs.
-		#print __CLASS__.'->'.__FUNCTION__.': unsent own'."\n";
+		#print __FUNCTION__.': unsent own'."\n";
 		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
 			if(
 				!in_array($msg->getId(), $processedMsgIds)
@@ -266,7 +266,7 @@ class Cronjob extends Thread{
 		}
 		
 		// Send foreign unsent msgs.
-		#print __CLASS__.'->'.__FUNCTION__.': unsent foreign'."\n";
+		#print __FUNCTION__.': unsent foreign'."\n";
 		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
 			if(
 				!in_array($msg->getId(), $processedMsgIds)
@@ -283,7 +283,7 @@ class Cronjob extends Thread{
 		}
 		
 		// Relay all other msgs.
-		#print __CLASS__.'->'.__FUNCTION__.': other'."\n";
+		#print __FUNCTION__.': other'."\n";
 		foreach($this->msgDb->getMsgs() as $msgId => $msg){
 			if(
 				!in_array($msg->getId(), $processedMsgIds)
@@ -299,10 +299,10 @@ class Cronjob extends Thread{
 		}
 		
 		$processedMsgs = array_unique($processedMsgs);
-		#print __CLASS__.'->'.__FUNCTION__.': processedMsgs: '.count($processedMsgs)."\n";
+		#print __FUNCTION__.': processedMsgs: '.count($processedMsgs)."\n";
 		
 		foreach($processedMsgs as $msgId => $msg){
-			#print __CLASS__.'->'.__FUNCTION__.': processedMsg A: '. $msg->getId() ."\n";
+			#print __FUNCTION__.': processedMsg A: '. $msg->getId() ."\n";
 			
 			$sentNodesC = count($msg->getSentNodes());
 			$forwardCycles = $msg->getForwardCycles();
@@ -421,12 +421,12 @@ class Cronjob extends Thread{
 	}
 	
 	public function shutdown(){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		print __FUNCTION__.''."\n";  # TODO
 		
 	}
 	
 	public function ipcKernelShutdown(){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		print __FUNCTION__.''."\n";  # TODO
 		$this->setExit(1);
 	}
 	
