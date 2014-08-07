@@ -901,15 +901,14 @@ class Client{
 								$msg->setSsl($this->getSsl());
 								
 								try{
-									$decryptedText = $msg->decrypt();
-									if($decryptedText){
+									if($msg->decrypt()){
 										print __CLASS__.'->'.__FUNCTION__.': decrypt ok'."\n"; # TODO: remove this line
 										$this->log('debug', 'msg '.$id.' decrypt ok');
 										
 										if(!$msg->getIgnore()){
 											print __CLASS__.'->'.__FUNCTION__.': add to db'."\n"; # TODO: remove this line
 											$this->log('debug', 'msg '.$id.' add to db');
-											$this->getServer()->imapMailAdd($msg, $decryptedText);
+											$this->getServer()->imapMailAdd($msg);
 										}
 										else{
 											print __CLASS__.'->'.__FUNCTION__.': ignore'."\n"; # TODO: remove this line

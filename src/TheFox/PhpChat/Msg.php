@@ -15,6 +15,7 @@ class Msg extends YamlStorage{
 	private $srcSslKeyPub = '';
 	private $srcUserNickname = '';
 	private $dstSslPubKey = '';
+	private $textDecrypted = '';
 	
 	private $ssl = null;
 	private $msgDb = null;
@@ -157,6 +158,10 @@ class Msg extends YamlStorage{
 	
 	public function getText(){
 		return $this->data['text'];
+	}
+	
+	public function getTextDecrypted(){
+		return $this->textDecrypted;
 	}
 	
 	public function setPassword($password){
@@ -538,6 +543,7 @@ class Msg extends YamlStorage{
 			throw new RuntimeException('no password set.', 201);
 		}
 		
+		$this->textDecrypted = $rv;
 		return $rv;
 	}
 	

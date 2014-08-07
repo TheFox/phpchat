@@ -344,7 +344,7 @@ class Server{
 		}
 	}
 	
-	public function imapMailAdd(Msg $msg, $decryptedText){
+	public function imapMailAdd(Msg $msg){
 		if($this->getKernel() && $this->getKernel()->getIpcImapConnection()){
 			
 			$version = $msg->getVersion();
@@ -352,8 +352,7 @@ class Server{
 			$srcNodeId = $msg->getSrcNodeId();
 			$srcUserNickname = $msg->getSrcUserNickname();
 			$dstNodeId = $msg->getDstNodeId();
-			#$text = $msg->getText();
-			$text = $decryptedText;
+			$text = $msg->getTextDecrypted();
 			$checksum = $msg->getChecksum();
 			$relayCount = $msg->getRelayCount();
 			$encryptionMode = $msg->getEncryptionMode();
