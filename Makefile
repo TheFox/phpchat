@@ -2,7 +2,7 @@
 RELEASE_VERSION = 0.3.0-dev
 RELEASE_NAME = phpchat
 
-DELETE = rm -rf
+RM = rm -rf
 MKDIR = mkdir -p
 TAR = tar
 GZIP = gzip
@@ -11,9 +11,9 @@ PHPCS = vendor/bin/phpcs
 PHPUNIT = vendor/bin/phpunit
 
 
-.PHONY: all install update
+.PHONY: all install tests test_phpcs test_phpunit release clean
 
-all: install tests tests test_phpcs test_phpunit release clean
+all: install tests
 
 install: composer.phar
 
@@ -58,6 +58,6 @@ release:
 	$(MV) ${RELEASE_NAME}-${RELEASE_VERSION}.tar.gz releases
 
 clean:
-	$(DELETE) composer.lock composer.phar
-	$(DELETE) vendor/*
-	$(DELETE) vendor
+	$(RM) composer.lock composer.phar
+	$(RM) vendor/*
+	$(RM) vendor
