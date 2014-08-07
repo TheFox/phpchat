@@ -549,39 +549,13 @@ class Console extends Thread{
 				elseif(substr($line, 0, 8) == 'connect '){
 					$this->handleCommandConnect($line);
 				}
-				elseif($line == 'ab'){ # TODO: in eigenstaendige funktion
-					$format = '%3d %36s  %s';
-					
-					$this->msgAdd(' ID UUID                                  USERNAME', false, false);
-					foreach($this->ipcKernelConnection->execSync('getAddressbook')->getContacts() as $contactId => $contact){
-						$this->msgAdd(sprintf($format, $contact->getId(), $contact->getNodeId(), $contact->getUserNickname()), false, false);
-					}
-					$this->msgAdd('END OF LIST', false, true);
-				}
-				elseif(substr($line, 0, 3) == 'ab '){
+				elseif(substr($line, 0, 2) == 'ab'){
 					$this->handleCommandAddressbook($line);
 				}
-				elseif($line == 'talk' || $line == 'talk '){ # TODO: in eigenstaendige funktion
-					$this->msgAdd('Usage: /talk <NICK|UUID>', false, true);
-				}
-				elseif(substr($line, 0, 5) == 'talk '){
+				elseif(substr($line, 0, 4) == 'talk'){
 					$this->handleCommandTalk($line);
 				}
-				elseif($line == 'request'){ # TODO: in eigenstaendige funktion
-					$format = '%3d %36s  %s %s';
-					
-					$this->msgAdd(' ID RID                                   IP:PORT               USERNAME', false, false);
-					foreach($this->talkRequests as $talkRequestId => $request){
-						$rid = substr($request->getRid(), 0, 36);
-						$ipPortStr = $request->getClient()->getIp().':'.$request->getClient()->getPort();
-						$ipPortStrLen = strlen($ipPortStr);
-						$ip = $ipPortStr.str_repeat(' ', 21 - $ipPortStrLen);
-						
-						$this->msgAdd(sprintf($format, $request->getId(), $rid, $ip, $request->getUserNickname()), false, false);
-					}
-					$this->msgAdd('END OF LIST', false, true);
-				}
-				elseif(substr($line, 0, 8) == 'request '){
+				elseif(substr($line, 0, 7) == 'request'){
 					$this->handleCommandRequest($line);
 				}
 				elseif($line == 'close'){
@@ -590,10 +564,7 @@ class Console extends Thread{
 				elseif(substr($line, 0, 3) == 'msg'){
 					$this->handleCommandMsg($line);
 				}
-				elseif($line == 'nick'){
-					$this->msgAdd('Your nickname: '.$this->userNickname, true, true);
-				}
-				elseif(substr($line, 0, 5) == 'nick '){
+				elseif(substr($line, 0, 4) == 'nick'){
 					$this->handleCommandNick($line);
 				}
 				elseif($line == 'save'){
@@ -697,7 +668,14 @@ class Console extends Thread{
 		
 		$pos = strpos($data, ' ');
 		if($pos === false){
-			$this->msgAdd('Usage: /ab rem <ID>', false, true);
+			#$this->msgAdd('Usage: /ab rem <ID>', false, true);
+			$format = '%3d %36s  %s';
+			
+			$this->msgAdd(' ID UUID                                  USERNAME', false, false);
+			foreach($this->ipcKernelConnection->execSync('getAddressbook')->getContacts() as $contactId => $contact){
+				$this->msgAdd(sprintf($format, $contact->getId(), $contact->getNodeId(), $contact->getUserNickname()), false, false);
+			}
+			$this->msgAdd('END OF LIST', false, true);
 		}
 		else{
 			$action = substr($data, 0, $pos);
@@ -720,100 +698,123 @@ class Console extends Thread{
 	private function handleCommandTalk($line){
 		$data = substr($line, 5);
 		
-		$uuid = '';
-		if(strIsUuid($data)){
-			$uuid = $data;
+		if($data){
+			$uuid = '';
+			if(strIsUuid($data)){
+				$uuid = $data;
+			}
+			else{
+				$contacts = $this->ipcKernelConnection->execSync('getAddressbook')->contactsGetByNick($data);
+				if(count($contacts) > 1){
+					$format = '%3d %36s  %s';
+					
+					$this->msgAdd();
+					$this->msgAdd('Found several nodes with nickname "'.$data.'". ', false, false);
+					$this->msgAdd('Delete old nodes or use UUID instead.', false, false);
+					$this->msgAdd(' ID UUID                                  USERNAME', false, false);
+					foreach($contacts as $contactId => $contact){
+						$this->msgAdd(sprintf($format, $contact->getId(), $contact->getNodeId(), $contact->getUserNickname()), false, false);
+					}
+					$this->msgAdd('END OF LIST', false, true);
+				}
+				elseif(count($contacts) == 1){
+					$contact = array_shift($contacts);
+					$uuid = $contact->getNodeId();
+				}
+				else{
+					$this->msgAdd();
+					$this->msgAdd('ERROR: Nick "'.$data.'" not found.', false, true);
+				}
+			}
+			
+			if($uuid){
+				$node = new Node();
+				$node->setIdHexStr($uuid);
+				
+				if($onode = $this->ipcKernelConnection->execSync('getTable')->nodeFindInBuckets($node)){
+					$this->connect($onode->getIp(), $onode->getPort());
+				}
+				else{
+					$this->msgAdd();
+					$this->msgAdd('ERROR: Node '.$node->getIdHexStr().' not found.', false, true);
+				}
+			}
 		}
 		else{
-			$contacts = $this->ipcKernelConnection->execSync('getAddressbook')->contactsGetByNick($data);
-			if(count($contacts) > 1){
-				$format = '%3d %36s  %s';
-				
-				$this->msgAdd();
-				$this->msgAdd('Found several nodes with nickname "'.$data.'". ', false, false);
-				$this->msgAdd('Delete old nodes or use UUID instead.', false, false);
-				$this->msgAdd(' ID UUID                                  USERNAME', false, false);
-				foreach($contacts as $contactId => $contact){
-					$this->msgAdd(sprintf($format, $contact->getId(), $contact->getNodeId(), $contact->getUserNickname()), false, false);
-				}
-				$this->msgAdd('END OF LIST', false, true);
-			}
-			elseif(count($contacts) == 1){
-				$contact = array_shift($contacts);
-				$uuid = $contact->getNodeId();
-			}
-			else{
-				$this->msgAdd();
-				$this->msgAdd('ERROR: Nick "'.$data.'" not found.', false, true);
-			}
-		}
-		
-		if($uuid){
-			$node = new Node();
-			$node->setIdHexStr($uuid);
-			
-			if($onode = $this->ipcKernelConnection->execSync('getTable')->nodeFindInBuckets($node)){
-				$this->connect($onode->getIp(), $onode->getPort());
-			}
-			else{
-				$this->msgAdd();
-				$this->msgAdd('ERROR: Node '.$node->getIdHexStr().' not found.', false, true);
-			}
+			$this->msgAdd();
+			$this->msgAdd('Usage: /talk <NICK|UUID>', false, true);
 		}
 	}
 	
 	private function handleCommandRequest($line){
 		$data = substr($line, 8);
 		
-		$pos = strpos($data, ' ');
-		if($pos === false){
-			$this->msgAdd();
-			$this->msgAdd('Usage: /request accept <ID>', false, false);
-			$this->msgAdd('       /request decline <ID>', false, true);
-		}
-		else{
-			$action = substr($data, 0, $pos);
-			$id = substr($data, $pos + 1);
-			
-			if(isset($this->talkRequests[$id])){
-				$talkRequest = $this->talkRequests[$id];
-				
-				if($talkRequest->getStatus() == 0){
-					if($action == 'accept'){
-						$talkRequest->setStatus(1);
-						
-						$this->msgAdd();
-						$this->msgAdd('Accepting talk request ID '.$talkRequest->getId().'.', true, false);
-						$this->msgAdd('Now talking to "'.$talkRequest->getUserNickname().'".', true, true);
-						
-						$this->setModeChannel(true);
-						$this->setModeChannelClient($talkRequest->getClient());
-					}
-					else{
-						$talkRequest->getStatus(2);
-						$this->msgAdd();
-						$this->msgAdd('Declining talk request ID '.$id.'.', true, true);
-					}
-					
-					$this->talkResponseSend($talkRequest);
-				}
-				elseif($talkRequest->getStatus() == 1){
-					$this->msgAdd();
-					$this->msgAdd('You already accepted this talk request.', true, true);
-				}
-				elseif($talkRequest->getStatus() == 2){
-					$this->msgAdd();
-					$this->msgAdd('You already declined this talk request.', true, true);
-				}
-				elseif($talkRequest->getStatus() == 3){
-					$this->msgAdd();
-					$this->msgAdd('Talk request ID '.$id.' timed-out.', true, true);
-				}
+		if($data){
+			$pos = strpos($data, ' ');
+			if($pos === false){
+				$this->msgAdd();
+				$this->msgAdd('Usage: /request accept <ID>', false, false);
+				$this->msgAdd('       /request decline <ID>', false, true);
 			}
 			else{
-				$this->msgAdd();
-				$this->msgAdd('Talk request ID '.$id.' not found.', true, true);
+				$action = substr($data, 0, $pos);
+				$id = substr($data, $pos + 1);
+				
+				if(isset($this->talkRequests[$id])){
+					$talkRequest = $this->talkRequests[$id];
+					
+					if($talkRequest->getStatus() == 0){
+						if($action == 'accept'){
+							$talkRequest->setStatus(1);
+							
+							$this->msgAdd();
+							$this->msgAdd('Accepting talk request ID '.$talkRequest->getId().'.', true, false);
+							$this->msgAdd('Now talking to "'.$talkRequest->getUserNickname().'".', true, true);
+							
+							$this->setModeChannel(true);
+							$this->setModeChannelClient($talkRequest->getClient());
+						}
+						else{
+							$talkRequest->getStatus(2);
+							$this->msgAdd();
+							$this->msgAdd('Declining talk request ID '.$id.'.', true, true);
+						}
+						
+						$this->talkResponseSend($talkRequest);
+					}
+					elseif($talkRequest->getStatus() == 1){
+						$this->msgAdd();
+						$this->msgAdd('You already accepted this talk request.', true, true);
+					}
+					elseif($talkRequest->getStatus() == 2){
+						$this->msgAdd();
+						$this->msgAdd('You already declined this talk request.', true, true);
+					}
+					elseif($talkRequest->getStatus() == 3){
+						$this->msgAdd();
+						$this->msgAdd('Talk request ID '.$id.' timed-out.', true, true);
+					}
+				}
+				else{
+					$this->msgAdd();
+					$this->msgAdd('Talk request ID '.$id.' not found.', true, true);
+				}
 			}
+		}
+		else{
+			$format = '%3d %36s  %s %s';
+			
+			$this->msgAdd();
+			$this->msgAdd(' ID RID                                   IP:PORT               USERNAME', false, false);
+			foreach($this->talkRequests as $talkRequestId => $request){
+				$rid = substr($request->getRid(), 0, 36);
+				$ipPortStr = $request->getClient()->getIp().':'.$request->getClient()->getPort();
+				$ipPortStrLen = strlen($ipPortStr);
+				$ip = $ipPortStr.str_repeat(' ', 21 - $ipPortStrLen);
+				
+				$this->msgAdd(sprintf($format, $request->getId(), $rid, $ip, $request->getUserNickname()), false, false);
+			}
+			$this->msgAdd('END OF LIST', false, true);
 		}
 	}
 	
@@ -1068,13 +1069,13 @@ class Console extends Thread{
 	}
 	
 	private function handleCommandNick($line){
-		$tmp = substr($line, 5);
-		$tmp = preg_replace('/[^a-zA-Z0-9-_.]/', '', $tmp);
-		$tmp = substr($tmp, 0, Settings::USER_NICKNAME_LEN_MAX);
+		$data = substr($line, 5);
+		$data = preg_replace('/[^a-zA-Z0-9-_.]/', '', $data);
+		$data = substr($data, 0, Settings::USER_NICKNAME_LEN_MAX);
 		
-		if($tmp){
+		if($data){
 			$userNicknameOld = $this->userNickname;
-			$this->userNickname = $tmp;
+			$this->userNickname = $data;
 			
 			$this->ipcKernelConnection->execAsync('setSettingsUserNickname', array($this->userNickname));
 			
