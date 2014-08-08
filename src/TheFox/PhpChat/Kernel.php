@@ -116,7 +116,7 @@ class Kernel extends Thread{
 		$this->ipcCronjobConnection->connect();
 		
 		// IMAP Server Connection
-		$this->getLog()->info('setup imap server connection');
+		$this->getLog()->info('setup IPC IMAP server connection');
 		$this->ipcImapServerConnection = new ConnectionServer();
 		$this->ipcImapServerConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20002));
 		foreach(array(
@@ -389,7 +389,7 @@ class Kernel extends Thread{
 		$this->getLog()->info('IPC Cronjob send shutdown');
 		$this->ipcCronjobConnection->execSync('shutdown');
 		
-		$this->getLog()->info('IPC IMAP send shutdown');
+		$this->getLog()->info('IPC IMAP server send shutdown');
 		$this->ipcImapServerConnection->execSync('shutdown');
 		
 		
