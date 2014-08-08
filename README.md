@@ -3,7 +3,7 @@ A decentralized, peer-to-peer, encrypted chat in PHP.
 
 ## Features
 - [Peer-to-peer](http://en.wikipedia.org/wiki/Peer-to-peer) instant messaging.
-- Decentralized: See [DHT](http://en.wikipedia.org/wiki/Distributed_hash_table) and <http://bittorrent.org/beps/bep_0005.html>.
+- Decentralized: See [DHT](http://en.wikipedia.org/wiki/Distributed_hash_table) and [Kademlia](http://en.wikipedia.org/wiki/Kademlia).
 - Encryption: SSL
 - Send P2P random messages.
 - Addressbook: manage all conversation partners.
