@@ -903,7 +903,7 @@ class Console extends Thread{
 								
 								
 								$msg = new Msg();
-								$msg->setSrcNodeId($$this->settings->data['node']['id']);
+								$msg->setSrcNodeId($this->settings->data['node']['id']);
 								$msg->setSrcSslKeyPub($table->getLocalNode()->getSslKeyPub());
 								$msg->setSrcUserNickname($this->userNickname);
 								
