@@ -19,7 +19,7 @@ A decentralized, peer-to-peer, encrypted chat in PHP.
 
 	`make`
 
-3. You must forward TCP port 25000 (default) on your modem to your computer. After the chat has been started once there will be a `settings.yml`. Edit this file to change the incoming port. After changing the settings file you must restart PHPChat.
+3. You must forward TCP port 25000 (default) on your modem to your computer. After the chat has been started once there will be a `settings.yml`. Edit this file to change the incoming port. After changing the settings file you must restart the chat.
 
 ## ToDo
 - Hashcash on connect. [link_1](http://en.wikipedia.org/wiki/Hashcash) | [link_2](https://en.bitcoin.it/wiki/Hashcash)
