@@ -180,9 +180,7 @@ class SmtpCommand extends BasicCommand{
 		#fwrite(STDOUT, 'mail new: /'.$from.'/ a/'.join('/ /', $rcpt).'/'."\n");
 		
 		$table = $this->ipcKernelConnection->execSync('getTable');
-		$text = 'Subject: '.$mail->getSubject().PHP_EOL;
-		$text .= ''.PHP_EOL;
-		$text .= $mail->getBody().PHP_EOL;
+		$text = $mail->getBody();
 		
 		foreach($rcpt as $dstNodeId){
 			$dstNodeId = substr($dstNodeId, 0, strpos($dstNodeId, '@'));
@@ -204,6 +202,7 @@ class SmtpCommand extends BasicCommand{
 			}
 			#else{ print 'node not found'.PHP_EOL; }
 			
+			$msg->setSubject($mail->getSubject());
 			$msg->setText($text);
 			$msg->setSslKeyPrvPath($this->settings->data['node']['sslKeyPrvPath'], $this->settings->data['node']['sslKeyPrvPass']);
 			$msg->setStatus('O');

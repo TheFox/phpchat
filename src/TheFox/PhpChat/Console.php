@@ -1029,7 +1029,7 @@ class Console extends Thread{
 							$this->msgAdd('WARNING: could not decrypt text. Only meta data available.', false, false);
 						}
 						$this->msgAdd('----- MESSAGE BEGIN -----');
-						$this->msgAdd('Subject: '.$toLine, false, false);
+						$this->msgAdd('Subject: '.$msg->getSubject(), false, false);
 						$this->msgAdd('From: '.$fromLine, false, false);
 						$this->msgAdd('To: '.$toLine, false, false);
 						$this->msgAdd('Msg ID: '.$msg->getId(), false, false);
