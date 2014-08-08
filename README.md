@@ -8,6 +8,7 @@ A decentralized, peer-to-peer, encrypted chat in PHP.
 - Send P2P random messages.
 - Addressbook: manage all conversation partners.
 - [IMAP](https://github.com/TheFox/imapd) interface for fetching new messages.
+- [SMTP](https://github.com/TheFox/smtpd) interface for sending messages.
 
 ## Install
 1. Clone
