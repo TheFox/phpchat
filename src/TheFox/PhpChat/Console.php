@@ -864,6 +864,8 @@ class Console extends Thread{
 						$this->sttyEchoOn();
 						stream_set_blocking(STDIN, 1);
 						
+						$subject = 'No subject'; # TODO
+						
 						$text = '';
 						while(!$this->getExit()){
 							$line = fgets(STDIN, 1024);
@@ -915,6 +917,7 @@ class Console extends Thread{
 								}
 								#else{ print 'node not found'.PHP_EOL; }
 								
+								$msg->setSubject($subject);
 								$msg->setText($text);
 								$msg->setSslKeyPrvPath($$this->settings->data['node']['sslKeyPrvPath'], $$this->settings->data['node']['sslKeyPrvPass']);
 								$msg->setStatus('O');
@@ -1024,9 +1027,10 @@ class Console extends Thread{
 							$this->msgAdd('WARNING: could not decrypt text. Only meta data available.', false, false);
 						}
 						$this->msgAdd('----- MESSAGE BEGIN -----');
-						$this->msgAdd('Msg ID: '.$msg->getId(), false, false);
+						$this->msgAdd('Subject: '.$toLine, false, false);
 						$this->msgAdd('From: '.$fromLine, false, false);
 						$this->msgAdd('To: '.$toLine, false, false);
+						$this->msgAdd('Msg ID: '.$msg->getId(), false, false);
 						$this->msgAdd('Status: '.$msg->getStatusText(), false, false);
 						$this->msgAdd('Date: '.$dateCreated->format('Y/m/d H:i:s'), false, false);
 						

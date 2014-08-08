@@ -189,9 +189,10 @@ class ImapCommand extends BasicCommand{
 		$this->log->info('mail add');
 	}*/
 	
-	public function mailAdd($version, $id, $srcNodeId, $srcUserNickname, $dstNodeId, $text,
+	public function mailAdd($version, $id, $srcNodeId, $srcUserNickname, $dstNodeId, $subject, $text,
 		$checksum, $relayCount, $encryptionMode, $status, $timeCreated, $timeReceived){
 		$this->log->info('mail add: '.$id);
+		$this->log->info('subject: '.$subject);
 		$this->log->info('from: '.$srcNodeId);
 		$this->log->info('nick: '.$srcUserNickname);
 		
@@ -210,7 +211,7 @@ class ImapCommand extends BasicCommand{
 		$message->setHeaders($headers);
 		$message->addFrom($srcNodeId.'@phpchat.fox21.at', $srcUserNickname);
 		$message->addTo($dstNodeId.'@phpchat.fox21.at');
-		$message->setSubject('Msg '.$id);
+		$message->setSubject($subject);
 		$message->setBody($text);
 		
 		$this->server->mailAdd($message);

@@ -15,6 +15,7 @@ class Msg extends YamlStorage{
 	private $srcSslKeyPub = '';
 	private $srcUserNickname = '';
 	private $dstSslPubKey = '';
+	private $subject = '';
 	private $textDecrypted = '';
 	
 	private $ssl = null;
@@ -150,6 +151,14 @@ class Msg extends YamlStorage{
 	
 	public function getDstSslPubKey(){
 		return $this->dstSslPubKey;
+	}
+	
+	public function setSubject($subject){
+		$this->subject = $subject;
+	}
+	
+	public function getSubject(){
+		return $this->subject;
 	}
 	
 	public function setText($text){
@@ -355,10 +364,12 @@ class Msg extends YamlStorage{
 			$signRv = openssl_sign($text, $sign, $this->getSsl(), $signAlgo);
 			if($signRv){
 				$sign = base64_encode($sign);
+				$subjectBase64 = base64_encode($this->getSubject());
 				$textBase64 = base64_encode($text);
 				$srcUserNickname = base64_encode($this->getSrcUserNickname());
 				
 				$jsonStr = json_encode(array(
+					'subject' => $subjectBase64,
 					'text' => $textBase64,
 					'sign' => $sign,
 					'signAlgo' => $signAlgo,
@@ -400,6 +411,7 @@ class Msg extends YamlStorage{
 					#fwrite(STDOUT, 'src node id: /'.$this->getSrcNodeId().'/'."\n");
 					#fwrite(STDOUT, 'dst node id: /'.$this->getDstNodeId().'/'."\n");
 					#fwrite(STDOUT, 'dst ssl pub key: /'.$this->getDstSslPubKey().'/'."\n");
+					#fwrite(STDOUT, 'subject: /'.$this->getSubject().'/'."\n");
 					#fwrite(STDOUT, 'text: /'.$text.'/'."\n");
 					#fwrite(STDOUT, 'time created: /'.$this->getTimeCreated().'/'."\n");
 					#fwrite(STDOUT, 'password: /'.$password.'/'."\n");
@@ -480,8 +492,9 @@ class Msg extends YamlStorage{
 					$data = gzdecode($data);
 					
 					$json = json_decode($data, true);
-					if($json && isset($json['text']) && isset($json['sign'])
+					if($json && isset($json['subject']) && isset($json['text']) && isset($json['sign'])
 						&& isset($json['signAlgo']) && isset($json['srcUserNickname'])){
+						$subject = base64_decode($json['subject']);
 						$text = base64_decode($json['text']);
 						$sign = base64_decode($json['sign']);
 						$signAlgo = (int)$json['signAlgo'];
@@ -502,6 +515,7 @@ class Msg extends YamlStorage{
 							#fwrite(STDOUT, 'checksum: '.$checksum."\n");
 							
 							if($checksum == $this->getChecksum()){
+								$this->setSubject($subject);
 								$this->setSrcUserNickname($srcUserNickname);
 								$this->setIgnore($ignore);
 								
@@ -515,6 +529,7 @@ class Msg extends YamlStorage{
 								$errorMsg .= "\n".'    src node id: /'.$this->getSrcNodeId().'/';
 								$errorMsg .= "\n".'    dst node id: /'.$this->getDstNodeId().'/';
 								$errorMsg .= "\n".'    dst ssl pub key: /'.$this->getDstSslPubKey().'/';
+								$errorMsg .= "\n".'    subject: /'.$subject.'/';
 								$errorMsg .= "\n".'    text: /'.$text.'/';
 								$errorMsg .= "\n".'    time created: /'.$this->getTimeCreated().'/';
 								$errorMsg .= "\n".'    password: /'.$password.'/';

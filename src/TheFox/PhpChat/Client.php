@@ -805,6 +805,7 @@ class Client{
 					$srcNodeId = '';
 					$srcSslKeyPub = '';
 					$dstNodeId = '';
+					$subject = '';
 					$text = '';
 					$password = '';
 					$checksum = '';

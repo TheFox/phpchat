@@ -352,6 +352,7 @@ class Server{
 			$srcNodeId = $msg->getSrcNodeId();
 			$srcUserNickname = $msg->getSrcUserNickname();
 			$dstNodeId = $msg->getDstNodeId();
+			$subject = $msg->getSubject();
 			$text = $msg->getTextDecrypted();
 			$checksum = $msg->getChecksum();
 			$relayCount = $msg->getRelayCount();
@@ -366,6 +367,7 @@ class Server{
 			$args[] = $srcNodeId;
 			$args[] = $srcUserNickname;
 			$args[] = $dstNodeId;
+			$args[] = $subject;
 			$args[] = $text;
 			$args[] = $checksum;
 			$args[] = $relayCount;

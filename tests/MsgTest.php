@@ -261,6 +261,9 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
 		$this->assertEquals(static::DST1_SSL_KEY_PUB, $msg->getDstSslPubKey());
 		
+		$msg->setSubject('my first subject');
+		$this->assertEquals('my first subject', $msg->getSubject());
+		
 		$msg->setText('hello world! this is a test');
 		$this->assertEquals('hello world! this is a test', $msg->getText());
 		
@@ -300,8 +303,8 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 	public function providerEncryption(){
 		$rv = array();
 		
-		$rv[] = array('thefox', 'hello world! this is a test', false);
-		$rv[] = array('thefox21', 'hello world! this is a test2', true);
+		$rv[] = array('thefox', 'another subject', 'hello world! this is a test', false);
+		$rv[] = array('thefox21', 'hello again', 'hello world! this is a test2', true);
 		
 		return $rv;
 	}
@@ -309,7 +312,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 	/**
      * @dataProvider providerEncryption
      */
-	public function testEncryption($srcUserNickname, $text, $ignore){
+	public function testEncryption($srcUserNickname, $subject, $text, $ignore){
 		$msg = new Msg();
 		
 		$msg->setVersion(1);
@@ -319,6 +322,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$msg->setSrcUserNickname($srcUserNickname);
 		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
 		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+		$msg->setSubject($subject);
 		$msg->setText($text);
 		$msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
 		$msg->setIgnore($ignore);
@@ -343,7 +347,9 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$msg->setPassword($password);
 		$msg->setChecksum($checksum);
 		
-		$this->assertEquals($text, $msg->decrypt());
+		$textDecrypted = $msg->decrypt();
+		$this->assertEquals($subject, $msg->getSubject());
+		$this->assertEquals($text, $textDecrypted);
 		$this->assertEquals($text, $msg->getTextDecrypted());
 		$this->assertEquals($srcUserNickname, $msg->getSrcUserNickname());
 		$this->assertEquals($ignore, $msg->getIgnore());
@@ -386,15 +392,18 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
 		$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
 		
+		$subject = 'N/A';
 		$text = 'N/A';
 		try{
 			$text = $msg->decrypt();
+			$subject = $msg->getSubject();
 		}
 		catch(Exception $e){
 			$text = $e->getMessage();
 		}
 		
-		$this->assertEquals('hello world! this is a test', $msg->decrypt());
+		$this->assertEquals('my first subject', $subject);
+		$this->assertEquals('hello world! this is a test', $text);
 		$this->assertEquals('thefox', $msg->getSrcUserNickname());
 	}
 	
@@ -411,14 +420,17 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$msg->setDstSslPubKey(static::DST2_SSL_KEY_PUB);
 		$msg->setSslKeyPrv(static::DST2_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
 		
+		$subject = 'N/A';
 		$text = 'N/A';
 		try{
 			$text = $msg->decrypt();
+			$subject = $msg->getSubject();
 		}
 		catch(Exception $e){
 			$text = 'FAILED OK';
 		}
 		
+		$this->assertEquals('N/A', $subject);
 		$this->assertEquals('FAILED OK', $text);
 		$this->assertEquals('', $msg->getSrcUserNickname());
 	}

@@ -121,6 +121,11 @@ class MsgDb extends YamlStorage{
 				$msgOld->setDstSslPubKey($msgNew->getDstSslPubKey());
 				$this->setDataChanged(true);
 			}
+			if($msgOld->getSubject() != $msgNew->getSubject()){
+				#print __CLASS__.'->'.__FUNCTION__.': changed: subject'."\n";
+				$msgOld->setSubject($msgNew->getSubject());
+				$this->setDataChanged(true);
+			}
 			if($msgOld->getText() != $msgNew->getText()){
 				#print __CLASS__.'->'.__FUNCTION__.': changed: text'."\n";
 				$msgOld->setText($msgNew->getText());
