@@ -75,10 +75,12 @@ class ImapCommand extends BasicCommand{
 			$port = (int)$input->getOption('port');
 		}
 		
+		$maildirPath = $this->settings->data['datadir'].'/mailbox';
+		$this->log->debug('maildir: '.$maildirPath);
+		
 		$this->log->info('server start');
 		$this->server = new Server($address, $port);
 		$this->server->setLog($this->log);
-		$this->server->storageAddMaildir($this->settings->data['datadir'].'/mailbox');
 		
 		#$eventMailAdd = new Event(Event::TRIGGER_MAIL_ADD, $this, 'imapMailAdd');
 		#$this->server->eventAdd($eventMailAdd);
@@ -92,7 +94,7 @@ class ImapCommand extends BasicCommand{
 		}
 		
 		try{
-			$this->server->storageAddMaildir('mailbox');
+			$this->server->storageAddMaildir($maildirPath);
 		}
 		catch(Exception $e){
 			$this->log->error('storage: '.$e->getMessage());
