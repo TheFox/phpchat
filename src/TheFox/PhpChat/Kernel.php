@@ -93,7 +93,7 @@ class Kernel extends Thread{
 		$this->ipcConsoleConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20000));
 		$this->ipcConsoleConnection->functionAdd('shutdown', $this, 'ipcConsoleShutdown');
 		foreach(array(
-			'getSettingsUserNickname', 'setSettingsUserNickname',
+			'setSettingsUserNickname',
 			'serverConnect', 'serverTalkResponseSend', 'serverTalkMsgSend', 'serverTalkUserNicknameChangeSend',
 				'serverTalkCloseSend',
 			'getAddressbook', 'addressbookContactAdd', 'addressbookContactRemove',

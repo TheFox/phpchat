@@ -31,6 +31,7 @@ class Console extends Thread{
 	const HISTORY_MAX = 100;
 	
 	private $log = null;
+	private $settings = null;
 	private $ipcKernelConnection = null;
 	private $ipcKernelShutdown = false;
 	private $ps1 = 'phpchat:> ';
@@ -219,7 +220,8 @@ class Console extends Thread{
 		$this->sttySetup();
 		$this->keybindingsSetup();
 		
-		$this->userNickname = $this->ipcKernelConnection->execSync('getSettingsUserNickname');
+		$this->settings = $this->ipcKernelConnection->execSync('getSettings');
+		$this->userNickname = $this->settings->data['user']['nickname'];
 		
 		print PHP_EOL."Type '/help' for help.".PHP_EOL;
 		
@@ -232,7 +234,6 @@ class Console extends Thread{
 		$this->log->debug('stty setup');
 		
 		$this->sttySettings = exec('stty -g');
-		#print "settings: '".$this->sttySettings."'\n";
 		
 		$this->log->debug('tput setup');
 		$this->tcols = (int)exec('tput cols');
@@ -829,9 +830,6 @@ class Console extends Thread{
 		#print __CLASS__.'->'.__FUNCTION__.': "'.$line.'"'."\n";
 		$line = substr($line, 3);
 		
-		#print __CLASS__.'->'.__FUNCTION__.': get settings'."\n";
-		$settings = $this->ipcKernelConnection->execSync('getSettings');
-		
 		#print __CLASS__.'->'.__FUNCTION__.': get table'."\n";
 		$table = $this->ipcKernelConnection->execSync('getTable');
 		
@@ -899,12 +897,11 @@ class Console extends Thread{
 								#$text = 'this is  a test. '.date('Y/m/d H:i:s');
 								
 								
-								$settings = $this->ipcKernelConnection->execSync('getSettings');
 								$table = $this->ipcKernelConnection->execSync('getTable');
 								
 								
 								$msg = new Msg();
-								$msg->setSrcNodeId($settings->data['node']['id']);
+								$msg->setSrcNodeId($$this->settings->data['node']['id']);
 								$msg->setSrcSslKeyPub($table->getLocalNode()->getSslKeyPub());
 								$msg->setSrcUserNickname($this->userNickname);
 								
@@ -919,7 +916,7 @@ class Console extends Thread{
 								#else{ print 'node not found'.PHP_EOL; }
 								
 								$msg->setText($text);
-								$msg->setSslKeyPrvPath($settings->data['node']['sslKeyPrvPath'], $settings->data['node']['sslKeyPrvPass']);
+								$msg->setSslKeyPrvPath($$this->settings->data['node']['sslKeyPrvPath'], $$this->settings->data['node']['sslKeyPrvPass']);
 								$msg->setStatus('O');
 								
 								$encrypted = false;
@@ -944,7 +941,7 @@ class Console extends Thread{
 									if($encrypted){
 										$this->ipcKernelConnection->execAsync('msgDbMsgAdd', array($msg));
 										
-										$this->msgAdd('OK: created msg '.$msg->getId(), true, true);
+										$this->msgAdd('OK: msg created '.$msg->getId(), true, true);
 									}
 									else{
 										$this->msgAdd('ERROR: could not encrypt message.', true, true);
@@ -990,8 +987,8 @@ class Console extends Thread{
 						
 						$msg->setDstSslPubKey($table->getLocalNode()->getSslKeyPub());
 						
-						$sslKeyPrvPath = $settings->data['node']['sslKeyPrvPath'];
-						$sslKeyPrvPass = $settings->data['node']['sslKeyPrvPass'];
+						$sslKeyPrvPath = $$this->settings->data['node']['sslKeyPrvPath'];
+						$sslKeyPrvPass = $$this->settings->data['node']['sslKeyPrvPass'];
 						$msg->setSslKeyPrvPath($sslKeyPrvPath, $sslKeyPrvPass);
 						
 						#ve($msg);
