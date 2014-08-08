@@ -7,6 +7,7 @@ A decentralized, peer-to-peer, encrypted chat in PHP.
 - Encryption: SSL
 - Send P2P random messages.
 - Addressbook: manage all conversation partners.
+- [IMAP](https://github.com/TheFox/imapd) interface for fetching new messages.
 
 ## Install
 1. Clone
@@ -15,23 +16,13 @@ A decentralized, peer-to-peer, encrypted chat in PHP.
 
 2. Change to your `phpchat` directory and run
 
-	`composer install`
+	`make`
 
-3. You must forward TCP port 25000 (default) on your modem to your computer. After the chat has been started once there will be a `settings.yml`. Edit this file to change the incoming port.
-
-## Dependencies
-Before running PHPChat, make sure you have all the needed dependencies
-installed on your system.
-
-Here's a list of dependencies needed for PHPChat:
-
-- PHP >= 5.3
-- [Composer](https://getcomposer.org/)
+3. You must forward TCP port 25000 (default) on your modem to your computer. After the chat has been started once there will be a `settings.yml`. Edit this file to change the incoming port. After changing the settings file you must restart PHPChat.
 
 ## ToDo
 - Hashcash on connect. [link_1](http://en.wikipedia.org/wiki/Hashcash) | [link_2](https://en.bitcoin.it/wiki/Hashcash)
 - Supernode over HTTP: no active process; just a http request, json interface. No GUI.
-- IMAP-server interface.
 - ReSSL after period/number of msgs. Reset the SSL passwords.
 - SSL sign public key to prove peer holds the private key.
 - Renew ssl_key_pub_get and ssl_key_pub_put.
