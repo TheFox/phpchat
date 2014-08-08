@@ -163,6 +163,7 @@ class ImapCommand extends BasicCommand{
 		
 		if($this->server){
 			$this->server->setExit($this->exit);
+			$this->server->shutdown();
 		}
 		if($this->exit >= 2){
 			exit(1);
@@ -178,6 +179,7 @@ class ImapCommand extends BasicCommand{
 		
 		if($this->server){
 			$this->server->setExit($this->exit);
+			$this->server->shutdown();
 		}
 		
 		return null;

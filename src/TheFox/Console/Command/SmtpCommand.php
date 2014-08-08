@@ -154,6 +154,7 @@ class SmtpCommand extends BasicCommand{
 		
 		if($this->server){
 			$this->server->setExit($this->exit);
+			$this->server->shutdown();
 		}
 		if($this->exit >= 2){
 			exit(1);
@@ -169,6 +170,7 @@ class SmtpCommand extends BasicCommand{
 		
 		if($this->server){
 			$this->server->setExit($this->exit);
+			$this->server->shutdown();
 		}
 		
 		return null;
