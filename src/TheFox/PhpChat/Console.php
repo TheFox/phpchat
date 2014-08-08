@@ -919,7 +919,7 @@ class Console extends Thread{
 								
 								$msg->setSubject($subject);
 								$msg->setText($text);
-								$msg->setSslKeyPrvPath($$this->settings->data['node']['sslKeyPrvPath'], $$this->settings->data['node']['sslKeyPrvPass']);
+								$msg->setSslKeyPrvPath($this->settings->data['node']['sslKeyPrvPath'], $this->settings->data['node']['sslKeyPrvPass']);
 								$msg->setStatus('O');
 								
 								$encrypted = false;
@@ -990,8 +990,8 @@ class Console extends Thread{
 						
 						$msg->setDstSslPubKey($table->getLocalNode()->getSslKeyPub());
 						
-						$sslKeyPrvPath = $$this->settings->data['node']['sslKeyPrvPath'];
-						$sslKeyPrvPass = $$this->settings->data['node']['sslKeyPrvPass'];
+						$sslKeyPrvPath = $this->settings->data['node']['sslKeyPrvPath'];
+						$sslKeyPrvPass = $this->settings->data['node']['sslKeyPrvPass'];
 						$msg->setSslKeyPrvPath($sslKeyPrvPath, $sslKeyPrvPass);
 						
 						#ve($msg);
