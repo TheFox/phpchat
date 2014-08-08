@@ -116,7 +116,7 @@ class Kernel extends Thread{
 		$this->ipcCronjobConnection->connect();
 		
 		// IMAP Server Connection
-		$this->getLog()->info('setup mailserver connection');
+		$this->getLog()->info('setup imap server connection');
 		$this->ipcImapServerConnection = new ConnectionServer();
 		$this->ipcImapServerConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20002));
 		foreach(array(
