@@ -852,6 +852,8 @@ class Console extends Thread{
 			$args = preg_split('/ /', $line);
 			#ve($args);
 			
+			#print __CLASS__.'->'.__FUNCTION__.': rest "'.$line.'"'."\n";
+			
 			#$this->printPs1(true, 'handleCommandMsg A');
 			
 			if(($args[0] == 'new' || $args[0] == 'n')){
