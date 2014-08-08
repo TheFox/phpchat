@@ -26,6 +26,7 @@ class Kernel extends Thread{
 	private $ipcConsoleShutdown = false;
 	private $ipcCronjobConnection = null;
 	private $ipcImapServerConnection = null;
+	private $ipcSmtpServerConnection = null;
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -125,6 +126,17 @@ class Kernel extends Thread{
 			$this->ipcImapServerConnection->functionAdd($functionName, $this, $functionName);
 		}
 		$this->ipcImapServerConnection->connect();
+		
+		// SMTP Server Connection
+		$this->getLog()->info('setup IPC SMTP server connection');
+		$this->ipcSmtpServerConnection = new ConnectionServer();
+		$this->ipcSmtpServerConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20003));
+		foreach(array(
+			'getSettings', 'getTable', 'msgDbMsgAdd'
+		) as $functionName){
+			$this->ipcSmtpServerConnection->functionAdd($functionName, $this, $functionName);
+		}
+		$this->ipcSmtpServerConnection->connect();
 		
 		
 		#ve($this->server);
@@ -348,11 +360,16 @@ class Kernel extends Thread{
 		return $this->ipcImapServerConnection;
 	}
 	
+	public function getIpcSmtpConnection(){
+		return $this->ipcSmtpServerConnection;
+	}
+	
 	public function run(){
 		$this->server->run();
 		$this->ipcConsoleConnection->run();
 		$this->ipcCronjobConnection->run();
 		$this->ipcImapServerConnection->run();
+		$this->ipcSmtpServerConnection->run();
 	}
 	
 	public function loop(){
@@ -391,6 +408,9 @@ class Kernel extends Thread{
 		
 		$this->getLog()->info('IPC IMAP server send shutdown');
 		$this->ipcImapServerConnection->execSync('shutdown');
+		
+		$this->getLog()->info('IPC SMTP server send shutdown');
+		$this->ipcSmtpServerConnection->execSync('shutdown');
 		
 		
 		$nodesNum = (int)$this->getTable()->getNodesNum();

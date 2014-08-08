@@ -10,6 +10,7 @@ use TheFox\Console\Command\ConsoleCommand;
 use TheFox\Console\Command\CronjobCommand;
 use TheFox\Console\Command\InfoCommand;
 use TheFox\Console\Command\ImapCommand;
+use TheFox\Console\Command\SmtpCommand;
 
 
 $application = new Application('PHPChat', '0.3.x-dev');
@@ -19,6 +20,7 @@ foreach(array(
 	new CronjobCommand(),
 	new InfoCommand(),
 	new ImapCommand(),
+	new SmtpCommand(),
 ) as $obj){
 	$obj->setSettings($settings);
 	$application->add($obj);
