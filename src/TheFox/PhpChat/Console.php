@@ -1043,7 +1043,8 @@ class Console extends Thread{
 						$this->msgAdd('To: '.$toLine, false, false);
 						$this->msgAdd('Msg ID: '.$msg->getId(), false, false);
 						$this->msgAdd('Status: '.$msg->getStatusText(), false, false);
-						$this->msgAdd('Date: '.$dateCreated->format('Y/m/d H:i:s'), false, false);
+						$this->msgAdd('Created:  '.$dateCreated->format('Y/m/d H:i:s'), false, false);
+						$this->msgAdd('Received: '.$dateReceived->format('Y/m/d H:i:s'), false, false);
 						
 						if($text){
 							$this->msgAdd();
@@ -1066,15 +1067,37 @@ class Console extends Thread{
 			}
 		}
 		else{
-			$format = '%3d %36s  %s';
+			$format = '%3d %1s %36s %s %s';
 			
 			$this->msgAdd();
-			$this->msgAdd(' NO ID                                    STATUS', false, true);
+			$this->msgAdd('  # S FROM                                 CRATED              RECEIVED', false, true);
 			
 			$no = 0;
 			foreach($msgs as $msgId => $msg){
 				$no++;
-				$this->msgAdd(sprintf($format, $no, $msg->getId(), $msg->getStatusText()), false, false);
+				
+				#$msg->setDstSslPubKey($table->getLocalNode()->getSslKeyPub());
+				#$msg->setSsl($this->getSsl());
+				$text = '';
+				#$text = $msg->decrypt();
+				if($text){
+					
+				}
+				
+				$dateCreated = new DateTime();
+				$dateCreated->setTimestamp($msg->getTimeCreated());
+				
+				$dateReceived = new DateTime();
+				$dateReceived->setTimestamp($msg->getTimeReceived());
+				
+				$line = sprintf($format,
+					$no,
+					$msg->getStatus(),
+					$msg->getSrcNodeId(),
+					$dateCreated->format('Y/m/d H:i:s'),
+					$dateReceived->format('Y/m/d H:i:s')
+				);
+				$this->msgAdd($line, false, false);
 			}
 			$this->msgAdd('END OF LIST', false, true);
 		}
