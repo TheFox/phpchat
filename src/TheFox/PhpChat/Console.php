@@ -532,7 +532,7 @@ class Console extends Thread{
 						}
 						
 						$this->bufferCursorPos++;
-						$this->log->debug('buffer '.$this->bufferCursorPos.', '.$end.', '.strlen($this->buffer).' "'.$this->buffer.'"');
+						#$this->log->debug('buffer '.$this->bufferCursorPos.', '.$end.', '.strlen($this->buffer).' "'.$this->buffer.'"');
 						
 					}
 				}
