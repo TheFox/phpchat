@@ -911,6 +911,7 @@ class Client{
 											$this->log('debug', 'msg '.$id.' not ignore');
 											$this->log('debug', 'msg '.$id.' subject: '.$msg->getSubject());
 											$this->getServer()->imapMailAdd($msg);
+											$this->getServer()->consoleMsgAdd('You got mail.', true, true, true);
 										}
 										else{
 											print 'msg '.$id.': ignore'."\n"; # TODO: remove this line
