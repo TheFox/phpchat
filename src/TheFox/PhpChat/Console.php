@@ -15,6 +15,7 @@ use TheFox\Logger\StreamHandler as LoggerStreamHandler;
 use TheFox\Ipc\ConnectionClient;
 use TheFox\Ipc\StreamHandler as IpcStreamHandler;
 use TheFox\Dht\Kademlia\Node;
+use TheFox\Storage\YamlStorage;
 
 class Console extends Thread{
 	
@@ -28,7 +29,7 @@ class Console extends Thread{
 	const RANDOM_MSG_DELAY_MAX = 300;
 	const RANDOM_MSG_CHAR_SET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 	const RANDOM_MSG_CHAR_SET_LEN = 58;
-	const HISTORY_MAX = 100;
+	const HISTORY_MAX = 1000;
 	
 	private $log = null;
 	private $settings = null;
@@ -222,6 +223,14 @@ class Console extends Thread{
 		
 		$this->settings = $this->ipcKernelConnection->execSync('getSettings');
 		$this->userNickname = $this->settings->data['user']['nickname'];
+		
+		$historyStoragePath = $this->settings->data['datadir'].'/history.yml';
+		if(file_exists($historyStoragePath)){
+			$historyStorage = new YamlStorage($historyStoragePath);
+			if($historyStorage->load()){
+				$this->history = $historyStorage->data;
+			}
+		}
 		
 		print PHP_EOL."Type '/help' for help.".PHP_EOL;
 		
@@ -1132,6 +1141,12 @@ class Console extends Thread{
 		if(!$this->ipcKernelShutdown){
 			#$this->ipcKernelConnection->execSync('shutdown'); # TODO
 		}
+		
+		$historyStoragePath = $this->settings->data['datadir'].'/history.yml';
+		$historyStorage = new YamlStorage($historyStoragePath);
+		$historyStorage->data = $this->history;
+		$historyStorage->setDataChanged(true);
+		$historyStorage->save();
 		
 		$this->sttyReset();
 	}
