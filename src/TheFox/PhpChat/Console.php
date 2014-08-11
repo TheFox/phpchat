@@ -29,7 +29,6 @@ class Console extends Thread{
 	const RANDOM_MSG_DELAY_MAX = 300;
 	const RANDOM_MSG_CHAR_SET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 	const RANDOM_MSG_CHAR_SET_LEN = 58;
-	const HISTORY_MAX = 1000;
 	
 	private $log = null;
 	private $settings = null;
@@ -225,11 +224,22 @@ class Console extends Thread{
 		$this->userNickname = $this->settings->data['user']['nickname'];
 		
 		$historyStoragePath = $this->settings->data['datadir'].'/history.yml';
-		if(file_exists($historyStoragePath)){
+		if($this->settings->data['console']['history']['enabled']
+			&& $this->settings->data['console']['history']['saveToFile']
+			&& file_exists($historyStoragePath)){
+			$this->log->info('load history');
+		
 			$historyStorage = new YamlStorage($historyStoragePath);
 			if($historyStorage->load()){
-				$this->history = $historyStorage->data;
+				if($this->settings->data['console']['history']['entriesMax']){
+					$this->history = array_slice($historyStorage->data, 0, $this->settings->data['console']['history']['entriesMax']);
+				}
+				else{
+					$this->history = $historyStorage->data;
+				}
 			}
+			
+			ve($this->history);
 		}
 		
 		print PHP_EOL."Type '/help' for help.".PHP_EOL;
@@ -1165,11 +1175,22 @@ class Console extends Thread{
 			#$this->ipcKernelConnection->execSync('shutdown'); # TODO
 		}
 		
-		$historyStoragePath = $this->settings->data['datadir'].'/history.yml';
-		$historyStorage = new YamlStorage($historyStoragePath);
-		$historyStorage->data = $this->history;
-		$historyStorage->setDataChanged(true);
-		$historyStorage->save();
+		if($this->settings->data['console']['history']['enabled'] && $this->settings->data['console']['history']['saveToFile']){
+			$historyStoragePath = $this->settings->data['datadir'].'/history.yml';
+			$historyStorage = new YamlStorage($historyStoragePath);
+			
+			if($this->settings->data['console']['history']['entriesMax']){
+				$historyStorage->data = array_slice($this->history, 0, $this->settings->data['console']['history']['entriesMax']);
+			}
+			else{
+				$historyStorage->data = $this->history;
+			}
+			
+			ve($historyStorage->data);
+			
+			$historyStorage->setDataChanged(true);
+			$historyStorage->save();
+		}
 		
 		$this->sttyReset();
 	}
@@ -1189,7 +1210,7 @@ class Console extends Thread{
 		$this->msgAdd();
 		$this->msgAdd('Connecting to '.$ipPort.' ...', true, false);
 		$connected = $this->ipcKernelConnection->execSync('serverConnect', array($ip, $port, true));
-		$this->msgAdd('Connection to '.$ipPort.' '.($connected ? 'established' : 'failed').'.', true, false);
+		$this->msgAdd('Connection to '.$ipPort.' '.($connected ? 'established' : 'failed').'.', true, true);
 	}
 	
 	public function talkRequestAdd(Client $client, $rid, $userNickname){
@@ -1295,11 +1316,14 @@ class Console extends Thread{
 	}
 	
 	private function historyAdd($line){
-		if(count($this->history) >= static::HISTORY_MAX){
+		if($this->settings->data['console']['history']['entriesMax']
+			&& count($this->history) >= $this->settings->data['console']['history']['entriesMax']){
 			array_pop($this->history);
 		}
 		
-		array_unshift($this->history, $line);
+		if($this->settings->data['console']['history']['enabled']){
+			array_unshift($this->history, $line);
+		}
 	}
 	
 }
