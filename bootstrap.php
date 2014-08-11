@@ -103,6 +103,8 @@ if(!$settings->data['node']['id']){
 	}
 }
 
+$log->info('node id: '.$settings->data['node']['id']);
+$log->info('SSL version: '.OPENSSL_VERSION_TEXT);
 if(!$settings->data['node']['sslKeyPrvPass']){
 	$sslKeyPrvPass = '';
 	try{
@@ -119,7 +121,7 @@ if(!$settings->data['node']['sslKeyPrvPass']){
 }
 
 if(!file_exists($settings->data['node']['sslKeyPrvPath'])){
-	$log->info('ssl: key pair generation.  this may take a while...');
+	$log->info('SSL: key pair generation.  this may take a while...');
 	
 	$keyPrv = null;
 	$keyPub = null;
@@ -146,27 +148,27 @@ if(!file_exists($settings->data['node']['sslKeyPrvPath'])){
 				openssl_private_decrypt($encrypted, $decrypted, $ssl);
 				
 				if($decrypted == 'test my keys'){
-					$log->info('ssl: test keys ok');
+					$log->info('SSL: test keys ok');
 					file_put_contents($settings->data['node']['sslKeyPubPath'], $keyPub);
 					$filesystem->chmod($settings->data['node']['sslKeyPubPath'], 0400);
 				}
 				else{
-					$log->critical('ssl: test keys failed');
+					$log->critical('SSL: test keys failed');
 					exit(1);
 				}
 			}
 			else{
-				$log->critical('ssl: public key generation failed: '.openssl_error_string());
+				$log->critical('SSL: public key generation failed: '.openssl_error_string());
 				exit(1);
 			}
 		}
 		else{
-			$log->critical('ssl: private key generation failed');
+			$log->critical('SSL: private key generation failed');
 			exit(1);
 		}
 	}
 	else{
-		$log->critical('ssl: key generation failed: '.openssl_error_string());
+		$log->critical('SSL: key generation failed: '.openssl_error_string());
 		exit(1);
 	}
 	
@@ -176,7 +178,7 @@ if(!file_exists($settings->data['node']['sslKeyPrvPath'])){
 	
 	openssl_pkey_free($ssl);
 	
-	$log->info('ssl: key pair generation done');
+	$log->info('SSL: key pair generation done');
 }
 
 $settings->save();
