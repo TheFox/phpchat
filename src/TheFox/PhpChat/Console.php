@@ -1198,7 +1198,19 @@ class Console extends Thread{
 		$this->msgAdd();
 		$this->msgAdd('Connecting to '.$ipPort.' ...', true, false);
 		$connected = $this->ipcKernelConnection->execSync('serverConnect', array($ip, $port, true));
-		$this->msgAdd('Connection to '.$ipPort.' '.($connected ? 'established' : 'failed').'.', true, true);
+		$msg = 'Connection to '.$ipPort.' ';
+		$printPs1 = false;
+		if($connected){
+			$msg .= 'established';
+			$printPs1 = false;
+		}
+		else{
+			$msg .= 'failed';
+			$printPs1 = true;
+		}
+		$msg .= '.';
+		
+		$this->msgAdd($msg, true, $printPs1);
 	}
 	
 	public function talkRequestAdd(Client $client, $rid, $userNickname){
