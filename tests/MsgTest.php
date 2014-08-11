@@ -328,7 +328,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$msg->setIgnore($ignore);
 		
 		$this->assertTrue( $msg->encrypt() );
-		$textEncrypted = $msg->getText();
+		$body = $msg->getBody();
 		$timeCreated = $msg->getTimeCreated();
 		$password = $msg->getPassword();
 		$checksum = $msg->getChecksum();
@@ -338,7 +338,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$msg->setVersion(1);
 		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
 		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setText($textEncrypted);
+		$msg->setBody($body);
 		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
 		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
 		$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
@@ -350,7 +350,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$textDecrypted = $msg->decrypt();
 		$this->assertEquals($subject, $msg->getSubject());
 		$this->assertEquals($text, $textDecrypted);
-		$this->assertEquals($text, $msg->getTextDecrypted());
+		$this->assertEquals($text, $msg->getText());
 		$this->assertEquals($srcUserNickname, $msg->getSrcUserNickname());
 		$this->assertEquals($ignore, $msg->getIgnore());
 	}

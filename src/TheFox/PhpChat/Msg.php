@@ -16,7 +16,7 @@ class Msg extends YamlStorage{
 	private $srcUserNickname = '';
 	private $dstSslPubKey = '';
 	private $subject = '';
-	private $textDecrypted = '';
+	private $text = '';
 	
 	private $ssl = null;
 	private $msgDb = null;
@@ -29,7 +29,7 @@ class Msg extends YamlStorage{
 		$this->data['relayNodeId'] = '';
 		$this->data['srcNodeId'] = '';
 		$this->data['dstNodeId'] = '';
-		$this->data['text'] = '';
+		$this->data['body'] = '';
 		$this->data['password'] = ''; 
 		$this->data['checksum'] = '';
 		$this->data['sentNodes'] = array();
@@ -161,16 +161,20 @@ class Msg extends YamlStorage{
 		return $this->subject;
 	}
 	
+	public function setBody($body){
+		$this->data['body'] = $body;
+	}
+	
+	public function getBody(){
+		return $this->data['body'];
+	}
+	
 	public function setText($text){
-		$this->data['text'] = $text;
+		$this->text = $text;
 	}
 	
 	public function getText(){
-		return $this->data['text'];
-	}
-	
-	public function getTextDecrypted(){
-		return $this->textDecrypted;
+		return $this->text;
 	}
 	
 	public function setPassword($password){
@@ -391,7 +395,7 @@ class Msg extends YamlStorage{
 					$data = gzencode($jsonStr, 9);
 					$data = base64_encode($data);
 					
-					$this->setText($data);
+					$this->setBody($data);
 					
 					$checksum = $this->createCheckSum(
 						$this->getVersion(),
@@ -478,7 +482,7 @@ class Msg extends YamlStorage{
 		}
 		
 		if($password){
-			$data = $this->getText();
+			$data = $this->getBody();
 			$data = base64_decode($data);
 			$data = gzdecode($data);
 			
@@ -491,15 +495,15 @@ class Msg extends YamlStorage{
 				if($data !== false){
 					$data = gzdecode($data);
 					
-					$json = json_decode($data, true);
-					if($json && isset($json['subject']) && isset($json['text']) && isset($json['sign'])
-						&& isset($json['signAlgo']) && isset($json['srcUserNickname'])){
-						$subject = base64_decode($json['subject']);
-						$text = base64_decode($json['text']);
-						$sign = base64_decode($json['sign']);
-						$signAlgo = (int)$json['signAlgo'];
-						$srcUserNickname = base64_decode($json['srcUserNickname']);
-						$ignore = (bool)$json['ignore'];
+					$body = json_decode($data, true);
+					if($body && isset($body['subject']) && isset($body['text']) && isset($body['sign'])
+						&& isset($body['signAlgo']) && isset($body['srcUserNickname'])){
+						$subject = base64_decode($body['subject']);
+						$text = base64_decode($body['text']);
+						$sign = base64_decode($body['sign']);
+						$signAlgo = (int)$body['signAlgo'];
+						$srcUserNickname = base64_decode($body['srcUserNickname']);
+						$ignore = (bool)$body['ignore'];
 						
 						if(openssl_verify($text, $sign, $this->getSrcSslKeyPub(), $signAlgo)){
 							$checksum = $this->createCheckSum(
@@ -558,7 +562,8 @@ class Msg extends YamlStorage{
 			throw new RuntimeException('no password set.', 201);
 		}
 		
-		$this->textDecrypted = $rv;
+		$this->setText($rv);
+		
 		return $rv;
 	}
 	

@@ -126,6 +126,11 @@ class MsgDb extends YamlStorage{
 				$msgOld->setSubject($msgNew->getSubject());
 				$this->setDataChanged(true);
 			}
+			if($msgOld->getBody() != $msgNew->getBody()){
+				#print __CLASS__.'->'.__FUNCTION__.': changed: text'."\n";
+				$msgOld->setBody($msgNew->getBody());
+				$this->setDataChanged(true);
+			}
 			if($msgOld->getText() != $msgNew->getText()){
 				#print __CLASS__.'->'.__FUNCTION__.': changed: text'."\n";
 				$msgOld->setText($msgNew->getText());

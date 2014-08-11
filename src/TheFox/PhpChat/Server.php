@@ -353,7 +353,7 @@ class Server{
 			$srcUserNickname = $msg->getSrcUserNickname();
 			$dstNodeId = $msg->getDstNodeId();
 			$subject = $msg->getSubject();
-			$text = $msg->getTextDecrypted();
+			$text = $msg->getText();
 			$checksum = $msg->getChecksum();
 			$relayCount = $msg->getRelayCount();
 			$encryptionMode = $msg->getEncryptionMode();

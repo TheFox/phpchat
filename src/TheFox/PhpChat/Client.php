@@ -806,7 +806,7 @@ class Client{
 					$srcSslKeyPub = '';
 					$dstNodeId = '';
 					$subject = '';
-					$text = '';
+					$body = '';
 					$password = '';
 					$checksum = '';
 					$relayCount = 0;
@@ -829,8 +829,8 @@ class Client{
 					if(array_key_exists('dstNodeId', $msgData)){
 						$dstNodeId = $msgData['dstNodeId'];
 					}
-					if(array_key_exists('text', $msgData)){
-						$text = $msgData['text'];
+					if(array_key_exists('body', $msgData)){
+						$body = $msgData['body'];
 					}
 					if(array_key_exists('password', $msgData)){
 						$password = $msgData['password'];
@@ -850,8 +850,8 @@ class Client{
 					
 					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$id);
 					
-					print __CLASS__.'->'.__FUNCTION__.' text: '.$text."\n"; # TODO
-					$this->log('debug', 'msg '.$id.' text: '.$text);
+					print __CLASS__.'->'.__FUNCTION__.' body: '.$body."\n"; # TODO
+					$this->log('debug', 'msg '.$id.' body: '.$body);
 					
 					$status = 1; // New
 					if($this->getMsgDb()->getMsgById($id)){
@@ -888,7 +888,7 @@ class Client{
 							$msg->setSrcNodeId($srcNodeId);
 							$msg->setSrcSslKeyPub($srcSslKeyPub);
 							$msg->setDstNodeId($dstNodeId);
-							$msg->setText($text);
+							$msg->setBody($body);
 							$msg->setPassword($password);
 							$msg->setChecksum($checksum);
 							$msg->setRelayCount($relayCount);
@@ -1848,7 +1848,7 @@ class Client{
 			'srcSslKeyPub' => base64_encode($msg->getSrcSslKeyPub()),
 			'srcUserNickname' => $msg->getSrcUserNickname(),
 			'dstNodeId' => $msg->getDstNodeId(),
-			'text' => $msg->getText(),
+			'body' => $msg->getBody(),
 			'password' => $msg->getPassword(),
 			'checksum' => $msg->getChecksum(),
 			'relayCount' => (int)$msg->getRelayCount() + 1,
