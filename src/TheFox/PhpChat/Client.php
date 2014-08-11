@@ -1417,7 +1417,7 @@ class Client{
 						}
 						elseif($status == 3){
 							// Timeout
-							$this->consoleMsgAdd('Talk request timed-out.', true, true);
+							$this->consoleMsgAdd('Talk request timed out.', true, true);
 						}
 						elseif($status == 4){
 							// No console, standalone server.
