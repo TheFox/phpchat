@@ -21,13 +21,6 @@ A decentralized, peer-to-peer, encrypted chat in PHP.
 
 3. You must forward TCP port 25000 (default) on your modem to your computer. After the chat has been started once there will be a `settings.yml`. Edit this file to change the incoming port. After changing the settings file you must restart the chat.
 
-## ToDo
-- Hashcash on connect. [link_1](http://en.wikipedia.org/wiki/Hashcash) | [link_2](https://en.bitcoin.it/wiki/Hashcash)
-- Supernode over HTTP: no active process; just a http request, json interface. No GUI.
-- ReSSL after period/number of msgs. Reset the SSL passwords.
-- SSL sign public key to prove peer holds the private key.
-- Renew ssl_key_pub_get and ssl_key_pub_put.
-
 ## Contribute
 You're welcome to contribute to this project. Fork this project at <https://github.com/TheFox/phpchat>. You should read GitHub's [How to Fork a Repo](https://help.github.com/articles/fork-a-repo).
 
