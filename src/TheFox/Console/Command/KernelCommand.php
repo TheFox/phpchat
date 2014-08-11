@@ -26,6 +26,8 @@ class KernelCommand extends BasicCommand{
 	protected function execute(InputInterface $input, OutputInterface $output){
 		$this->executePre($input, $output);
 		
+		$this->log->info('SSL version: '.OPENSSL_VERSION_TEXT);
+		
 		$this->log->info('kernel start');
 		$this->kernel = new Kernel();
 		$this->kernel->loop();

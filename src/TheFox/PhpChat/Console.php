@@ -238,8 +238,6 @@ class Console extends Thread{
 					$this->history = $historyStorage->data;
 				}
 			}
-			
-			ve($this->history);
 		}
 		
 		print PHP_EOL."Type '/help' for help.".PHP_EOL;
@@ -1086,14 +1084,6 @@ class Console extends Thread{
 			foreach($msgs as $msgId => $msg){
 				$no++;
 				
-				#$msg->setDstSslPubKey($table->getLocalNode()->getSslKeyPub());
-				#$msg->setSsl($this->getSsl());
-				$text = '';
-				#$text = $msg->decrypt();
-				if($text){
-					
-				}
-				
 				$dateCreated = new DateTime();
 				$dateCreated->setTimestamp($msg->getTimeCreated());
 				
@@ -1185,8 +1175,6 @@ class Console extends Thread{
 			else{
 				$historyStorage->data = $this->history;
 			}
-			
-			ve($historyStorage->data);
 			
 			$historyStorage->setDataChanged(true);
 			$historyStorage->save();

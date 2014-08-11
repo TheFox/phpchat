@@ -103,8 +103,6 @@ if(!$settings->data['node']['id']){
 	}
 }
 
-$log->info('node id: '.$settings->data['node']['id']);
-$log->info('SSL version: '.OPENSSL_VERSION_TEXT);
 if(!$settings->data['node']['sslKeyPrvPass']){
 	$sslKeyPrvPass = '';
 	try{
