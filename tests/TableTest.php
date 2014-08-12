@@ -73,12 +73,6 @@ class TableTest extends PHPUnit_Framework_TestCase{
 		
 		$onode = $table->nodeFindInBuckets($node_b);
 		$this->assertEquals(null, $onode);
-		
-		#$this->assertEquals('10.0.0.1', $onode->getIp());
-		
-		#ve($onode);
-		
-		
 	}
 	
 	public function testNodeEnclose1(){

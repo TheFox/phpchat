@@ -1,5 +1,7 @@
 <?php
 
+use Symfony\Component\Finder\Finder;
+
 use TheFox\PhpChat\Msg;
 
 class MsgTest extends PHPUnit_Framework_TestCase{
@@ -232,7 +234,6 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 	}
 	
 	public function testSave(){
-		#$this->markTestIncomplete('This test has not been implemented yet.');
 		$msg = new Msg('data/test_msg.yml');
 		$msg->setDatadirBasePath('data');
 		$msg->setDataChanged(true);
@@ -298,6 +299,10 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$this->assertTrue( $msg->encrypt() );
 		
 		$this->assertTrue( (bool)$msg->save() );
+		
+		$finder = new Finder();
+		$files = $finder->in('data')->name('test_msg.yml');
+		$this->assertEquals(1, count($files));
 	}
 	
 	public function providerEncryption(){

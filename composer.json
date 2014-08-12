@@ -17,6 +17,7 @@
 		"symfony/yaml": "~2.5",
 		"symfony/console": "~2.5",
 		"symfony/filesystem": "~2.5",
+		"symfony/finder": "~2.5",
 		"rhumsaa/uuid": "~2.7",
 		"liip/process-manager": "~1.0",
 		"thefox/utilities": "~1.1",
