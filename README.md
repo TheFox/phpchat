@@ -13,11 +13,11 @@ A decentralized, peer-to-peer, encrypted chat in PHP.
 ## Install
 1. Clone
 
-	`git clone https://github.com/TheFox/phpchat.git`
+		git clone https://github.com/TheFox/phpchat.git
 
 2. Change to your `phpchat` directory and run
 
-	`make`
+		make
 
 3. You must forward TCP port 25000 (default) on your modem to your computer. After the chat has been started once there will be a `settings.yml`. Edit this file to change the incoming port. After changing the settings file you must restart the chat.
 
