@@ -1180,9 +1180,6 @@ class Client{
 						else{
 							$this->sendError(290, $msgName);
 						}
-						
-						$this->sslTestToken = '';
-						$this->sslPasswordToken = '';
 					}
 					else{
 						$this->sendError(900, $msgName);
@@ -1197,6 +1194,9 @@ class Client{
 				$this->sendError(260, $msgName);
 				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
 			}
+			
+			$this->sslTestToken = '';
+			$this->sslPasswordToken = '';
 		}
 		elseif($msgName == 'ssl_key_pub_get'){
 			if($this->getStatus('hasId')){
