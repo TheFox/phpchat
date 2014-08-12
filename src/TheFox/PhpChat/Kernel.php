@@ -30,16 +30,59 @@ class Kernel extends Thread{
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+	}
+	
+	public function setLog($log){
+		$this->log = $log;
+	}
+	
+	public function getLog(){
+		return $this->log;
+	}
+	
+	public function setSettings(Settings $settings){
+		$this->settings = $settings;
+	}
+	
+	public function getSettings(){
+		#ve($this->settings);
+		return $this->settings;
+	}
+	
+	public function getSettingsUserNickname(){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#ve($this->settings);
 		
-		$this->log = new Logger('kernel');
-		$this->log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::ERROR));
-		$this->log->pushHandler(new LoggerStreamHandler('log/kernel.log', Logger::DEBUG));
-		
-		$this->getLog()->info('start');
-		
-		$this->getLog()->info('setup settings');
-		$this->settings = new Settings(getcwd().'/settings.yml');
-		$this->getLog()->info('setup settings: done');
+		return $this->getSettings()->data['user']['nickname'];
+	}
+	
+	public function setSettingsUserNickname($userNickname){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		$this->getSettings()->data['user']['nickname'] = $userNickname;
+		$this->getSettings()->setDataChanged(true);
+	}
+	
+	public function getLocalNode(){
+		return $this->localNode;
+	}
+	
+	public function getServer(){
+		return $this->server;
+	}
+	
+	public function init(){
+		if(!$this->log){
+			$this->log = new Logger('kernel');
+			$this->log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::ERROR));
+			$this->log->pushHandler(new LoggerStreamHandler('log/kernel.log', Logger::DEBUG));
+			
+			$this->getLog()->info('start');
+		}
+		if(!$this->settings){
+			$this->getLog()->info('setup settings');
+			$this->settings = new Settings(getcwd().'/settings.yml');
+			$this->getLog()->info('setup settings: done');
+		}
 		
 		$this->getLog()->info('setup local node');
 		$this->localNode = new Node();
@@ -137,41 +180,6 @@ class Kernel extends Thread{
 			$this->ipcSmtpServerConnection->functionAdd($functionName, $this, $functionName);
 		}
 		$this->ipcSmtpServerConnection->connect();
-		
-		
-		#ve($this->server);
-		#$this->shutdown();
-		
-	}
-	
-	private function getLog(){
-		return $this->log;
-	}
-	
-	public function getSettings(){
-		#ve($this->settings);
-		return $this->settings;
-	}
-	
-	public function getSettingsUserNickname(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		#ve($this->settings);
-		
-		return $this->getSettings()->data['user']['nickname'];
-	}
-	
-	public function setSettingsUserNickname($userNickname){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		$this->getSettings()->data['user']['nickname'] = $userNickname;
-		$this->getSettings()->setDataChanged(true);
-	}
-	
-	public function getLocalNode(){
-		return $this->localNode;
-	}
-	
-	private function getServer(){
-		return $this->server;
 	}
 	
 	public function serverConnect($ip, $port, $isTalkRequest = false, $isPingOnly = false, $msgIds = array()){

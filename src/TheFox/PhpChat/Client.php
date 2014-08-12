@@ -150,7 +150,9 @@ class Client{
 	}
 	
 	public function setIpPort($ip = '', $port = 0){
-		$this->getSocket()->getPeerName($ip, $port);
+		if($this->getSocket()){
+			$this->getSocket()->getPeerName($ip, $port);
+		}
 		$this->setIp($ip);
 		$this->setPort($port);
 	}
@@ -186,7 +188,7 @@ class Client{
 		return null;
 	}
 	
-	private function getLog(){
+	public function getLog(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		if($this->getServer()){
@@ -206,7 +208,7 @@ class Client{
 		}
 	}
 	
-	private function getTable(){
+	public function getTable(){
 		if($this->getServer()){
 			return $this->getServer()->getTable();
 		}
@@ -214,7 +216,7 @@ class Client{
 		return null;
 	}
 	
-	private function getMsgDb(){
+	public function getMsgDb(){
 		if($this->getServer()){
 			return $this->getServer()->getMsgDb();
 		}
@@ -222,7 +224,7 @@ class Client{
 		return null;
 	}
 	
-	private function getHashcashDb(){
+	public function getHashcashDb(){
 		if($this->getServer()){
 			return $this->getServer()->getHashcashDb();
 		}
@@ -230,28 +232,30 @@ class Client{
 		return null;
 	}
 	
-	private function hashcashMint($bits = null){
+	public function hashcashMint($bits = null){
 		if($bits === null){
 			$bits = static::HASHCASH_BITS_MIN;
 		}
-		$hashcash = new Hashcash($bits, $this->getLocalNode()->getIdHexStr());
-		$hashcash->setDate(date(Hashcash::DATE_FORMAT12));
-		#$hashcash->setMintAttemptsMax(10);
-		
-		try{
-			$this->log('debug', 'hashcash: mint '.$bits.' bits');
-			$stamp = $hashcash->mint();
-			$this->log('debug', 'hashcash minted: '.$stamp);
-			return $stamp;
-		}
-		catch(Exception $e){
-			$this->log('error', $e->getMessage());
+		if($this->getLocalNode()){
+			$hashcash = new Hashcash($bits, $this->getLocalNode()->getIdHexStr());
+			$hashcash->setDate(date(Hashcash::DATE_FORMAT12));
+			#$hashcash->setMintAttemptsMax(10);
+			
+			try{
+				$this->log('debug', 'hashcash: mint '.$bits.' bits');
+				$stamp = $hashcash->mint();
+				$this->log('debug', 'hashcash minted: '.$stamp);
+				return $stamp;
+			}
+			catch(Exception $e){
+				$this->log('error', $e->getMessage());
+			}
 		}
 		
 		return null;
 	}
 	
-	private function hashcashVerify($hashcashStr, $resource, $bits = null){
+	public function hashcashVerify($hashcashStr, $resource, $bits = null){
 		$this->log('debug', 'hashcash: '.$hashcashStr);
 		
 		if($bits === null){
@@ -284,7 +288,7 @@ class Client{
 		return false;
 	}
 	
-	private function requestAdd($name, $rid, $data = array()){
+	public function requestAdd($name, $rid, $data = array()){
 		$this->requestsId++;
 		
 		$request = array(
@@ -299,7 +303,7 @@ class Client{
 		return $request;
 	}
 	
-	private function requestGetByRid($rid){
+	public function requestGetByRid($rid){
 		foreach($this->requests as $requestId => $request){
 			if($request['rid'] == $rid){
 				return $request;
@@ -308,7 +312,7 @@ class Client{
 		return null;
 	}
 	
-	private function requestRemove($request){
+	public function requestRemove($request){
 		unset($this->requests[$request['id']]);
 	}
 	
@@ -320,7 +324,7 @@ class Client{
 		$this->actions[$this->actionsId] = $action;
 	}
 	
-	private function actionsGetByCriterion($criterion){
+	public function actionsGetByCriterion($criterion){
 		$rv = array();
 		foreach($this->actions as $actionsId => $action){
 			if($action->hasCriterion($criterion)){
@@ -330,7 +334,7 @@ class Client{
 		return $rv;
 	}
 	
-	private function actionGetByCriterion($criterion){
+	public function actionGetByCriterion($criterion){
 		foreach($this->actions as $actionsId => $action){
 			if($action->hasCriterion($criterion)){
 				return $action;
@@ -430,7 +434,8 @@ class Client{
 		while($data);
 	}
 	
-	private function msgHandle($msgRaw){
+	public function msgHandle($msgRaw){
+		$rv = '';
 		$msg = json_decode(base64_decode($msgRaw), true);
 		
 		$msgName = '';
@@ -480,7 +485,7 @@ class Client{
 				$action->functionExec($this);
 			}
 			
-			$this->sendId();
+			$rv = $this->sendId();
 		}
 		elseif($msgName == 'id'){
 			#print __CLASS__.'->'.__FUNCTION__.': '.$msgName.', '.(int)$this->getStatus('hasId')."\n";
@@ -583,7 +588,7 @@ class Client{
 						}
 					}
 					else{
-						$this->sendError(900, $msgName);
+						$rv .= $this->sendError(900, $msgName);
 					}
 					
 					if($idOk){
@@ -592,22 +597,22 @@ class Client{
 						$this->setStatus('hasId', true);
 						$this->setNode($node);
 						
-						$this->sendIdOk();
+						$rv .= $this->sendIdOk();
 						
 						$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$id.', '.$port);
 					}
 					else{
-						$this->sendQuit();
+						$rv .= $this->sendQuit();
 						$this->shutdown();
 					}
 					
 				}
 				else{
-					$this->sendError(110, $msgName);
+					$rv .= $this->sendError(110, $msgName);
 				}
 			}
 			else{
-				$this->sendError(910, $msgName);
+				$rv .= $this->sendError(910, $msgName);
 			}
 		}
 		elseif($msgName == 'id_ok'){
@@ -1708,6 +1713,8 @@ class Client{
 		else{
 			$this->log('debug', $this->getIpPort().' recv '.$msgName.': not implemented.');
 		}
+		
+		return $rv;
 	}
 	
 	private function msgCreate($name, $data){
@@ -1724,10 +1731,17 @@ class Client{
 		#print __CLASS__.'->'.__FUNCTION__.': "'.$msg.'"'."\n";
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
+		$rv = '';
+		
 		if($msg){
 			$msg = base64_encode($msg);
-			$this->getSocket()->write($msg.static::MSG_SEPARATOR);
+			$rv = $msg.static::MSG_SEPARATOR;
+			if($this->getSocket()){
+				$this->getSocket()->write($rv);
+			}
 		}
+		
+		return $rv;
 	}
 	
 	private function sslMsgCreatePublicEncrypt($name, $data){
@@ -1950,10 +1964,10 @@ class Client{
 		$data = array(
 			'ip' => $this->getIp(),
 		);
-		$this->dataSend($this->msgCreate('hello', $data));
+		return $this->dataSend($this->msgCreate('hello', $data));
 	}
 	
-	private function sendId(){
+	public function sendId(){
 		if(!$this->getLocalNode()){
 			throw new RuntimeException('localNode not set.');
 		}
@@ -1968,13 +1982,13 @@ class Client{
 			'isChannel' => $this->getStatus('isChannelLocal'),
 			#'hashcash'  => $this->hashcashMint(static::HASHCASH_BITS_MIN),
 		);
-		$this->dataSend($this->msgCreate('id', $data));
+		return $this->dataSend($this->msgCreate('id', $data));
 	}
 	
 	private function sendIdOk(){
 		$data = array(
 		);
-		$this->dataSend($this->msgCreate('id_ok', $data));
+		return $this->dataSend($this->msgCreate('id_ok', $data));
 	}
 	
 	public function sendNodeFind($nodeId, $distance = 'ffffffff-ffff-4fff-bfff-ffffffffffff', $nodesFoundIds = array()){
@@ -1996,7 +2010,7 @@ class Client{
 			'nodeId'    => $nodeId,
 			'hashcash'  => $this->hashcashMint(static::HASHCASH_BITS_MIN),
 		);
-		$this->dataSend($this->msgCreate('node_find', $data));
+		return $this->dataSend($this->msgCreate('node_find', $data));
 	}
 	
 	private function sendNodeFound($rid, $nodes = array()){
@@ -2019,7 +2033,7 @@ class Client{
 			'nodes'     => $nodesOut,
 			'hashcash'  => $this->hashcashMint(static::HASHCASH_BITS_MAX),
 		);
-		$this->dataSend($this->msgCreate('node_found', $data));
+		return $this->dataSend($this->msgCreate('node_found', $data));
 	}
 	
 	public function sendMsg(Msg $msg){
@@ -2339,7 +2353,7 @@ class Client{
 			'msg' => $errors[$errorCode],
 			'name' => $msgName,
 		);
-		$this->dataSend($this->msgCreate('error', $data));
+		return $this->dataSend($this->msgCreate('error', $data));
 	}
 	
 	public function sendQuit(){
@@ -2352,8 +2366,10 @@ class Client{
 		if(!$this->getStatus('hasShutdown')){
 			$this->setStatus('hasShutdown', true);
 			
-			$this->getSocket()->shutdown();
-			$this->getSocket()->close();
+			if($this->getSocket()){
+				$this->getSocket()->shutdown();
+				$this->getSocket()->close();
+			}
 			
 			if($this->ssl){
 				openssl_free_key($this->ssl);

@@ -210,7 +210,9 @@ class Server{
 	public function shutdown(){
 		$this->log->info('shutdown');
 		
-		$this->socket->close();
+		if($this->socket){
+			$this->socket->close();
+		}
 	}
 	
 	private function clientNew($socket){

@@ -30,6 +30,7 @@ class KernelCommand extends BasicCommand{
 		
 		$this->log->info('kernel start');
 		$this->kernel = new Kernel();
+		$this->kernel->init();
 		$this->kernel->loop();
 		
 		$this->executePost();
