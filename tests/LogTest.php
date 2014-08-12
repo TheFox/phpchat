@@ -1,5 +1,7 @@
 <?php
 
+use Symfony\Component\Filesystem\Filesystem;
+
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler;
 
@@ -41,12 +43,13 @@ class LogTest extends PHPUnit_Framework_TestCase{
      * @dataProvider providerLog
      */
 	public function testLog($level, $expected){
-		if(file_exists('log/test.log')){
-			unlink('log/test.log');
+		if(file_exists('tests/test.log')){
+			$filesystem = new Filesystem();
+			$filesystem->remove('tests/test.log');
 		}
 		
 		$log = new Logger('tester');
-		$log->pushHandler(new StreamHandler('log/test.log', $level));
+		$log->pushHandler(new StreamHandler('tests/test.log', $level));
 		
 		$log->debug('test1');
 		$log->info('test2');
@@ -57,7 +60,7 @@ class LogTest extends PHPUnit_Framework_TestCase{
 		$log->alert('test7');
 		$log->emergency('test8');
 		
-		$this->assertRegExp('/^'.$expected.'/s', file_get_contents('log/test.log'));
+		$this->assertRegExp('/^'.$expected.'/s', file_get_contents('tests/test.log'));
 	}
 	
 	public function providerLevel(){

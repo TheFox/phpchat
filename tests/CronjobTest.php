@@ -9,6 +9,77 @@ use TheFox\Dht\Kademlia\Node;
 
 class CronjobTest extends PHPUnit_Framework_TestCase{
 	
+	const NODE_LOCAL_SSL_KEY_PRV = '-----BEGIN RSA PRIVATE KEY-----
+Proc-Type: 4,ENCRYPTED
+DEK-Info: DES-EDE3-CBC,3816DB7169EE9CF2
+
+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
+-----END RSA PRIVATE KEY-----
+';
+	const NODE_LOCAL_SSL_KEY_PUB = '-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAznSTQMh8UIkcVEtzqOUi
+H0+EW8d1y1G/wE9UFjVHiVs9lj0oGifkPXGdNM8+5BmHF7XGGaVT6pRhmyAbI6Ua
+eZdDKMPe29wELizLlvVRr/6EH6K667KKPG2o1EJp0uamyYkcJfj5qaBN6gVDzFUJ
+DzzQLnng25F1Rus5ZLdS3zhs5G6HlFpg2asqOb9+jmBej5doeldh5KKxYDYW3yxf
+FytBG2ReUthJIoA1IhAJXeFojQSEBJ8hJn4f8dBkFzZuxiFCYIonPhT4+vOw0FMj
+s5HlS/G/xcAGPfM3yCdc+jtPYwiXqvdnCLUkKY0/L44X3vqy1J46ukF/9EFfFUG/
+jLKnWEkGBqh2VkC7EixGqU9axB41MevbFlrFmaeW/8o9bxZVbKqYl3tv26wxEH5Y
+HVSQixlBIiEQ2EiVoFbUgHGLcNJXRxkdU4YzYDRaL5wrn6jF5bigHUdqko3+c4nY
+u/fxl0//YxtjoZolv2PNVQioZ8Rqpp547dfy0i0qA8jciEQ8vxPF77vSkaYGyc2v
+EfkgsdcYjokApKmHGnzKzgSuSdWXWrEquf0vWGolXqQPGgpcDQ4ADFDSUKzfrCAi
+ySj0UbxOszWhy+YSOG94NkyZXu9LtydlWdU7lBL6PtwkOGh4KdDekMOxeW96269T
+KvIgKHuK+G9nj9AMzpIvbWkCAwEAAQ==
+-----END PUBLIC KEY-----
+';
+	
 	const NODE0_SSL_KEY_PUB = '-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtIIiZm70ZPEIOd+FIqr7
 E7qav8+jNvI08LVhMSmOHE1s9WymLTChv2a10J8fhYY9ipIyc8WnCzN5Amtth9hK
@@ -73,12 +144,23 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 	public static function setUpBeforeClass(){
 		#fwrite(STDOUT, __METHOD__.''."\n");
 		
-		$settings = new Settings('./settings.yml');
+		file_put_contents('tests/id_rsa2.prv', static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('tests/id_rsa2.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+		
+		$settings = new Settings('tests/settings.yml');
+		$settings->data['datadir'] = 'tests';
+		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
+		$settings->data['node']['sslKeyPrvPath'] = 'tests/id_rsa2.prv';
+		$settings->data['node']['sslKeyPubPath'] = 'tests/id_rsa2.pub';
+		$settings->setDataChanged(true);
+		$settings->save();
 		
 		$localNode = new Node();
 		$localNode->setIdHexStr($settings->data['node']['id']);
 		$localNode->setPort($settings->data['node']['port']);
 		$localNode->setSslKeyPub(file_get_contents($settings->data['node']['sslKeyPubPath']));
+		self::assertEquals(static::NODE_LOCAL_SSL_KEY_PUB, $localNode->getSslKeyPub());
+		self::assertEquals('FC_WwG2GdTmCLSKhpEmJso6pejm9c6oACjX', Node::genSslKeyFingerprint($localNode->getSslKeyPub()));
 		
 		self::$nodes[0] = new Node();
 		self::$nodes[0]->setIdHexStr('10000000-1000-4001-8001-100000000000');
@@ -151,6 +233,8 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		self::$msgs[1003]->setEncryptionMode('S');
 		self::$msgs[1003]->setDstSslPubKey($table->getLocalNode()->getSslKeyPub());
 		self::assertEquals('S', self::$msgs[1003]->getEncryptionMode());
+		
+		#ve($table->getLocalNode()->getSslKeyPub());
 		
 		self::$msgs[1004]->setSentNodes(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
 		self::assertEquals(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), self::$msgs[1004]->getSentNodes());

@@ -78,6 +78,10 @@ class Console extends Thread{
 		return $this->log;
 	}
 	
+	public function setSettings($settings){
+		$this->settings = $settings;
+	}
+	
 	private function setPs1($ps1){
 		$this->ps1 = $ps1;
 	}
@@ -112,7 +116,8 @@ class Console extends Thread{
 		if($printBuffer){
 			$output .= $this->buffer;
 		}
-		print $output;
+		#print $output;
+		fwrite(STDOUT, $output);
 	}
 	
 	private function cursorUp(){
@@ -157,7 +162,8 @@ class Console extends Thread{
 	
 	private function linePrint($text){
 		#$this->log->debug('line print "'.$text.'"');
-		print $text.PHP_EOL;
+		#print $text.PHP_EOL;
+		fwrite(STDOUT, $text.PHP_EOL);
 	}
 	
 	private function printMsgStack(){
@@ -220,7 +226,9 @@ class Console extends Thread{
 		$this->sttySetup();
 		$this->keybindingsSetup();
 		
-		$this->settings = $this->ipcKernelConnection->execSync('getSettings');
+		if($this->ipcKernelConnection){
+			$this->settings = $this->ipcKernelConnection->execSync('getSettings');
+		}
 		$this->userNickname = $this->settings->data['user']['nickname'];
 		
 		$historyStoragePath = $this->settings->data['datadir'].'/history.yml';
@@ -240,7 +248,8 @@ class Console extends Thread{
 			}
 		}
 		
-		print PHP_EOL."Type '/help' for help.".PHP_EOL;
+		#print PHP_EOL."Type '/help' for help.".PHP_EOL;
+		fwrite(STDOUT, PHP_EOL."Type '/help' for help.".PHP_EOL);
 		
 		$this->msgAdd('start', true, true);
 		
@@ -268,11 +277,9 @@ class Console extends Thread{
 		$this->charControlH = static::VT100_CHAR_CONTROL_H;
 		$this->backspace = static::VT100_CHAR_BACKSPACE;
 		
-		
 		$keys = array();
 		exec('infocmp', $lines);
 		foreach($lines as $line){
-			
 			if($line[0] == "\t"){
 				#print "line '".substr($line, 1)."'\n";
 				#ve(\TheFox\Utilities\Hex::dataEncode($line));
@@ -285,10 +292,7 @@ class Console extends Thread{
 					}
 				}
 			}
-			
-			#break;
 		}
-		
 	}
 	
 	private function sttyReset(){
@@ -317,6 +321,17 @@ class Console extends Thread{
 	}
 	
 	public function run(){
+		$this->readStdin();
+		$this->printMsgStack();
+		$this->sendRandomMsg();
+		
+		if($this->ipcKernelConnection && !$this->ipcKernelConnection->run()){
+			$this->log->info('Connection to kernel process end unexpected.');
+			$this->setExit(1);
+		}
+	}
+	
+	public function loop(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		if(!$this->ipcKernelConnection){
@@ -324,17 +339,7 @@ class Console extends Thread{
 		}
 		
 		while(!$this->getExit()){
-			#$this->log->debug('run');
-			
-			$this->readStdin();
-			$this->printMsgStack();
-			$this->sendRandomMsg();
-			
-			if(!$this->ipcKernelConnection->run()){
-				$this->log->info('Connection to kernel process end unexpected.');
-				$this->setExit(1);
-			}
-			
+			$this->run();
 			usleep(static::LOOP_USLEEP);
 		}
 		
@@ -549,7 +554,7 @@ class Console extends Thread{
 		#else{ $this->log->debug('stream not changed'); }
 	}
 	
-	private function handleLine($line){
+	public function handleLine($line){
 		if($line){
 			$this->log->debug('user input line: "'.$line.'"');
 			
@@ -1150,7 +1155,6 @@ class Console extends Thread{
 		#$this->msgAdd('line A', false, false, true);
 		$this->msgAdd('line B');
 		$this->msgAdd('line C', false, true);
-		
 	}
 	
 	public function shutdown(){

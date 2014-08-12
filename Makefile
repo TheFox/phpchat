@@ -36,6 +36,9 @@ test_phpcs: $(PHPCS) vendor/thefox/phpcsrs/Standards/TheFox
 
 test_phpunit: $(PHPUNIT) phpunit.xml
 	$(PHPUNIT)
+	$(RM) tests/*.yml
+	$(RM) tests/*.log
+	$(RM) tests/*.prv tests/*.pub
 
 release:
 	find . -name .DS_Store -exec rm {} \;
@@ -61,3 +64,6 @@ clean:
 	$(RM) composer.lock composer.phar
 	$(RM) vendor/*
 	$(RM) vendor
+	$(RM) tests/*.yml
+	$(RM) tests/*.log
+	$(RM) tests/*.prv tests/*.pub

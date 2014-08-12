@@ -43,10 +43,10 @@ class ConsoleCommand extends BasicCommand{
 		}
 
 		try{
-			$this->console->run();
+			$this->console->loop();
 		}
 		catch(Exception $e){
-			$log->error('run: '.$e->getMessage());
+			$log->error('loop: '.$e->getMessage());
 			exit(1);
 		}
 		

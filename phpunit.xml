@@ -22,11 +22,12 @@
 	<testsuites>
 		<testsuite name="My Test Suite">
 			<file>tests/BasicTest.php</file>
-			<!--<file>tests/ConsoleTest.php</file>//-->
+			<file>tests/ConsoleTest.php</file>
 			<file>tests/CronjobTest.php</file>
 			<file>tests/LogTest.php</file>
 			<file>tests/MsgTest.php</file>
 			<file>tests/NodeTest.php</file>
+			<file>tests/SslTest.php</file>
 			<file>tests/TableTest.php</file>
 		</testsuite>
 	</testsuites>
