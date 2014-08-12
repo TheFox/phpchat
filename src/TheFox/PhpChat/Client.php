@@ -23,6 +23,8 @@ class Client{
 	const HASHCASH_BITS_MIN = 12;
 	const HASHCASH_BITS_MAX = 15;
 	const HASHCASH_EXPIRATION = 172800; // 2 days
+	const SSL_PASSWORD_TTL = 300;
+	const SSL_PASSWORD_MSG_MAX = 100;
 	
 	private $id = 0;
 	private $status = array();
@@ -36,7 +38,10 @@ class Client{
 	private $sslTestToken = '';
 	private $sslPasswordToken = '';
 	private $sslPasswordLocal = '';
+	private $sslPasswordLocalNew = '';
 	private $sslPasswordPeer = '';
+	private $sslPasswordPeerNew = '';
+	private $sslPasswordTime = 0;
 	
 	private $recvBufferTmp = '';
 	private $requestsId = 0;
@@ -45,6 +50,7 @@ class Client{
 	private $actions = array();
 	private $pingTime = 0;
 	private $pongTime = 0;
+	private $sslMsgCount = 0;
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -60,7 +66,10 @@ class Client{
 		$this->status['hasSslTest'] = false;
 		$this->status['hasSslVerify'] = false;
 		$this->status['hasSslPasswortPut'] = false;
+		$this->status['hasReSslPasswortPutInit'] = false;
+		$this->status['hasReSslPasswortPut'] = false;
 		$this->status['hasSslPasswortTest'] = false;
+		$this->status['hasReSslPasswortTest'] = false;
 		$this->status['hasSslPasswortVerify'] = false;
 		$this->status['hasSsl'] = false;
 	}
@@ -342,6 +351,7 @@ class Client{
 		$this->checkPingSend();
 		$this->checkPongTimeout();
 		$this->checkActions();
+		$this->checkSslPasswordTimeout();
 	}
 	
 	private function checkPingSend(){
@@ -376,6 +386,26 @@ class Client{
 				$this->actionRemove($action);
 				$action->functionExec($this);
 			}
+		}
+	}
+	
+	private function checkSslPasswordTimeout(){
+		if(!$this->sslPasswordTime){
+			$this->sslPasswordTime = time();
+		}
+		if($this->sslPasswordTime < time() - static::SSL_PASSWORD_TTL || $this->sslMsgCount >= static::SSL_PASSWORD_MSG_MAX){
+			#$this->log('debug', 'SSL: password timed out: '.date('H:i:s', $this->sslPasswordTime));
+			#$this->log('debug', 'SSL: msgs count: '.$this->sslMsgCount);
+			
+			$this->sslMsgCount = 0;
+			$this->sslPasswordToken = '';
+			$this->sslPasswordLocalNew = '';
+			$this->sslPasswordPeerNew = '';
+			$this->setStatus('hasReSslPasswortPutInit', true);
+			$this->setStatus('hasReSslPasswortPut', false);
+			$this->setStatus('hasReSslPasswortTest', false);
+			
+			$this->sendSslPasswordReput();
 		}
 	}
 	
@@ -1107,6 +1137,7 @@ class Client{
 						
 						$this->setStatus('hasSslPasswortPut', true);
 						$this->sslPasswordPeer = $password;
+						$this->log('debug', 'SSL: peer password: '.substr($this->sslPasswordPeer, 0, 20));
 						
 						$this->sendSslPasswordTest();
 					}
@@ -1122,6 +1153,48 @@ class Client{
 			else{
 				$this->sendError(260, $msgName);
 				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
+			}
+		}
+		elseif($msgName == 'ssl_password_reput'){
+			if($this->getStatus('hasSsl') && !$this->getStatus('hasReSslPasswortPut')){
+				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
+				if($msgData){
+					$password = '';
+					if(array_key_exists('password', $msgData)){
+						$password = $msgData['password'];
+					}
+					
+					if($password){
+						$this->log('debug', 're-SSL: password reput');
+						
+						$this->sslPasswordPeerNew = $password;
+						
+						#$this->log('debug', 'SSL: peer password: '.substr($this->sslPasswordPeer, 0, 20));
+						#$this->log('debug', 'SSL: peer password new: '.substr($this->sslPasswordPeerNew, 0, 20));
+						
+						if(!$this->getStatus('hasReSslPasswortPutInit')){
+							$this->sslMsgCount = 0;
+							$this->sslPasswordToken = '';
+							$this->sslPasswordLocalNew = '';
+							$this->setStatus('hasReSslPasswortPutInit', true);
+							$this->setStatus('hasReSslPasswortTest', false);
+							
+							$this->sendSslPasswordReput();
+						}
+						$this->sendSslPasswordRetest();
+					}
+					else{
+						$this->sendError(900, $msgName);
+					}
+				}
+				else{
+					$this->sendError(270, $msgName);
+					$this->log('warning', $msgName.' re-SSL: decryption failed');
+				}
+			}
+			else{
+				$this->sendError(260, $msgName);
+				$this->log('warning', $msgName.' re-SSL: you need to initialize ssl, hasSsl=/'.(int)$this->getStatus('hasSsl').'/ hasReSslPasswortPut=/'.(int)$this->getStatus('hasReSslPasswortPut').'/');
 			}
 		}
 		elseif($msgName == 'ssl_password_test'){
@@ -1151,8 +1224,37 @@ class Client{
 				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
 			}
 		}
+		elseif($msgName == 'ssl_password_retest'){
+			if($this->getStatus('hasSsl') && !$this->getStatus('hasReSslPasswortTest')){
+				$msgData = $this->sslMsgDataPasswordDecrypt($msgData, $this->sslPasswordLocalNew, $this->sslPasswordPeerNew);
+				if($msgData){
+					$token = '';
+					if(array_key_exists('token', $msgData)){
+						$token = $msgData['token'];
+					}
+					
+					if($token){
+						$this->log('debug', 're-SSL: password retest');
+						
+						$this->setStatus('hasReSslPasswortTest', true);
+						$this->sendSslPasswordReverify($token);
+					}
+					else{
+						$this->sendError(900, $msgName);
+					}
+				}
+				else{
+					$this->sendError(270, $msgName);
+					$this->log('warning', $msgName.' re-SSL: decryption failed');
+				}
+			}
+			else{
+				$this->sendError(260, $msgName);
+				$this->log('warning', $msgName.' re-SSL: you need to initialize ssl, hasSsl=/'.(int)$this->getStatus('hasSsl').'/ hasReSslPasswortTest=/'.(int)$this->getStatus('hasReSslPasswortTest').'/');
+			}
+		}
 		elseif($msgName == 'ssl_password_verify'){
-			if($this->getStatus('hasSslPasswortTest') && !$this->getStatus('hasSsl')){
+			if($this->getStatus('hasSslPasswortTest')){
 				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
 				if($msgData){
 					$token = '';
@@ -1197,6 +1299,57 @@ class Client{
 			
 			$this->sslTestToken = '';
 			$this->sslPasswordToken = '';
+		}
+		elseif($msgName == 'ssl_password_reverify'){
+			if($this->getStatus('hasSsl') && $this->getStatus('hasReSslPasswortTest')){
+				$msgData = $this->sslMsgDataPasswordDecrypt($msgData, $this->sslPasswordLocalNew, $this->sslPasswordPeerNew);
+				if($msgData){
+					$token = '';
+					if(array_key_exists('token', $msgData)){
+						$token = $msgData['token'];
+					}
+					
+					#print __CLASS__.'->'.__FUNCTION__.': '.$msgName.' re-SSL: password token: '.$token."\n";
+					
+					if($token){
+						$testToken = hash('sha512',
+							$this->sslPasswordToken.'_'.$this->getNode()->getSslKeyPubFingerprint());
+						if($this->sslPasswordToken && $token == $testToken){
+							$this->log('debug', 're-SSL: password verified');
+							$this->log('debug', 're-SSL: OK');
+							
+							$this->setStatus('hasReSslPasswortPutInit', false);
+							
+							$this->sslPasswordLocal = $this->sslPasswordLocalNew;
+							$this->sslPasswordPeer = $this->sslPasswordPeerNew;
+							
+							$action = $this->actionGetByCriterion(ClientAction::CRITERION_AFTER_HAS_RESSL);
+							if($action){
+								$this->actionRemove($action);
+								$action->functionExec($this);
+							}
+						}
+						else{
+							$this->sendError(290, $msgName);
+						}
+					}
+					else{
+						$this->sendError(900, $msgName);
+					}
+				}
+				else{
+					$this->sendError(270, $msgName);
+					$this->log('warning', $msgName.' re-SSL: decryption failed');
+				}
+			}
+			else{
+				$this->sendError(260, $msgName);
+				$this->log('warning', $msgName.' re-SSL: you need to initialize ssl, hasSsl=/'.(int)$this->getStatus('hasSsl').'/ hasReSslPasswortTest=/'.(int)$this->getStatus('hasReSslPasswortTest').'/');
+			}
+			
+			$this->sslPasswordToken = '';
+			$this->sslPasswordLocalNew = '';
+			$this->sslPasswordLocalNew = '';
 		}
 		elseif($msgName == 'ssl_key_pub_get'){
 			if($this->getStatus('hasId')){
@@ -1612,11 +1765,12 @@ class Client{
 		return null;
 	}
 	
-	private function sslMsgCreatePasswordEncrypt($name, $data){
-		#print __CLASS__.'->'.__FUNCTION__.': "'.$name.'"'."\n";
+	private function sslMsgCreatePasswordEncrypt($name, $data, $sslPasswordLocal = null, $sslPasswordPeer = null){
+		$this->sslMsgCount++;
+		#print __CLASS__.'->'.__FUNCTION__.': /'.$name.'/ '.$this->sslMsgCount."\n";
 		
 		$data = json_encode($data);
-		$dataEnc = $this->sslPasswordEncrypt($data);
+		$dataEnc = $this->sslPasswordEncrypt($data, $sslPasswordLocal, $sslPasswordPeer);
 		
 		if($dataEnc){
 			$json = array(
@@ -1629,8 +1783,8 @@ class Client{
 		return null;
 	}
 	
-	private function sslMsgDataPasswordDecrypt($dataEnc){
-		$data = $this->sslPasswordDecrypt($dataEnc);
+	private function sslMsgDataPasswordDecrypt($dataEnc, $sslPasswordLocal = null, $sslPasswordPeer = null){
+		$data = $this->sslPasswordDecrypt($dataEnc, $sslPasswordLocal, $sslPasswordPeer);
 		if($data){
 			$data = json_decode($data, true);
 			return $data;
@@ -1663,23 +1817,37 @@ class Client{
 		$data = gzdecode($data);
 		$json = json_decode($data, true);
 		
-		$data = base64_decode($json['data']);
-		$sign = base64_decode($json['sign']);
-		
-		if(openssl_private_decrypt($data, $decrypted, $this->getSsl())){
-			if(openssl_verify($decrypted, $sign, $this->getNode()->getSslKeyPub(), OPENSSL_ALGO_SHA1)){
-				$rv = $decrypted;
-				
-				return $rv;
+		if(isset($json['data']) && isset($json['sign'])){
+			$data = base64_decode($json['data']);
+			$sign = base64_decode($json['sign']);
+			
+			if(openssl_private_decrypt($data, $decrypted, $this->getSsl())){
+				if(openssl_verify($decrypted, $sign, $this->getNode()->getSslKeyPub(), OPENSSL_ALGO_SHA1)){
+					$rv = $decrypted;
+					
+					return $rv;
+				}
 			}
 		}
 		
 		return null;
 	}
 	
-	private function sslPasswordEncrypt($data){
-		if($this->sslPasswordLocal && $this->sslPasswordPeer){
-			$password = $this->sslPasswordLocal.'_'.$this->sslPasswordPeer;
+	private function sslPasswordEncrypt($data, $sslPasswordLocal = null, $sslPasswordPeer = null){
+		#$this->log('debug', 'SSL password encrypt: /'.$sslPasswordLocal.'/ /'.$sslPasswordPeer.'/');
+		
+		if($sslPasswordLocal === null){
+			#$this->log('debug', 'SSL password encrypt: no local password set');
+			$sslPasswordLocal = $this->sslPasswordLocal;
+		}
+		if($sslPasswordPeer === null){
+			#$this->log('debug', 'SSL password encrypt: no peer password set');
+			$sslPasswordPeer = $this->sslPasswordPeer;
+		}
+		
+		if($sslPasswordLocal && $sslPasswordPeer){
+			$password = $sslPasswordLocal.'_'.$sslPasswordPeer;
+			#$this->log('debug', 'SSL password encrypt pwd: '.$password);
 			
 			if(openssl_sign($data, $sign, $this->getSsl(), OPENSSL_ALGO_SHA1)){
 				$sign = base64_encode($sign);
@@ -1704,37 +1872,59 @@ class Client{
 		return null;
 	}
 	
-	private function sslPasswordDecrypt($data){
-		if($this->sslPasswordLocal && $this->sslPasswordPeer){
-			$password = $this->sslPasswordPeer.'_'.$this->sslPasswordLocal;
-			#$this->log('debug', 'password: '.$password);
+	private function sslPasswordDecrypt($data, $sslPasswordLocal = null, $sslPasswordPeer = null){
+		#$this->log('debug', 'SSL password decrypt: /'.$sslPasswordLocal.'/ /'.$sslPasswordPeer.'/');
+		
+		if($sslPasswordLocal === null){
+			#$this->log('debug', 'SSL password decrypt: no local password set');
+			$sslPasswordLocal = $this->sslPasswordLocal;
+		}
+		if($sslPasswordPeer === null){
+			#$this->log('debug', 'SSL password decrypt: no peer password set');
+			$sslPasswordPeer = $this->sslPasswordPeer;
+		}
+		
+		if($sslPasswordLocal && $sslPasswordPeer){
+			$password = $sslPasswordPeer.'_'.$sslPasswordLocal;
+			#$this->log('debug', 'SSL password decrypt pwd: '.$password);
 			
 			$data = base64_decode($data);
 			$json = json_decode(gzdecode($data), true);
-			
-			$data = $json['data'];
-			$iv = base64_decode($json['iv']);
-			
-			$data = openssl_decrypt($data, 'AES-256-CBC', $password, 0, $iv);
-			if($data !== false){
-				$json = json_decode(gzdecode($data), true);
+			if(isset($json['data']) && isset($json['iv'])){
+				$data = $json['data'];
+				$iv = base64_decode($json['iv']);
 				
-				$data = base64_decode($json['data']);
-				$sign = base64_decode($json['sign']);
-				
-				if(openssl_verify($data, $sign, $this->getNode()->getSslKeyPub(), OPENSSL_ALGO_SHA1)){
-					return $data;
+				$data = openssl_decrypt($data, 'AES-256-CBC', $password, 0, $iv);
+				if($data !== false){
+					$json = json_decode(gzdecode($data), true);
+					if(isset($json['data']) && isset($json['sign'])){
+						$data = base64_decode($json['data']);
+						$sign = base64_decode($json['sign']);
+						
+						if(openssl_verify($data, $sign, $this->getNode()->getSslKeyPub(), OPENSSL_ALGO_SHA1)){
+							return $data;
+						}
+						else{
+							$this->log('warning', 'sslPasswordDecrypt: openssl_verify failed');
+						}
+					}
+					else{
+						$this->log('warning', 'sslPasswordDecrypt: data or sign not set');
+					}
 				}
 				else{
-					$this->log('warning', 'sslPasswordDecrypt openssl_verify failed');
+					$this->log('warning', 'sslPasswordDecrypt: openssl_decrypt failed');
+					while($openSslErrorStr = openssl_error_string()){
+						$this->log('error', 'SSL: '.$openSslErrorStr);
+					}
 				}
 			}
 			else{
-				$this->log('warning', 'sslPasswordDecrypt openssl_decrypt failed');
+				$this->log('warning', 'sslPasswordDecrypt: data or iv not set');
 			}
 		}
 		else{
-			$this->log('warning', 'sslPasswordDecrypt no passwords set');
+			$this->log('warning', 'sslPasswordDecrypt: no passwords set');
 		}
 		
 		return null;
@@ -1918,21 +2108,45 @@ class Client{
 		$this->dataSend($this->sslMsgCreatePublicEncrypt('ssl_verify', $data));
 	}
 	
+	private function genSslPassword(){
+		$addr = $this->getIp().':'.$this->getPort();
+		$password = hash('sha512', $addr.'_'.mt_rand(0, 999999));
+		#$password = substr(hash('sha512', $addr.'_'.mt_rand(0, 999999)), 0, 3);
+		
+		return $password;
+	}
+	
 	private function sendSslPasswordPut(){
 		if(!$this->getSsl()){
 			throw new RuntimeException('ssl not set.');
 		}
 		
-		$addr = $this->getIp().':'.$this->getPort();
-		$password = hash('sha512', $addr.'_'.mt_rand(0, 999999));
-		
-		$this->sslPasswordLocal = $password;
-		#$this->log('debug', 'SSL: local password: '.$this->sslPasswordLocal);
+		$this->sslPasswordLocal = $this->genSslPassword();
+		$this->sslPasswordTime = time();
+		#$this->log('debug', 'SSL: local password: '.substr($this->sslPasswordLocal, 0, 20));
 		
 		$data = array(
-			'password' => $password,
+			'password' => $this->sslPasswordLocal,
 		);
 		$this->dataSend($this->sslMsgCreatePublicEncrypt('ssl_password_put', $data));
+	}
+	
+	private function sendSslPasswordReput(){
+		if(!$this->getSsl()){
+			throw new RuntimeException('ssl not set.');
+		}
+		
+		$this->sslPasswordLocalNew = $this->genSslPassword();
+		$this->sslPasswordTime = time();
+		#$this->log('debug', 're-SSL: local password:     '.substr($this->sslPasswordLocal, 0, 20));
+		#$this->log('debug', 're-SSL: local password new: '.substr($this->sslPasswordLocalNew, 0, 20));
+		#$this->log('debug', 're-SSL: peer password:      '.substr($this->sslPasswordPeer, 0, 20));
+		#$this->log('debug', 're-SSL: peer password new:  '.substr($this->sslPasswordPeerNew, 0, 20));
+		
+		$data = array(
+			'password' => $this->sslPasswordLocalNew,
+		);
+		$this->dataSend($this->sslMsgCreatePasswordEncrypt('ssl_password_reput', $data));
 	}
 	
 	private function sendSslPasswordTest(){
@@ -1948,6 +2162,20 @@ class Client{
 		$this->dataSend($this->sslMsgCreatePasswordEncrypt('ssl_password_test', $data));
 	}
 	
+	private function sendSslPasswordRetest(){
+		if(!$this->getSsl()){
+			throw new RuntimeException('ssl not set.');
+		}
+		
+		$this->sslPasswordToken = (string)Uuid::uuid4();
+		#$this->log('debug', 're-SSL token: '.substr($this->sslPasswordToken, 0, 20));
+		
+		$data = array(
+			'token' => $this->sslPasswordToken,
+		);
+		$this->dataSend($this->sslMsgCreatePasswordEncrypt('ssl_password_retest', $data, $this->sslPasswordLocalNew, $this->sslPasswordPeerNew));
+	}
+	
 	private function sendSslPasswordVerify($token){
 		if(!$this->getSsl()){
 			throw new RuntimeException('ssl not set.');
@@ -1959,6 +2187,21 @@ class Client{
 			'token' => $token,
 		);
 		$this->dataSend($this->sslMsgCreatePasswordEncrypt('ssl_password_verify', $data));
+	}
+	
+	private function sendSslPasswordReverify($token){
+		if(!$this->getSsl()){
+			throw new RuntimeException('ssl not set.');
+		}
+		
+		#$this->log('debug', 're-SSL peer token: '.substr($token, 0, 20));
+		$token = hash('sha512', $token.'_'.$this->getLocalNode()->getSslKeyPubFingerprint());
+		#$this->log('debug', 're-SSL local token: '.substr($token, 0, 20));
+		
+		$data = array(
+			'token' => $token,
+		);
+		$this->dataSend($this->sslMsgCreatePasswordEncrypt('ssl_password_reverify', $data, $this->sslPasswordLocalNew, $this->sslPasswordPeerNew));
 	}
 	
 	public function sendSslKeyPubGet($nodeSslKeyPubFingerprint){

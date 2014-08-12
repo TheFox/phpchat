@@ -18,6 +18,7 @@ class ClientAction{
 	const CRITERION_AFTER_MSG_RESPONSE_SUCCESSFULL = 311;
 	#const CRITERION_AFTER_MSG_RESPONSE_FAIL = 312;
 	const CRITERION_AFTER_HAS_SSL = 400;
+	const CRITERION_AFTER_HAS_RESSL = 410;
 	
 	// After all previous actions in actions array.
 	const CRITERION_AFTER_PREVIOUS_ACTIONS = 900;
