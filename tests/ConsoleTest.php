@@ -18,6 +18,7 @@ class ConsoleTest extends PHPUnit_Framework_TestCase{
 		$settings->data['console']['history']['saveToFile'] = false;
 		
 		$console = new Console();
+		$console->setDebug(true);
 		$console->setSettings($settings);
 		$console->init();
 		$console->handleLine('/help');
@@ -41,6 +42,7 @@ class ConsoleTest extends PHPUnit_Framework_TestCase{
 		$settings->data['console']['history']['saveToFile'] = false;
 		
 		$console = new Console();
+		$console->setDebug(true);
 		$console->setSettings($settings);
 		$console->init();
 		$console->handleLine('/help');
@@ -62,6 +64,7 @@ class ConsoleTest extends PHPUnit_Framework_TestCase{
 		$settings->data['console']['history']['saveToFile'] = false;
 		
 		$console = new Console();
+		$console->setDebug(true);
 		$console->setSettings($settings);
 		$console->handleLine('/help');
 		$console->handleLine('/history');
@@ -83,6 +86,7 @@ class ConsoleTest extends PHPUnit_Framework_TestCase{
 		$settings->data['console']['history']['saveToFile'] = true;
 		
 		$console = new Console();
+		$console->setDebug(true);
 		$console->setSettings($settings);
 		$console->handleLine('/help');
 		$console->handleLine('/history');

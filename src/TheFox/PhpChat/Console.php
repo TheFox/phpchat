@@ -30,6 +30,7 @@ class Console extends Thread{
 	const RANDOM_MSG_CHAR_SET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 	const RANDOM_MSG_CHAR_SET_LEN = 58;
 	
+	private $debug = false;
 	private $log = null;
 	private $settings = null;
 	private $ipcKernelConnection = null;
@@ -72,6 +73,10 @@ class Console extends Thread{
 		
 		$this->nextRandomMsg = time() + static::RANDOM_MSG_DELAY_MIN;
 		$this->randomMsgDebug();
+	}
+	
+	public function setDebug($debug){
+		$this->debug = $debug;
 	}
 	
 	private function getLog(){
@@ -221,7 +226,9 @@ class Console extends Thread{
 	}
 	
 	public function init(){
-		$this->initIpcKernelConnection();
+		if(!$this->debug){
+			$this->initIpcKernelConnection();
+		}
 		
 		$this->sttySetup();
 		$this->keybindingsSetup();
