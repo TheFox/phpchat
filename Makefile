@@ -39,6 +39,7 @@ test_phpunit: $(PHPUNIT) phpunit.xml
 	$(RM) tests/*.yml
 	$(RM) tests/*.log
 	$(RM) tests/*.prv tests/*.pub
+	$(RM) tests/client{1,2}
 
 release:
 	find . -name .DS_Store -exec rm {} \;
@@ -67,3 +68,4 @@ clean:
 	$(RM) tests/*.yml
 	$(RM) tests/*.log
 	$(RM) tests/*.prv tests/*.pub
+	$(RM) tests/client{1,2}

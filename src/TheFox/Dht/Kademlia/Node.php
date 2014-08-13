@@ -52,7 +52,9 @@ class Node extends YamlStorage{
 		
 		if(parent::load()){
 			$this->setIdHexStr($this->data['id']);
-			$this->setSslKeyPub(base64_decode($this->data['sslKeyPub']));
+			if($this->data['sslKeyPub']){
+				$this->setSslKeyPub(base64_decode($this->data['sslKeyPub']));
+			}
 			unset($this->data['sslKeyPub']);
 			
 			return true;

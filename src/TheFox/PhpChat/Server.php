@@ -28,12 +28,10 @@ class Server{
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
-		$this->log = new Logger('server');
-		$this->log->pushHandler(new StreamHandler('php://stdout', Logger::ERROR));
-		$this->log->pushHandler(new StreamHandler('log/server.log', Logger::DEBUG));
-		
-		$this->log->info('start');
+	}
+	
+	public function setLog($log){
+		$this->log = $log;
 	}
 	
 	public function getLog(){
@@ -116,6 +114,13 @@ class Server{
 	}
 	
 	public function init(){
+		if(!$this->log){
+			$this->log = new Logger('server');
+			$this->log->pushHandler(new StreamHandler('php://stdout', Logger::ERROR));
+			$this->log->pushHandler(new StreamHandler('log/server.log', Logger::DEBUG));
+			
+			$this->log->info('start');
+		}
 		if($this->ip && $this->port){
 			$this->log->notice('listen on '.$this->ip.':'.$this->port);
 			

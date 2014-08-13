@@ -1,6 +1,7 @@
 <?php
 
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Filesystem\Filesystem;
 
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler as LoggerStreamHandler;
@@ -9,6 +10,10 @@ use TheFox\PhpChat\Kernel;
 #use TheFox\PhpChat\Server;
 use TheFox\PhpChat\Client;
 use TheFox\PhpChat\ClientAction;
+use TheFox\PhpChat\Msg;
+use TheFox\Dht\Kademlia\Table;
+use TheFox\Dht\Kademlia\Bucket;
+use TheFox\Dht\Kademlia\Node;
 
 class ClientTest extends PHPUnit_Framework_TestCase{
 	
@@ -196,18 +201,21 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$this->assertEquals($kernel->getTable(), $server->getTable());
 		$this->assertEquals($kernel->getMsgDb(), $server->getMsgDb());
 		$this->assertEquals($kernel->getHashcashDb(), $server->getHashcashDb());
-		
 	}
 	
 	public function testGetIpPort(){
 		$client = new Client();
+		
+		$this->assertEquals(':0', $client->getIpPort());
+		
 		$client->setIp('192.168.241.21');
 		$client->setPort(1987);
-		
 		$this->assertEquals('192.168.241.21:1987', $client->getIpPort());
 	}
 	
 	public function testHashcashMint(){
+		@unlink('tests/hashcashdb.yml');
+		
 		file_put_contents('tests/id_rsa_client1.prv', static::NODE_LOCAL_SSL_KEY_PRV1);
 		file_put_contents('tests/id_rsa_client1.pub', static::NODE_LOCAL_SSL_KEY_PUB1);
 		
@@ -245,7 +253,10 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$kernel->shutdown();
 		
 		$finder = new Finder();
-		$files = $finder->in('tests')->name('hashcashdb.yml');
+		$files = $finder->in('tests')->depth(0)->name('hashcashdb.yml')->files();
+		foreach($files as $file){
+			ve($file->getRealpath());
+		}
 		$this->assertEquals(1, count($files));
 	}
 	
@@ -342,53 +353,104 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$kernel->shutdown();
 	}
 	
-	public function testSendLogic(){
-		file_put_contents('tests/id_rsa_client1.prv', static::NODE_LOCAL_SSL_KEY_PRV1);
-		file_put_contents('tests/id_rsa_client1.pub', static::NODE_LOCAL_SSL_KEY_PUB1);
+	public function genFiles(){
+		$filesystem = new Filesystem();
+		$filesystem->mkdir('tests/client1', $mode = 0777);
+		$filesystem->mkdir('tests/client2', $mode = 0777);
 		
-		file_put_contents('tests/id_rsa_client2.prv', static::NODE_LOCAL_SSL_KEY_PRV2);
-		file_put_contents('tests/id_rsa_client2.pub', static::NODE_LOCAL_SSL_KEY_PUB2);
+		file_put_contents('tests/client1/id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV1);
+		file_put_contents('tests/client1/id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB1);
 		
+		file_put_contents('tests/client2/id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV2);
+		file_put_contents('tests/client2/id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB2);
+		
+		
+		$localNode1 = new Node();
+		$localNode1->setIp('127.0.0.1');
+		$localNode1->setPort(25000);
+		$localNode1->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		
+		$table1 = new Table('tests/client1/table.yml');
+		$table1->setDatadirBasePath('tests/client1');
+		$table1->setLocalNode($localNode1);
+		for($n = 0; $n < 5; $n++){
+			$node = new Node();
+			$node->setIp('192.168.241.'.$n);
+			#$node->setPort(25000);
+			$node->setIdHexStr('10000000-1000-4000-8000-1'.sprintf('%011d', $n));
+			$table1->nodeEnclose($node);
+			#fwrite(STDOUT, 'node: /'.$node->getIdHexStr().'/ '.$node->getIpPort()."\n");
+		}
+		$table1->setDataChanged(true);
+		$table1->save();
+		
+		
+		$localNode2 = new Node();
+		$localNode2->setIp('127.0.0.2');
+		$localNode2->setPort(25000);
+		$localNode2->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1739');
+		
+		$table2 = new Table('tests/client2/table.yml');
+		$table2->setDatadirBasePath('tests/client2');
+		$table2->setLocalNode($localNode2);
+		for($n = 5; $n < 10; $n++){
+			$node = new Node();
+			$node->setIp('192.168.241.'.$n);
+			#$node->setPort(25000);
+			$node->setIdHexStr('10000000-1000-4000-8000-1'.sprintf('%011d', $n));
+			$table2->nodeEnclose($node);
+			#fwrite(STDOUT, 'node: /'.$node->getIdHexStr().'/ '.$node->getIpPort()."\n");
+		}
+		$table2->setDataChanged(true);
+		$table2->save();
+	}
+	
+	public function genClients(){
 		$settings1 = new Settings();
-		$settings1->data['datadir'] = 'tests';
+		$settings1->data['datadir'] = 'tests/client1';
 		$settings1->data['firstRun'] = false;
 		$settings1->data['node']['timeCreated'] = time();
 		$settings1->data['node']['ip'] = '127.0.0.1';
 		$settings1->data['node']['port'] = 0;
 		$settings1->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
 		$settings1->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings1->data['node']['sslKeyPrvPath'] = 'tests/id_rsa_client1.prv';
-		$settings1->data['node']['sslKeyPubPath'] = 'tests/id_rsa_client1.pub';
+		$settings1->data['node']['sslKeyPrvPath'] = 'tests/client1/id_rsa.prv';
+		$settings1->data['node']['sslKeyPubPath'] = 'tests/client1/id_rsa.pub';
 		$settings1->data['user']['nickname'] = 'user1';
 		
 		$settings2 = new Settings();
-		$settings2->data['datadir'] = 'tests';
+		$settings2->data['datadir'] = 'tests/client2';
 		$settings2->data['firstRun'] = false;
 		$settings2->data['node']['timeCreated'] = time();
 		$settings2->data['node']['ip'] = '127.0.0.2';
 		$settings2->data['node']['port'] = 0;
 		$settings2->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1739';
 		$settings2->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings2->data['node']['sslKeyPrvPath'] = 'tests/id_rsa_client2.prv';
-		$settings2->data['node']['sslKeyPubPath'] = 'tests/id_rsa_client2.pub';
+		$settings2->data['node']['sslKeyPrvPath'] = 'tests/client2/id_rsa.prv';
+		$settings2->data['node']['sslKeyPubPath'] = 'tests/client2/id_rsa.pub';
 		$settings2->data['user']['nickname'] = 'user2';
 		
 		
-		$log = new Logger('test_application');
-		$log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
+		$log1 = new Logger('client_1');
+		$log1->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
+		
+		$log2 = new Logger('client_2');
+		$log2->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
 		
 		$kernel1 = new Kernel();
-		$kernel1->setLog($log);
+		$kernel1->setLog($log1);
 		$kernel1->setSettings($settings1);
 		$kernel1->init();
 		
 		$kernel2 = new Kernel();
-		$kernel2->setLog($log);
+		$kernel2->setLog($log2);
 		$kernel2->setSettings($settings2);
 		$kernel2->init();
 		
 		$server1 = $kernel1->getServer();
+		$server1->setLog($log1);
 		$server2 = $kernel2->getServer();
+		$server2->setLog($log2);
 		
 		$client1 = new Client();
 		$client1->setSslPrv($settings1->data['node']['sslKeyPrvPath'], $settings1->data['node']['sslKeyPrvPass']);
@@ -396,6 +458,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$client1->setIp($settings1->data['node']['ip']);
 		$client1->setServer($server1);
 		$this->assertEquals($settings1->data['node']['ip'], $client1->getIp());
+		#fwrite(STDOUT, 'ip1: /'.$client1->getIp().'/'."\n");
 		
 		$client2 = new Client();
 		$client2->setSslPrv($settings2->data['node']['sslKeyPrvPath'], $settings2->data['node']['sslKeyPrvPass']);
@@ -403,36 +466,390 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$client2->setIp($settings2->data['node']['ip']);
 		$client2->setServer($server2);
 		$this->assertEquals($settings2->data['node']['ip'], $client2->getIp());
+		#fwrite(STDOUT, 'ip2: /'.$client2->getIp().'/'."\n");
+		
+		return array($client1, $client2);
+	}
+	
+	public function rawMsgToArray($raw){
+		$ar = array_map(function($item){
+			return base64_decode($item);
+		}, preg_split('/'.Client::MSG_SEPARATOR.'/', substr($raw, 0, -Client::MSG_SEPARATOR_LEN)));
+		#fwrite(STDOUT, 'rawMsgToArray'."\n");
+		#ve($ar);
+		return $ar;
+	}
+	
+	public function rawMsgToJson($raw){
+		#ve($raw);
+		$ar = $this->rawMsgToArray($raw);
+		#fwrite(STDOUT, 'rawMsgToJson'."\n");
+		#ve($ar);
+		$rv = array_map(function($item){
+			return json_decode($item, true);
+		}, $ar);
+		return $rv;
+	}
+	
+	public function testSend(){
+		$this->genFiles();
+		list($client1, $client2) = $this->genClients();
+		
+		#ve($client1);
+		
+		// Node Find before ID should cause an error.
+		$raw = $client1->sendNodeFind($client1->getSettings()->data['node']['id']);
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('error', $json[0]['name']);
+		$this->assertEquals(1000, $json[0]['data']['code']);
+		
+		// Node Find before ID should cause an error.
+		$raw = $client1->sendNodeFind($client1->getSettings()->data['node']['id']);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('error', $json[0]['name']);
+		$this->assertEquals(1000, $json[0]['data']['code']);
+		
+		// Send Msg before ID should cause an error.
+		$msg = new Msg();
+		$msg->setVersion(1);
+		$msg->setSrcNodeId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		$msg->setSrcSslKeyPub(static::NODE_LOCAL_SSL_KEY_PUB1);
+		$msg->setSrcUserNickname('thefox');
+		$msg->setDstNodeId('cafed00d-2131-4159-8e11-0b4dbadb1739');
+		$msg->setDstSslPubKey(static::NODE_LOCAL_SSL_KEY_PUB2);
+		$msg->setSubject('my first subject');
+		$msg->setText('hello world! this is a test');
+		$msg->setSslKeyPrv(static::NODE_LOCAL_SSL_KEY_PRV1, 'my_password');
+		$msg->encrypt();
+		
+		$raw = $client1->sendMsg($msg);
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('error', $json[0]['name']);
+		$this->assertEquals(1000, $json[0]['data']['code']);
+		
+		// SSL before ID should cause an error.
+		$raw = $client1->sendSslInit();
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('ssl_init_response', $json[0]['name']);
+		$this->assertEquals(1000, $json[0]['data']['code']);
+		
+		$raw = $client1->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('error', $json[0]['name']);
+		$this->assertEquals(3100, $json[0]['data']['code']);
 		
 		
 		
+		// NoOp
+		$raw = $client1->sendNoop();
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('noop', $json[0]['name']);
+		
+		// Hello Client1
 		$raw = $client1->sendHello();
-		$expect = '{"name":"hello","data":{"ip":"127.0.0.1"}}';
-		$this->assertEquals($expect, base64_decode($raw));
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('hello', $json[0]['name']);
+		$this->assertEquals('127.0.0.1', $json[0]['data']['ip']);
 		
-		$raw = $client2->msgHandle($raw);
-		$expect = '{"name":"id","data":{"release":3,"id":"cafed00d-2131-4159-8e11-0b4dbadb1739","port":0,"sslKeyPub":"LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQ0lqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FnOEFNSUlDQ2dLQ0FnRUF2QXlaV2UrVkwxQWZ6SzhjaXdCUQpQcTJKQ3pEeEZXejdEaGljUDN1a2FZM3E1UjNmeFM0NnBmWlJOVGdDUlV1UUowVUhzRXhvMzVjTEszRWhjZ0NiCjJhcG96K1ptTVliSUFCSnltS2hhS05NV1NQTmtwY0NpRVlpemY5ZWU1Q3hLVytDbHMvNTNqR013T3hMUnhhaHMKWjMzeUZCZ0VWOXFKS3ZSS3hzOFllREFSMG80ODIvcWF1bkJxbDA2b1o2V3FnL2lLdUd6N3ZpOXArbHQvbXNHdAppakVGT0UvaCtWYmxHbnRwQXpKa1ZLK1NJd203ZHBhRld3QkovQ3B6VzhINmtZVGZtNXZQZzFjZHAzZm5IVUFZCngwbDdwM242c3JuN0oyYXE2NGwwYi9ZamxXYmN3QzBXdTA5NTJlZ0FhZ2JJWUx1M0pKRm1UQ0pkSThFN2NramcKUnNnOGxkWjU1S1RyeDhIWEhJekpZOWFiK2JxbmVtWCtaelpVbnNSWEdvQTh1amRRQStyR1JHK1R5RjUrZDZJSApWN1BVK3JGRThrcm05Ym13eVdtTE1aWWQzUHB4ZHN3Z21LcmdXbVRzUmMvcG5QTXF2NWxqNHhLZnNnQTdSam5YCnJYOVZnWGVxWHlyTXJjQU8xeDN3NWREeVpjaTBwUUYvSjB2WjdUaExVV1BMUFR3NVFSc0tCemxJcDE0ZFpHYk4KYzJDaWZnUjAzZll6TVhTdVVES3lKd0YvYVZlaFRxNGtrd3c5dnNSamRidWRnMjdSRi9GeEtBM1FDOFJaaFZyKwptUzlHOFMvSFNtZDJGMlNNeUk4dGRpam9waHZ3MGcwcFpjV2o0S1N3Um1IOWJROW9ZTVJWaU82ZGhuMExhRmd6CmVydVpCMVZkZ3ExSGlIcW11Ri9jUDBFQ0F3RUFBUT09Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQo=","isChannel":false}}';
-		$this->assertEquals($expect, base64_decode($raw));
+		// ID Client1
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('id', $json[0]['name']);
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1739', $json[0]['data']['id']);
+		$this->assertFalse($json[0]['data']['isChannel']);
 		
-		$raw = $client1->msgHandle($raw);
-		$expect = '{"name":"id_ok","data":[]}';
-		$this->assertEquals($expect, base64_decode($raw));
+		$raw = $client1->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('id_ok', $json[0]['name']);
 		
-		$raw = $client2->msgHandle($raw);
-		$this->assertEquals('', base64_decode($raw));
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals(null, $json[0]);
 		
-		$raw = $client1->sendNodeFind($settings1->data['node']['id']);
-		$expect = '{"name":"node_find","data":{"rid":"db254d77-2d23-4a3c-9291-1196b5ff171b","num":8,"nodeId":"cafed00d-2131-4159-8e11-0b4dbadb1738","hashcash":"1:12:140813003553:cafed00d-2131-4159-8e11-0b4dbadb1738::N2v4S6mP2EWMXM3Dr7n9kg==:1202"}}';
-		$this->assertEquals($expect, base64_decode($raw));
+		// Hello Client2
+		$raw = $client2->sendHello();
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('hello', $json[0]['name']);
+		$this->assertEquals('127.0.0.2', $json[0]['data']['ip']);
+		
+		// ID Client2
+		$raw = $client1->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('id', $json[0]['name']);
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $json[0]['data']['id']);
+		$this->assertFalse($json[0]['data']['isChannel']);
+		
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('id_ok', $json[0]['name']);
+		
+		// re-ID
+		$raw = $client1->sendId();
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('error', $json[0]['name']);
+		$this->assertEquals(1010, $json[0]['data']['code']);
+		
+		
+		// Node Find
+		$raw = $client1->sendNodeFind($client1->getSettings()->data['node']['id']);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('node_find', $json[0]['name']);
+		$this->assertEquals(8, $json[0]['data']['num']);
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $json[0]['data']['nodeId']);
+		
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('node_found', $json[0]['name']);
+		$this->assertTrue(strIsUuid($json[0]['data']['rid']));
+		$this->assertEquals('10000000-1000-4000-8000-100000000008', $json[0]['data']['nodes'][0]['id']);
+		$this->assertEquals('10000000-1000-4000-8000-100000000009', $json[0]['data']['nodes'][1]['id']);
+		$this->assertEquals('10000000-1000-4000-8000-100000000005', $json[0]['data']['nodes'][2]['id']);
+		$this->assertEquals('10000000-1000-4000-8000-100000000006', $json[0]['data']['nodes'][3]['id']);
+		$this->assertEquals('10000000-1000-4000-8000-100000000007', $json[0]['data']['nodes'][4]['id']);
+		
+		$raw = $client1->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals(null, $json[0]);
+		
+		// Node Find without Hashcash should cause an error.
+		$raw = $client1->sendNodeFind($client1->getSettings()->data['node']['id'], null, null, false);
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('error', $json[0]['name']);
+		$this->assertEquals(4000, $json[0]['data']['code']);
+		
+		// Found Node with wrong RID should cause an error.
+		$raw = $client1->sendNodeFound('wrong_rid', array(), false);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('node_found', $json[0]['name']);
+		
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('error', $json[0]['name']);
+		$this->assertEquals(9000, $json[0]['data']['code']);
+		
+		
+		
+		
+		// Send Msg
+		$msg = new Msg();
+		$msg->setVersion(1);
+		#$msg->setId('200b9758-2d34-4152-8ada-fc09fc9c9da0');
+		$msg->setSrcNodeId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		$msg->setSrcSslKeyPub(static::NODE_LOCAL_SSL_KEY_PUB1);
+		$msg->setSrcUserNickname('thefox');
+		$msg->setDstNodeId('cafed00d-2131-4159-8e11-0b4dbadb1739');
+		$msg->setDstSslPubKey(static::NODE_LOCAL_SSL_KEY_PUB2);
+		$msg->setSubject('my first subject');
+		$msg->setText('hello world! this is a test');
+		$msg->setSslKeyPrv(static::NODE_LOCAL_SSL_KEY_PRV1, 'my_password');
+		$msg->encrypt();
+		
+		$raw = $client1->sendMsg($msg);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$rid = $json[0]['data']['rid'];
+		$this->assertEquals('msg', $json[0]['name']);
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $json[0]['data']['srcNodeId']);
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1739', $json[0]['data']['dstNodeId']);
+		
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('msg_response', $json[0]['name']);
+		$this->assertEquals($rid, $json[0]['data']['rid']);
+		
+		
+		// SSL without Hashcash should cause an error.
+		$raw = $client1->sendSslInit(false);
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('ssl_init_response', $json[0]['name']);
+		$this->assertEquals(4000, $json[0]['data']['code']);
+		
+		$raw = $client1->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('error', $json[0]['name']);
+		$this->assertEquals(3100, $json[0]['data']['code']);
+		
+		// SSL
+		$raw = $client1->sendSslInit();
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('ssl_init', $json[0]['name']);
+		
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('ssl_init', $json[0]['name']);
+		$this->assertEquals('ssl_init_response', $json[1]['name']);
+		
+		// SSL response
+		$raw = $client1->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('ssl_init_response', $json[0]['name']);
+		$this->assertEquals('ssl_test', $json[1]['name']);
+		
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('ssl_test', $json[0]['name']);
+		$this->assertEquals('ssl_verify', $json[1]['name']);
+		
+		$raw = $client1->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('ssl_verify', $json[0]['name']);
+		$this->assertEquals('ssl_password_put', $json[1]['name']);
+		
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('ssl_password_put', $json[0]['name']);
+		$this->assertEquals('ssl_password_test', $json[1]['name']);
+		
+		$raw = $client1->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('ssl_password_test', $json[0]['name']);
+		$this->assertEquals('ssl_password_verify', $json[1]['name']);
+		
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('ssl_password_verify', $json[0]['name']);
+		
+		$raw = $client1->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals(null, $json[0]);
+		
+		
+		// Talk Request
+		$raw = $client1->sendTalkRequest('user1');
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('talk_request', $json[0]['name']);
+		
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('talk_response', $json[0]['name']);
+		
+		$raw = $client1->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals(null, $json[0]);
+		
+		// Talk Msg
+		$raw = $client1->sendTalkMsg('de0bb575-cead-4ffe-adcb-311388511ed5', 'user1', 'hello world', false);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('talk_msg', $json[0]['name']);
+		
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals(null, $json[0]);
+		
+		// Talk User Nickname change
+		$raw = $client1->sendTalkUserNicknameChange('user1', 'user1b');
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('talk_user_nickname_change', $json[0]['name']);
+		
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals(null, $json[0]);
+		
+		// Talk Close
+		$raw = $client1->sendTalkClose('de0bb575-cead-4ffe-adcb-311388511ed6', 'user1b');
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('talk_close', $json[0]['name']);
+		
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('quit', $json[0]['name']);
+		
+		$raw = $client1->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals(null, $json[0]);
+		
+		// Ping - Pong
+		$raw = $client1->sendPing();
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('ping', $json[0]['name']);
+		$this->assertEquals('', $json[0]['data']['id']);
+		
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('pong', $json[0]['name']);
+		$this->assertEquals('', $json[0]['data']['id']);
+		
+		$raw = $client1->sendPing('de0bb575-cead-4ffe-adcb-311388511ed7');
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('ping', $json[0]['name']);
+		$this->assertEquals('de0bb575-cead-4ffe-adcb-311388511ed7', $json[0]['data']['id']);
+		
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('pong', $json[0]['name']);
+		$this->assertEquals('de0bb575-cead-4ffe-adcb-311388511ed7', $json[0]['data']['id']);
+		
+		
+		// Unknown Command
+		$raw = $client2->msgHandle(base64_encode('{"name":"blaaaaa"}'));
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('error', $json[0]['name']);
+		$this->assertEquals(9020, $json[0]['data']['code']);
+		$this->assertEquals('blaaaaa', $json[0]['data']['name']);
+		
 		
 		#fwrite(STDOUT, 'return: /'.($raw).'/'."\n");
-		fwrite(STDOUT, 'return: /'.base64_decode($raw).'/'."\n");
+		#fwrite(STDOUT, 'return: /'.base64_decode($raw).'/'."\n");
 		
 		
-		
-		
-		$server1->shutdown();
-		$kernel2->shutdown();
+		$client1->getServer()->getKernel()->shutdown();
+		$client2->getServer()->getKernel()->shutdown();
 	}
 	
 }
