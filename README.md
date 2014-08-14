@@ -1,6 +1,11 @@
 # PHPChat
 A decentralized, peer-to-peer, encrypted chat in PHP.
 
+## Why this project?
+Because we need to encrypt and secure the Internet. The Internet is broken and we need to fix it. Thanks people like [Edward Snowden](https://en.wikipedia.org/wiki/Edward_Snowden) we know today that the [NSA](https://en.wikipedia.org/wiki/National_Security_Agency) (and also other [intelligence agencies](https://en.wikipedia.org/wiki/Intelligence_agency) too) operates a [global surveillance](https://en.wikipedia.org/wiki/Global_surveillance_disclosures_(2013%E2%80%93present)) on citizens. We can't loose our right of freedom, our right of privacy to centralized governmental authorities. Now it's our move. It's time to fight back!
+
+I also like the [Bitmessage](https://bitmessage.org) project. But building thinks by myself feels like I can contribute to the Internet. And coding this with PHP because it's an easy-to-learn programming language and every one can [contribute](#contribute) to this project.
+
 ## Features
 - [Peer-to-peer](http://en.wikipedia.org/wiki/Peer-to-peer) instant messaging.
 - Decentralized: See [DHT](http://en.wikipedia.org/wiki/Distributed_hash_table) and [Kademlia](http://en.wikipedia.org/wiki/Kademlia).
