@@ -888,36 +888,40 @@ class Console extends Thread{
 			if(($args[0] == 'new' || $args[0] == 'n')){
 				if(strIsUuid($args[1])){
 					if($args[1] != $table->getLocalNode()->getIdHexStr()){
-						print PHP_EOL.'Enter the text to send to '.$args[1].'.'.PHP_EOL;
-						print 'NOTE: end text with  <RETURN>.<RETURN>'.PHP_EOL;
-						
 						$this->sttyExitIcanonMode();
 						$this->sttyEchoOn();
 						stream_set_blocking(STDIN, 1);
 						
-						$subject = 'No subject'; # TODO
+						print PHP_EOL.'Subject: ';
+						$subject = strtolower(substr(fgets(STDIN, 100), 0, -1));
+						if(!$subject){
+							$subject = 'No Subject';
+						}
+						#print "Subject: '".$subject."'\n\n";
+						
+						print PHP_EOL.'Enter the text to send.'.PHP_EOL;
+						print 'NOTE: end text with  <RETURN>.<RETURN>'.PHP_EOL;
 						
 						$text = '';
 						while(!$this->getExit()){
 							$line = fgets(STDIN, 1024);
 							
-							#print "line: '".substr($line, 0, -1)."'\n";
+							print "line: '".substr($line, 0, -1)."'\n";
 							if(substr($line, 0, -1) == '.') break;
 							$text .= $line;
 							
-							sleep(1);
+							#sleep(1);
 						}
 						
 						if(!$this->getExit()){
-							print 'Send msg? [Y/n] ';
-							
 							$text = substr($text, 0, -1);
 							
+							print 'Send msg? [Y/n] ';
 							$answer = strtolower(substr(fgets(STDIN, 100), 0, -1));
 							if(!$answer){
 								$answer = 'y';
 							}
-							print "Answer: '".$answer."'\n";
+							print "Answer: '".$answer."'".PHP_EOL;
 							#print "Text: '".$text."'\n";
 							
 							stream_set_blocking(STDIN, 0);
