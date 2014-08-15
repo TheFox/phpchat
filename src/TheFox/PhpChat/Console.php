@@ -1094,7 +1094,7 @@ class Console extends Thread{
 			$format = '%3d %1s %36s %s %s';
 			
 			$this->msgAdd();
-			$this->msgAdd('  # S FROM                                 CRATED              RECEIVED', false, true);
+			$this->msgAdd('  # N FROM                                 CRATED              RECEIVED', false, true);
 			
 			$no = 0;
 			foreach($msgs as $msgId => $msg){
@@ -1108,7 +1108,7 @@ class Console extends Thread{
 				
 				$line = sprintf($format,
 					$no,
-					$msg->getStatus(),
+					$msg->getStatus() == 'U' ? '*' : ' ',
 					$msg->getSrcNodeId(),
 					$dateCreated->format('Y/m/d H:i:s'),
 					$dateReceived->format('Y/m/d H:i:s')
