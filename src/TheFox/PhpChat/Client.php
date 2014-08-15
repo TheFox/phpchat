@@ -1116,7 +1116,6 @@ class Client{
 				$this->resetStatusSsl();
 				$rv .= $this->sendError(3100, $msgName);
 			}
-			
 		}
 		elseif($msgName == 'ssl_test'){
 			if($this->getStatus('hasSslInitOk') && !$this->getStatus('hasSslTest')){
