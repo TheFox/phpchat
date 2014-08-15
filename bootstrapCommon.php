@@ -35,7 +35,7 @@ if(!in_array('ripemd160', hash_algos())){
 	exit(1);
 }
 
-if(!file_exists(__DIR__.'/vendor')){
+if(!file_exists('vendor')){
 	print "FATAL ERROR: you must first run 'composer install'.\nVisit https://getcomposer.org\n";
 	exit(1);
 }
