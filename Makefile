@@ -4,9 +4,9 @@ RELEASE_NAME = phpchat
 
 RM = rm -rf
 MKDIR = mkdir -p
-TAR = tar
 GZIP = gzip
 MV = mv -i
+CP = cp -rp
 PHPCS = vendor/bin/phpcs
 PHPUNIT = vendor/bin/phpunit
 
@@ -42,24 +42,24 @@ test_phpunit: $(PHPUNIT) phpunit.xml
 	$(RM) tests/client{1,2}
 
 release:
-	find . -name .DS_Store -exec rm {} \;
-	$(MKDIR) releases
-	$(TAR) -cpf $(RELEASE_NAME)-$(RELEASE_VERSION).tar \
-		README.md \
-		application.php \
-		composer.json \
-		bootstrap.php \
-		functions.php \
-		src \
-		vendor/autoload.php \
-		vendor/composer \
-		vendor/liip \
-		vendor/rhumsaa \
-		vendor/sebastian \
-		vendor/symfony \
-		vendor/thefox
-	$(GZIP) -9 -f $(RELEASE_NAME)-$(RELEASE_VERSION).tar
-	$(MV) ${RELEASE_NAME}-${RELEASE_VERSION}.tar.gz releases
+	$(MKDIR) releases $(RELEASE_NAME)-$(RELEASE_VERSION)
+	
+	$(CP) application.php $(RELEASE_NAME)-$(RELEASE_VERSION)
+	$(CP) bootstrap.php $(RELEASE_NAME)-$(RELEASE_VERSION)
+	$(CP) bootstrapCommon.php $(RELEASE_NAME)-$(RELEASE_VERSION)
+	$(CP) composer.json $(RELEASE_NAME)-$(RELEASE_VERSION)
+	$(CP) functions.php $(RELEASE_NAME)-$(RELEASE_VERSION)
+	$(CP) README.md $(RELEASE_NAME)-$(RELEASE_VERSION)
+	$(CP) src $(RELEASE_NAME)-$(RELEASE_VERSION)
+	$(CP) start.sh $(RELEASE_NAME)-$(RELEASE_VERSION)
+	$(CP) stop.sh $(RELEASE_NAME)-$(RELEASE_VERSION)
+	
+	cd $(RELEASE_NAME)-$(RELEASE_VERSION); curl -sS https://getcomposer.org/installer | php; ./composer.phar install --no-dev
+	find $(RELEASE_NAME)-$(RELEASE_VERSION) -name .DS_Store -exec rm -v {} \;
+	tar -cpzf $(RELEASE_NAME)-$(RELEASE_VERSION).tar.gz $(RELEASE_NAME)-$(RELEASE_VERSION)
+	$(MV) $(RELEASE_NAME)-$(RELEASE_VERSION).tar.gz releases
+	chmod -R 777 $(RELEASE_NAME)-$(RELEASE_VERSION)
+	$(RM) $(RELEASE_NAME)-$(RELEASE_VERSION)
 
 clean:
 	$(RM) composer.lock composer.phar
