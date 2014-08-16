@@ -366,8 +366,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		
 		
 		$localNode1 = new Node();
-		$localNode1->setHost('127.0.0.1');
-		$localNode1->setPort(25000);
+		$localNode1->setUri('tcp://127.0.0.1:25000');
 		$localNode1->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
 		
 		$table1 = new Table('tests/client1/table.yml');
@@ -375,8 +374,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$table1->setLocalNode($localNode1);
 		for($n = 0; $n < 5; $n++){
 			$node = new Node();
-			$node->setHost('192.168.241.'.$n);
-			#$node->setPort(25000);
+			$node->setUri('tcp://192.168.241.'.$n);
 			$node->setIdHexStr('10000000-1000-4000-8000-1'.sprintf('%011d', $n));
 			$table1->nodeEnclose($node);
 			#fwrite(STDOUT, 'node: /'.$node->getIdHexStr().'/ '.$node->getIpPort()."\n");
@@ -386,8 +384,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		
 		
 		$localNode2 = new Node();
-		$localNode2->setHost('127.0.0.2');
-		$localNode2->setPort(25000);
+		$localNode1->setUri('tcp://127.0.0.2:25000');
 		$localNode2->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1739');
 		
 		$table2 = new Table('tests/client2/table.yml');
@@ -395,8 +392,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$table2->setLocalNode($localNode2);
 		for($n = 5; $n < 10; $n++){
 			$node = new Node();
-			$node->setHost('192.168.241.'.$n);
-			#$node->setPort(25000);
+			$node->setUri('tcp://192.168.241.'.$n);
 			$node->setIdHexStr('10000000-1000-4000-8000-1'.sprintf('%011d', $n));
 			$table2->nodeEnclose($node);
 			#fwrite(STDOUT, 'node: /'.$node->getIdHexStr().'/ '.$node->getIpPort()."\n");

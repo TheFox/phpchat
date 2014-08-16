@@ -4,9 +4,13 @@ namespace TheFox\Dht\Kademlia;
 
 use RuntimeException;
 
+use Zend\Uri\UriFactory;
+use Zend\Uri\Http;
+
 use TheFox\Storage\YamlStorage;
 use TheFox\Utilities\Hex;
 use TheFox\Utilities\Base58;
+use TheFox\PhpChat\TcpUri;
 
 class Node extends YamlStorage{
 	
@@ -15,15 +19,15 @@ class Node extends YamlStorage{
 	const SSL_KEY_LEN_MIN = 4096;
 	
 	private $id = array();
-	private $uriType = 'tcp';
-	private $uriHost = '';
-	private $uriPort = '';
-	private $uriPath = '';
+	private $uri = null;
 	private $sslKeyPub = null;
 	private $bucket = null;
 	
 	public function __construct($filePath = null){
 		parent::__construct($filePath);
+		
+		$this->uri = UriFactory::factory('tcp://');
+		#ve($this->uri);
 		
 		$this->data['id'] = '00000000-0000-4000-8000-000000000000';
 		$this->data['uri'] = '';
@@ -45,21 +49,32 @@ class Node extends YamlStorage{
 	public function save(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
+		$this->data['uri'] = (string)$this->uri;
 		$this->data['sslKeyPub'] = base64_encode($this->sslKeyPub);
 		return parent::save();
 	}
 	
 	public function load(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#fwrite(STDOUT, 'load node'."\n");
 		
 		if(parent::load()){
 			$this->setIdHexStr($this->data['id']);
-			if($this->data['sslKeyPub']){
-				$this->setSslKeyPub(base64_decode($this->data['sslKeyPub']));
-			}
-			unset($this->data['sslKeyPub']);
 			
-			$this->setUri($this->data['uri']);
+			#ve($this->data);
+			
+			if(isset($this->data['sslKeyPub'])){
+				if($this->data['sslKeyPub']){
+					$this->setSslKeyPub(base64_decode($this->data['sslKeyPub']));
+				}
+				unset($this->data['sslKeyPub']);
+			}
+			
+			if(isset($this->data['uri'])){
+				fwrite(STDOUT, 'load node: uri /'.$this->data['uri'].'/'."\n");
+				$this->setUri($this->data['uri']);
+				unset($this->data['uri']);
+			}
 			
 			return true;
 		}
@@ -104,92 +119,19 @@ class Node extends YamlStorage{
 	}
 	
 	public function setUri($uri){
-		$uri = parse_url($uri);
-		#ve($uri);
-		
-		$this->uriType = 'tcp';
-		if(isset($uri['scheme'])){
-			$this->uriType = $uri['scheme'];
+		if(is_string($uri)){
+			if($uri){
+				$uri = UriFactory::factory($uri);
+			}
+			else{
+				$uri = UriFactory::factory('tcp://');
+			}
 		}
-		if(isset($uri['host'])){
-			$this->uriHost = $uri['host'];
-		}
-		if(isset($uri['port'])){
-			$this->uriPort = $uri['port'];
-		}
-		if(isset($uri['path'])){
-			$this->uriPath = $uri['path'];
-		}
-		
-		$this->buildUri();
+		$this->uri = $uri;
 	}
 	
 	public function getUri(){
-		return $this->data['uri'];
-	}
-	
-	private function buildUri(){
-		switch($this->uriType){
-			case 'tcp':
-				if($this->uriHost && $this->uriPort){
-					$this->data['uri'] = $this->uriType.'://'.$this->uriHost.':'.$this->uriPort;
-				}
-				break;
-			case 'http':
-				if($this->uriHost && $this->uriPath){
-					$this->data['uri'] = $this->uriType.'://'.$this->uriHost;
-					if($this->uriPort){
-						$this->data['uri'] .= ':'.$this->uriPort;
-					}
-					$this->data['uri'] .= $this->uriPath;
-				}
-				break;
-			default:
-				$this->data['uri'] = '';
-		}
-	}
-	
-	public function setType($type){
-		$type = strtolower($type);
-		switch($type){
-			case 'tcp':
-			case 'http':
-				$this->uriType = $type;
-				break;
-			default:
-				$this->uriType = 'tcp';
-		}
-		
-		$this->buildUri();
-	}
-	
-	public function getType(){
-		return $this->uriType;
-	}
-	
-	public function setHost($host){
-		$this->uriHost = $host;
-		$this->buildUri();
-	}
-	
-	public function getHost(){
-		return $this->uriHost;
-	}
-	
-	public function setPort($port){
-		$this->uriPort = (int)$port;
-		$this->buildUri();
-	}
-	
-	public function getPort(){
-		return $this->uriPort;
-	}
-	
-	public function getHostPort(){
-		if($this->getPort()){
-			return $this->getHost().':'.$this->getPort();
-		}
-		return $this->getHost();
+		return $this->uri;
 	}
 	
 	public function setSslKeyPub($strKeyPub, $force = false){

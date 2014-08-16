@@ -547,8 +547,7 @@ class Client{
 						if($strKeyPub){
 							#if($hashcash && $this->hashcashVerify($hashcash, $id, static::HASHCASH_BITS_MIN)){
 								$node->setIdHexStr($id);
-								$node->setHost($this->getIp());
-								$node->setPort($port);
+								$node->setUri('tcp://'.$this->getIp().':'.$port);
 								$node->setTimeLastSeen(time());
 								
 								$node = $this->getTable()->nodeEnclose($node);
@@ -749,8 +748,7 @@ class Client{
 							$nodeId = $request['data']['nodeId'];
 							$nodesFoundIds = $request['data']['nodesFoundIds'];
 							$distanceOld = $request['data']['distance'];
-							$ip = '';
-							$port = 0;
+							$uri = '';
 							
 							if($nodes){
 								// Find the smallest distance.
@@ -760,11 +758,8 @@ class Client{
 									if(isset($nodeAr['id'])){
 										$node->setIdHexStr($nodeAr['id']);
 									}
-									if(isset($nodeAr['ip'])){
-										$node->setHost($nodeAr['ip']);
-									}
-									if(isset($nodeAr['port'])){
-										$node->setPort($nodeAr['port']);
+									if(isset($nodeAr['uri'])){
+										$node->setUri($nodeAr['uri']);
 									}
 									if(isset($nodeAr['sslKeyPub']) && $nodeAr['sslKeyPub']){
 										$node->setSslKeyPub(base64_decode($nodeAr['sslKeyPub']));
@@ -776,8 +771,8 @@ class Client{
 									$this->log('debug', 'node found: '.$nodeArId.', '.$nodeAr['id'].', do='.$distanceOld.', dn='.$distanceNew);
 									
 									if(!$this->getLocalNode()->isEqual($node)){
-										if($this->getSettings()->data['node']['ipPub'] != $node->getHost()
-											|| $this->getLocalNode()->getPort() != $node->getPort()){
+										if($this->getSettings()->data['node']['ipPub'] != $node->getUri()->getHost()
+											|| $this->getLocalNode()->getUri()->getPort() != $node->getUri()->getPort()){
 											if(!in_array($node->getIdHexStr(), $nodesFoundIds)){
 												
 												$nodesFoundIds[] = $nodeAr['id'];
@@ -787,16 +782,14 @@ class Client{
 												
 												if($nodeAr['id'] == $nodeId){
 													$this->log('debug', 'node found: find completed');
-													$ip = '';
-													$port = 0;
+													$uri = '';
 												}
 												else{
 													if($distanceOld != $distanceNew){
 														$distanceMin = Node::idMinHexStr($distanceOld, $distanceNew);
 														if($distanceMin == $distanceNew){ // Is smaller then $distanceOld.
 															$distanceOld = $distanceNew;
-															$ip = $node->getHost();
-															$port = $node->getPort();
+															$uri = $node->getUri();
 														}
 													}
 												}
@@ -808,7 +801,7 @@ class Client{
 											}
 										}
 										else{
-											$this->log('debug', 'node found: myself, ip:port equal ('.$node->getHost().':'.$node->getPort().')');
+											$this->log('debug', 'node found: myself, uri equal ('.$node->getUri().')');
 										}
 									}
 									else{
@@ -817,9 +810,9 @@ class Client{
 								}
 							}
 							
-							if($ip){
+							if($uri){
 								// Further search at the nearest node.
-								$this->log('debug', 'node found: ip ('.$ip.':'.$port.') ok');
+								$this->log('debug', 'node found: uri ('.$uri.') ok');
 								
 								$clientActions = array();
 								$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
@@ -828,9 +821,7 @@ class Client{
 								});
 								$clientActions[] = $action;
 								
-								if($ip && $port){
-									$this->getServer()->connect($ip, $port, $clientActions);
-								}
+								$this->getServer()->connect($uri, $clientActions);
 							}
 						}
 						else{
@@ -2026,7 +2017,7 @@ class Client{
 		$data = array(
 			'release'   => $this->getSettings()->data['release'],
 			'id'        => $this->getLocalNode()->getIdHexStr(),
-			'port'      => $this->getLocalNode()->getPort(),
+			'port'      => $this->getLocalNode()->getUri()->getPort(),
 			'sslKeyPub' => $sslKeyPub,
 			'isChannel' => $this->getStatus('isChannelLocal'),
 			#'hashcash'  => $this->hashcashMint(static::HASHCASH_BITS_MIN),
@@ -2078,8 +2069,7 @@ class Client{
 		foreach($nodes as $nodeId => $node){
 			$nodesOut[] = array(
 				'id' => $node->getIdHexStr(),
-				'ip' => $node->getHost(),
-				'port' => $node->getPort(),
+				'uri' => (string)$node->getUri(),
 				'sslKeyPub' => base64_encode($node->getSslKeyPub()),
 			);
 		}

@@ -45,7 +45,7 @@ class TableTest extends PHPUnit_Framework_TestCase{
 		
 		$node_a = new Node();
 		$node_a->setIdHexStr('10000001-2002-4004-8008-100000000002');
-		$node_a->setHost('192.168.241.21');
+		$node_a->setUri('tcp://192.168.241.21');
 		$table->nodeEnclose($node_a);
 		
 		$node_b = new Node();
@@ -53,7 +53,7 @@ class TableTest extends PHPUnit_Framework_TestCase{
 		
 		$onode = $table->nodeFindInBuckets($node_b);
 		
-		$this->assertEquals('192.168.241.21', $onode->getHost());
+		$this->assertEquals('192.168.241.21', $onode->getUri()->getHost());
 	}
 	
 	public function testNodeFindInBuckets2(){
@@ -64,12 +64,12 @@ class TableTest extends PHPUnit_Framework_TestCase{
 		
 		$node_a = new Node();
 		$node_a->setIdHexStr('10000001-2002-4004-8008-100000000002');
-		$node_a->setHost('192.168.241.21');
+		$node_a->setUri('tcp://192.168.241.21');
 		$table->nodeEnclose($node_a);
 		
 		$node_b = new Node();
 		$node_b->setIdHexStr('10000001-2002-4004-8008-100000000003');
-		$node_b->setHost('10.0.0.1');
+		$node_b->setUri('tcp://10.0.0.1');
 		
 		$onode = $table->nodeFindInBuckets($node_b);
 		$this->assertEquals(null, $onode);
@@ -96,19 +96,19 @@ class TableTest extends PHPUnit_Framework_TestCase{
 		
 		$node_a = new Node();
 		$node_a->setIdHexStr('10000001-2002-4004-8008-100000000002');
-		$node_a->setHost('192.168.241.21');
+		$node_a->setUri('tcp://192.168.241.21');
 		$table->nodeEnclose($node_a);
 		
 		$node_b = new Node();
 		$node_b->setIdHexStr('10000001-2002-4004-8008-100000000002');
-		$node_b->setHost('10.0.0.1');
+		$node_b->setUri('tcp://10.0.0.1');
 		
 		$onode = $table->nodeEnclose($node_b);
 		
 		$this->assertFalse($node_a === $node_b);
 		$this->assertTrue($node_a === $onode);
 		
-		$this->assertEquals('192.168.241.21', $onode->getHost());
+		$this->assertEquals('192.168.241.21', $onode->getUri()->getHost());
 	}
 	
 }

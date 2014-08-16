@@ -87,7 +87,7 @@ class Kernel extends Thread{
 		$this->getLog()->info('setup local node');
 		$this->localNode = new Node();
 		$this->localNode->setIdHexStr($this->settings->data['node']['id']);
-		$this->localNode->setPort($this->settings->data['node']['port']);
+		$this->localNode->setUri('tcp://'.$this->settings->data['node']['ip'].':'.$this->settings->data['node']['port']);
 		$this->localNode->setSslKeyPub(file_get_contents($this->settings->data['node']['sslKeyPubPath']));
 		$this->getLog()->info('setup local node: done');
 		

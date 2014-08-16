@@ -65,6 +65,7 @@ require_once __DIR__.'/functions.php';
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
 use Symfony\Component\Filesystem\Filesystem;
+use Zend\Uri\UriFactory;
 
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler;
@@ -78,6 +79,8 @@ $filesystem->mkdir('pid', 0700);
 $log = new Logger('main');
 $log->pushHandler(new StreamHandler('php://stdout', Logger::INFO));
 $log->pushHandler(new StreamHandler('log/bootstrap.log', Logger::DEBUG));
+
+UriFactory::registerScheme('tcp', 'TheFox\PhpChat\TcpUri');
 
 $settings = new Settings(__DIR__.'/settings.yml');
 

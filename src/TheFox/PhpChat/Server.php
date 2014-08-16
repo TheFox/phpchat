@@ -304,15 +304,25 @@ class Server{
 		unset($this->clients[$clientsId]);
 	}
 	
-	public function connect($ip, $port, $clientActions = array()){
+	public function connect($uri, $clientActions = array()){
 		$socket = new Socket();
 		
 		$connected = false;
 		try{
-			$connected = $socket->connect($ip, $port);
+			if($uri->getScheme() == 'tcp'){
+				if($uri->getHost() && $uri->getPort()){
+					$connected = $socket->connect($uri->getHost(), $uri->getPort());
+				}
+			}
+			elseif($uri->getScheme() == 'http'){
+				# TODO
+			}
+			else{
+				$this->log->debug('connection to '.$uri.' failed: invalid uri scheme ('.$uri->getScheme().')');
+			}
 		}
 		catch(Exception $e){
-			$this->log->debug('connection to '.$ip.', '.$port.' failed: '.$e->getMessage());
+			$this->log->debug('connection to '.$uri.' failed: '.$e->getMessage());
 		}
 		
 		if($connected){

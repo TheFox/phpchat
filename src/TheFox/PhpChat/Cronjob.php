@@ -353,7 +353,7 @@ class Cronjob extends Thread{
 			}
 			
 			$onode = $this->table->nodeFindInBuckets($dstNode);
-			if($onode && $onode->getHost() && $onode->getPort()){
+			if($onode && $onode->getUri()->getHost() && $onode->getUri()->getPort()){
 				#fwrite(STDOUT, __METHOD__.'      dst node found in table'."\n"); # TODO
 				
 				$nodes[$onode->getIdHexStr()] = $onode;
@@ -370,7 +370,7 @@ class Cronjob extends Thread{
 				if(
 					$msg->getRelayNodeId() != $node->getIdHexStr()
 					&& !in_array($node->getIdHexStr(), $msg->getSentNodes())
-					&& $node->getHost() && $node->getPort()
+					&& $node->getUri()->getHost() && $node->getUri()->getPort()
 				){
 					#fwrite(STDOUT, __METHOD__.'             n '.$node->getIdHexStr()."\n"); # TODO
 					
