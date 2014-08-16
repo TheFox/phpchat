@@ -1211,6 +1211,9 @@ class Console extends Thread{
 	}
 	
 	public function connect($uri){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#ve($uri);
+		
 		$this->msgAdd();
 		$this->msgAdd('Connecting to '.$uri.' ...', true, false);
 		
