@@ -1468,6 +1468,8 @@ class Client{
 							}
 							else{
 								$msgHandleReturnValue .= $this->sendTalkResponse($rid, 4);
+								$msgHandleReturnValue .= $this->sendQuit();
+								$this->shutdown();
 							}
 						}
 						else{
@@ -1540,6 +1542,8 @@ class Client{
 						elseif($status == 4){
 							// No console, standalone server.
 							$this->consoleMsgAdd($this->getUri().' has no user interface. Can\'t talk to you.', true, true);
+							$msgHandleReturnValue .= $this->sendQuit();
+							$this->shutdown();
 						}
 					}
 					else{
