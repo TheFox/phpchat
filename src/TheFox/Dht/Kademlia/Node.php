@@ -37,7 +37,7 @@ class Node extends YamlStorage{
 	}
 	
 	public function __sleep(){
-		return array('data', 'id', 'sslKeyPub');
+		return array('data', 'id', 'uri', 'sslKeyPub');
 	}
 	
 	public function __toString(){

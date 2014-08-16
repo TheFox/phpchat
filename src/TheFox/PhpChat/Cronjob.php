@@ -142,13 +142,14 @@ class Cronjob extends Thread{
 		#ve($nodes);
 		
 		foreach($nodes as $nodeId => $node){
+			#ve($node->getUri());
 			$this->getIpcKernelConnection()->execAsync('serverConnect', array($node->getUri(), false, true));
 		}
 	}
 	
 	public function msgDbInit(){
 		$this->log->debug(__FUNCTION__);
-		print __FUNCTION__.''."\n"; # TODO
+		#print __FUNCTION__.''."\n"; # TODO
 		
 		$this->msgDb = $this->getIpcKernelConnection()->execSync('getMsgDb', array(), 10);
 		$this->settings = $this->getIpcKernelConnection()->execSync('getSettings');

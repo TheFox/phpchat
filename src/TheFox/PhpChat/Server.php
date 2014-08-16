@@ -305,8 +305,8 @@ class Server{
 	}
 	
 	public function connect($uri, $clientActions = array()){
-		print __CLASS__.'->'.__FUNCTION__.''."\n";
-		ve($uri);
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#ve($uri);
 		
 		$socket = new Socket();
 		

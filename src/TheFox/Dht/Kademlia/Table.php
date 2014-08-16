@@ -205,8 +205,7 @@ class Table extends YamlStorage{
 				#print __CLASS__.'->'.__FUNCTION__.': old node'."\n";
 				
 				if( $node->getTimeLastSeen() > $onode->getTimeLastSeen() ){
-					$onode->setIp($node->getIp());
-					$onode->setPort($node->getPort());
+					$onode->setUri($node->getUri());
 					$onode->setTimeLastSeen($node->getTimeLastSeen());
 					$onode->setDataChanged(true);
 				}
