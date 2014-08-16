@@ -119,4 +119,19 @@ class TcpClient extends Client{
 		return $msg;
 	}
 	
+	public function shutdown(){
+		if(!$this->getStatus('hasShutdown')){
+			$this->setStatus('hasShutdown', true);
+			
+			if($this->getSocket()){
+				$this->getSocket()->shutdown();
+				$this->getSocket()->close();
+			}
+			
+			if($this->getSsl()){
+				openssl_free_key($this->getSsl());
+			}
+		}
+	}
+	
 }

@@ -2322,18 +2322,7 @@ class Client{
 	}
 	
 	public function shutdown(){
-		if(!$this->getStatus('hasShutdown')){
-			$this->setStatus('hasShutdown', true);
-			
-			if($this->getSocket()){
-				$this->getSocket()->shutdown();
-				$this->getSocket()->close();
-			}
-			
-			if($this->ssl){
-				openssl_free_key($this->ssl);
-			}
-		}
+		
 	}
 	
 	private function consoleMsgAdd($msgText = '', $showDate = true, $printPs1 = true, $clearLine = false){
