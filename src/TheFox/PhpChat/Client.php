@@ -120,6 +120,9 @@ class Client{
 	
 	public function setSocket(AbstractSocket $socket){
 		$this->socket = $socket;
+		$this->socket->getPeerName($ip, $port);
+		$this->setIp($ip);
+		$this->setPort($port);
 	}
 	
 	public function getSocket(){
@@ -139,9 +142,6 @@ class Client{
 	}
 	
 	public function getIp(){
-		if(!$this->ip){
-			$this->setIpPort();
-		}
 		return $this->ip;
 	}
 	
@@ -150,18 +150,7 @@ class Client{
 	}
 	
 	public function getPort(){
-		if(!$this->port){
-			$this->setIpPort();
-		}
 		return $this->port;
-	}
-	
-	public function setIpPort($ip = '', $port = 0){
-		if($this->getSocket()){
-			$this->getSocket()->getPeerName($ip, $port);
-			$this->setIp($ip);
-			$this->setPort($port);
-		}
 	}
 	
 	public function getIpPort(){
