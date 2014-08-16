@@ -142,10 +142,7 @@ class Cronjob extends Thread{
 		#ve($nodes);
 		
 		foreach($nodes as $nodeId => $node){
-			if($node->getIp() && $node->getPort()){
-				$this->getIpcKernelConnection()->execAsync('serverConnect',
-					array($node->getIp(), $node->getPort(), false, true));
-			}
+			$this->getIpcKernelConnection()->execAsync('serverConnect', array($node->getUri(), false, true));
 		}
 	}
 	

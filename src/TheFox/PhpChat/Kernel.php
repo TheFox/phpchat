@@ -182,13 +182,14 @@ class Kernel extends Thread{
 		$this->ipcSmtpServerConnection->connect();
 	}
 	
-	public function serverConnect($ip, $port, $isTalkRequest = false, $isPingOnly = false, $msgIds = array()){
-		if($this->getServer() && $ip && $port){
-			print __CLASS__.'->'.__FUNCTION__.': '.$ip.':'.$port."\n";
+	public function serverConnect($uri, $isTalkRequest = false, $isPingOnly = false, $msgIds = array()){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#ve($uri);
+		
+		if($this->getServer()){
 			
 			$clientActions = array();
 			if($isTalkRequest){
-				
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_HELLO);
 				$action->functionSet(function($action, $client){
 					$client->setStatus('isChannelLocal', true);
@@ -267,7 +268,7 @@ class Kernel extends Thread{
 				$clientActions[] = $action;
 			}
 			
-			return $this->getServer()->connect($ip, $port, $clientActions);
+			return $this->getServer()->connect($uri, $clientActions);
 		}
 		
 		return false;
