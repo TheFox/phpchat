@@ -157,6 +157,23 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 -----END PUBLIC KEY-----
 ';
 	
+	public function testSerialize(){
+		$node = new Node();
+		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		
+		$client = new Client();
+		$client->setId(21);
+		$client->setUri('tcp://127.0.0.1:25000');
+		$client->setNode($node);
+		
+		$client = unserialize(serialize($client));
+		#ve($client);
+		
+		$this->assertEquals(21, $client->getId());
+		$this->assertEquals('tcp://127.0.0.1:25000', (string)$client->getUri());
+		$this->assertEquals($node, $client->getNode());
+	}
+	
 	public function testBasic(){
 		file_put_contents('tests/id_rsa_client1.prv', static::NODE_LOCAL_SSL_KEY_PRV1);
 		file_put_contents('tests/id_rsa_client1.pub', static::NODE_LOCAL_SSL_KEY_PUB1);

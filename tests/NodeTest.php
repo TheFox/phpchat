@@ -60,6 +60,17 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 2JGsj8q54He5gnVI01MEWr0CAwEAAQ==
 -----END PUBLIC KEY-----';
 	
+	public function testSerialize(){
+		$node = new Node();
+		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		$node->setUri('tcp://192.168.241.21:25001');
+		
+		$node = unserialize(serialize($node));
+		
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
+		$this->assertEquals('tcp://192.168.241.21:25001', (string)$node->getUri());
+	}
+	
 	public function testId(){
 		$id = (string)Uuid::uuid4();
 		
