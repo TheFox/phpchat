@@ -547,7 +547,7 @@ class Client{
 						if($strKeyPub){
 							#if($hashcash && $this->hashcashVerify($hashcash, $id, static::HASHCASH_BITS_MIN)){
 								$node->setIdHexStr($id);
-								$node->setIp($this->getIp());
+								$node->setHost($this->getIp());
 								$node->setPort($port);
 								$node->setTimeLastSeen(time());
 								
@@ -761,7 +761,7 @@ class Client{
 										$node->setIdHexStr($nodeAr['id']);
 									}
 									if(isset($nodeAr['ip'])){
-										$node->setIp($nodeAr['ip']);
+										$node->setHost($nodeAr['ip']);
 									}
 									if(isset($nodeAr['port'])){
 										$node->setPort($nodeAr['port']);
@@ -776,7 +776,7 @@ class Client{
 									$this->log('debug', 'node found: '.$nodeArId.', '.$nodeAr['id'].', do='.$distanceOld.', dn='.$distanceNew);
 									
 									if(!$this->getLocalNode()->isEqual($node)){
-										if($this->getSettings()->data['node']['ipPub'] != $node->getIp()
+										if($this->getSettings()->data['node']['ipPub'] != $node->getHost()
 											|| $this->getLocalNode()->getPort() != $node->getPort()){
 											if(!in_array($node->getIdHexStr(), $nodesFoundIds)){
 												
@@ -795,7 +795,7 @@ class Client{
 														$distanceMin = Node::idMinHexStr($distanceOld, $distanceNew);
 														if($distanceMin == $distanceNew){ // Is smaller then $distanceOld.
 															$distanceOld = $distanceNew;
-															$ip = $node->getIp();
+															$ip = $node->getHost();
 															$port = $node->getPort();
 														}
 													}
@@ -808,7 +808,7 @@ class Client{
 											}
 										}
 										else{
-											$this->log('debug', 'node found: myself, ip:port equal ('.$node->getIp().':'.$node->getPort().')');
+											$this->log('debug', 'node found: myself, ip:port equal ('.$node->getHost().':'.$node->getPort().')');
 										}
 									}
 									else{
@@ -2078,7 +2078,7 @@ class Client{
 		foreach($nodes as $nodeId => $node){
 			$nodesOut[] = array(
 				'id' => $node->getIdHexStr(),
-				'ip' => $node->getIp(),
+				'ip' => $node->getHost(),
 				'port' => $node->getPort(),
 				'sslKeyPub' => base64_encode($node->getSslKeyPub()),
 			);

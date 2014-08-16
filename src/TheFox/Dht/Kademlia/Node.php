@@ -15,6 +15,10 @@ class Node extends YamlStorage{
 	const SSL_KEY_LEN_MIN = 4096;
 	
 	private $id = array();
+	private $uriType = 'tcp';
+	private $uriHost = '';
+	private $uriPort = '';
+	private $uriPath = '';
 	private $sslKeyPub = null;
 	private $bucket = null;
 	
@@ -22,9 +26,7 @@ class Node extends YamlStorage{
 		parent::__construct($filePath);
 		
 		$this->data['id'] = '00000000-0000-4000-8000-000000000000';
-		$this->data['type'] = 'tcp';
-		$this->data['ip'] = '';
-		$this->data['port'] = 0;
+		$this->data['uri'] = '';
 		$this->data['sslKeyPubFingerprint'] = '';
 		$this->data['timeCreated'] = time();
 		$this->data['timeLastSeen'] = 0;
@@ -56,6 +58,8 @@ class Node extends YamlStorage{
 				$this->setSslKeyPub(base64_decode($this->data['sslKeyPub']));
 			}
 			unset($this->data['sslKeyPub']);
+			
+			$this->setUri($this->data['uri']);
 			
 			return true;
 		}
@@ -99,24 +103,93 @@ class Node extends YamlStorage{
 		return $rv;
 	}
 	
-	public function setIp($ip){
-		$this->data['ip'] = $ip;
+	public function setUri($uri){
+		$uri = parse_url($uri);
+		#ve($uri);
+		
+		$this->uriType = 'tcp';
+		if(isset($uri['scheme'])){
+			$this->uriType = $uri['scheme'];
+		}
+		if(isset($uri['host'])){
+			$this->uriHost = $uri['host'];
+		}
+		if(isset($uri['port'])){
+			$this->uriPort = $uri['port'];
+		}
+		if(isset($uri['path'])){
+			$this->uriPath = $uri['path'];
+		}
+		
+		$this->buildUri();
 	}
 	
-	public function getIp(){
-		return $this->data['ip'];
+	public function getUri(){
+		return $this->data['uri'];
+	}
+	
+	private function buildUri(){
+		switch($this->uriType){
+			case 'tcp':
+				if($this->uriHost && $this->uriPort){
+					$this->data['uri'] = $this->uriType.'://'.$this->uriHost.':'.$this->uriPort;
+				}
+				break;
+			case 'http':
+				if($this->uriHost && $this->uriPath){
+					$this->data['uri'] = $this->uriType.'://'.$this->uriHost;
+					if($this->uriPort){
+						$this->data['uri'] .= ':'.$this->uriPort;
+					}
+					$this->data['uri'] .= $this->uriPath;
+				}
+				break;
+			default:
+				$this->data['uri'] = '';
+		}
+	}
+	
+	public function setType($type){
+		$type = strtolower($type);
+		switch($type){
+			case 'tcp':
+			case 'http':
+				$this->uriType = $type;
+				break;
+			default:
+				$this->uriType = 'tcp';
+		}
+		
+		$this->buildUri();
+	}
+	
+	public function getType(){
+		return $this->uriType;
+	}
+	
+	public function setHost($host){
+		$this->uriHost = $host;
+		$this->buildUri();
+	}
+	
+	public function getHost(){
+		return $this->uriHost;
 	}
 	
 	public function setPort($port){
-		$this->data['port'] = (int)$port;
+		$this->uriPort = (int)$port;
+		$this->buildUri();
 	}
 	
 	public function getPort(){
-		return $this->data['port'];
+		return $this->uriPort;
 	}
 	
-	public function getIpPort(){
-		return $this->data['ip'].':'.$this->data['port'];
+	public function getHostPort(){
+		if($this->getPort()){
+			return $this->getHost().':'.$this->getPort();
+		}
+		return $this->getHost();
 	}
 	
 	public function setSslKeyPub($strKeyPub, $force = false){

@@ -64,11 +64,97 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		$this->assertEquals($id, $node->getIdHexStr());
 	}
 	
+	public function testUri(){
+		$node = new Node();
+		$this->assertEquals('', $node->getUri());
+		$this->assertEquals('tcp', $node->getType());
+		$this->assertEquals('', $node->getHost());
+		$this->assertEquals('', $node->getPort());
+		$this->assertEquals('', $node->getHostPort());
+		
+		$node = new Node();
+		$node->setType('invalid_type');
+		$this->assertEquals('', $node->getUri());
+		$this->assertEquals('tcp', $node->getType());
+		$this->assertEquals('', $node->getHost());
+		$this->assertEquals('', $node->getPort());
+		$this->assertEquals('', $node->getHostPort());
+		
+		$node = new Node();
+		$node->setType('tcp');
+		$node->setHost('192.168.241.21');
+		$this->assertEquals('', $node->getUri());
+		$this->assertEquals('tcp', $node->getType());
+		$this->assertEquals('192.168.241.21', $node->getHost());
+		$this->assertEquals('', $node->getPort());
+		$this->assertEquals('192.168.241.21', $node->getHostPort());
+		
+		$node = new Node();
+		$node->setType('tcp');
+		$node->setHost('192.168.241.21');
+		$node->setPort('26001');
+		$this->assertEquals('tcp://192.168.241.21:26001', $node->getUri());
+		$this->assertEquals('tcp', $node->getType());
+		$this->assertEquals('192.168.241.21', $node->getHost());
+		$this->assertEquals('26001', $node->getPort());
+		$this->assertEquals('192.168.241.21:26001', $node->getHostPort());
+		
+		$node = new Node();
+		$node->setType('tcp');
+		$node->setHost('192.168.241.21');
+		$node->setPort('26001');
+		$this->assertEquals('tcp://192.168.241.21:26001', $node->getUri());
+		$this->assertEquals('tcp', $node->getType());
+		$this->assertEquals('192.168.241.21', $node->getHost());
+		$this->assertEquals('26001', $node->getPort());
+		$this->assertEquals('192.168.241.21:26001', $node->getHostPort());
+		
+		$node = new Node();
+		$node->setUri('tcp://192.168.241.21:26001');
+		$this->assertEquals('tcp://192.168.241.21:26001', $node->getUri());
+		$this->assertEquals('tcp', $node->getType());
+		$this->assertEquals('192.168.241.21', $node->getHost());
+		$this->assertEquals('26001', $node->getPort());
+		$this->assertEquals('192.168.241.21:26001', $node->getHostPort());
+		
+		$node = new Node();
+		$node->setUri('http://phpchat.fox21.at/web/phpchat.php');
+		$this->assertEquals('http://phpchat.fox21.at/web/phpchat.php', $node->getUri());
+		$this->assertEquals('http', $node->getType());
+		$this->assertEquals('phpchat.fox21.at', $node->getHost());
+		$this->assertEquals('', $node->getPort());
+		$this->assertEquals('phpchat.fox21.at', $node->getHostPort());
+		
+		$node = new Node();
+		$node->setUri('http://phpchat.fox21.at:8080/web/phpchat.php');
+		$this->assertEquals('http://phpchat.fox21.at:8080/web/phpchat.php', $node->getUri());
+		$this->assertEquals('http', $node->getType());
+		$this->assertEquals('phpchat.fox21.at', $node->getHost());
+		$this->assertEquals('8080', $node->getPort());
+		$this->assertEquals('phpchat.fox21.at:8080', $node->getHostPort());
+	}
+	
 	public function testSave(){
 		$node = new Node('tests/test_node.yml');
 		$node->setDatadirBasePath('tests');
 		$node->setDataChanged(true);
 		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		
+		$node->setSslKeyPub(static::SSL_KEY_PUB1);
+		$this->assertFalse( $node->setSslKeyPub(static::SSL_KEY_PUB1) );
+		
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
+		$this->assertEquals('FC_BtK4HvbdX9wNQ6hGopSrFxs71SuuwMZra', $node->getSslKeyPubFingerprint());
+		
+		$this->assertTrue( (bool)$node->save() );
+	}
+	
+	public function testSaveWebnode(){
+		$node = new Node('tests/test_node_web.yml');
+		$node->setDatadirBasePath('tests');
+		$node->setDataChanged(true);
+		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		$node->setUri('http://phpchat.fox21.at:8080/web/phpchat.php');
 		
 		$node->setSslKeyPub(static::SSL_KEY_PUB1);
 		$this->assertFalse( $node->setSslKeyPub(static::SSL_KEY_PUB1) );
@@ -88,6 +174,21 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		
 		$this->assertTrue($node->load());
 		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
+		$this->assertEquals('tcp', $node->getType());
+		$this->assertEquals('FC_BtK4HvbdX9wNQ6hGopSrFxs71SuuwMZra', $node->getSslKeyPubFingerprint());
+		$this->assertEquals(static::SSL_KEY_PUB1, $node->getSslKeyPub());
+	}
+	
+	/**
+	* @depends testSaveWebnode
+	*/
+	public function testLoadWebnode(){
+		$node = new Node('tests/test_node_web.yml');
+		$node->setDatadirBasePath('tests');
+		
+		$this->assertTrue($node->load());
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
+		$this->assertEquals('http', $node->getType());
 		$this->assertEquals('FC_BtK4HvbdX9wNQ6hGopSrFxs71SuuwMZra', $node->getSslKeyPubFingerprint());
 		$this->assertEquals(static::SSL_KEY_PUB1, $node->getSslKeyPub());
 	}
