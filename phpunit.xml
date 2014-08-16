@@ -30,6 +30,7 @@
 			<file>tests/NodeTest.php</file>
 			<file>tests/SslTest.php</file>
 			<file>tests/TableTest.php</file>
+			<file>tests/TcpClientTest.php</file>
 		</testsuite>
 	</testsuites>
 </phpunit>

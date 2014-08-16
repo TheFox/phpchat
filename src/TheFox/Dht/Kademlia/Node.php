@@ -69,7 +69,7 @@ class Node extends YamlStorage{
 			}
 			
 			if(isset($this->data['uri'])){
-				fwrite(STDOUT, 'load node: uri /'.$this->data['uri'].'/'."\n");
+				#fwrite(STDOUT, 'load node: uri /'.$this->data['uri'].'/'."\n");
 				$this->setUri($this->data['uri']);
 				unset($this->data['uri']);
 			}

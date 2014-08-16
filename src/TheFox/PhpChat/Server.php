@@ -224,7 +224,7 @@ class Server{
 		$this->clientsId++;
 		#print __CLASS__.'->'.__FUNCTION__.': '.$this->clientsId."\n";
 		
-		$client = new Client();
+		$client = new TcpClient();
 		$client->setSocket($socket);
 		$client->setSslPrv($this->sslKeyPrvPath, $this->sslKeyPrvPass);
 		
