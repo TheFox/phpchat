@@ -183,8 +183,8 @@ class Kernel extends Thread{
 	}
 	
 	public function serverConnect($uri, $isTalkRequest = false, $isPingOnly = false, $msgIds = array()){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		#ve($uri);
+		print __CLASS__.'->'.__FUNCTION__.''."\n";
+		ve($uri);
 		
 		if($this->getServer()){
 			
