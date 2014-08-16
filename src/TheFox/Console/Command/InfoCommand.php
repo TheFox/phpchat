@@ -26,7 +26,7 @@ class InfoCommand extends BasicCommand{
 		
 		$localNode = new Node();
 		$localNode->setIdHexStr($settings->data['node']['id']);
-		$localNode->setPort($settings->data['node']['port']);
+		$localNode->setUri('tcp://'.$settings->data['node']['ip'].':'.$settings->data['node']['port']);
 		$localNode->setSslKeyPub(file_get_contents($settings->data['node']['sslKeyPubPath']));
 		
 		print '--------'."\n";
