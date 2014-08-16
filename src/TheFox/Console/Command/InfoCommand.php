@@ -38,6 +38,8 @@ class InfoCommand extends BasicCommand{
 		print '   Nickname: '.$settings->data['user']['nickname']."\n";
 		print '   SSL version: '.OPENSSL_VERSION_TEXT."\n";
 		print '--------'."\n";
+		print '   Pub Key Base64:'."\n".base64_encode($localNode->getSslKeyPub())."\n";
+		print '--------'."\n";
 		
 		$this->executePost();
 	}

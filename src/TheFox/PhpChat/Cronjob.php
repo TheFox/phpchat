@@ -97,6 +97,7 @@ class Cronjob extends Thread{
 			#print __FUNCTION__.': '.$this->getExit().', '.$hours.', '.$minutes.', '.$seconds."\n";
 			
 			if($hours == 0 && $minutes == 1 && $seconds == 0){
+				print __FUNCTION__.': ping'."\n";  # TODO
 				$this->pingClosestNodes();
 			}
 			
@@ -136,9 +137,9 @@ class Cronjob extends Thread{
 		#print __FUNCTION__.''."\n";
 		$this->log->debug(__FUNCTION__);
 		$table = $this->getIpcKernelConnection()->execSync('getTable');
+		#ve($table);
 		
 		$nodes = $table->getNodesClosest(20);
-		#ve($table);
 		#ve($nodes);
 		
 		foreach($nodes as $nodeId => $node){

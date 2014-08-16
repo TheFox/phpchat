@@ -198,6 +198,7 @@ class Server{
 					$client = $this->clientGetByHandle($readableHandle);
 					if($client instanceof TcpClient){
 						if(feof($client->getSocket()->getHandle())){
+							$this->log->debug('remove client: '.$client->getUri());
 							$this->clientRemove($client);
 						}
 						else{
@@ -224,7 +225,7 @@ class Server{
 	
 	private function clientNewTcp($socket){
 		$this->clientsId++;
-		#print __CLASS__.'->'.__FUNCTION__.': '.$this->clientsId."\n";
+		fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.$this->clientsId."\n"); # TODO
 		
 		$client = new TcpClient();
 		$client->setSocket($socket);
@@ -246,7 +247,7 @@ class Server{
 		}
 		
 		$this->clients[$this->clientsId] = $client;
-		#print __CLASS__.'->'.__FUNCTION__.': '.count($this->clients)."\n";
+		fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.count($this->clients)."\n");
 		
 		return $client;
 	}
@@ -307,7 +308,7 @@ class Server{
 	}
 	
 	public function connect($uri, $clientActions = array()){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		print __CLASS__.'->'.__FUNCTION__.': '.$uri."\n";
 		#ve($uri);
 		
 		$socket = new Socket();
