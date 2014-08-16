@@ -7,6 +7,7 @@ use RuntimeException;
 
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
+use Zend\Uri\UriFactory;
 
 use TheFox\Utilities\Hex;
 use TheFox\Network\AbstractSocket;
@@ -34,8 +35,7 @@ class Client{
 	private $server = null;
 	private $socket = null;
 	private $node = null;
-	private $ip = '';
-	private $port = 0;
+	private $uri = null;
 	private $ssl = null;
 	private $sslTestToken = '';
 	private $sslPasswordToken = '';
@@ -57,6 +57,8 @@ class Client{
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
+		$this->uri = UriFactory::factory('tcp://');
+		
 		$this->status['hasShutdown'] = false;
 		$this->status['isChannelLocal'] = false;
 		$this->status['isChannelPeer'] = false;
@@ -69,7 +71,7 @@ class Client{
 	public function __sleep(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
-		return array('id', 'ip', 'port', 'node');
+		return array('id', 'uri', 'node');
 	}
 	
 	public function __destruct(){
@@ -121,8 +123,7 @@ class Client{
 	public function setSocket(AbstractSocket $socket){
 		$this->socket = $socket;
 		$this->socket->getPeerName($ip, $port);
-		$this->setIp($ip);
-		$this->setPort($port);
+		$this->setUri('tcp://'.$ip.':'.$port);
 	}
 	
 	public function getSocket(){
@@ -137,24 +138,20 @@ class Client{
 		return $this->node;
 	}
 	
-	public function setIp($ip){
-		$this->ip = $ip;
+	public function setUri($uri){
+		if(is_string($uri)){
+			if($uri){
+				$uri = UriFactory::factory($uri);
+			}
+			else{
+				$uri = UriFactory::factory('tcp://');
+			}
+		}
+		$this->uri = $uri;
 	}
 	
-	public function getIp(){
-		return $this->ip;
-	}
-	
-	public function setPort($port){
-		$this->port = $port;
-	}
-	
-	public function getPort(){
-		return $this->port;
-	}
-	
-	public function getIpPort(){
-		return $this->getIp().':'.$this->getPort();
+	public function getUri(){
+		return $this->uri;
 	}
 	
 	public function setSsl($ssl){
@@ -536,7 +533,7 @@ class Client{
 						if($strKeyPub){
 							#if($hashcash && $this->hashcashVerify($hashcash, $id, static::HASHCASH_BITS_MIN)){
 								$node->setIdHexStr($id);
-								$node->setUri('tcp://'.$this->getIp().':'.$port);
+								$node->setUri('tcp://'.$this->getUri()->getHost().':'.$port);
 								$node->setTimeLastSeen(time());
 								
 								$node = $this->getTable()->nodeEnclose($node);
@@ -605,7 +602,7 @@ class Client{
 						
 						$rv .= $this->sendIdOk();
 						
-						$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$id.', '.$port);
+						$this->log('debug', $this->getUri().' recv '.$msgName.': '.$id.', '.$port);
 					}
 					else{
 						$rv .= $this->sendQuit();
@@ -621,7 +618,7 @@ class Client{
 			}
 		}
 		elseif($msgName == 'id_ok'){
-			$this->log('debug', $this->getIpPort().' recv '.$msgName);
+			$this->log('debug', $this->getUri().' recv '.$msgName);
 			
 			$action = $this->actionGetByCriterion(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
 			if($action){
@@ -630,7 +627,7 @@ class Client{
 			}
 			
 			if($this->getStatus('isChannelPeer')){
-				$this->consoleMsgAdd('New incoming channel connection from '.$this->getIpPort().'.', true, true, true);
+				$this->consoleMsgAdd('New incoming channel connection from '.$this->getUri().'.', true, true, true);
 			}
 			
 			if($this->getStatus('isChannelPeer') || $this->getStatus('isChannelLocal')){
@@ -671,7 +668,7 @@ class Client{
 					$hashcash = $msgData['hashcash'];
 				}
 				
-				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$nodeId.', '.(int)($this->getNode() != null));
+				$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.$nodeId.', '.(int)($this->getNode() != null));
 				
 				if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MIN)){
 					if($nodeId){
@@ -727,7 +724,7 @@ class Client{
 				}
 				
 				if($rid){
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid);
+					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid);
 					
 					$request = $this->requestGetByRid($rid);
 					if($request){
@@ -882,7 +879,7 @@ class Client{
 						$hashcash = $msgData['hashcash'];
 					}
 					
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$id);
+					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$id);
 					
 					#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.' body: '.$body."\n"); # TODO
 					#$this->log('debug', 'msg '.$id.' body: '.$body);
@@ -992,7 +989,7 @@ class Client{
 					$status = (int)$msgData['status'];
 				}
 				
-				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$status);
+				$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.$status);
 				
 				$request = $this->requestGetByRid($rid);
 				if($request){
@@ -1395,14 +1392,14 @@ class Client{
 					$nodeSslKeyPubFingerprint = $msgData['nodeSslKeyPubFingerprint'];
 				}
 				
-				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid);
+				$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid);
 				
 				if(Node::sslKeyPubFingerprintVerify($nodeSslKeyPubFingerprint)){
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': pub key fp ok');
+					$this->log('debug', $this->getUri().' recv '.$msgName.': pub key fp ok');
 					
 					$node = $this->getTable()->nodeFindByKeyPubFingerprint($nodeSslKeyPubFingerprint);
 					if($node){
-						$this->log('debug', $this->getIpPort().' recv '.$msgName.': found node');
+						$this->log('debug', $this->getUri().' recv '.$msgName.': found node');
 						
 						$this->sendSslKeyPubPut($rid, $node->getIdHexStr(),
 							$node->getIp(), $node->getPort(),
@@ -1412,14 +1409,14 @@ class Client{
 						// Not found.
 						$this->sendSslKeyPubPut($rid);
 						
-						$this->log('debug', $this->getIpPort().' recv '.$msgName.': node not found A');
+						$this->log('debug', $this->getUri().' recv '.$msgName.': node not found A');
 					}
 				}
 				else{
 					// Fingerprint not valid.
 					$this->sendSslKeyPubPut($rid);
 					
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': node not found B');
+					$this->log('debug', $this->getUri().' recv '.$msgName.': node not found B');
 				}
 			}
 			else{
@@ -1456,12 +1453,12 @@ class Client{
 				}
 				
 				$debugText = '"'.$rid.'" "'.$nodeId.'" "'.$nodeIp.':'.$nodePort.'" "'.$nodeSslKeyPubFingerprint.'"';
-				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$debugText);
+				$this->log('debug', $this->getUri().' recv '.$msgName.': '.$debugText);
 				
 				$request = $this->requestGetByRid($rid);
 				if($request){
 					$this->requestRemove($request);
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': request '.$request['id']);
+					$this->log('debug', $this->getUri().' recv '.$msgName.': request '.$request['id']);
 					
 					if($nodeId){
 						$node = new Node();
@@ -1482,7 +1479,7 @@ class Client{
 							
 							$onode = $this->getTable()->nodeFindInBuckets($node);
 							if($onode){
-								$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', old node');
+								$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', old node');
 								
 								if(!$onode->getSslKeyPub() && $node->getSslKeyPub()){
 									$onode->setSslKeyPub($node->getSslKeyPub());
@@ -1490,7 +1487,7 @@ class Client{
 								}
 							}
 							else{
-								$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', new node');
+								$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', new node');
 								
 								$this->getTable()->nodeEnclose($node);
 							}
@@ -1527,7 +1524,7 @@ class Client{
 						$hashcash = $msgData['hashcash'];
 					}
 					
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$userNickname);
+					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.$userNickname);
 					
 					if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MAX)){
 						if($rid){
@@ -1572,12 +1569,12 @@ class Client{
 						$userNickname = $msgData['userNickname'];
 					}
 					
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.(int)$status.', '.$userNickname);
+					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.(int)$status.', '.$userNickname);
 					
 					$request = $this->requestGetByRid($rid);
 					if($request){
 						$this->requestRemove($request);
-						$this->log('debug', $this->getIpPort().' recv '.$msgName.': request ok');
+						$this->log('debug', $this->getUri().' recv '.$msgName.': request ok');
 						
 						//if($status == 0){} // Undefined
 						if($status == 1){
@@ -1607,7 +1604,7 @@ class Client{
 						}
 						elseif($status == 4){
 							// No console, standalone server.
-							$this->consoleMsgAdd($this->getIpPort().' has no user interface. Can\'t talk to you.', true, true);
+							$this->consoleMsgAdd($this->getUri().' has no user interface. Can\'t talk to you.', true, true);
 						}
 					}
 					else{
@@ -1617,7 +1614,7 @@ class Client{
 			}
 		}
 		elseif($msgName == 'talk_msg'){
-			#$this->log('debug', $this->getIpPort().' recv '.$msgName);
+			#$this->log('debug', $this->getUri().' recv '.$msgName);
 			
 			if($this->getStatus('hasSsl')){
 				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
@@ -1640,7 +1637,7 @@ class Client{
 					}
 					
 					$debugText = $rid.', '.$userNickname.', '.(int)$ignore.', '.$text;
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$debugText);
+					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$debugText);
 					if(!$ignore){
 						$this->consoleTalkMsgAdd($rid, $userNickname, $text);
 					}
@@ -1648,7 +1645,7 @@ class Client{
 			}
 		}
 		elseif($msgName == 'talk_user_nickname_change'){
-			#$this->log('debug', $this->getIpPort().' recv '.$msgName);
+			#$this->log('debug', $this->getUri().' recv '.$msgName);
 			
 			if($this->getStatus('hasSsl')){
 				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
@@ -1674,7 +1671,7 @@ class Client{
 						}
 					}
 					
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$userNicknameOld.', '.$userNicknameNew);
+					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$userNicknameOld.', '.$userNicknameNew);
 					$this->consoleMsgAdd('User "'.$userNicknameOld.'" is now known as "'.$userNicknameNew.'".',
 						true, true, true);
 				}
@@ -1693,7 +1690,7 @@ class Client{
 						$userNickname = $msgData['userNickname'];
 					}
 					
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$userNickname);
+					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.$userNickname);
 					
 					$rv .= $this->sendQuit();
 					$this->shutdown();
@@ -1733,13 +1730,13 @@ class Client{
 				$name = $msgData['name'];
 			}
 			
-			$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$code.', '.$msg.', '.$name);
+			$this->log('debug', $this->getUri().' recv '.$msgName.': '.$code.', '.$msg.', '.$name);
 		}
 		elseif($msgName == 'quit'){
 			$this->shutdown();
 		}
 		else{
-			$this->log('debug', $this->getIpPort().' recv '.$msgName.': not implemented.');
+			$this->log('debug', $this->getUri().' recv '.$msgName.': not implemented.');
 			$rv .= $this->sendError(9020, $msgName);
 		}
 		
@@ -1991,7 +1988,7 @@ class Client{
 	
 	public function sendHello(){
 		$data = array(
-			'ip' => $this->getIp(),
+			'ip' => $this->getUri()->getHost(),
 		);
 		return $this->dataSend($this->msgCreate('hello', $data));
 	}
@@ -2169,10 +2166,7 @@ class Client{
 	}
 	
 	private function genSslPassword(){
-		$addr = $this->getIp().':'.$this->getPort();
-		$password = hash('sha512', $addr.'_'.mt_rand(0, 999999));
-		#$password = substr(hash('sha512', $addr.'_'.mt_rand(0, 999999)), 0, 3);
-		
+		$password = hash('sha512', $this->getUri().'_'.mt_rand(0, 999999));
 		return $password;
 	}
 	

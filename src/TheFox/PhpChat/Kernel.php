@@ -204,9 +204,9 @@ class Kernel extends Thread{
 				
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
 				$action->functionSet(function($action, $client){
-					$this->ipcConsoleMsgSend('Sening talk request to '.$client->getIpPort().' ...', true, false);
+					$this->ipcConsoleMsgSend('Sening talk request to '.$client->getUri().' ...', true, false);
 					$client->sendTalkRequest($this->getSettingsUserNickname());
-					$this->ipcConsoleMsgSend('Talk request sent to '.$client->getIpPort().'. Waiting for response ...', true, true);
+					$this->ipcConsoleMsgSend('Talk request sent to '.$client->getUri().'. Waiting for response ...', true, true);
 				});
 				$clientActions[] = $action;
 			}

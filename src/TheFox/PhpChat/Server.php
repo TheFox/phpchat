@@ -188,7 +188,7 @@ class Server{
 						
 						$client->sendHello();
 						
-						$this->log->debug('new client: '.$client->getId().', '.$client->getIpPort());
+						$this->log->debug('new client: '.$client->getUri());
 					}
 				}
 				else{
@@ -199,7 +199,7 @@ class Server{
 							$this->clientRemove($client);
 						}
 						else{
-							#$this->log->debug('old client: '.$client->getId().', '.$client->getIpPort());
+							#$this->log->debug('old client: '.$client->getUri());
 							$client->dataRecv();
 							
 							if($client->getStatus('hasShutdown')){
@@ -295,7 +295,7 @@ class Server{
 			$this->consoleSetModeChannelClient(null);
 			
 			$this->consoleMsgAdd();
-			$this->consoleMsgAdd('Connection to '.$client->getIpPort().' closed.', true, true);
+			$this->consoleMsgAdd('Connection to '.$client->getUri().' closed.', true, true);
 		}
 		
 		$client->shutdown();

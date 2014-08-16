@@ -206,11 +206,10 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 	public function testGetIpPort(){
 		$client = new Client();
 		
-		$this->assertEquals(':0', $client->getIpPort());
+		$this->assertEquals('', (string)$client->getUri());
 		
-		$client->setIp('192.168.241.21');
-		$client->setPort(1987);
-		$this->assertEquals('192.168.241.21:1987', $client->getIpPort());
+		$client->setUri('tcp://192.168.241.21:1987');
+		$this->assertEquals('tcp://192.168.241.21:1987', (string)$client->getUri());
 	}
 	
 	public function testHashcashMint(){
@@ -451,18 +450,18 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$client1 = new Client();
 		$client1->setSslPrv($settings1->data['node']['sslKeyPrvPath'], $settings1->data['node']['sslKeyPrvPass']);
 		$client1->setId(1);
-		$client1->setIp($settings1->data['node']['ip']);
+		$client1->setUri('tcp://'.$settings1->data['node']['ip']);
 		$client1->setServer($server1);
-		$this->assertEquals($settings1->data['node']['ip'], $client1->getIp());
-		#fwrite(STDOUT, 'ip1: /'.$client1->getIp().'/'."\n");
+		$this->assertEquals($settings1->data['node']['ip'], $client1->getUri()->getHost());
+		#fwrite(STDOUT, 'ip1: /'.$client1->getUri()->getHost().'/'."\n");
 		
 		$client2 = new Client();
 		$client2->setSslPrv($settings2->data['node']['sslKeyPrvPath'], $settings2->data['node']['sslKeyPrvPass']);
 		$client2->setId(2);
-		$client2->setIp($settings2->data['node']['ip']);
+		$client2->setUri('tcp://'.$settings2->data['node']['ip']);
 		$client2->setServer($server2);
-		$this->assertEquals($settings2->data['node']['ip'], $client2->getIp());
-		#fwrite(STDOUT, 'ip2: /'.$client2->getIp().'/'."\n");
+		$this->assertEquals($settings2->data['node']['ip'], $client2->getUri()->getHost());
+		#fwrite(STDOUT, 'ip2: /'.$client2->getUri()->getHost().'/'."\n");
 		
 		return array($client1, $client2);
 	}
