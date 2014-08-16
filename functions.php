@@ -20,6 +20,17 @@ function vej($v = null){
 	}
 }
 
+function vew($v = null){
+	try{
+		print '<pre>';
+		var_export($v, true);
+		print '</pre>';
+	}
+	catch(Exception $e){
+		print "ERROR: ".$e->getMessage()."\n";
+	}
+}
+
 function strIsUuid($str){
 	# UUID v4: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx where x is any hexadecimal digit and y is one of 8, 9, A, or B
 	# xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
