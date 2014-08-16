@@ -174,7 +174,7 @@ class Client{
 		return null;
 	}
 	
-	private function log($level, $msg){
+	public function log($level, $msg){
 		#print __CLASS__.'->'.__FUNCTION__.': '.$level.', '.$msg."\n";
 		
 		if($this->getLog()){
@@ -290,6 +290,12 @@ class Client{
 	
 	public function requestRemove($request){
 		unset($this->requests[$request['id']]);
+	}
+	
+	public function actionsAdd($actions){
+		foreach($actions as $action){
+			$this->actionAdd($action);
+		}
 	}
 	
 	public function actionAdd(ClientAction $action){

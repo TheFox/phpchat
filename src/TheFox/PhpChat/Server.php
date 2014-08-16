@@ -166,14 +166,22 @@ class Server{
 			$readHandles[] = $this->socket->getHandle();
 		}
 		foreach($this->clients as $clientId => $client){
-			if($client instanceof TcpClient){
-				// Collect client handles.
-				$readHandles[] = $client->getSocket()->getHandle();
-			}
+			#$this->log->debug('client: '.$client->getUri());
 			
-			// Run client.
-			#print __CLASS__.'->'.__FUNCTION__.': client run'."\n";
-			$client->run();
+			if($client->getStatus('hasShutdown')){
+				$this->log->debug('remove client, hasShutdown: '.$client->getUri());
+				$this->clientRemove($client);
+			}
+			else{
+				if($client instanceof TcpClient){
+					// Collect client handles.
+					$readHandles[] = $client->getSocket()->getHandle();
+				}
+				
+				// Run client.
+				#print __CLASS__.'->'.__FUNCTION__.': client run'."\n";
+				$client->run();
+			}
 		}
 		$readHandlesNum = count($readHandles);
 		
@@ -198,16 +206,12 @@ class Server{
 					$client = $this->clientGetByHandle($readableHandle);
 					if($client instanceof TcpClient){
 						if(feof($client->getSocket()->getHandle())){
-							$this->log->debug('remove client: '.$client->getUri());
+							$this->log->debug('remove client, EOF: '.$client->getUri());
 							$this->clientRemove($client);
 						}
 						else{
 							#$this->log->debug('old client: '.$client->getUri());
 							$client->dataRecv();
-							
-							if($client->getStatus('hasShutdown')){
-								$this->clientRemove($client);
-							}
 						}
 					}
 				}
@@ -226,11 +230,27 @@ class Server{
 	private function clientNewTcp($socket){
 		$this->clientsId++;
 		fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.$this->clientsId."\n"); # TODO
+		$this->log->debug('new tcp client: '.$this->clientsId);
 		
 		$client = new TcpClient();
 		$client->setSocket($socket);
 		$client->setSslPrv($this->sslKeyPrvPath, $this->sslKeyPrvPass);
 		
+		return $this->clientAdd($client);
+	}
+	
+	private function clientNewHttp($uri){
+		$this->clientsId++;
+		fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.$this->clientsId."\n");
+		$this->log->debug('new http client: '.$this->clientsId);
+		
+		$client = new HttpClient();
+		$client->setUri($uri);
+		
+		return $this->clientAdd($client);
+	}
+	
+	private function clientAdd($client){
 		$client->setId($this->clientsId);
 		$client->setServer($this);
 		
@@ -254,7 +274,7 @@ class Server{
 	
 	private function clientGetByHandle($handle){
 		foreach($this->clients as $clientId => $client){
-			if($client->getSocket()->getHandle() == $handle){
+			if($client instanceof TcpClient && $client->getSocket()->getHandle() == $handle){
 				return $client;
 			}
 		}
@@ -311,17 +331,25 @@ class Server{
 		print __CLASS__.'->'.__FUNCTION__.': '.$uri."\n";
 		#ve($uri);
 		
-		$socket = new Socket();
-		
-		$connected = false;
 		try{
 			if($uri->getScheme() == 'tcp'){
+				$connected = false;
 				if($uri->getHost() && $uri->getPort()){
+					$socket = new Socket();
 					$connected = $socket->connect($uri->getHost(), $uri->getPort());
+					$client = $this->clientNewTcp($socket);
+				}
+				if($connected){
+					$client->actionsAdd($clientActions);
+					$client->sendHello();
+					
+					return true;
 				}
 			}
 			elseif($uri->getScheme() == 'http'){
-				# TODO
+				$client = $this->clientNewHttp($uri);
+				$client->actionsAdd($clientActions);
+				return true;
 			}
 			else{
 				$this->log->debug('connection to '.$uri.' failed: invalid uri scheme ('.$uri->getScheme().')');
@@ -329,20 +357,6 @@ class Server{
 		}
 		catch(Exception $e){
 			$this->log->debug('connection to '.$uri.' failed: '.$e->getMessage());
-		}
-		
-		if($connected){
-			$client = $this->clientNewTcp($socket);
-			
-			foreach($clientActions as $clientAction){
-				$client->actionAdd($clientAction);
-			}
-			
-			$client->sendHello();
-			
-			#ve($client);
-			
-			return true;
 		}
 		
 		return false;

@@ -122,6 +122,7 @@ class TcpClient extends Client{
 	public function shutdown(){
 		if(!$this->getStatus('hasShutdown')){
 			$this->setStatus('hasShutdown', true);
+			$this->log('debug', $this->getUri().' shutdown');
 			
 			if($this->getSocket()){
 				$this->getSocket()->shutdown();
