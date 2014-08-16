@@ -7,6 +7,7 @@ use Zend\Uri\Http;
 
 use TheFox\Dht\Kademlia\Node;
 use TheFox\PhpChat\TcpUri;
+use TheFox\PhpChat\HttpUri;
 
 class NodeTest extends PHPUnit_Framework_TestCase{
 	
@@ -84,7 +85,7 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		$this->assertEquals('tcp://192.168.241.21:25001', (string)$node->getUri());
 		
 		$uri = UriFactory::factory('http://phpchat.fox21.at/web/phpchat.php');
-		$this->assertTrue($uri instanceof Http);
+		$this->assertTrue($uri instanceof HttpUri);
 		$node = new Node();
 		$node->setUri($uri);
 		$this->assertEquals($uri, $node->getUri());

@@ -81,6 +81,7 @@ $log->pushHandler(new StreamHandler('php://stdout', Logger::INFO));
 $log->pushHandler(new StreamHandler('log/bootstrap.log', Logger::DEBUG));
 
 UriFactory::registerScheme('tcp', 'TheFox\PhpChat\TcpUri');
+UriFactory::registerScheme('http', 'TheFox\PhpChat\HttpUri');
 
 $settings = new Settings(__DIR__.'/settings.yml');
 

@@ -5,12 +5,10 @@ namespace TheFox\Dht\Kademlia;
 use RuntimeException;
 
 use Zend\Uri\UriFactory;
-use Zend\Uri\Http;
 
 use TheFox\Storage\YamlStorage;
 use TheFox\Utilities\Hex;
 use TheFox\Utilities\Base58;
-use TheFox\PhpChat\TcpUri;
 
 class Node extends YamlStorage{
 	
