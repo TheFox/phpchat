@@ -158,6 +158,23 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 -----END PUBLIC KEY-----
 ';
 	
+	public function testSerialize(){
+		$node = new Node();
+		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		
+		$client = new TcpClient();
+		$client->setId(21);
+		$client->setUri('tcp://127.0.0.1:25000');
+		$client->setNode($node);
+		
+		$client = unserialize(serialize($client));
+		#ve($client);
+		
+		$this->assertEquals(21, $client->getId());
+		$this->assertEquals('tcp://127.0.0.1:25000', (string)$client->getUri());
+		$this->assertEquals($node, $client->getNode());
+	}
+	
 	public function genFiles(){
 		$filesystem = new Filesystem();
 		$filesystem->mkdir('tests/client1_tcp', $mode = 0777);
@@ -318,21 +335,21 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		
 		// Node Find before ID should cause an error.
 		$raw = $client1->sendNodeFind($client1->getSettings()->data['node']['id']);
-		ve('testSend raw A'); ve($raw);
+		#ve('testSend raw A'); ve($raw);
 		$raw = $client2->dataRecv($raw);
-		ve('testSend raw B'); ve($raw);
+		#ve('testSend raw B'); ve($raw);
 		$json = $this->rawMsgToJson($raw);
-		ve('testSend json'); ve($json);
+		#ve('testSend json'); ve($json);
 		$this->assertEquals('error', $json[0]['name']);
 		$this->assertEquals(1000, $json[0]['data']['code']);
 		
 		// Node Find before ID should cause an error.
 		$raw = $client1->sendNodeFind($client1->getSettings()->data['node']['id']);
 		$json = $this->rawMsgToJson($raw);
-		ve($json);
+		#ve($json);
 		$raw = $client2->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
-		ve($json);
+		#ve($json);
 		$this->assertEquals('error', $json[0]['name']);
 		$this->assertEquals(1000, $json[0]['data']['code']);
 		
@@ -370,7 +387,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		
 		$raw = $client1->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
-		ve($json);
+		#ve($json);
 		$this->assertEquals('error', $json[0]['name']);
 		$this->assertEquals(3100, $json[0]['data']['code']);
 		
@@ -391,9 +408,9 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		
 		// ID Client1
 		$raw = $client2->dataRecv($raw);
-		ve($raw);
+		#ve($raw);
 		$json = $this->rawMsgToJson($raw);
-		ve($json);
+		#ve($json);
 		$this->assertEquals('id', $json[0]['name']);
 		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1739', $json[0]['data']['id']);
 		$this->assertFalse($json[0]['data']['isChannel']);
@@ -664,7 +681,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		// Unknown Command
 		$raw = $client2->msgHandle('{"name":"blaaaaa"}');
 		$json = $this->rawMsgToJson($raw);
-		ve($json);
+		#ve($json);
 		$this->assertEquals('error', $json[0]['name']);
 		$this->assertEquals(9020, $json[0]['data']['code']);
 		$this->assertEquals('blaaaaa', $json[0]['data']['name']);

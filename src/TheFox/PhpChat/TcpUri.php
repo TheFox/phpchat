@@ -12,7 +12,7 @@ class TcpUri extends Uri{
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		#ve($this);
 		
-		return array('scheme', 'host', 'port', 'path');
+		return array('scheme', 'host', 'port');
 	}
 	
 }

@@ -82,7 +82,7 @@ class TcpClient extends Client{
 				$this->recvBufferTmp = '';
 				
 				$msg = base64_decode($msg);
-				fwrite(STDOUT, 'dataRecv: /'.$msg.'/'."\n");
+				#fwrite(STDOUT, 'dataRecv: /'.$msg.'/'."\n");
 				
 				#$dataRecvReturnValue .= $this->msgHandle($msg);
 				$msgHandleReturnValue = $this->msgHandle($msg);
@@ -104,7 +104,7 @@ class TcpClient extends Client{
 	
 	public function dataSend($data){
 		#fwrite(STDOUT, 'dataSend'."\n");
-		fwrite(STDOUT, 'dataSend: /'.$data.'/'."\n");
+		#fwrite(STDOUT, 'dataSend: /'.$data.'/'."\n");
 		
 		$msg = '';
 		

@@ -166,8 +166,10 @@ class Server{
 			$readHandles[] = $this->socket->getHandle();
 		}
 		foreach($this->clients as $clientId => $client){
-			// Collect client handles.
-			$readHandles[] = $client->getSocket()->getHandle();
+			if($client instanceof TcpClient){
+				// Collect client handles.
+				$readHandles[] = $client->getSocket()->getHandle();
+			}
 			
 			// Run client.
 			#print __CLASS__.'->'.__FUNCTION__.': client run'."\n";
@@ -184,7 +186,7 @@ class Server{
 					// Server
 					$socket = $this->socket->accept();
 					if($socket){
-						$client = $this->clientNew($socket);
+						$client = $this->clientNewTcp($socket);
 						
 						$client->sendHello();
 						
@@ -194,7 +196,7 @@ class Server{
 				else{
 					// Client
 					$client = $this->clientGetByHandle($readableHandle);
-					if($client){
+					if($client instanceof TcpClient){
 						if(feof($client->getSocket()->getHandle())){
 							$this->clientRemove($client);
 						}
@@ -220,7 +222,7 @@ class Server{
 		}
 	}
 	
-	private function clientNew($socket){
+	private function clientNewTcp($socket){
 		$this->clientsId++;
 		#print __CLASS__.'->'.__FUNCTION__.': '.$this->clientsId."\n";
 		
@@ -329,7 +331,7 @@ class Server{
 		}
 		
 		if($connected){
-			$client = $this->clientNew($socket);
+			$client = $this->clientNewTcp($socket);
 			
 			foreach($clientActions as $clientAction){
 				$client->actionAdd($clientAction);

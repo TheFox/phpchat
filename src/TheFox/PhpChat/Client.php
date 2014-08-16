@@ -26,12 +26,12 @@ class Client{
 	const SSL_PASSWORD_MSG_MAX = 100;
 	
 	private $debug = false;
-	private $id = 0;
+	protected $id = 0;
 	private $status = array();
 	
 	private $server = null;
-	private $node = null;
-	private $uri = null;
+	protected $node = null;
+	protected $uri = null;
 	private $ssl = null;
 	private $sslTestToken = '';
 	private $sslPasswordToken = '';
@@ -45,8 +45,8 @@ class Client{
 	private $requests = array();
 	private $actionsId = 0;
 	private $actions = array();
-	public $pingTime = 0;
-	public $pongTime = 0;
+	protected $pingTime = 0;
+	protected $pongTime = 0;
 	private $sslMsgCount = 0;
 	
 	public function __construct(){
@@ -374,7 +374,7 @@ class Client{
 	}
 	
 	public function msgHandle($msgRaw){
-		fwrite(STDOUT, 'msgHandle: /'.$msgRaw.'/'."\n");
+		#fwrite(STDOUT, 'msgHandle: /'.$msgRaw.'/'."\n");
 		
 		$msgHandleReturnValue = '';
 		$msg = json_decode($msgRaw, true);
