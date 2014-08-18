@@ -347,9 +347,9 @@ class Server{
 				}
 			}
 			elseif($uri->getScheme() == 'http'){
-				$client = $this->clientNewHttp($uri);
+				/*$client = $this->clientNewHttp($uri);
 				$client->actionsAdd($clientActions);
-				return true;
+				return true;*/
 			}
 			else{
 				$this->log->debug('connection to '.$uri.' failed: invalid uri scheme ('.$uri->getScheme().')');
