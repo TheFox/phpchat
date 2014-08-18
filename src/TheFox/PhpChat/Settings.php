@@ -6,13 +6,15 @@ use TheFox\Storage\YamlStorage;
 
 class Settings extends YamlStorage{
 	
+	const VERSION = '0.3.0-dev';
+	const RELEASE = 3;
 	const USER_NICKNAME_LEN_MAX = 256;
 	
 	public function __construct($filePath = null){
 		parent::__construct($filePath);
 		
-		$this->data['version'] = '0.3.0-dev';
-		$this->data['release'] = 3;
+		$this->data['version'] = static::VERSION;
+		$this->data['release'] = static::RELEASE;
 		$this->data['datadir'] = 'data';
 		$this->data['firstRun'] = true;
 		#$this->data['isBootstrap'] = true;

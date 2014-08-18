@@ -6,6 +6,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use TheFox\PhpChat\Settings;
 use TheFox\Dht\Kademlia\Node;
 
 class InfoCommand extends BasicCommand{
@@ -31,6 +32,7 @@ class InfoCommand extends BasicCommand{
 		
 		print '--------'."\n";
 		print 'Informations about your node:'."\n";
+		print '   Version: '.Settings::VERSION.' ('.Settings::RELEASE.')'."\n";
 		print '   ID: '.$localNode->getIdHexStr()."\n";
 		print '   Public key fingerprint: '.$localNode->getSslKeyPubFingerprint()."\n";
 		print '   Last public IP: '.$settings->data['node']['ipPub']."\n";
