@@ -229,7 +229,7 @@ class Server{
 	
 	private function clientNewTcp($socket){
 		$this->clientsId++;
-		fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.$this->clientsId."\n"); # TODO
+		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.$this->clientsId."\n"); # TODO
 		$this->log->debug('new tcp client: '.$this->clientsId);
 		
 		$client = new TcpClient();
@@ -241,7 +241,7 @@ class Server{
 	
 	private function clientNewHttp($uri){
 		$this->clientsId++;
-		fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.$this->clientsId."\n");
+		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.$this->clientsId."\n");
 		$this->log->debug('new http client: '.$this->clientsId);
 		
 		$client = new HttpClient();
@@ -254,6 +254,7 @@ class Server{
 		$client->setId($this->clientsId);
 		$client->setServer($this);
 		
+		// Network Bootstrap
 		if($this->getSettings()->data['firstRun'] && !$this->getHasDhtNetworkBootstrapped()){
 			$this->setHasDhtNetworkBootstrapped(true);
 			
@@ -267,7 +268,7 @@ class Server{
 		}
 		
 		$this->clients[$this->clientsId] = $client;
-		fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.count($this->clients)."\n");
+		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.count($this->clients)."\n");
 		
 		return $client;
 	}

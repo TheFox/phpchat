@@ -29,7 +29,7 @@ class Cronjob extends Thread{
 		#print __FUNCTION__.''."\n";
 		
 		$this->log = new Logger('cronjob');
-		$this->log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::ERROR));
+		$this->log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
 		$this->log->pushHandler(new LoggerStreamHandler('log/cronjob.log', Logger::DEBUG));
 		
 		$this->log->info('start');
@@ -97,18 +97,24 @@ class Cronjob extends Thread{
 			#print __FUNCTION__.': '.$this->getExit().', '.$hours.', '.$minutes.', '.$seconds."\n";
 			
 			if($hours == 0 && $minutes == 1 && $seconds == 0){
-				print __FUNCTION__.': ping'."\n";  # TODO
+				#print 'ping'."\n";  # TODO
+				$this->log->debug('ping');
 				$this->pingClosestNodes();
 			}
 			
 			if($seconds == 0){
+				#print 'msgs'."\n";  # TODO
+				$this->log->debug('msgs');
 				$this->msgDbInit();
 			}
 			if($minutes % 5 == 0 && $seconds == 0){
-				print __FUNCTION__.': save'."\n";  # TODO
+				#print 'save'."\n";  # TODO
+				$this->log->debug('save');
 				$this->getIpcKernelConnection()->execAsync('save');
 			}
 			if($minutes % 15 == 0 && $seconds == 0){
+				#print 'ping'."\n";  # TODO
+				$this->log->debug('ping');
 				$this->pingClosestNodes();
 			}
 			
@@ -120,7 +126,8 @@ class Cronjob extends Thread{
 				$seconds = 0;
 				$minutes++;
 				
-				print __FUNCTION__.': '.$this->getExit().', '.$hours.', '.$minutes.', '.$seconds."\n";  # TODO
+				#print __FUNCTION__.': '.$this->getExit().', '.$hours.':'.$minutes.':'.$seconds."\n";  # TODO
+				$this->log->debug($this->getExit().' '.$hours.':'.$minutes.':'.$seconds);
 			}
 			if($minutes >= 60){
 				$minutes = 0;
@@ -135,7 +142,7 @@ class Cronjob extends Thread{
 	
 	private function pingClosestNodes(){
 		#print __FUNCTION__.''."\n";
-		$this->log->debug(__FUNCTION__);
+		#$this->log->debug(__FUNCTION__);
 		$table = $this->getIpcKernelConnection()->execSync('getTable');
 		#ve($table);
 		
@@ -149,7 +156,7 @@ class Cronjob extends Thread{
 	}
 	
 	public function msgDbInit(){
-		$this->log->debug(__FUNCTION__);
+		#$this->log->debug(__FUNCTION__);
 		#print __FUNCTION__.''."\n"; # TODO
 		
 		$this->msgDb = $this->getIpcKernelConnection()->execSync('getMsgDb', array(), 10);
@@ -172,7 +179,7 @@ class Cronjob extends Thread{
 	}
 	
 	public function msgDbInitNodes(){
-		$this->log->debug(__FUNCTION__);
+		#$this->log->debug(__FUNCTION__);
 		#print __FUNCTION__.''."\n";
 		
 		if(!$this->msgDb){
@@ -228,7 +235,7 @@ class Cronjob extends Thread{
 	}
 	
 	public function msgDbSendAll(){
-		$this->log->debug(__FUNCTION__);
+		#$this->log->debug(__FUNCTION__);
 		#print __FUNCTION__.''."\n";
 		
 		if(!$this->msgDb){
@@ -420,12 +427,12 @@ class Cronjob extends Thread{
 	}
 	
 	public function shutdown(){
-		print __FUNCTION__.''."\n";  # TODO
-		
+		#print __FUNCTION__.''."\n";  # TODO
+		$this->log->debug('shutdown');
 	}
 	
 	public function ipcKernelShutdown(){
-		print __FUNCTION__.''."\n";  # TODO
+		#print __FUNCTION__.''."\n";  # TODO
 		$this->setExit(1);
 	}
 	

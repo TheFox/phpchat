@@ -908,7 +908,7 @@ class Console extends Thread{
 						while(!$this->getExit()){
 							$line = fgets(STDIN, 1024);
 							
-							print "line: '".substr($line, 0, -1)."'\n";
+							#print "line: '".substr($line, 0, -1)."'\n";
 							if(substr($line, 0, -1) == '.') break;
 							$text .= $line;
 							

@@ -1519,7 +1519,7 @@ class Client{
 					$request = $this->requestGetByRid($rid);
 					if($request){
 						$this->requestRemove($request);
-						$this->log('debug', $this->getUri().' recv '.$msgName.': request ok');
+						$this->log('debug', $this->getUri().' recv '.$msgName.': request ok ('.$status.')');
 						
 						//if($status == 0){} // Undefined
 						if($status == 1){
