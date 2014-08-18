@@ -391,6 +391,53 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$this->assertEquals('error', $json[0]['name']);
 		$this->assertEquals(3100, $json[0]['data']['code']);
 		
+		// Talk Request before ID should cause an error.
+		$raw = $client1->sendTalkRequest('user1');
+		#ve($raw);
+		$raw = $client2->dataRecv($raw);
+		#ve($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals(null, $json[0]);
+		
+		// Talk Response before ID should cause an error.
+		$raw = $client1->sendTalkResponse('rid1', 1, 'user1');
+		#ve($raw);
+		$raw = $client2->dataRecv($raw);
+		#ve($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals(null, $json[0]);
+		
+		// Talk Msg before ID should cause an error.
+		$raw = $client1->sendTalkMsg('rid1', 'user1', 'hello world', false);
+		#ve($raw);
+		$raw = $client2->dataRecv($raw);
+		#ve($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals(null, $json[0]);
+		
+		// Talk User Nickname Change before ID should cause an error.
+		$raw = $client1->sendTalkUserNicknameChange('user1', 'user1b');
+		#ve($raw);
+		$raw = $client2->dataRecv($raw);
+		#ve($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals(null, $json[0]);
+		
+		// Talk Close before ID should cause an error.
+		$raw = $client1->sendTalkClose('rid1', 'user1b');
+		#ve($raw);
+		$raw = $client2->dataRecv($raw);
+		#ve($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals(null, $json[0]);
+		
+		
+		
 		
 		
 		// NoOp
@@ -686,6 +733,22 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$this->assertEquals('error', $json[0]['name']);
 		$this->assertEquals(9020, $json[0]['data']['code']);
 		$this->assertEquals('blaaaaa', $json[0]['data']['name']);
+		
+		
+		// Error
+		$raw = $client1->sendError();
+		$json = $this->rawMsgToJson($raw);
+		$this->assertEquals('error', $json[0]['name']);
+		$this->assertEquals(9999, $json[0]['data']['code']);
+		
+		$errors = Client::getError();
+		foreach($errors as $errorCode => $error){
+			$raw = $client1->sendError($errorCode);
+			$json = $this->rawMsgToJson($raw);
+			#ve($json);
+			$this->assertEquals('error', $json[0]['name']);
+			$this->assertEquals($errorCode, $json[0]['data']['code']);
+		}
 		
 		
 		#fwrite(STDOUT, 'return: /'.($raw).'/'."\n");

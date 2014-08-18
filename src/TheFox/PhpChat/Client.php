@@ -2092,7 +2092,7 @@ class Client{
 		return $this->dataSend($this->msgCreate('pong', $data));
 	}
 	
-	private function sendError($errorCode = 999, $msgName = ''){
+	public static function getError(){
 		$errors = array(
 			// 1000-1999: ID
 			1000 => 'You need to identify',
@@ -2122,16 +2122,23 @@ class Client{
 			9010 => 'Invalid setup',
 			9020 => 'Unknown command',
 			9030 => 'Command not implemented',
-			9099 => 'Unknown error',
+			9999 => 'Unknown error',
 		);
+		return $errors;
+	}
+	
+	public function sendError($errorCode = 9999, $msgName = ''){
+		$errors = static::getError();
 		
 		if(!isset($errors[$errorCode])){
 			throw new RuntimeException('Error '.$errorCode.' not defined.');
 		}
 		
+		$msg = $errors[$errorCode];
+		$this->log('debug', 'send ERROR: '.$errorCode.', '.$msg);
 		$data = array(
 			'code'   => $errorCode,
-			'msg' => $errors[$errorCode],
+			'msg' => $msg,
 			'name' => $msgName,
 		);
 		return $this->dataSend($this->msgCreate('error', $data));
@@ -2190,6 +2197,8 @@ class Client{
 			);
 			return json_encode($json);
 		}
+		
+		$this->log('debug', 'SSL msg create: failed');
 		
 		return null;
 	}
@@ -2279,6 +2288,8 @@ class Client{
 				}
 			}
 		}
+		
+		$this->log('debug', 'SSL password encrypt: failed');
 		
 		return null;
 	}
