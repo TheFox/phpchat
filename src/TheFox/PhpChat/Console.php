@@ -1178,9 +1178,7 @@ class Console extends Thread{
 			$this->talkCloseSend();
 		}
 		
-		if(!$this->ipcKernelShutdown){
-			#$this->ipcKernelConnection->execSync('shutdown'); # TODO
-		}
+		#if(!$this->ipcKernelShutdown){ $this->ipcKernelConnection->execSync('shutdown'); }
 		
 		if($this->settings->data['console']['history']['enabled'] && $this->settings->data['console']['history']['saveToFile']){
 			$historyStoragePath = $this->settings->data['datadir'].'/history.yml';
