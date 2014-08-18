@@ -8,23 +8,29 @@ class TableTest extends PHPUnit_Framework_TestCase{
 	public function testSerialize(){
 		$localNode = new Node();
 		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
+		$localNode->setTimeCreated(1408371221);
 		$table = new Table();
 		$table->setLocalNode($localNode);
 		
 		$node_a = new Node();
 		$node_a->setIdHexStr('10000001-2002-4004-8008-010000000002');
+		$node_a->setTimeCreated(1408371221);
 		
 		$node_b = new Node();
 		$node_b->setIdHexStr('10000001-2002-4004-8008-010000000004');
+		$node_b->setTimeCreated(1408371221);
 		
 		$node_c = new Node();
 		$node_c->setIdHexStr('10000001-2002-4004-8008-010000000008');
+		$node_c->setTimeCreated(1408371221);
 		
 		$node_d = new Node();
 		$node_d->setIdHexStr('10000001-2002-4004-8008-010000000010');
+		$node_d->setTimeCreated(1408371221);
 		
 		$node_e = new Node();
 		$node_e->setIdHexStr('10000001-2002-4004-8008-020000000008');
+		$node_e->setTimeCreated(1408371221);
 		
 		$table->nodeEnclose($node_a);
 		$table->nodeEnclose($node_b);
@@ -36,18 +42,23 @@ class TableTest extends PHPUnit_Framework_TestCase{
 		
 		$node_a = new Node();
 		$node_a->setIdHexStr('10000001-2002-4004-8008-010000000002');
+		$node_a->setTimeCreated(1408371221);
 		
 		$node_b = new Node();
 		$node_b->setIdHexStr('10000001-2002-4004-8008-010000000004');
+		$node_b->setTimeCreated(1408371221);
 		
 		$node_c = new Node();
 		$node_c->setIdHexStr('10000001-2002-4004-8008-010000000008');
+		$node_c->setTimeCreated(1408371221);
 		
 		$node_d = new Node();
 		$node_d->setIdHexStr('10000001-2002-4004-8008-010000000010');
+		$node_d->setTimeCreated(1408371221);
 		
 		$node_e = new Node();
 		$node_e->setIdHexStr('10000001-2002-4004-8008-020000000008');
+		$node_e->setTimeCreated(1408371221);
 		
 		$this->assertEquals($localNode, $table->getLocalNode());
 		$this->assertEquals(array($node_a, $node_b, $node_c, $node_d, $node_e), $table->getNodes());
