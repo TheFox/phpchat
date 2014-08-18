@@ -52,6 +52,8 @@ class Client{
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
+		$this->uri = new TcpUri();
+		
 		$this->status['hasShutdown'] = false;
 		$this->status['isChannelLocal'] = false;
 		$this->status['isChannelPeer'] = false;
