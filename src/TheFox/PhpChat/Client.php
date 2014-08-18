@@ -1727,7 +1727,7 @@ class Client{
 		return $this->dataSend($this->msgCreateHello());
 	}
 	
-	public function sendId(){
+	public function msgCreateId(){
 		if(!$this->getLocalNode()){
 			throw new RuntimeException('localNode not set.');
 		}
@@ -1742,7 +1742,11 @@ class Client{
 			'isChannel' => $this->getStatus('isChannelLocal'),
 			#'hashcash'  => $this->hashcashMint(static::HASHCASH_BITS_MIN),
 		);
-		return $this->dataSend($this->msgCreate('id', $data));
+		return $this->msgCreate('id', $data);
+	}
+	
+	public function sendId(){
+		return $this->dataSend($this->msgCreateId());
 	}
 	
 	private function sendIdOk(){
