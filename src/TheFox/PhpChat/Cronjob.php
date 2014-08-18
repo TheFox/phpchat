@@ -75,6 +75,7 @@ class Cronjob extends Thread{
 	public function init(){
 		$this->log->info('init');
 		
+		usleep(100000); // Let the kernel start up.
 		$this->setIpcKernelConnection(new ConnectionClient());
 		$this->getIpcKernelConnection()->setHandler(new IpcStreamHandler('127.0.0.1', 20001));
 		$this->getIpcKernelConnection()->functionAdd('shutdown', $this, 'ipcKernelShutdown');

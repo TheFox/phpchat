@@ -46,6 +46,8 @@ class SmtpCommand extends BasicCommand{
 	}
 	
 	private function initIpcKernelConnection(){
+		usleep(100000); // Let the kernel start up.
+		
 		$this->ipcKernelConnection = new ConnectionClient();
 		$this->ipcKernelConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20003));
 		$this->ipcKernelConnection->functionAdd('shutdown', $this, 'ipcKernelShutdown');
