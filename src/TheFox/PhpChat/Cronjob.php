@@ -13,7 +13,6 @@ use TheFox\Dht\Kademlia\Node;
 
 class Cronjob extends Thread{
 	
-	#const LOOP_USLEEP = 100000;
 	const MSG_FORWARD_TO_NODES_MIN = 8;
 	const MSG_FORWARD_TO_NODES_MAX = 20;
 	const MSG_FORWARD_CYCLES_MAX = 100;
@@ -24,6 +23,9 @@ class Cronjob extends Thread{
 	private $settings;
 	private $table;
 	private $localNode;
+	private $hours = 0;
+	private $minutes = 0;
+	private $seconds = 0;
 	
 	public function __construct(){
 		#print __FUNCTION__.''."\n";
@@ -83,64 +85,74 @@ class Cronjob extends Thread{
 		}
 	}
 	
-	public function run(){
-		#print __FUNCTION__.''."\n";
+	public function cycle(){
 		if(!$this->getIpcKernelConnection()){
 			throw new RuntimeException('You must first run init().');
 		}
 		
-		$hours = 0;
-		$minutes = 0;
-		$seconds = 0;
+		$this->pingClosestNodes();
+		$this->msgDbInit();
 		
-		while(!$this->getExit()){
-			#print __FUNCTION__.': '.$this->getExit().', '.$hours.', '.$minutes.', '.$seconds."\n";
-			
-			if($hours == 0 && $minutes == 1 && $seconds == 0){
-				#print 'ping'."\n";  # TODO
-				$this->log->debug('ping');
-				$this->pingClosestNodes();
-			}
-			
-			if($seconds == 0){
-				#print 'msgs'."\n";  # TODO
-				$this->log->debug('msgs');
-				$this->msgDbInit();
-			}
-			if($minutes % 5 == 0 && $seconds == 0){
-				#print 'save'."\n";  # TODO
-				$this->log->debug('save');
-				$this->getIpcKernelConnection()->execAsync('save');
-			}
-			if($minutes % 15 == 0 && $seconds == 0){
-				#print 'ping'."\n";  # TODO
-				$this->log->debug('ping');
-				$this->pingClosestNodes();
-			}
-			
-			$this->getIpcKernelConnection()->run();
-			
-			
-			$seconds++;
-			if($seconds >= 60){
-				$seconds = 0;
-				$minutes++;
-				
-				#print __FUNCTION__.': '.$this->getExit().', '.$hours.':'.$minutes.':'.$seconds."\n";  # TODO
-				$this->log->debug($this->getExit().' '.$hours.':'.$minutes.':'.$seconds);
-			}
-			if($minutes >= 60){
-				$minutes = 0;
-				$hours++;
-			}
-			sleep(1);
-			
+		$this->getIpcKernelConnection()->run();
+		
+		$this->shutdown();
+	}
+	
+	private function run(){
+		if(!$this->getIpcKernelConnection()){
+			throw new RuntimeException('You must first run init().');
 		}
+		
+		if($this->hours == 0 && $this->minutes == 1 && $this->seconds == 0){
+			#print 'ping'."\n";  # TODO
+			$this->pingClosestNodes();
+		}
+		
+		if($this->seconds == 0){
+			#print 'msgs'."\n";  # TODO
+			$this->msgDbInit();
+		}
+		if($this->minutes % 5 == 0 && $this->seconds == 0){
+			#print 'save'."\n";  # TODO
+			$this->log->debug('save');
+			$this->getIpcKernelConnection()->execAsync('save');
+		}
+		if($this->minutes % 15 == 0 && $this->seconds == 0){
+			#print 'ping'."\n";  # TODO
+			$this->pingClosestNodes();
+		}
+		
+		$this->getIpcKernelConnection()->run();
+		
+		$this->seconds++;
+		if($this->seconds >= 60){
+			$this->seconds = 0;
+			$this->minutes++;
+			
+			#print __FUNCTION__.': '.$this->getExit().', '.$this->hours.':'.$this->minutes.':'.$this->seconds."\n";  # TODO
+			$this->log->debug($this->getExit().' '.$this->hours.':'.$this->minutes.':'.$this->seconds);
+		}
+		if($this->minutes >= 60){
+			$this->minutes = 0;
+			$this->hours++;
+		}
+	}
+	
+	public function loop(){
+		$this->log->debug('loop start');
+		while(!$this->getExit()){
+			#print __FUNCTION__.': '.$this->getExit().', '.$this->hours.', '.$this->minutes.', '.$this->seconds."\n";
+			
+			$this->run();
+			sleep(1);
+		}
+		$this->log->debug('loop end');
 		
 		$this->shutdown();
 	}
 	
 	private function pingClosestNodes(){
+		$this->log->debug('ping');
 		#print __FUNCTION__.''."\n";
 		#$this->log->debug(__FUNCTION__);
 		$table = $this->getIpcKernelConnection()->execSync('getTable');
@@ -156,6 +168,7 @@ class Cronjob extends Thread{
 	}
 	
 	public function msgDbInit(){
+		$this->log->debug('msgs');
 		#$this->log->debug(__FUNCTION__);
 		#print __FUNCTION__.''."\n"; # TODO
 		
