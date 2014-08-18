@@ -1688,7 +1688,7 @@ class Client{
 		return $msgHandleReturnValue;
 	}
 	
-	private function msgCreate($name, $data = array()){
+	public function msgCreate($name, $data = array()){
 		#print __CLASS__.'->'.__FUNCTION__.': "'.$name.'"'."\n";
 		
 		$json = array(
@@ -1714,11 +1714,15 @@ class Client{
 		return $this->dataSend($this->msgCreate('test', $data));
 	}
 	
-	public function sendHello(){
+	public function msgCreateHello(){
 		$data = array(
 			'ip' => $this->getUri()->getHost(),
 		);
-		return $this->dataSend($this->msgCreate('hello', $data));
+		return $this->msgCreate('hello', $data);
+	}
+	
+	public function sendHello(){
+		return $this->dataSend($this->msgCreateHello());
 	}
 	
 	public function sendId(){
