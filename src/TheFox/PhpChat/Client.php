@@ -2198,7 +2198,7 @@ class Client{
 			return json_encode($json);
 		}
 		
-		$this->log('debug', 'SSL msg create: failed');
+		$this->log('debug', 'SSL msg create: failed ('.$name.')');
 		
 		return null;
 	}
