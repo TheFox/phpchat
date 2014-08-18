@@ -412,7 +412,7 @@ class Cronjob extends Thread{
 			if($msgs && $this->getIpcKernelConnection()){
 				#fwrite(STDOUT, __METHOD__.'      msgs: '.count($msgs)."\n"); # TODO
 				
-				$serverConnectArgs = array($node->getUri()->getHost(), $node->getUri()->getPort(), false, false, $msgIds);
+				$serverConnectArgs = array($node->getUri(), false, false, $msgIds);
 				$this->getIpcKernelConnection()->execSync('serverConnect', $serverConnectArgs);
 			}
 		}
