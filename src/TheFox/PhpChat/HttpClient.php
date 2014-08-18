@@ -9,6 +9,7 @@ class HttpClient extends Client{
 	const TTL = 30;
 	
 	private $timeoutTime = 0;
+	private $curl;
 	
 	public function __construct(){
 		parent::__construct();
@@ -39,7 +40,29 @@ class HttpClient extends Client{
 	}
 	
 	public function dataSend($msg){
-		fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__."\n");
+		$url = (string)$this->getUri();
+		fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.' url: /'.$url.'/'."\n");
+		fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.' msg: /'.$msg.'/'."\n");
+		
+		$data = array(
+			'data' => base64_encode($msg),
+		);
+		
+		$curl = curl_init();
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_FRESH_CONNECT, true);
+		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, false);
+		curl_setopt($curl, CURLOPT_NOPROGRESS, true);
+		curl_setopt($curl, CURLOPT_VERBOSE, true);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+		curl_setopt($curl, CURLOPT_TIMEOUT, 5);
+		curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_POST, true);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+		
+		$this->curl = $curl;
 	}
 	
 	public function sendHello(){
