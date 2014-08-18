@@ -451,6 +451,8 @@ class Cronjob extends Thread{
 	}
 	
 	private function bootstrapNodesEnclose(){
+		$this->log->debug('bootstrap nodes enclose');
+		
 		$urls = array(
 			'http://phpchat.fox21.at/nodes.json',
 		);
@@ -529,17 +531,21 @@ class Cronjob extends Thread{
 		
 		foreach($nodesNewDb->getNodes() as $nodeId => $node){
 			if($node['connectAttempt'] >= 4){
+				$this->log->debug('node remove: '.$nodeId);
 				$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeRemove', array($nodeId));
 			}
 			else{
 				$nodeObj = new Node();
 				$nodeObj->setUri($node['uri']);
 				
+				$this->log->debug('node connect: '.(string)$nodeObj->getUri());
 				$connected = $this->getIpcKernelConnection()->execSync('serverConnect', array($nodeObj->getUri(), false, true));
 				if($connected){
+					$this->log->debug('node remove: '.$nodeId);
 					$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeRemove', array($nodeId));
 				}
 				else{
+					$this->log->debug('node inc connect attempt: '.$nodeId);
 					$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeIncConnectAttempt', array($nodeId));
 				}
 			}
