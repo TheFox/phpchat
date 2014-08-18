@@ -23,7 +23,7 @@ function vej($v = null){
 function vew($v = null){
 	try{
 		print '<pre>';
-		var_export($v, true);
+		var_export($v);
 		print '</pre>';
 	}
 	catch(Exception $e){
