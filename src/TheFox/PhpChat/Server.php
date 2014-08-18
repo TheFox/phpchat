@@ -329,8 +329,7 @@ class Server{
 	}
 	
 	public function connect($uri, $clientActions = array()){
-		print __CLASS__.'->'.__FUNCTION__.': '.$uri."\n";
-		#ve($uri);
+		$this->log->debug('connect: '.$uri);
 		
 		try{
 			if($uri->getScheme() == 'tcp'){
