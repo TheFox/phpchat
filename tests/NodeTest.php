@@ -147,7 +147,7 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		
 		$this->assertTrue($node->load());
 		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
-		ve($node->getUri());
+		#ve($node->getUri());
 		$this->assertEquals('tcp', $node->getUri()->getScheme());
 		$this->assertEquals('FC_BtK4HvbdX9wNQ6hGopSrFxs71SuuwMZra', $node->getSslKeyPubFingerprint());
 		$this->assertEquals(static::SSL_KEY_PUB1, $node->getSslKeyPub());
