@@ -332,31 +332,36 @@ class Server{
 		$this->log->debug('connect: '.$uri);
 		
 		try{
-			if($uri->getScheme() == 'tcp'){
-				$connected = false;
-				if($uri->getHost() && $uri->getPort()){
-					$socket = new Socket();
-					$connected = $socket->connect($uri->getHost(), $uri->getPort());
-					$client = $this->clientNewTcp($socket);
+			if(is_object($uri)){
+				if($uri->getScheme() == 'tcp'){
+					$connected = false;
+					if($uri->getHost() && $uri->getPort()){
+						$socket = new Socket();
+						$connected = $socket->connect($uri->getHost(), $uri->getPort());
+						$client = $this->clientNewTcp($socket);
+					}
+					if($connected){
+						$client->actionsAdd($clientActions);
+						$client->sendHello();
+						
+						return true;
+					}
 				}
-				if($connected){
+				elseif($uri->getScheme() == 'http'){
+					/*$client = $this->clientNewHttp($uri);
 					$client->actionsAdd($clientActions);
-					$client->sendHello();
-					
-					return true;
+					return true;*/
 				}
-			}
-			elseif($uri->getScheme() == 'http'){
-				/*$client = $this->clientNewHttp($uri);
-				$client->actionsAdd($clientActions);
-				return true;*/
+				else{
+					$this->log->warning('connection to '.$uri.' failed: invalid uri scheme ('.$uri->getScheme().')');
+				}
 			}
 			else{
-				$this->log->debug('connection to '.$uri.' failed: invalid uri scheme ('.$uri->getScheme().')');
+				$this->log->warning('connection to '.$uri.' failed: uri is no object');
 			}
 		}
 		catch(Exception $e){
-			$this->log->debug('connection to '.$uri.' failed: '.$e->getMessage());
+			$this->log->warning('connection to '.$uri.' failed: '.$e->getMessage());
 		}
 		
 		return false;
