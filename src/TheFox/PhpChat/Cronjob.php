@@ -399,7 +399,8 @@ class Cronjob extends Thread{
 			$msgIds = array();
 			
 			foreach($msgs as $msgId => $msg){
-				$direct = (int)($msg->getDstNodeId() == $node->getIdHexStr() && $node->getIp() && $node->getPort());
+				$direct = (int)($msg->getDstNodeId() == $node->getIdHexStr()
+					&& $node->getUri()->getHost() && $node->getUri()->getPort());
 				$tmp = $msg->getId().', '.$msg->getStatus().', '.$msg->getEncryptionMode(); # TODO
 				$tmp .= ', direct='.$direct; # TODO
 				#fwrite(STDOUT, __METHOD__.'      msg: '.$tmp."\n"); # TODO
@@ -411,7 +412,7 @@ class Cronjob extends Thread{
 			if($msgs && $this->getIpcKernelConnection()){
 				#fwrite(STDOUT, __METHOD__.'      msgs: '.count($msgs)."\n"); # TODO
 				
-				$serverConnectArgs = array($node->getIp(), $node->getPort(), false, false, $msgIds);
+				$serverConnectArgs = array($node->getUri()->getHost(), $node->getUri()->getPort(), false, false, $msgIds);
 				$this->getIpcKernelConnection()->execSync('serverConnect', $serverConnectArgs);
 			}
 		}
