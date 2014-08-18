@@ -40,6 +40,7 @@ test_phpunit: $(PHPUNIT) phpunit.xml
 	$(RM) tests/*.log
 	$(RM) tests/*.prv tests/*.pub
 	$(RM) tests/client{1,2}
+	$(RM) tests/client{1,2}_tcp
 
 release:
 	$(MKDIR) releases $(RELEASE_NAME)-$(RELEASE_VERSION)
@@ -69,3 +70,4 @@ clean:
 	$(RM) tests/*.log
 	$(RM) tests/*.prv tests/*.pub
 	$(RM) tests/client{1,2}
+	$(RM) tests/client{1,2}_tcp
