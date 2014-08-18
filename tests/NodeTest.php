@@ -2,8 +2,12 @@
 
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
+use Zend\Uri\UriFactory;
+use Zend\Uri\Http;
 
 use TheFox\Dht\Kademlia\Node;
+use TheFox\PhpChat\TcpUri;
+use TheFox\PhpChat\HttpUri;
 
 class NodeTest extends PHPUnit_Framework_TestCase{
 	
@@ -56,6 +60,17 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 2JGsj8q54He5gnVI01MEWr0CAwEAAQ==
 -----END PUBLIC KEY-----';
 	
+	public function testSerialize(){
+		$node = new Node();
+		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		$node->setUri('tcp://192.168.241.21:25001');
+		
+		$node = unserialize(serialize($node));
+		
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
+		$this->assertEquals('tcp://192.168.241.21:25001', (string)$node->getUri());
+	}
+	
 	public function testId(){
 		$id = (string)Uuid::uuid4();
 		
@@ -64,8 +79,35 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		$this->assertEquals($id, $node->getIdHexStr());
 	}
 	
-	public function testSave(){
-		$node = new Node('tests/test_node.yml');
+	public function testUri(){
+		$node = new Node();
+		$this->assertTrue($node->getUri() instanceof TcpUri);
+		$this->assertEquals('tcp', $node->getUri()->getScheme());
+		#ve($node->getUri());
+		
+		$uri = UriFactory::factory('tcp://192.168.241.21:25001');
+		$this->assertTrue($uri instanceof TcpUri);
+		$node = new Node();
+		$node->setUri($uri);
+		$this->assertEquals($uri, $node->getUri());
+		$this->assertEquals('tcp', $node->getUri()->getScheme());
+		$this->assertEquals('192.168.241.21', $node->getUri()->getHost());
+		$this->assertEquals('25001', $node->getUri()->getPort());
+		$this->assertEquals('tcp://192.168.241.21:25001', (string)$node->getUri());
+		
+		$uri = UriFactory::factory('http://phpchat.fox21.at/web/phpchat.php');
+		$this->assertTrue($uri instanceof HttpUri);
+		$node = new Node();
+		$node->setUri($uri);
+		$this->assertEquals($uri, $node->getUri());
+		$this->assertEquals('http', $node->getUri()->getScheme());
+		$this->assertEquals('phpchat.fox21.at', $node->getUri()->getHost());
+		$this->assertEquals('/web/phpchat.php', $node->getUri()->getPath());
+		$this->assertEquals('http://phpchat.fox21.at/web/phpchat.php', (string)$node->getUri());
+	}
+	
+	public function testSaveTcpnode(){
+		$node = new Node('tests/test_node_tcp.yml');
 		$node->setDatadirBasePath('tests');
 		$node->setDataChanged(true);
 		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
@@ -79,15 +121,48 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		$this->assertTrue( (bool)$node->save() );
 	}
 	
+	public function testSaveHttpnode(){
+		$node = new Node('tests/test_node_http.yml');
+		$node->setDatadirBasePath('tests');
+		$node->setDataChanged(true);
+		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		$node->setUri('http://phpchat.fox21.at:8080/web/phpchat.php');
+		#ve($node->getUri());
+		
+		$node->setSslKeyPub(static::SSL_KEY_PUB1);
+		$this->assertFalse( $node->setSslKeyPub(static::SSL_KEY_PUB1) );
+		
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
+		$this->assertEquals('FC_BtK4HvbdX9wNQ6hGopSrFxs71SuuwMZra', $node->getSslKeyPubFingerprint());
+		
+		$this->assertTrue( (bool)$node->save() );
+	}
+	
 	/**
-	* @depends testSave
+	* @depends testSaveTcpnode
 	*/
-	public function testLoad(){
-		$node = new Node('tests/test_node.yml');
+	public function testLoadTcpnode(){
+		$node = new Node('tests/test_node_tcp.yml');
 		$node->setDatadirBasePath('tests');
 		
 		$this->assertTrue($node->load());
 		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
+		ve($node->getUri());
+		$this->assertEquals('tcp', $node->getUri()->getScheme());
+		$this->assertEquals('FC_BtK4HvbdX9wNQ6hGopSrFxs71SuuwMZra', $node->getSslKeyPubFingerprint());
+		$this->assertEquals(static::SSL_KEY_PUB1, $node->getSslKeyPub());
+	}
+	
+	/**
+	* @depends testSaveHttpnode
+	*/
+	public function testLoadHttpnode(){
+		$node = new Node('tests/test_node_http.yml');
+		$node->setDatadirBasePath('tests');
+		
+		$this->assertTrue($node->load());
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
+		$this->assertEquals('http', $node->getUri()->getScheme());
 		$this->assertEquals('FC_BtK4HvbdX9wNQ6hGopSrFxs71SuuwMZra', $node->getSslKeyPubFingerprint());
 		$this->assertEquals(static::SSL_KEY_PUB1, $node->getSslKeyPub());
 	}

@@ -589,24 +589,24 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		
 		$raw = $client2->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
-		ve($json);
+		#ve($json);
 		$this->assertEquals('ssl_password_verify', $json[0]['name']);
 		
 		$raw = $client1->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
-		ve($json);
+		#ve($json);
 		$this->assertEquals(null, $json[0]);
 		
 		
 		// Talk Request
 		$raw = $client1->sendTalkRequest('user1');
 		$json = $this->rawMsgToJson($raw);
-		ve($json);
+		#ve($json);
 		$this->assertEquals('talk_request', $json[0]['name']);
 		
 		$raw = $client2->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
-		ve($json);
+		#ve($json);
 		$this->assertEquals('talk_response', $json[0]['name']);
 		
 		$raw = $client1->dataRecv($raw);

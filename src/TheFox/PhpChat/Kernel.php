@@ -87,7 +87,7 @@ class Kernel extends Thread{
 		$this->getLog()->info('setup local node');
 		$this->localNode = new Node();
 		$this->localNode->setIdHexStr($this->settings->data['node']['id']);
-		$this->localNode->setPort($this->settings->data['node']['port']);
+		$this->localNode->setUri('tcp://'.$this->settings->data['node']['ip'].':'.$this->settings->data['node']['port']);
 		$this->localNode->setSslKeyPub(file_get_contents($this->settings->data['node']['sslKeyPubPath']));
 		$this->getLog()->info('setup local node: done');
 		
@@ -182,13 +182,14 @@ class Kernel extends Thread{
 		$this->ipcSmtpServerConnection->connect();
 	}
 	
-	public function serverConnect($ip, $port, $isTalkRequest = false, $isPingOnly = false, $msgIds = array()){
-		if($this->getServer() && $ip && $port){
-			print __CLASS__.'->'.__FUNCTION__.': '.$ip.':'.$port."\n";
+	public function serverConnect($uri, $isTalkRequest = false, $isPingOnly = false, $msgIds = array()){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#ve($uri);
+		
+		if($this->getServer()){
 			
 			$clientActions = array();
 			if($isTalkRequest){
-				
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_HELLO);
 				$action->functionSet(function($action, $client){
 					$client->setStatus('isChannelLocal', true);
@@ -203,9 +204,9 @@ class Kernel extends Thread{
 				
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
 				$action->functionSet(function($action, $client){
-					$this->ipcConsoleMsgSend('Sening talk request to '.$client->getIpPort().' ...', true, false);
+					$this->ipcConsoleMsgSend('Sening talk request to '.$client->getUri().' ...', true, false);
 					$client->sendTalkRequest($this->getSettingsUserNickname());
-					$this->ipcConsoleMsgSend('Talk request sent to '.$client->getIpPort().'. Waiting for response ...', true, true);
+					$this->ipcConsoleMsgSend('Talk request sent to '.$client->getUri().'. Waiting for response ...', true, true);
 				});
 				$clientActions[] = $action;
 			}
@@ -267,7 +268,7 @@ class Kernel extends Thread{
 				$clientActions[] = $action;
 			}
 			
-			return $this->getServer()->connect($ip, $port, $clientActions);
+			return $this->getServer()->connect($uri, $clientActions);
 		}
 		
 		return false;

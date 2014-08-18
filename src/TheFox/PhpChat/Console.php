@@ -9,6 +9,7 @@ use DateTimeZone;
 
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
+use Zend\Uri\UriFactory;
 
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler as LoggerStreamHandler;
@@ -682,7 +683,8 @@ class Console extends Thread{
 			$portMax = 0xffff;
 			
 			if($port <= $portMax){
-				$this->connect($ip, $port);
+				$uri = UriFactory::factory('tcp://'.$ip.':'.$port);
+				$this->connect($uri);
 			}
 			else{
 				$this->msgAdd();
@@ -762,7 +764,7 @@ class Console extends Thread{
 				$node->setIdHexStr($uuid);
 				
 				if($onode = $this->ipcKernelConnection->execSync('getTable')->nodeFindInBuckets($node)){
-					$this->connect($onode->getIp(), $onode->getPort());
+					$this->connect($onode->getUri());
 				}
 				else{
 					$this->msgAdd();
@@ -906,7 +908,7 @@ class Console extends Thread{
 						while(!$this->getExit()){
 							$line = fgets(STDIN, 1024);
 							
-							print "line: '".substr($line, 0, -1)."'\n";
+							#print "line: '".substr($line, 0, -1)."'\n";
 							if(substr($line, 0, -1) == '.') break;
 							$text .= $line;
 							
@@ -1208,12 +1210,16 @@ class Console extends Thread{
 		return null;
 	}
 	
-	public function connect($ip, $port){
-		$ipPort = $ip.':'.$port;
+	public function connect($uri){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#ve($uri);
+		
 		$this->msgAdd();
-		$this->msgAdd('Connecting to '.$ipPort.' ...', true, false);
-		$connected = $this->ipcKernelConnection->execSync('serverConnect', array($ip, $port, true));
-		$msg = 'Connection to '.$ipPort.' ';
+		$this->msgAdd('Connecting to '.$uri.' ...', true, false);
+		
+		$connected = $this->ipcKernelConnection->execSync('serverConnect', array($uri, true));
+		
+		$msg = 'Connection to '.$uri.' ';
 		$printPs1 = false;
 		if($connected){
 			$msg .= 'established';

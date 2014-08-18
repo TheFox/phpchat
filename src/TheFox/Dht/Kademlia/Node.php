@@ -4,6 +4,8 @@ namespace TheFox\Dht\Kademlia;
 
 use RuntimeException;
 
+use Zend\Uri\UriFactory;
+
 use TheFox\Storage\YamlStorage;
 use TheFox\Utilities\Hex;
 use TheFox\Utilities\Base58;
@@ -15,16 +17,18 @@ class Node extends YamlStorage{
 	const SSL_KEY_LEN_MIN = 4096;
 	
 	private $id = array();
+	private $uri = null;
 	private $sslKeyPub = null;
 	private $bucket = null;
 	
 	public function __construct($filePath = null){
 		parent::__construct($filePath);
 		
+		$this->uri = UriFactory::factory('tcp://');
+		#ve($this->uri);
+		
 		$this->data['id'] = '00000000-0000-4000-8000-000000000000';
-		$this->data['type'] = 'tcp';
-		$this->data['ip'] = '';
-		$this->data['port'] = 0;
+		$this->data['uri'] = '';
 		$this->data['sslKeyPubFingerprint'] = '';
 		$this->data['timeCreated'] = time();
 		$this->data['timeLastSeen'] = 0;
@@ -33,7 +37,7 @@ class Node extends YamlStorage{
 	}
 	
 	public function __sleep(){
-		return array('data', 'id', 'sslKeyPub');
+		return array('data', 'id', 'uri', 'sslKeyPub');
 	}
 	
 	public function __toString(){
@@ -43,19 +47,32 @@ class Node extends YamlStorage{
 	public function save(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
+		$this->data['uri'] = (string)$this->uri;
 		$this->data['sslKeyPub'] = base64_encode($this->sslKeyPub);
 		return parent::save();
 	}
 	
 	public function load(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#fwrite(STDOUT, 'load node'."\n");
 		
 		if(parent::load()){
 			$this->setIdHexStr($this->data['id']);
-			if($this->data['sslKeyPub']){
-				$this->setSslKeyPub(base64_decode($this->data['sslKeyPub']));
+			
+			#ve($this->data);
+			
+			if(isset($this->data['sslKeyPub'])){
+				if($this->data['sslKeyPub']){
+					$this->setSslKeyPub(base64_decode($this->data['sslKeyPub']));
+				}
+				unset($this->data['sslKeyPub']);
 			}
-			unset($this->data['sslKeyPub']);
+			
+			if(isset($this->data['uri'])){
+				#fwrite(STDOUT, 'load node: uri /'.$this->data['uri'].'/'."\n");
+				$this->setUri($this->data['uri']);
+				unset($this->data['uri']);
+			}
 			
 			return true;
 		}
@@ -99,24 +116,20 @@ class Node extends YamlStorage{
 		return $rv;
 	}
 	
-	public function setIp($ip){
-		$this->data['ip'] = $ip;
+	public function setUri($uri){
+		if(is_string($uri)){
+			if($uri){
+				$uri = UriFactory::factory($uri);
+			}
+			else{
+				$uri = UriFactory::factory('tcp://');
+			}
+		}
+		$this->uri = $uri;
 	}
 	
-	public function getIp(){
-		return $this->data['ip'];
-	}
-	
-	public function setPort($port){
-		$this->data['port'] = (int)$port;
-	}
-	
-	public function getPort(){
-		return $this->data['port'];
-	}
-	
-	public function getIpPort(){
-		return $this->data['ip'].':'.$this->data['port'];
+	public function getUri(){
+		return $this->uri;
 	}
 	
 	public function setSslKeyPub($strKeyPub, $force = false){

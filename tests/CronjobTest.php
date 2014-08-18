@@ -157,7 +157,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		
 		$localNode = new Node();
 		$localNode->setIdHexStr($settings->data['node']['id']);
-		$localNode->setPort($settings->data['node']['port']);
+		$localNode->setUri('tcp://'.$settings->data['node']['ip'].':'.$settings->data['node']['port']);
 		$localNode->setSslKeyPub(file_get_contents($settings->data['node']['sslKeyPubPath']));
 		self::assertEquals(static::NODE_LOCAL_SSL_KEY_PUB, $localNode->getSslKeyPub());
 		self::assertEquals('FC_WwG2GdTmCLSKhpEmJso6pejm9c6oACjX', Node::genSslKeyFingerprint($localNode->getSslKeyPub()));

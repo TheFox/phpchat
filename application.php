@@ -5,6 +5,7 @@ require_once __DIR__.'/bootstrap.php';
 
 use Symfony\Component\Console\Application;
 
+use TheFox\PhpChat\Settings;
 use TheFox\Console\Command\KernelCommand;
 use TheFox\Console\Command\ConsoleCommand;
 use TheFox\Console\Command\CronjobCommand;
@@ -13,7 +14,7 @@ use TheFox\Console\Command\ImapCommand;
 use TheFox\Console\Command\SmtpCommand;
 
 
-$application = new Application('PHPChat', '0.3.x-dev');
+$application = new Application('PHPChat', Settings::VERSION);
 foreach(array(
 	new KernelCommand(),
 	new ConsoleCommand(),

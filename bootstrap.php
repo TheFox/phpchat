@@ -35,6 +35,10 @@ if(!extension_loaded('sockets')){
 	print "FATAL ERROR: you must first install sockets.\n";
 	exit(1);
 }
+if(!extension_loaded('curl')){
+	print "FATAL ERROR: you must first install curl.\n";
+	exit(1);
+}
 if(!function_exists('gzcompress')){
 	print "FATAL ERROR: you need the PHP gzip functions.\n";
 	exit(1);
@@ -65,6 +69,7 @@ require_once __DIR__.'/functions.php';
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
 use Symfony\Component\Filesystem\Filesystem;
+use Zend\Uri\UriFactory;
 
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler;
@@ -78,6 +83,9 @@ $filesystem->mkdir('pid', 0700);
 $log = new Logger('main');
 $log->pushHandler(new StreamHandler('php://stdout', Logger::INFO));
 $log->pushHandler(new StreamHandler('log/bootstrap.log', Logger::DEBUG));
+
+UriFactory::registerScheme('tcp', 'TheFox\PhpChat\TcpUri');
+UriFactory::registerScheme('http', 'TheFox\PhpChat\HttpUri');
 
 $settings = new Settings(__DIR__.'/settings.yml');
 

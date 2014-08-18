@@ -7,9 +7,9 @@ use RuntimeException;
 
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
+use Zend\Uri\UriFactory;
 
 use TheFox\Utilities\Hex;
-use TheFox\Network\AbstractSocket;
 use TheFox\Dht\Kademlia\Node;
 use TheFox\Pow\Hashcash;
 
@@ -19,8 +19,6 @@ class Client{
 	const MSG_SEPARATOR_LEN = 1;
 	const NODE_FIND_NUM = 8;
 	const NODE_FIND_MAX_NODE_IDS = 1024;
-	const PING_TTL = 25;
-	const PONG_TTL = 300;
 	const HASHCASH_BITS_MIN = 12;
 	const HASHCASH_BITS_MAX = 15;
 	const HASHCASH_EXPIRATION = 172800; // 2 days
@@ -28,14 +26,12 @@ class Client{
 	const SSL_PASSWORD_MSG_MAX = 100;
 	
 	private $debug = false;
-	private $id = 0;
+	protected $id = 0;
 	private $status = array();
 	
 	private $server = null;
-	private $socket = null;
-	private $node = null;
-	private $ip = '';
-	private $port = 0;
+	protected $node = null;
+	protected $uri = null;
 	private $ssl = null;
 	private $sslTestToken = '';
 	private $sslPasswordToken = '';
@@ -45,17 +41,18 @@ class Client{
 	private $sslPasswordPeerNew = '';
 	private $sslPasswordTime = 0;
 	
-	private $recvBufferTmp = '';
 	private $requestsId = 0;
 	private $requests = array();
 	private $actionsId = 0;
 	private $actions = array();
-	private $pingTime = 0;
-	private $pongTime = 0;
+	protected $pingTime = 0;
+	protected $pongTime = 0;
 	private $sslMsgCount = 0;
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+		$this->uri = new TcpUri();
 		
 		$this->status['hasShutdown'] = false;
 		$this->status['isChannelLocal'] = false;
@@ -69,7 +66,7 @@ class Client{
 	public function __sleep(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
-		return array('id', 'ip', 'port', 'node');
+		return array('id', 'uri', 'node');
 	}
 	
 	public function __destruct(){
@@ -118,14 +115,6 @@ class Client{
 		return $this->server;
 	}
 	
-	public function setSocket(AbstractSocket $socket){
-		$this->socket = $socket;
-	}
-	
-	public function getSocket(){
-		return $this->socket;
-	}
-	
 	public function setNode(Node $node){
 		$this->node = $node;
 	}
@@ -134,38 +123,20 @@ class Client{
 		return $this->node;
 	}
 	
-	public function setIp($ip){
-		$this->ip = $ip;
-	}
-	
-	public function getIp(){
-		if(!$this->ip){
-			$this->setIpPort();
+	public function setUri($uri){
+		if(is_string($uri)){
+			if($uri){
+				$uri = UriFactory::factory($uri);
+			}
+			else{
+				$uri = UriFactory::factory('tcp://');
+			}
 		}
-		return $this->ip;
+		$this->uri = $uri;
 	}
 	
-	public function setPort($port){
-		$this->port = $port;
-	}
-	
-	public function getPort(){
-		if(!$this->port){
-			$this->setIpPort();
-		}
-		return $this->port;
-	}
-	
-	public function setIpPort($ip = '', $port = 0){
-		if($this->getSocket()){
-			$this->getSocket()->getPeerName($ip, $port);
-			$this->setIp($ip);
-			$this->setPort($port);
-		}
-	}
-	
-	public function getIpPort(){
-		return $this->getIp().':'.$this->getPort();
+	public function getUri(){
+		return $this->uri;
 	}
 	
 	public function setSsl($ssl){
@@ -205,7 +176,7 @@ class Client{
 		return null;
 	}
 	
-	private function log($level, $msg){
+	public function log($level, $msg){
 		#print __CLASS__.'->'.__FUNCTION__.': '.$level.', '.$msg."\n";
 		
 		if($this->getLog()){
@@ -323,6 +294,12 @@ class Client{
 		unset($this->requests[$request['id']]);
 	}
 	
+	public function actionsAdd($actions){
+		foreach($actions as $action){
+			$this->actionAdd($action);
+		}
+	}
+	
 	public function actionAdd(ClientAction $action){
 		$this->actionsId++;
 		
@@ -357,36 +334,12 @@ class Client{
 	}
 	
 	public function run(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
-		$this->checkPingSend();
-		$this->checkPongTimeout();
-		$this->checkActions();
-		$this->checkSslPasswordTimeout();
 	}
 	
-	private function checkPingSend(){
-		if($this->pingTime < time() - static::PING_TTL){
-			#print __CLASS__.'->'.__FUNCTION__.''."\n";
-			
-			$this->sendPing();
-		}
-	}
 	
-	private function checkPongTimeout(){
-		if(!$this->pongTime){
-			#print __CLASS__.'->'.__FUNCTION__.': set pong time'."\n";
-			$this->pongTime = time();
-		}
-		#print __CLASS__.'->'.__FUNCTION__.': check '.( time() - static::PONG_TTL - $this->pongTime )."\n";
-		if($this->pongTime < time() - static::PONG_TTL){
-			#print __CLASS__.'->'.__FUNCTION__.': shutdown'."\n";
-			$this->sendQuit();
-			$this->shutdown();
-		}
-	}
 	
-	private function checkActions(){
+	public function checkActions(){
 		#print __CLASS__.'->'.__FUNCTION__.': after actions'."\n";
 		$action = $this->actionGetByCriterion(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
 		
@@ -400,7 +353,7 @@ class Client{
 		}
 	}
 	
-	private function checkSslPasswordTimeout(){
+	public function checkSslPasswordTimeout(){
 		if(!$this->sslPasswordTime){
 			$this->sslPasswordTime = time();
 		}
@@ -421,40 +374,18 @@ class Client{
 	}
 	
 	public function dataRecv($data = null){
-		#fwrite(STDOUT, 'data: /'.$data.'/'."\n");
 		
-		$rv = '';
-		if($data === null && $this->getSocket()){
-			#fwrite(STDOUT, 'data read from socket'."\n");
-			$data = $this->getSocket()->read();
-		}
+	}
+	
+	public function dataSend($data){
 		
-		#fwrite(STDOUT, 'data: /'.$data.'/'."\n");
-		
-		do{
-			$separatorPos = strpos($data, static::MSG_SEPARATOR);
-			if($separatorPos === false){
-				$this->recvBufferTmp .= $data;
-				$data = '';
-			}
-			else{
-				$msg = $this->recvBufferTmp.substr($data, 0, $separatorPos);
-				$this->recvBufferTmp = '';
-				
-				$rv .= $this->msgHandle($msg);
-				#fwrite(STDOUT, 'rv: /'.$rv.'/'."\n");
-				
-				$data = substr($data, $separatorPos + 1);
-			}
-		}
-		while($data);
-		
-		return $rv;
 	}
 	
 	public function msgHandle($msgRaw){
-		$rv = '';
-		$msg = json_decode(base64_decode($msgRaw), true);
+		#fwrite(STDOUT, 'msgHandle: /'.$msgRaw.'/'."\n");
+		
+		$msgHandleReturnValue = '';
+		$msg = json_decode($msgRaw, true);
 		
 		$msgName = '';
 		$msgData = array();
@@ -466,14 +397,11 @@ class Client{
 		}
 		else{
 			#$this->log('error', 'json_decode failed: "'.$msgRaw.'"');
-			$this->log('error', 'json_decode failed: "'.base64_decode($msgRaw).'"');
+			$this->log('error', 'json_decode failed: /'.base64_decode($msgRaw).'/');
 			#$this->log('error', 'json_decode failed');
 		}
 		
-		#print __CLASS__.'->'.__FUNCTION__.': '.$this->getIp().':'.$this->getPort().' raw: '.$msgRaw."\n";
-		#print __CLASS__.'->'.__FUNCTION__.': '.$this->getIp().':'.$this->getPort().' raw: '.$msgRaw."\n";
-		#print __CLASS__.'->'.__FUNCTION__.': "'.$msgName.'"'."\n";
-		#print __CLASS__.'->'.__FUNCTION__.': "'.$msgName.'", '.json_encode($msg['data'])."\n";
+		#fwrite(STDOUT, 'msgHandle: /'.$msgName.'/'."\n");
 		
 		if($msgName == 'noop'){
 			$noop = 0x90;
@@ -503,7 +431,7 @@ class Client{
 				$action->functionExec($this);
 			}
 			
-			$rv .= $this->sendId();
+			$msgHandleReturnValue .= $this->sendId();
 		}
 		elseif($msgName == 'id'){
 			#print __CLASS__.'->'.__FUNCTION__.': '.$msgName.', '.(int)$this->getStatus('hasId')."\n";
@@ -547,8 +475,7 @@ class Client{
 						if($strKeyPub){
 							#if($hashcash && $this->hashcashVerify($hashcash, $id, static::HASHCASH_BITS_MIN)){
 								$node->setIdHexStr($id);
-								$node->setIp($this->getIp());
-								$node->setPort($port);
+								$node->setUri('tcp://'.$this->getUri()->getHost().':'.$port);
 								$node->setTimeLastSeen(time());
 								
 								$node = $this->getTable()->nodeEnclose($node);
@@ -563,7 +490,7 @@ class Client{
 											$idOk = true;
 										}
 										else{
-											$rv .= $this->sendError(2030, $msgName);
+											$msgHandleReturnValue .= $this->sendError(2030, $msgName);
 											#$this->log('warning', 'ssl public key changed since last handshake');
 										}
 									}
@@ -581,20 +508,20 @@ class Client{
 													$idOk = true;
 												}
 												else{
-													$rv .= $this->sendError(2035, $msgName);
+													$msgHandleReturnValue .= $this->sendError(2035, $msgName);
 												}
 											}
 											else{
-												$rv .= $this->sendError(2020, $msgName);
+												$msgHandleReturnValue .= $this->sendError(2020, $msgName);
 											}
 										}
 										else{
-											$rv .= $this->sendError(2040, $msgName);
+											$msgHandleReturnValue .= $this->sendError(2040, $msgName);
 										}
 									}
 								}
 								else{
-									$rv .= $this->sendError(1020, $msgName);
+									$msgHandleReturnValue .= $this->sendError(1020, $msgName);
 								}
 							#}
 							#else{
@@ -602,11 +529,11 @@ class Client{
 							#}
 						}
 						else{
-							$rv .= $this->sendError(2000, $msgName);
+							$msgHandleReturnValue .= $this->sendError(2000, $msgName);
 						}
 					}
 					else{
-						$rv .= $this->sendError(9000, $msgName);
+						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
 					}
 					
 					if($idOk){
@@ -615,25 +542,25 @@ class Client{
 						$this->setStatus('hasId', true);
 						$this->setNode($node);
 						
-						$rv .= $this->sendIdOk();
+						$msgHandleReturnValue .= $this->sendIdOk();
 						
-						$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$id.', '.$port);
+						$this->log('debug', $this->getUri().' recv '.$msgName.': '.$id.', '.$port);
 					}
 					else{
-						$rv .= $this->sendQuit();
+						$msgHandleReturnValue .= $this->sendQuit();
 						$this->shutdown();
 					}
 				}
 				else{
-					$rv .= $this->sendError(1010, $msgName);
+					$msgHandleReturnValue .= $this->sendError(1010, $msgName);
 				}
 			}
 			else{
-				$rv .= $this->sendError(9010, $msgName);
+				$msgHandleReturnValue .= $this->sendError(9010, $msgName);
 			}
 		}
 		elseif($msgName == 'id_ok'){
-			$this->log('debug', $this->getIpPort().' recv '.$msgName);
+			$this->log('debug', $this->getUri().' recv '.$msgName);
 			
 			$action = $this->actionGetByCriterion(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
 			if($action){
@@ -642,7 +569,7 @@ class Client{
 			}
 			
 			if($this->getStatus('isChannelPeer')){
-				$this->consoleMsgAdd('New incoming channel connection from '.$this->getIpPort().'.', true, true, true);
+				$this->consoleMsgAdd('New incoming channel connection from '.$this->getUri().'.', true, true, true);
 			}
 			
 			if($this->getStatus('isChannelPeer') || $this->getStatus('isChannelLocal')){
@@ -683,7 +610,7 @@ class Client{
 					$hashcash = $msgData['hashcash'];
 				}
 				
-				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$nodeId.', '.(int)($this->getNode() != null));
+				$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.$nodeId.', '.(int)($this->getNode() != null));
 				
 				if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MIN)){
 					if($nodeId){
@@ -693,12 +620,12 @@ class Client{
 						if( $node->isEqual($this->getLocalNode()) ){
 							$this->log('debug', 'node find: find myself');
 							
-							$rv .= $this->sendNodeFound($rid);
+							$msgHandleReturnValue .= $this->sendNodeFound($rid);
 						}
 						elseif( !$node->isEqual($this->getNode()) && $onode = $this->getTable()->nodeFindInBuckets($node) ){
 							$this->log('debug', 'node find: find in buckets');
 							
-							$rv .= $this->sendNodeFound($rid, array($onode));
+							$msgHandleReturnValue .= $this->sendNodeFound($rid, array($onode));
 						}
 						else{
 							$this->log('debug', 'node find: closest to "'.$node->getIdHexStr().'"');
@@ -711,16 +638,16 @@ class Client{
 								}
 							}
 							
-							$rv .= $this->sendNodeFound($rid, $nodes);
+							$msgHandleReturnValue .= $this->sendNodeFound($rid, $nodes);
 						}
 					}
 				}
 				else{
-					$rv .= $this->sendError(4000, $msgName);
+					$msgHandleReturnValue .= $this->sendError(4000, $msgName);
 				}
 			}
 			else{
-				$rv .= $this->sendError(1000, $msgName);
+				$msgHandleReturnValue .= $this->sendError(1000, $msgName);
 			}
 		}
 		elseif($msgName == 'node_found'){
@@ -739,7 +666,7 @@ class Client{
 				}
 				
 				if($rid){
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid);
+					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid);
 					
 					$request = $this->requestGetByRid($rid);
 					if($request){
@@ -749,8 +676,7 @@ class Client{
 							$nodeId = $request['data']['nodeId'];
 							$nodesFoundIds = $request['data']['nodesFoundIds'];
 							$distanceOld = $request['data']['distance'];
-							$ip = '';
-							$port = 0;
+							$uri = '';
 							
 							if($nodes){
 								// Find the smallest distance.
@@ -760,11 +686,8 @@ class Client{
 									if(isset($nodeAr['id'])){
 										$node->setIdHexStr($nodeAr['id']);
 									}
-									if(isset($nodeAr['ip'])){
-										$node->setIp($nodeAr['ip']);
-									}
-									if(isset($nodeAr['port'])){
-										$node->setPort($nodeAr['port']);
+									if(isset($nodeAr['uri'])){
+										$node->setUri($nodeAr['uri']);
 									}
 									if(isset($nodeAr['sslKeyPub']) && $nodeAr['sslKeyPub']){
 										$node->setSslKeyPub(base64_decode($nodeAr['sslKeyPub']));
@@ -776,8 +699,8 @@ class Client{
 									$this->log('debug', 'node found: '.$nodeArId.', '.$nodeAr['id'].', do='.$distanceOld.', dn='.$distanceNew);
 									
 									if(!$this->getLocalNode()->isEqual($node)){
-										if($this->getSettings()->data['node']['ipPub'] != $node->getIp()
-											|| $this->getLocalNode()->getPort() != $node->getPort()){
+										if($this->getSettings()->data['node']['ipPub'] != $node->getUri()->getHost()
+											|| $this->getLocalNode()->getUri()->getPort() != $node->getUri()->getPort()){
 											if(!in_array($node->getIdHexStr(), $nodesFoundIds)){
 												
 												$nodesFoundIds[] = $nodeAr['id'];
@@ -787,16 +710,14 @@ class Client{
 												
 												if($nodeAr['id'] == $nodeId){
 													$this->log('debug', 'node found: find completed');
-													$ip = '';
-													$port = 0;
+													$uri = '';
 												}
 												else{
 													if($distanceOld != $distanceNew){
 														$distanceMin = Node::idMinHexStr($distanceOld, $distanceNew);
 														if($distanceMin == $distanceNew){ // Is smaller then $distanceOld.
 															$distanceOld = $distanceNew;
-															$ip = $node->getIp();
-															$port = $node->getPort();
+															$uri = $node->getUri();
 														}
 													}
 												}
@@ -808,7 +729,7 @@ class Client{
 											}
 										}
 										else{
-											$this->log('debug', 'node found: myself, ip:port equal ('.$node->getIp().':'.$node->getPort().')');
+											$this->log('debug', 'node found: myself, uri equal ('.$node->getUri().')');
 										}
 									}
 									else{
@@ -817,9 +738,9 @@ class Client{
 								}
 							}
 							
-							if($ip){
+							if($uri){
 								// Further search at the nearest node.
-								$this->log('debug', 'node found: ip ('.$ip.':'.$port.') ok');
+								$this->log('debug', 'node found: uri ('.$uri.') ok');
 								
 								$clientActions = array();
 								$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
@@ -828,25 +749,23 @@ class Client{
 								});
 								$clientActions[] = $action;
 								
-								if($ip && $port){
-									$this->getServer()->connect($ip, $port, $clientActions);
-								}
+								$this->getServer()->connect($uri, $clientActions);
 							}
 						}
 						else{
-							$rv .= $this->sendError(4000, $msgName);
+							$msgHandleReturnValue .= $this->sendError(4000, $msgName);
 						}
 					}
 					else{
-						$rv .= $this->sendError(9000, $msgName);
+						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
 					}
 				}
 				else{
-					$rv .= $this->sendError(9000, $msgName);
+					$msgHandleReturnValue .= $this->sendError(9000, $msgName);
 				}
 			}
 			else{
-				$rv .= $this->sendError(1000, $msgName);
+				$msgHandleReturnValue .= $this->sendError(1000, $msgName);
 			}
 		}
 		
@@ -902,7 +821,7 @@ class Client{
 						$hashcash = $msgData['hashcash'];
 					}
 					
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$id);
+					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$id);
 					
 					#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.' body: '.$body."\n"); # TODO
 					#$this->log('debug', 'msg '.$id.' body: '.$body);
@@ -931,7 +850,7 @@ class Client{
 					}
 					
 					if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MAX)){
-						$rv .= $this->sendMsgResponse($rid, $status);
+						$msgHandleReturnValue .= $this->sendMsgResponse($rid, $status);
 						
 						if($status == 1){
 							$msg = new Msg();
@@ -990,15 +909,15 @@ class Client{
 						}
 					}
 					else{
-						$rv .= $this->sendError(4000, $msgName);
+						$msgHandleReturnValue .= $this->sendError(4000, $msgName);
 					}
 				}
 				else{
-					$rv .= $this->sendError(3090, $msgName);
+					$msgHandleReturnValue .= $this->sendError(3090, $msgName);
 				}
 			}
 			else{
-				$rv .= $this->sendError(1000, $msgName);
+				$msgHandleReturnValue .= $this->sendError(1000, $msgName);
 			}
 		}
 		elseif($msgName == 'msg_response'){
@@ -1012,7 +931,7 @@ class Client{
 					$status = (int)$msgData['status'];
 				}
 				
-				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$status);
+				$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.$status);
 				
 				$request = $this->requestGetByRid($rid);
 				if($request){
@@ -1032,11 +951,11 @@ class Client{
 					}
 				}
 				else{
-					$rv .= $this->sendError(9000, $msgName);
+					$msgHandleReturnValue .= $this->sendError(9000, $msgName);
 				}
 			}
 			else{
-				$rv .= $this->sendError(1000, $msgName);
+				$msgHandleReturnValue .= $this->sendError(1000, $msgName);
 			}
 			
 			$action = $this->actionGetByCriterion(ClientAction::CRITERION_AFTER_MSG_RESPONSE);
@@ -1047,6 +966,7 @@ class Client{
 		}
 		
 		elseif($msgName == 'ssl_init'){
+			#ve($this);
 			if($this->getSsl()){
 				if($this->getStatus('hasId')){
 					if(!$this->getStatus('hasSslInit')){
@@ -1061,26 +981,26 @@ class Client{
 							$this->log('debug', 'SSL: init B');
 							
 							$this->setStatus('hasSslInit', true);
-							$rv .= $this->sendSslInit();
-							$rv .= $this->sendSslInitResponse(1);
+							$msgHandleReturnValue .= $this->sendSslInit();
+							$msgHandleReturnValue .= $this->sendSslInitResponse(1);
 						}
 						else{
 							$this->resetStatusSsl();
-							#$rv .= $this->sendError(4000, $msgName);
-							$rv .= $this->sendSslInitResponse(4000);
+							#$msgHandleReturnValue .= $this->sendError(4000, $msgName);
+							$msgHandleReturnValue .= $this->sendSslInitResponse(4000);
 						}
 					}
 				}
 				else{
 					$this->resetStatusSsl();
-					#$rv .= $this->sendError(1000, $msgName);
-					$rv .= $this->sendSslInitResponse(1000);
+					#$msgHandleReturnValue .= $this->sendError(1000, $msgName);
+					$msgHandleReturnValue .= $this->sendSslInitResponse(1000);
 				}
 			}
 			else{
 				$this->resetStatusSsl();
-				#$rv .= $this->sendError(3090, $msgName);
-				$rv .= $this->sendSslInitResponse(3090);
+				#$msgHandleReturnValue .= $this->sendError(3090, $msgName);
+				$msgHandleReturnValue .= $this->sendSslInitResponse(3090);
 			}
 		}
 		elseif($msgName == 'ssl_init_response'){
@@ -1098,23 +1018,23 @@ class Client{
 						$this->log('debug', 'SSL: init ok');
 						
 						$this->setStatus('hasSslInitOk', true);
-						$rv .= $this->sendSslTest();
+						$msgHandleReturnValue .= $this->sendSslTest();
 					}
 					else{
 						$this->log('warning', $msgName.' SSL: you already initialized ssl');
-						$rv .= $this->sendError(2050, $msgName);
+						$msgHandleReturnValue .= $this->sendError(2050, $msgName);
 					}
 				}
 				else{
 					$this->log('warning', $msgName.' SSL: failed. code = '.$code);
 					$this->resetStatusSsl();
-					$rv .= $this->sendError(3100, $msgName);
+					$msgHandleReturnValue .= $this->sendError(3100, $msgName);
 				}
 			}
 			else{
 				$this->log('warning', $msgName.' SSL: failed, invalid data');
 				$this->resetStatusSsl();
-				$rv .= $this->sendError(3100, $msgName);
+				$msgHandleReturnValue .= $this->sendError(3100, $msgName);
 			}
 		}
 		elseif($msgName == 'ssl_test'){
@@ -1130,19 +1050,19 @@ class Client{
 						$this->log('debug', 'SSL: test');
 						
 						$this->setStatus('hasSslTest', true);
-						$rv .= $this->sendSslVerify($token);
+						$msgHandleReturnValue .= $this->sendSslVerify($token);
 					}
 					else{
-						$rv .= $this->sendError(9000, $msgName);
+						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
 					}
 				}
 				else{
-					$rv .= $this->sendError(2070, $msgName);
+					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
 					$this->log('warning', $msgName.' SSL: decryption failed');
 				}
 			}
 			else{
-				$rv .= $this->sendError(2060, $msgName);
+				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
 				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
 			}
 		}
@@ -1160,19 +1080,19 @@ class Client{
 						#print __CLASS__.'->'.__FUNCTION__.': '.$msgName.' SSL: verified'."\n";
 						
 						$this->setStatus('hasSslVerify', true);
-						$rv .= $this->sendSslPasswordPut();
+						$msgHandleReturnValue .= $this->sendSslPasswordPut();
 					}
 					else{
-						$rv .= $this->sendError(2080, $msgName);
+						$msgHandleReturnValue .= $this->sendError(2080, $msgName);
 					}
 				}
 				else{
-					$rv .= $this->sendError(2070, $msgName);
+					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
 					$this->log('warning', $msgName.' SSL: decryption failed');
 				}
 			}
 			else{
-				$rv .= $this->sendError(2060, $msgName);
+				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
 				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
 			}
 		}
@@ -1192,19 +1112,19 @@ class Client{
 						$this->sslPasswordPeer = $password;
 						$this->log('debug', 'SSL: peer password: '.substr($this->sslPasswordPeer, 0, 20));
 						
-						$rv .= $this->sendSslPasswordTest();
+						$msgHandleReturnValue .= $this->sendSslPasswordTest();
 					}
 					else{
-						$rv .= $this->sendError(9000, $msgName);
+						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
 					}
 				}
 				else{
-					$rv .= $this->sendError(2070, $msgName);
+					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
 					$this->log('warning', $msgName.' SSL: decryption failed');
 				}
 			}
 			else{
-				$rv .= $this->sendError(2060, $msgName);
+				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
 				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
 			}
 		}
@@ -1232,21 +1152,21 @@ class Client{
 							$this->setStatus('hasReSslPasswortPutInit', true);
 							$this->setStatus('hasReSslPasswortTest', false);
 							
-							$rv .= $this->sendSslPasswordReput();
+							$msgHandleReturnValue .= $this->sendSslPasswordReput();
 						}
-						$rv .= $this->sendSslPasswordRetest();
+						$msgHandleReturnValue .= $this->sendSslPasswordRetest();
 					}
 					else{
-						$rv .= $this->sendError(9000, $msgName);
+						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
 					}
 				}
 				else{
-					$rv .= $this->sendError(2070, $msgName);
+					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
 					$this->log('warning', $msgName.' re-SSL: decryption failed');
 				}
 			}
 			else{
-				$rv .= $this->sendError(2060, $msgName);
+				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
 				$this->log('warning', $msgName.' re-SSL: you need to initialize ssl, hasSsl=/'.(int)$this->getStatus('hasSsl').'/ hasReSslPasswortPut=/'.(int)$this->getStatus('hasReSslPasswortPut').'/');
 			}
 		}
@@ -1261,19 +1181,19 @@ class Client{
 					
 					if($token){
 						$this->setStatus('hasSslPasswortTest', true);
-						$rv .= $this->sendSslPasswordVerify($token);
+						$msgHandleReturnValue .= $this->sendSslPasswordVerify($token);
 					}
 					else{
-						$rv .= $this->sendError(9000, $msgName);
+						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
 					}
 				}
 				else{
-					$rv .= $this->sendError(2070, $msgName);
+					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
 					$this->log('warning', $msgName.' SSL: decryption failed');
 				}
 			}
 			else{
-				$rv .= $this->sendError(2060, $msgName);
+				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
 				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
 			}
 		}
@@ -1290,19 +1210,19 @@ class Client{
 						$this->log('debug', 're-SSL: password retest');
 						
 						$this->setStatus('hasReSslPasswortTest', true);
-						$rv .= $this->sendSslPasswordReverify($token);
+						$msgHandleReturnValue .= $this->sendSslPasswordReverify($token);
 					}
 					else{
-						$rv .= $this->sendError(9000, $msgName);
+						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
 					}
 				}
 				else{
-					$rv .= $this->sendError(2070, $msgName);
+					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
 					$this->log('warning', $msgName.' re-SSL: decryption failed');
 				}
 			}
 			else{
-				$rv .= $this->sendError(2060, $msgName);
+				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
 				$this->log('warning', $msgName.' re-SSL: you need to initialize ssl, hasSsl=/'.(int)$this->getStatus('hasSsl').'/ hasReSslPasswortTest=/'.(int)$this->getStatus('hasReSslPasswortTest').'/');
 			}
 		}
@@ -1333,20 +1253,20 @@ class Client{
 							}
 						}
 						else{
-							$rv .= $this->sendError(2090, $msgName);
+							$msgHandleReturnValue .= $this->sendError(2090, $msgName);
 						}
 					}
 					else{
-						$rv .= $this->sendError(9000, $msgName);
+						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
 					}
 				}
 				else{
-					$rv .= $this->sendError(2070, $msgName);
+					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
 					$this->log('warning', $msgName.' SSL: decryption failed');
 				}
 			}
 			else{
-				$rv .= $this->sendError(2060, $msgName);
+				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
 				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
 			}
 			
@@ -1383,20 +1303,20 @@ class Client{
 							}
 						}
 						else{
-							$rv .= $this->sendError(2090, $msgName);
+							$msgHandleReturnValue .= $this->sendError(2090, $msgName);
 						}
 					}
 					else{
-						$rv .= $this->sendError(9000, $msgName);
+						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
 					}
 				}
 				else{
-					$rv .= $this->sendError(2070, $msgName);
+					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
 					$this->log('warning', $msgName.' re-SSL: decryption failed');
 				}
 			}
 			else{
-				$rv .= $this->sendError(2060, $msgName);
+				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
 				$this->log('warning', $msgName.' re-SSL: you need to initialize ssl, hasSsl=/'.(int)$this->getStatus('hasSsl').'/ hasReSslPasswortTest=/'.(int)$this->getStatus('hasReSslPasswortTest').'/');
 			}
 			
@@ -1415,14 +1335,14 @@ class Client{
 					$nodeSslKeyPubFingerprint = $msgData['nodeSslKeyPubFingerprint'];
 				}
 				
-				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid);
+				$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid);
 				
 				if(Node::sslKeyPubFingerprintVerify($nodeSslKeyPubFingerprint)){
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': pub key fp ok');
+					$this->log('debug', $this->getUri().' recv '.$msgName.': pub key fp ok');
 					
 					$node = $this->getTable()->nodeFindByKeyPubFingerprint($nodeSslKeyPubFingerprint);
 					if($node){
-						$this->log('debug', $this->getIpPort().' recv '.$msgName.': found node');
+						$this->log('debug', $this->getUri().' recv '.$msgName.': found node');
 						
 						$this->sendSslKeyPubPut($rid, $node->getIdHexStr(),
 							$node->getIp(), $node->getPort(),
@@ -1432,14 +1352,14 @@ class Client{
 						// Not found.
 						$this->sendSslKeyPubPut($rid);
 						
-						$this->log('debug', $this->getIpPort().' recv '.$msgName.': node not found A');
+						$this->log('debug', $this->getUri().' recv '.$msgName.': node not found A');
 					}
 				}
 				else{
 					// Fingerprint not valid.
 					$this->sendSslKeyPubPut($rid);
 					
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': node not found B');
+					$this->log('debug', $this->getUri().' recv '.$msgName.': node not found B');
 				}
 			}
 			else{
@@ -1476,12 +1396,12 @@ class Client{
 				}
 				
 				$debugText = '"'.$rid.'" "'.$nodeId.'" "'.$nodeIp.':'.$nodePort.'" "'.$nodeSslKeyPubFingerprint.'"';
-				$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$debugText);
+				$this->log('debug', $this->getUri().' recv '.$msgName.': '.$debugText);
 				
 				$request = $this->requestGetByRid($rid);
 				if($request){
 					$this->requestRemove($request);
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': request '.$request['id']);
+					$this->log('debug', $this->getUri().' recv '.$msgName.': request '.$request['id']);
 					
 					if($nodeId){
 						$node = new Node();
@@ -1502,7 +1422,7 @@ class Client{
 							
 							$onode = $this->getTable()->nodeFindInBuckets($node);
 							if($onode){
-								$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', old node');
+								$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', old node');
 								
 								if(!$onode->getSslKeyPub() && $node->getSslKeyPub()){
 									$onode->setSslKeyPub($node->getSslKeyPub());
@@ -1510,7 +1430,7 @@ class Client{
 								}
 							}
 							else{
-								$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', new node');
+								$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', new node');
 								
 								$this->getTable()->nodeEnclose($node);
 							}
@@ -1547,7 +1467,7 @@ class Client{
 						$hashcash = $msgData['hashcash'];
 					}
 					
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$userNickname);
+					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.$userNickname);
 					
 					if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MAX)){
 						if($rid){
@@ -1555,23 +1475,25 @@ class Client{
 								$this->consoleTalkRequestAdd($rid, $userNickname);
 							}
 							else{
-								$rv .= $this->sendTalkResponse($rid, 4);
+								$msgHandleReturnValue .= $this->sendTalkResponse($rid, 4);
+								$msgHandleReturnValue .= $this->sendQuit();
+								$this->shutdown();
 							}
 						}
 						else{
-							$rv .= $this->sendError(9000, $msgName);
+							$msgHandleReturnValue .= $this->sendError(9000, $msgName);
 						}
 					}
 					else{
-						$rv .= $this->sendError(4000, $msgName);
+						$msgHandleReturnValue .= $this->sendError(4000, $msgName);
 					}
 				}
 				else{
-					$rv .= $this->sendError(9000, $msgName);
+					$msgHandleReturnValue .= $this->sendError(9000, $msgName);
 				}
 			}
 			else{
-				$rv .= $this->sendError(2060, $msgName);
+				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
 				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
 			}
 		}
@@ -1592,12 +1514,12 @@ class Client{
 						$userNickname = $msgData['userNickname'];
 					}
 					
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.(int)$status.', '.$userNickname);
+					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.(int)$status.', '.$userNickname);
 					
 					$request = $this->requestGetByRid($rid);
 					if($request){
 						$this->requestRemove($request);
-						$this->log('debug', $this->getIpPort().' recv '.$msgName.': request ok');
+						$this->log('debug', $this->getUri().' recv '.$msgName.': request ok ('.$status.')');
 						
 						//if($status == 0){} // Undefined
 						if($status == 1){
@@ -1627,17 +1549,19 @@ class Client{
 						}
 						elseif($status == 4){
 							// No console, standalone server.
-							$this->consoleMsgAdd($this->getIpPort().' has no user interface. Can\'t talk to you.', true, true);
+							$this->consoleMsgAdd($this->getUri().' has no user interface. Can\'t talk to you.', true, true);
+							$msgHandleReturnValue .= $this->sendQuit();
+							$this->shutdown();
 						}
 					}
 					else{
-						$rv .= $this->sendError(9000, $msgName);
+						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
 					}
 				}
 			}
 		}
 		elseif($msgName == 'talk_msg'){
-			#$this->log('debug', $this->getIpPort().' recv '.$msgName);
+			#$this->log('debug', $this->getUri().' recv '.$msgName);
 			
 			if($this->getStatus('hasSsl')){
 				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
@@ -1660,7 +1584,7 @@ class Client{
 					}
 					
 					$debugText = $rid.', '.$userNickname.', '.(int)$ignore.', '.$text;
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$debugText);
+					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$debugText);
 					if(!$ignore){
 						$this->consoleTalkMsgAdd($rid, $userNickname, $text);
 					}
@@ -1668,7 +1592,7 @@ class Client{
 			}
 		}
 		elseif($msgName == 'talk_user_nickname_change'){
-			#$this->log('debug', $this->getIpPort().' recv '.$msgName);
+			#$this->log('debug', $this->getUri().' recv '.$msgName);
 			
 			if($this->getStatus('hasSsl')){
 				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
@@ -1694,7 +1618,7 @@ class Client{
 						}
 					}
 					
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$userNicknameOld.', '.$userNicknameNew);
+					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$userNicknameOld.', '.$userNicknameNew);
 					$this->consoleMsgAdd('User "'.$userNicknameOld.'" is now known as "'.$userNicknameNew.'".',
 						true, true, true);
 				}
@@ -1713,9 +1637,9 @@ class Client{
 						$userNickname = $msgData['userNickname'];
 					}
 					
-					$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$rid.', '.$userNickname);
+					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.$userNickname);
 					
-					$rv .= $this->sendQuit();
+					$msgHandleReturnValue .= $this->sendQuit();
 					$this->shutdown();
 					
 					$this->consoleMsgAdd('Talk closed by "'.$userNickname.'".', true, true, true);
@@ -1730,7 +1654,7 @@ class Client{
 			if(array_key_exists('id', $msgData)){
 				$id = $msgData['id'];
 			}
-			$rv .= $this->sendPong($id);
+			$msgHandleReturnValue .= $this->sendPong($id);
 		}
 		elseif($msgName == 'pong'){
 			$id = '';
@@ -1753,20 +1677,20 @@ class Client{
 				$name = $msgData['name'];
 			}
 			
-			$this->log('debug', $this->getIpPort().' recv '.$msgName.': '.$code.', '.$msg.', '.$name);
+			$this->log('debug', $this->getUri().' recv '.$msgName.': '.$code.', '.$msg.', '.$name);
 		}
 		elseif($msgName == 'quit'){
 			$this->shutdown();
 		}
 		else{
-			$this->log('debug', $this->getIpPort().' recv '.$msgName.': not implemented.');
-			$rv .= $this->sendError(9020, $msgName);
+			$this->log('debug', $this->getUri().' recv /'.$msgName.'/: not implemented.');
+			$msgHandleReturnValue .= $this->sendError(9020, $msgName);
 		}
 		
-		return $rv;
+		return $msgHandleReturnValue;
 	}
 	
-	private function msgCreate($name, $data = array()){
+	public function msgCreate($name, $data = array()){
 		#print __CLASS__.'->'.__FUNCTION__.': "'.$name.'"'."\n";
 		
 		$json = array(
@@ -1776,223 +1700,6 @@ class Client{
 			$json['data'] = $data;
 		}
 		return json_encode($json);
-	}
-	
-	private function dataSend($msg){
-		#print __CLASS__.'->'.__FUNCTION__.': "'.$msg.'"'."\n";
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
-		$rv = '';
-		
-		if($msg){
-			$msg = base64_encode($msg);
-			$rv = $msg.static::MSG_SEPARATOR;
-			if($this->getSocket()){
-				$this->getSocket()->write($rv);
-			}
-		}
-		
-		return $rv;
-	}
-	
-	private function sslMsgCreatePublicEncrypt($name, $data){
-		#print __CLASS__.'->'.__FUNCTION__.': "'.$name.'"'."\n";
-		#ve($data);
-		
-		$data = json_encode($data);
-		
-		#ve($data);
-		$dataEnc = $this->sslPublicEncrypt($data);
-		
-		if($dataEnc){
-			#ve($dataEnc);
-			
-			$json = array(
-				'name' => $name,
-				'data' => $dataEnc,
-			);
-			
-			#print __CLASS__.'->'.__FUNCTION__.': "'.$name.'", "'.json_encode($json).'"'."\n";
-			return json_encode($json);
-		}
-		
-		return null;
-	}
-	
-	private function sslMsgDataPrivateDecrypt($dataEnc){
-		$data = $this->sslPrivateDecrypt($dataEnc);
-		if($data){
-			$data = json_decode($data, true);
-			
-			return $data;
-		}
-		
-		return null;
-	}
-	
-	private function sslMsgCreatePasswordEncrypt($name, $data, $sslPasswordLocal = null, $sslPasswordPeer = null){
-		$this->sslMsgCount++;
-		#print __CLASS__.'->'.__FUNCTION__.': /'.$name.'/ '.$this->sslMsgCount."\n";
-		
-		$data = json_encode($data);
-		$dataEnc = $this->sslPasswordEncrypt($data, $sslPasswordLocal, $sslPasswordPeer);
-		
-		if($dataEnc){
-			$json = array(
-				'name' => $name,
-				'data' => $dataEnc,
-			);
-			return json_encode($json);
-		}
-		
-		return null;
-	}
-	
-	private function sslMsgDataPasswordDecrypt($dataEnc, $sslPasswordLocal = null, $sslPasswordPeer = null){
-		$data = $this->sslPasswordDecrypt($dataEnc, $sslPasswordLocal, $sslPasswordPeer);
-		if($data){
-			$data = json_decode($data, true);
-			return $data;
-		}
-		
-		return null;
-	}
-	
-	private function sslPublicEncrypt($data){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
-		if(openssl_sign($data, $sign, $this->getSsl(), OPENSSL_ALGO_SHA1)){
-			$sign = base64_encode($sign);
-			
-			if(openssl_public_encrypt($data, $cryped, $this->getNode()->getSslKeyPub())){
-				$data = base64_encode($cryped);
-				$jsonStr = json_encode(array('data' => $data, 'sign' => $sign));
-				$gzdata = gzencode($jsonStr, 9);
-				$rv = base64_encode($gzdata);
-				
-				return $rv;
-			}
-		}
-		
-		return null;
-	}
-	
-	private function sslPrivateDecrypt($data){
-		$data = base64_decode($data);
-		$data = gzdecode($data);
-		$json = json_decode($data, true);
-		
-		if(isset($json['data']) && isset($json['sign'])){
-			$data = base64_decode($json['data']);
-			$sign = base64_decode($json['sign']);
-			
-			if(openssl_private_decrypt($data, $decrypted, $this->getSsl())){
-				if(openssl_verify($decrypted, $sign, $this->getNode()->getSslKeyPub(), OPENSSL_ALGO_SHA1)){
-					$rv = $decrypted;
-					
-					return $rv;
-				}
-			}
-		}
-		
-		return null;
-	}
-	
-	private function sslPasswordEncrypt($data, $sslPasswordLocal = null, $sslPasswordPeer = null){
-		#$this->log('debug', 'SSL password encrypt: /'.$sslPasswordLocal.'/ /'.$sslPasswordPeer.'/');
-		
-		if($sslPasswordLocal === null){
-			#$this->log('debug', 'SSL password encrypt: no local password set');
-			$sslPasswordLocal = $this->sslPasswordLocal;
-		}
-		if($sslPasswordPeer === null){
-			#$this->log('debug', 'SSL password encrypt: no peer password set');
-			$sslPasswordPeer = $this->sslPasswordPeer;
-		}
-		
-		if($sslPasswordLocal && $sslPasswordPeer){
-			$password = $sslPasswordLocal.'_'.$sslPasswordPeer;
-			#$this->log('debug', 'SSL password encrypt pwd: '.$password);
-			
-			if(openssl_sign($data, $sign, $this->getSsl(), OPENSSL_ALGO_SHA1)){
-				$sign = base64_encode($sign);
-				$data = base64_encode($data);
-				
-				$jsonStr = json_encode(array('data' => $data, 'sign' => $sign));
-				$data = gzencode($jsonStr, 9);
-				
-				$iv = substr(hash('sha512', mt_rand(0, 999999), true), 0, 16);
-				$data = openssl_encrypt($data, 'AES-256-CBC', $password, 0, $iv);
-				if($data !== false){
-					$iv = base64_encode($iv);
-					
-					$data = gzencode(json_encode(array('data' => $data, 'iv' => $iv)), 9);
-					$rv = base64_encode($data);
-					
-					return $rv;
-				}
-			}
-		}
-		
-		return null;
-	}
-	
-	private function sslPasswordDecrypt($data, $sslPasswordLocal = null, $sslPasswordPeer = null){
-		#$this->log('debug', 'SSL password decrypt: /'.$sslPasswordLocal.'/ /'.$sslPasswordPeer.'/');
-		
-		if($sslPasswordLocal === null){
-			#$this->log('debug', 'SSL password decrypt: no local password set');
-			$sslPasswordLocal = $this->sslPasswordLocal;
-		}
-		if($sslPasswordPeer === null){
-			#$this->log('debug', 'SSL password decrypt: no peer password set');
-			$sslPasswordPeer = $this->sslPasswordPeer;
-		}
-		
-		if($sslPasswordLocal && $sslPasswordPeer){
-			$password = $sslPasswordPeer.'_'.$sslPasswordLocal;
-			#$this->log('debug', 'SSL password decrypt pwd: '.$password);
-			
-			$data = base64_decode($data);
-			$json = json_decode(gzdecode($data), true);
-			if(isset($json['data']) && isset($json['iv'])){
-				$data = $json['data'];
-				$iv = base64_decode($json['iv']);
-				
-				$data = openssl_decrypt($data, 'AES-256-CBC', $password, 0, $iv);
-				if($data !== false){
-					$json = json_decode(gzdecode($data), true);
-					if(isset($json['data']) && isset($json['sign'])){
-						$data = base64_decode($json['data']);
-						$sign = base64_decode($json['sign']);
-						
-						if(openssl_verify($data, $sign, $this->getNode()->getSslKeyPub(), OPENSSL_ALGO_SHA1)){
-							return $data;
-						}
-						else{
-							$this->log('warning', 'sslPasswordDecrypt: openssl_verify failed');
-						}
-					}
-					else{
-						$this->log('warning', 'sslPasswordDecrypt: data or sign not set');
-					}
-				}
-				else{
-					$this->log('warning', 'sslPasswordDecrypt: openssl_decrypt failed');
-					while($openSslErrorStr = openssl_error_string()){
-						$this->log('error', 'SSL: '.$openSslErrorStr);
-					}
-				}
-			}
-			else{
-				$this->log('warning', 'sslPasswordDecrypt: data or iv not set');
-			}
-		}
-		else{
-			$this->log('warning', 'sslPasswordDecrypt: no passwords set');
-		}
-		
-		return null;
 	}
 	
 	public function sendNoop(){
@@ -2006,17 +1713,21 @@ class Client{
 			'len' => $len,
 			'test_data' => $test_data,
 		);
-		$this->dataSend($this->msgCreate('test', $data));
+		return $this->dataSend($this->msgCreate('test', $data));
+	}
+	
+	public function msgCreateHello(){
+		$data = array(
+			'ip' => $this->getUri()->getHost(),
+		);
+		return $this->msgCreate('hello', $data);
 	}
 	
 	public function sendHello(){
-		$data = array(
-			'ip' => $this->getIp(),
-		);
-		return $this->dataSend($this->msgCreate('hello', $data));
+		return $this->dataSend($this->msgCreateHello());
 	}
 	
-	public function sendId(){
+	public function msgCreateId(){
 		if(!$this->getLocalNode()){
 			throw new RuntimeException('localNode not set.');
 		}
@@ -2026,12 +1737,16 @@ class Client{
 		$data = array(
 			'release'   => $this->getSettings()->data['release'],
 			'id'        => $this->getLocalNode()->getIdHexStr(),
-			'port'      => $this->getLocalNode()->getPort(),
+			'port'      => $this->getLocalNode()->getUri()->getPort(),
 			'sslKeyPub' => $sslKeyPub,
 			'isChannel' => $this->getStatus('isChannelLocal'),
 			#'hashcash'  => $this->hashcashMint(static::HASHCASH_BITS_MIN),
 		);
-		return $this->dataSend($this->msgCreate('id', $data));
+		return $this->msgCreate('id', $data);
+	}
+	
+	public function sendId(){
+		return $this->dataSend($this->msgCreateId());
 	}
 	
 	private function sendIdOk(){
@@ -2078,8 +1793,7 @@ class Client{
 		foreach($nodes as $nodeId => $node){
 			$nodesOut[] = array(
 				'id' => $node->getIdHexStr(),
-				'ip' => $node->getIp(),
-				'port' => $node->getPort(),
+				'uri' => (string)$node->getUri(),
 				'sslKeyPub' => base64_encode($node->getSslKeyPub()),
 			);
 		}
@@ -2190,10 +1904,7 @@ class Client{
 	}
 	
 	private function genSslPassword(){
-		$addr = $this->getIp().':'.$this->getPort();
-		$password = hash('sha512', $addr.'_'.mt_rand(0, 999999));
-		#$password = substr(hash('sha512', $addr.'_'.mt_rand(0, 999999)), 0, 3);
-		
+		$password = hash('sha512', $this->getUri().'_'.mt_rand(0, 999999));
 		return $password;
 	}
 	
@@ -2430,19 +2141,208 @@ class Client{
 		return $this->dataSend($this->msgCreate('quit'));
 	}
 	
-	public function shutdown(){
-		if(!$this->getStatus('hasShutdown')){
-			$this->setStatus('hasShutdown', true);
+	private function sslMsgCreatePublicEncrypt($name, $data){
+		#print __CLASS__.'->'.__FUNCTION__.': "'.$name.'"'."\n";
+		#ve($data);
+		
+		$data = json_encode($data);
+		
+		#ve($data);
+		$dataEnc = $this->sslPublicEncrypt($data);
+		
+		if($dataEnc){
+			#ve($dataEnc);
 			
-			if($this->getSocket()){
-				$this->getSocket()->shutdown();
-				$this->getSocket()->close();
-			}
+			$json = array(
+				'name' => $name,
+				'data' => $dataEnc,
+			);
 			
-			if($this->ssl){
-				openssl_free_key($this->ssl);
+			#print __CLASS__.'->'.__FUNCTION__.': "'.$name.'", "'.json_encode($json).'"'."\n";
+			return json_encode($json);
+		}
+		
+		return null;
+	}
+	
+	private function sslMsgDataPrivateDecrypt($dataEnc){
+		$data = $this->sslPrivateDecrypt($dataEnc);
+		if($data){
+			$data = json_decode($data, true);
+			
+			return $data;
+		}
+		
+		return null;
+	}
+	
+	private function sslMsgCreatePasswordEncrypt($name, $data, $sslPasswordLocal = null, $sslPasswordPeer = null){
+		$this->sslMsgCount++;
+		#print __CLASS__.'->'.__FUNCTION__.': /'.$name.'/ '.$this->sslMsgCount."\n";
+		
+		$data = json_encode($data);
+		$dataEnc = $this->sslPasswordEncrypt($data, $sslPasswordLocal, $sslPasswordPeer);
+		
+		if($dataEnc){
+			$json = array(
+				'name' => $name,
+				'data' => $dataEnc,
+			);
+			return json_encode($json);
+		}
+		
+		return null;
+	}
+	
+	private function sslMsgDataPasswordDecrypt($dataEnc, $sslPasswordLocal = null, $sslPasswordPeer = null){
+		$data = $this->sslPasswordDecrypt($dataEnc, $sslPasswordLocal, $sslPasswordPeer);
+		if($data){
+			$data = json_decode($data, true);
+			return $data;
+		}
+		
+		return null;
+	}
+	
+	private function sslPublicEncrypt($data){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		
+		if(openssl_sign($data, $sign, $this->getSsl(), OPENSSL_ALGO_SHA1)){
+			$sign = base64_encode($sign);
+			
+			if(openssl_public_encrypt($data, $cryped, $this->getNode()->getSslKeyPub())){
+				$data = base64_encode($cryped);
+				$jsonStr = json_encode(array('data' => $data, 'sign' => $sign));
+				$gzdata = gzencode($jsonStr, 9);
+				$rv = base64_encode($gzdata);
+				
+				return $rv;
 			}
 		}
+		
+		return null;
+	}
+	
+	private function sslPrivateDecrypt($data){
+		$data = base64_decode($data);
+		$data = gzdecode($data);
+		$json = json_decode($data, true);
+		
+		if(isset($json['data']) && isset($json['sign'])){
+			$data = base64_decode($json['data']);
+			$sign = base64_decode($json['sign']);
+			
+			if(openssl_private_decrypt($data, $decrypted, $this->getSsl())){
+				if(openssl_verify($decrypted, $sign, $this->getNode()->getSslKeyPub(), OPENSSL_ALGO_SHA1)){
+					$rv = $decrypted;
+					
+					return $rv;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	private function sslPasswordEncrypt($data, $sslPasswordLocal = null, $sslPasswordPeer = null){
+		#$this->log('debug', 'SSL password encrypt: /'.$sslPasswordLocal.'/ /'.$sslPasswordPeer.'/');
+		
+		if($sslPasswordLocal === null){
+			#$this->log('debug', 'SSL password encrypt: no local password set');
+			$sslPasswordLocal = $this->sslPasswordLocal;
+		}
+		if($sslPasswordPeer === null){
+			#$this->log('debug', 'SSL password encrypt: no peer password set');
+			$sslPasswordPeer = $this->sslPasswordPeer;
+		}
+		
+		if($sslPasswordLocal && $sslPasswordPeer){
+			$password = $sslPasswordLocal.'_'.$sslPasswordPeer;
+			#$this->log('debug', 'SSL password encrypt pwd: '.$password);
+			
+			if(openssl_sign($data, $sign, $this->getSsl(), OPENSSL_ALGO_SHA1)){
+				$sign = base64_encode($sign);
+				$data = base64_encode($data);
+				
+				$jsonStr = json_encode(array('data' => $data, 'sign' => $sign));
+				$data = gzencode($jsonStr, 9);
+				
+				$iv = substr(hash('sha512', mt_rand(0, 999999), true), 0, 16);
+				$data = openssl_encrypt($data, 'AES-256-CBC', $password, 0, $iv);
+				if($data !== false){
+					$iv = base64_encode($iv);
+					
+					$data = gzencode(json_encode(array('data' => $data, 'iv' => $iv)), 9);
+					$rv = base64_encode($data);
+					
+					return $rv;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	private function sslPasswordDecrypt($data, $sslPasswordLocal = null, $sslPasswordPeer = null){
+		#$this->log('debug', 'SSL password decrypt: /'.$sslPasswordLocal.'/ /'.$sslPasswordPeer.'/');
+		
+		if($sslPasswordLocal === null){
+			#$this->log('debug', 'SSL password decrypt: no local password set');
+			$sslPasswordLocal = $this->sslPasswordLocal;
+		}
+		if($sslPasswordPeer === null){
+			#$this->log('debug', 'SSL password decrypt: no peer password set');
+			$sslPasswordPeer = $this->sslPasswordPeer;
+		}
+		
+		if($sslPasswordLocal && $sslPasswordPeer){
+			$password = $sslPasswordPeer.'_'.$sslPasswordLocal;
+			#$this->log('debug', 'SSL password decrypt pwd: '.$password);
+			
+			$data = base64_decode($data);
+			$json = json_decode(gzdecode($data), true);
+			if(isset($json['data']) && isset($json['iv'])){
+				$data = $json['data'];
+				$iv = base64_decode($json['iv']);
+				
+				$data = openssl_decrypt($data, 'AES-256-CBC', $password, 0, $iv);
+				if($data !== false){
+					$json = json_decode(gzdecode($data), true);
+					if(isset($json['data']) && isset($json['sign'])){
+						$data = base64_decode($json['data']);
+						$sign = base64_decode($json['sign']);
+						
+						if(openssl_verify($data, $sign, $this->getNode()->getSslKeyPub(), OPENSSL_ALGO_SHA1)){
+							return $data;
+						}
+						else{
+							$this->log('warning', 'sslPasswordDecrypt: openssl_verify failed');
+						}
+					}
+					else{
+						$this->log('warning', 'sslPasswordDecrypt: data or sign not set');
+					}
+				}
+				else{
+					$this->log('warning', 'sslPasswordDecrypt: openssl_decrypt failed');
+					while($openSslErrorStr = openssl_error_string()){
+						$this->log('error', 'SSL: '.$openSslErrorStr);
+					}
+				}
+			}
+			else{
+				$this->log('warning', 'sslPasswordDecrypt: data or iv not set');
+			}
+		}
+		else{
+			$this->log('warning', 'sslPasswordDecrypt: no passwords set');
+		}
+		
+		return null;
+	}
+	
+	public function shutdown(){
+		
 	}
 	
 	private function consoleMsgAdd($msgText = '', $showDate = true, $printPs1 = true, $clearLine = false){

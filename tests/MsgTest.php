@@ -215,6 +215,8 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 	
 	const SSL_KEY_PRV_PASS = 'test';
 	
+	#public function testSerialize(){}
+	
 	public function testId(){
 		#$this->markTestIncomplete('This test has not been implemented yet.');
 		$msg = new Msg();
