@@ -21,6 +21,7 @@ class Kernel extends Thread{
 	private $addressbook;
 	private $msgDb;
 	private $hashcashDb;
+	private $nodesNewDb;
 	private $server;
 	private $ipcConsoleConnection = null;
 	private $ipcConsoleShutdown = false;
@@ -116,6 +117,12 @@ class Kernel extends Thread{
 		$load = $this->hashcashDb->load();
 		$this->getLog()->info('setup hashcashDb: done ('.(int)$load.')');
 		
+		$this->getLog()->info('setup nodesNewDb');
+		$this->nodesNewDb = new NodesNewDb($this->settings->data['datadir'].'/nodesnewdb.yml');
+		$this->nodesNewDb->setDatadirBasePath($this->settings->data['datadir']);
+		$load = $this->nodesNewDb->load();
+		$this->getLog()->info('setup nodesNewDb: done ('.(int)$load.')');
+		
 		$this->getLog()->info('setup server');
 		$this->server = new Server();
 		$this->server->setKernel($this);
@@ -154,6 +161,7 @@ class Kernel extends Thread{
 			'getSettings', 'getLocalNode',
 			'getTable', 'tableNodeEnclose',
 			'getMsgDb', 'msgDbMsgUpdate', 'msgDbMsgIncForwardCyclesById', 'msgDbMsgSetStatusById',
+			'getNodesNewDb', 'nodesNewDbNodeAdd', 'nodesNewDbNodeIncConnectAttempt', 'nodesNewDbNodeRemove',
 			'serverConnect', 'save', 
 		) as $functionName){
 			$this->ipcCronjobConnection->functionAdd($functionName, $this, $functionName);
@@ -367,6 +375,22 @@ class Kernel extends Thread{
 		return $this->hashcashDb;
 	}
 	
+	public function getNodesNewDb(){
+		return $this->nodesNewDb;
+	}
+	
+	public function nodesNewDbNodeAdd($uri){
+		return $this->getNodesNewDb()->nodeAdd($uri);
+	}
+	
+	public function nodesNewDbNodeIncConnectAttempt($id){
+		return $this->getNodesNewDb()->nodeIncConnectAttempt($id);
+	}
+	
+	public function nodesNewDbNodeRemove($id){
+		return $this->getNodesNewDb()->nodeRemove($id);
+	}
+	
 	public function getIpcConsoleConnection(){
 		return $this->ipcConsoleConnection;
 	}
@@ -399,11 +423,18 @@ class Kernel extends Thread{
 	
 	public function save(){
 		$this->getTable()->save();
+		
 		$this->getAddressbook()->save();
+		
 		$this->getMsgDb()->setDataChanged(true);
 		$this->getMsgDb()->save();
+		
 		$this->getHashcashDb()->setDataChanged(true);
 		$this->getHashcashDb()->save();
+		
+		$this->getNodesNewDb()->setDataChanged(true);
+		$this->getNodesNewDb()->save();
+		
 		$this->getSettings()->save();
 	}
 	

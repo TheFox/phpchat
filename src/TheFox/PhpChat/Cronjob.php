@@ -94,6 +94,7 @@ class Cronjob extends Thread{
 		$this->pingClosestNodes();
 		$this->msgDbInit();
 		$this->bootstrapNodesEnclose();
+		$this->nodesNewEnclose();
 		
 		$this->log->debug('save');
 		$this->getIpcKernelConnection()->execAsync('save');
@@ -112,11 +113,13 @@ class Cronjob extends Thread{
 			#print 'ping'."\n";  # TODO
 			$this->pingClosestNodes();
 			$this->bootstrapNodesEnclose();
+			$this->nodesNewEnclose();
 		}
 		
 		if($this->seconds == 0){
 			#print 'msgs'."\n";  # TODO
 			$this->msgDbInit();
+			$this->nodesNewEnclose();
 		}
 		if($this->minutes % 5 == 0 && $this->seconds == 0){
 			#print 'save'."\n";  # TODO
@@ -491,16 +494,19 @@ class Cronjob extends Thread{
 								
 								$nodeObj = new Node();
 								
-								if(isset($node['id'])){
-									$nodeObj->setIdHexStr($node['id']);
-								}
 								if(isset($node['uri'])){
 									$nodeObj->setUri($node['uri']);
+									
+									if(isset($node['id'])){
+										$nodeObj->setIdHexStr($node['id']);
+										$this->getIpcKernelConnection()->execAsync('tableNodeEnclose', array($nodeObj));
+									}
+									else{
+										$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeAdd', array((string)$nodeObj->getUri()));
+									}
 								}
 								
-								$this->log->debug('node: '.$nodeObj->getIdHexStr());
-								$this->getIpcKernelConnection()->execAsync('tableNodeEnclose', array($nodeObj));
-								#$onode = $this->getIpcKernelConnection()->execSync('tableNodeEnclose', array($nodeObj));
+								$this->log->debug('node: '.$nodeObj->getUri());
 							}
 						}
 					}
@@ -510,6 +516,31 @@ class Cronjob extends Thread{
 				}
 				else{
 					$this->log->warning('response code for "'.$url.'": '.$response->getStatusCode());
+				}
+			}
+		}
+	}
+	
+	private function nodesNewEnclose(){
+		$this->log->debug('nodes new enclose');
+		
+		$nodesNewDb = $this->getIpcKernelConnection()->execSync('getNodesNewDb', array(), 10);
+		#ve($nodesNewDb);
+		
+		foreach($nodesNewDb->getNodes() as $nodeId => $node){
+			if($node['connectAttempt'] >= 4){
+				$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeRemove', array($nodeId));
+			}
+			else{
+				$nodeObj = new Node();
+				$nodeObj->setUri($node['uri']);
+				
+				$connected = $this->getIpcKernelConnection()->execSync('serverConnect', array($nodeObj->getUri(), false, true));
+				if($connected){
+					$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeRemove', array($nodeId));
+				}
+				else{
+					$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeIncConnectAttempt', array($nodeId));
 				}
 			}
 		}
