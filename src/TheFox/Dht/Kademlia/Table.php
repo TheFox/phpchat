@@ -151,6 +151,19 @@ class Table extends YamlStorage{
 		return null;
 	}
 	
+	public function nodeFindInBucketsByUri($uri){
+		#fwrite(STDOUT, 'nodeFindInBucketsByUri'."\n");
+		foreach($this->buckets as $bucketId => $bucket){
+			#fwrite(STDOUT, 'nodeFindInBucketsByUri: '.$bucketId."\n");
+			if($onode = $bucket->nodeFindByUri($uri)){
+				#fwrite(STDOUT, 'nodeFindInBucketsByUri: '.$bucketId.', found'."\n");
+				return $onode;
+			}
+		}
+		
+		return null;
+	}
+	
 	public function nodeFindClosest(Node $node, $num = 8){
 		$nodes = array();
 		

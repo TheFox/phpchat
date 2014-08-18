@@ -64,6 +64,67 @@ class TableTest extends PHPUnit_Framework_TestCase{
 		$this->assertEquals(array($node_a, $node_b, $node_c, $node_d, $node_e), $table->getNodes());
 	}
 	
+	public function testNodeFindInBuckets1(){
+		$localNode = new Node();
+		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
+		$table = new Table();
+		$table->setLocalNode($localNode);
+		
+		$node_a = new Node();
+		$node_a->setIdHexStr('10000001-2002-4004-8008-100000000002');
+		$node_a->setUri('tcp://192.168.241.1');
+		$table->nodeEnclose($node_a);
+		
+		$node_b = new Node();
+		$node_b->setIdHexStr('10000001-2002-4004-8008-100000000002');
+		
+		$onode = $table->nodeFindInBuckets($node_b);
+		
+		$this->assertEquals('192.168.241.1', $onode->getUri()->getHost());
+	}
+	
+	public function testNodeFindInBuckets2(){
+		$localNode = new Node();
+		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
+		$table = new Table();
+		$table->setLocalNode($localNode);
+		
+		$node_a = new Node();
+		$node_a->setIdHexStr('10000001-2002-4004-8008-100000000002');
+		$node_a->setUri('tcp://192.168.241.1');
+		$table->nodeEnclose($node_a);
+		
+		$node_b = new Node();
+		$node_b->setIdHexStr('10000001-2002-4004-8008-100000000003');
+		$node_b->setUri('tcp://192.168.241.2');
+		
+		$onode = $table->nodeFindInBuckets($node_b);
+		$this->assertEquals(null, $onode);
+	}
+	
+	public function testNodeFindInBucketsByUri(){
+		$localNode = new Node();
+		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
+		$table = new Table();
+		$table->setLocalNode($localNode);
+		
+		$node_a = new Node();
+		$node_a->setIdHexStr('10000001-2002-4004-8008-100000000002');
+		$node_a->setUri('tcp://192.168.241.1');
+		$table->nodeEnclose($node_a);
+		
+		$node_b = new Node();
+		$node_b->setIdHexStr('10000001-2002-4004-8008-100000000003');
+		$node_b->setUri('tcp://192.168.241.2');
+		$table->nodeEnclose($node_b);
+		
+		$onode = $table->nodeFindInBucketsByUri('tcp://192.168.241.3');
+		$this->assertEquals(null, $onode);
+		
+		$onode = $table->nodeFindInBucketsByUri('tcp://192.168.241.2');
+		$this->assertEquals($node_b, $onode);
+	}
+	
 	public function testNodeFindClosest(){
 		$localNode = new Node();
 		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
@@ -96,44 +157,6 @@ class TableTest extends PHPUnit_Framework_TestCase{
 		$this->assertEquals(array($node_c, $node_a, $node_b, $node_d), $nodes);
 	}
 	
-	public function testNodeFindInBuckets1(){
-		$localNode = new Node();
-		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
-		$table = new Table();
-		$table->setLocalNode($localNode);
-		
-		$node_a = new Node();
-		$node_a->setIdHexStr('10000001-2002-4004-8008-100000000002');
-		$node_a->setUri('tcp://192.168.241.21');
-		$table->nodeEnclose($node_a);
-		
-		$node_b = new Node();
-		$node_b->setIdHexStr('10000001-2002-4004-8008-100000000002');
-		
-		$onode = $table->nodeFindInBuckets($node_b);
-		
-		$this->assertEquals('192.168.241.21', $onode->getUri()->getHost());
-	}
-	
-	public function testNodeFindInBuckets2(){
-		$localNode = new Node();
-		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
-		$table = new Table();
-		$table->setLocalNode($localNode);
-		
-		$node_a = new Node();
-		$node_a->setIdHexStr('10000001-2002-4004-8008-100000000002');
-		$node_a->setUri('tcp://192.168.241.21');
-		$table->nodeEnclose($node_a);
-		
-		$node_b = new Node();
-		$node_b->setIdHexStr('10000001-2002-4004-8008-100000000003');
-		$node_b->setUri('tcp://10.0.0.1');
-		
-		$onode = $table->nodeFindInBuckets($node_b);
-		$this->assertEquals(null, $onode);
-	}
-	
 	public function testNodeEnclose1(){
 		$localNode = new Node();
 		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
@@ -155,19 +178,19 @@ class TableTest extends PHPUnit_Framework_TestCase{
 		
 		$node_a = new Node();
 		$node_a->setIdHexStr('10000001-2002-4004-8008-100000000002');
-		$node_a->setUri('tcp://192.168.241.21');
+		$node_a->setUri('tcp://192.168.241.1');
 		$table->nodeEnclose($node_a);
 		
 		$node_b = new Node();
 		$node_b->setIdHexStr('10000001-2002-4004-8008-100000000002');
-		$node_b->setUri('tcp://10.0.0.1');
+		$node_b->setUri('tcp://192.168.241.2');
 		
 		$onode = $table->nodeEnclose($node_b);
 		
 		$this->assertFalse($node_a === $node_b);
 		$this->assertTrue($node_a === $onode);
 		
-		$this->assertEquals('192.168.241.21', $onode->getUri()->getHost());
+		$this->assertEquals('192.168.241.1', $onode->getUri()->getHost());
 	}
 	
 }

@@ -138,6 +138,18 @@ class Bucket extends YamlStorage{
 		return null;
 	}
 	
+	public function nodeFindByUri($uri){
+		#fwrite(STDOUT, 'nodeFindByUri'."\n");
+		foreach($this->nodes as $nodeId => $node){
+			#fwrite(STDOUT, 'nodeFindByUri: '.$node->getIdHexStr().', '.(string)$node->getUri()."\n");
+			if((string)$node->getUri() == $uri){
+				#fwrite(STDOUT, 'nodeFindByUri: '.$node->getIdHexStr().', found'."\n");
+				return $node;
+			}
+		}
+		return null;
+	}
+	
 	public function nodeAdd(Node $node, $sortNodes = true){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		$onode = $this->nodeFind($node);
