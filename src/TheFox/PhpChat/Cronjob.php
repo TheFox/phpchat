@@ -92,6 +92,10 @@ class Cronjob extends Thread{
 		
 		$this->pingClosestNodes();
 		$this->msgDbInit();
+		$this->bootstrapNodesEnclose();
+		
+		$this->log->debug('save');
+		$this->getIpcKernelConnection()->execAsync('save');
 		
 		$this->getIpcKernelConnection()->run();
 		
@@ -106,6 +110,7 @@ class Cronjob extends Thread{
 		if($this->hours == 0 && $this->minutes == 1 && $this->seconds == 0){
 			#print 'ping'."\n";  # TODO
 			$this->pingClosestNodes();
+			$this->bootstrapNodesEnclose();
 		}
 		
 		if($this->seconds == 0){
@@ -120,6 +125,7 @@ class Cronjob extends Thread{
 		if($this->minutes % 15 == 0 && $this->seconds == 0){
 			#print 'ping'."\n";  # TODO
 			$this->pingClosestNodes();
+			$this->bootstrapNodesEnclose();
 		}
 		
 		$this->getIpcKernelConnection()->run();
@@ -438,6 +444,74 @@ class Cronjob extends Thread{
 		}
 		
 		return $updateMsgs;
+	}
+	
+	private function bootstrapNodesEnclose(){
+		$urls = array(
+			'http://phpchat.fox21.at/nodes.json',
+		);
+		
+		foreach($urls as $url){
+			$client = new \GuzzleHttp\Client();
+			#$success = false;
+			$response = null;
+			
+			try{
+				$this->log->debug('get url "'.$url.'"');
+				$response = $client->get($url, array(
+					'headers' => array(
+						'User-Agent' => 'PHPChat/'.Settings::VERSION.' PHP/'.PHP_VERSION.' curl/'.curl_version()['version'],
+						'Accept' => 'application/json',
+					),
+					'connect_timeout' => 3,
+					'timeout' => 5,
+				));
+				
+				#$success = true;
+			}
+			catch(Exception $e){
+				$this->log->error('url failed, "'.$url.'": '.$e->getMessage());
+			}
+			
+			if($response){
+				if($response->getStatusCode() == 200){
+					if($response->getHeader('content-type') == 'application/json'){
+						$data = array();
+						try{
+							$data = $response->json();
+						}
+						catch(Exception $e){
+							$this->log->error('JSON: '.$e->getMessage());
+						}
+						
+						if(isset($data['nodes']) && is_array($data['nodes'])){
+							foreach($data['nodes'] as $node){
+								#ve($node);
+								
+								$nodeObj = new Node();
+								
+								if(isset($node['id'])){
+									$nodeObj->setIdHexStr($node['id']);
+								}
+								if(isset($node['uri'])){
+									$nodeObj->setUri($node['uri']);
+								}
+								
+								$this->log->debug('node: '.$nodeObj->getIdHexStr());
+								$this->getIpcKernelConnection()->execAsync('tableNodeEnclose', array($nodeObj));
+								#$onode = $this->getIpcKernelConnection()->execSync('tableNodeEnclose', array($nodeObj));
+							}
+						}
+					}
+					else{
+						$this->log->warning('response type for "'.$url.'": '.$response->getHeader('content-type'));
+					}
+				}
+				else{
+					$this->log->warning('response code for "'.$url.'": '.$response->getStatusCode());
+				}
+			}
+		}
 	}
 	
 	public function shutdown(){

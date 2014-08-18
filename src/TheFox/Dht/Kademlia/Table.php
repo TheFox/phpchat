@@ -202,7 +202,7 @@ class Table extends YamlStorage{
 			
 			$onode = $this->nodeFindInBuckets($node);
 			if($onode){
-				#print __CLASS__.'->'.__FUNCTION__.': old node'."\n";
+				#print __CLASS__.'->'.__FUNCTION__.' old node: '.$onode->getIdHexStr()."\n";
 				
 				if( $node->getTimeLastSeen() > $onode->getTimeLastSeen() ){
 					$onode->setUri($node->getUri());
@@ -213,7 +213,7 @@ class Table extends YamlStorage{
 				$rv = $onode;
 			}
 			else{
-				#print __CLASS__.'->'.__FUNCTION__.': new node'."\n";
+				#print __CLASS__.'->'.__FUNCTION__.' new node: '.$node->getIdHexStr()."\n";
 				
 				$idLenBits = Node::ID_LEN_BITS - 1;
 				$mbase = array_fill(0, Node::ID_LEN, 0);

@@ -141,7 +141,7 @@ class Bucket extends YamlStorage{
 	public function nodeAdd(Node $node, $sortNodes = true){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		$onode = $this->nodeFind($node);
-		if(!$onode){
+		if(!$onode && $node->getIdHexStr() != '00000000-0000-4000-8000-000000000000'){
 			#print __CLASS__.'->'.__FUNCTION__.': old node'."\n";
 			$filePath = null;
 			if($this->getDatadirBasePath()){

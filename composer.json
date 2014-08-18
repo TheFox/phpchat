@@ -21,6 +21,7 @@
 		"rhumsaa/uuid": "~2.7",
 		"liip/process-manager": "~1.0",
 		"zendframework/zend-uri": "~2.3",
+		"guzzlehttp/guzzle": "~4.1",
 		"thefox/utilities": "~1.1",
 		"thefox/hashcash": "~1.5",
 		"thefox/imapd": "~0.1",

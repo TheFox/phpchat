@@ -151,7 +151,8 @@ class Kernel extends Thread{
 		$this->ipcCronjobConnection = new ConnectionServer();
 		$this->ipcCronjobConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20001));
 		foreach(array(
-			'getSettings', 'getLocalNode', 'getTable',
+			'getSettings', 'getLocalNode',
+			'getTable', 'tableNodeEnclose',
 			'getMsgDb', 'msgDbMsgUpdate', 'msgDbMsgIncForwardCyclesById', 'msgDbMsgSetStatusById',
 			'serverConnect', 'save', 
 		) as $functionName){
@@ -307,6 +308,11 @@ class Kernel extends Thread{
 	public function getTable(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		return $this->table;
+	}
+	
+	public function tableNodeEnclose(Node $node){
+		#ve($node->getIdHexStr());
+		return $this->getTable()->nodeEnclose($node);
 	}
 	
 	public function getAddressbook(){
