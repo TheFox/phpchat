@@ -48,7 +48,7 @@ class Table extends YamlStorage{
 		
 		if(parent::load()){
 			
-			if(isset($this->data['buckets']) && $this->data['buckets']){
+			if($this->data && array_key_exists('buckets', $this->data) && $this->data['buckets']){
 				foreach($this->data['buckets'] as $bucketId => $bucketAr){
 					if(file_exists($bucketAr['path'])){
 						$bucket = new Bucket($bucketAr['path']);

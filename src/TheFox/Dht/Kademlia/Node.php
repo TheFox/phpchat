@@ -59,19 +59,21 @@ class Node extends YamlStorage{
 		if(parent::load()){
 			$this->setIdHexStr($this->data['id']);
 			
-			#ve($this->data);
-			
-			if(isset($this->data['sslKeyPub'])){
-				if($this->data['sslKeyPub']){
-					$this->setSslKeyPub(base64_decode($this->data['sslKeyPub']));
+			if($this->data){
+				if(array_key_exists('sslKeyPub', $this->data)){
+					if($this->data['sslKeyPub']){
+						$this->setSslKeyPub(base64_decode($this->data['sslKeyPub']));
+					}
+					unset($this->data['sslKeyPub']);
 				}
-				unset($this->data['sslKeyPub']);
-			}
-			
-			if(isset($this->data['uri'])){
-				#fwrite(STDOUT, 'load node: uri /'.$this->data['uri'].'/'."\n");
-				$this->setUri($this->data['uri']);
-				unset($this->data['uri']);
+				
+				if(array_key_exists('uri', $this->data)){
+					#fwrite(STDOUT, 'load node: uri /'.$this->data['uri'].'/'."\n");
+					if($this->data['uri']){
+						$this->setUri($this->data['uri']);
+					}
+					unset($this->data['uri']);
+				}
 			}
 			
 			return true;

@@ -337,8 +337,6 @@ class Client{
 		
 	}
 	
-	
-	
 	public function checkActions(){
 		#print __CLASS__.'->'.__FUNCTION__.': after actions'."\n";
 		$action = $this->actionGetByCriterion(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);

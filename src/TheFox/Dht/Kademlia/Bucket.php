@@ -52,7 +52,7 @@ class Bucket extends YamlStorage{
 		
 		if(parent::load()){
 			
-			if(array_key_exists('nodes', $this->data) && $this->data['nodes']){
+			if($this->data && array_key_exists('nodes', $this->data) && $this->data['nodes']){
 				foreach($this->data['nodes'] as $nodeId => $nodeAr){
 					if(file_exists($nodeAr['path'])){
 						$this->nodesId = $nodeId;
