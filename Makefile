@@ -1,7 +1,4 @@
 
-RELEASE_VERSION = 0.3.0-dev
-RELEASE_NAME = phpchat
-
 RM = rm -rf
 MKDIR = mkdir -p
 GZIP = gzip
@@ -43,24 +40,7 @@ test_phpunit: $(PHPUNIT) phpunit.xml
 	$(RM) tests/client{1,2}_tcp
 
 release:
-	$(MKDIR) releases $(RELEASE_NAME)-$(RELEASE_VERSION)
-	
-	$(CP) application.php $(RELEASE_NAME)-$(RELEASE_VERSION)
-	$(CP) bootstrap.php $(RELEASE_NAME)-$(RELEASE_VERSION)
-	$(CP) bootstrapCommon.php $(RELEASE_NAME)-$(RELEASE_VERSION)
-	$(CP) composer.json $(RELEASE_NAME)-$(RELEASE_VERSION)
-	$(CP) functions.php $(RELEASE_NAME)-$(RELEASE_VERSION)
-	$(CP) README.md $(RELEASE_NAME)-$(RELEASE_VERSION)
-	$(CP) src $(RELEASE_NAME)-$(RELEASE_VERSION)
-	$(CP) start.sh $(RELEASE_NAME)-$(RELEASE_VERSION)
-	$(CP) stop.sh $(RELEASE_NAME)-$(RELEASE_VERSION)
-	
-	cd $(RELEASE_NAME)-$(RELEASE_VERSION); curl -sS https://getcomposer.org/installer | php; ./composer.phar install --no-dev
-	find $(RELEASE_NAME)-$(RELEASE_VERSION) -name .DS_Store -exec rm -v {} \;
-	tar -cpzf $(RELEASE_NAME)-$(RELEASE_VERSION).tar.gz $(RELEASE_NAME)-$(RELEASE_VERSION)
-	$(MV) $(RELEASE_NAME)-$(RELEASE_VERSION).tar.gz releases
-	chmod -R 777 $(RELEASE_NAME)-$(RELEASE_VERSION)
-	$(RM) $(RELEASE_NAME)-$(RELEASE_VERSION)
+	./release.sh
 
 clean:
 	$(RM) composer.lock composer.phar

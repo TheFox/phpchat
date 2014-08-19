@@ -1743,7 +1743,7 @@ class Client{
 		$sslKeyPub = base64_encode($this->getLocalNode()->getSslKeyPub());
 		
 		$data = array(
-			'release'   => $this->getSettings()->data['release'],
+			'release'   => PhpChat::RELEASE,
 			'id'        => $this->getLocalNode()->getIdHexStr(),
 			'port'      => $this->getLocalNode()->getUri()->getPort(),
 			'sslKeyPub' => $sslKeyPub,

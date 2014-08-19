@@ -481,7 +481,7 @@ class Cronjob extends Thread{
 				$this->log->debug('get url "'.$url.'"');
 				$response = $client->get($url, array(
 					'headers' => array(
-						'User-Agent' => 'PHPChat/'.Settings::VERSION.' PHP/'.PHP_VERSION.' curl/'.curl_version()['version'],
+						'User-Agent' => PhpChat::NAME.'/'.PhpChat::VERSION.' PHP/'.PHP_VERSION.' curl/'.curl_version()['version'],
 						'Accept' => 'application/json',
 					),
 					'connect_timeout' => 3,
