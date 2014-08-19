@@ -471,67 +471,75 @@ class Client{
 					
 					if(strIsUuid($id)){
 						if($strKeyPub){
-							#if($hashcash && $this->hashcashVerify($hashcash, $id, static::HASHCASH_BITS_MIN)){
-								$node->setIdHexStr($id);
-								$node->setUri('tcp://'.$this->getUri()->getHost().':'.$port);
-								$node->setTimeLastSeen(time());
+							$node->setIdHexStr($id);
+							$node->setUri('tcp://'.$this->getUri()->getHost().':'.$port);
+							$node->setTimeLastSeen(time());
+							
+							$node = $this->getTable()->nodeEnclose($node);
+							
+							// Check if not Local Node
+							if(! $this->getLocalNode()->isEqual($node)){
 								
-								$node = $this->getTable()->nodeEnclose($node);
-								
-								if(! $this->getLocalNode()->isEqual($node)){
-									if($node->getSslKeyPub()){
-										#$this->log('debug', 'found old ssl public key');
+								// Check if a public key already exists.
+								if($node->getSslKeyPub()){
+									#$this->log('debug', 'found old ssl public key');
+									
+									// When old public key exists check if it's the same we got.
+									if( $node->getSslKeyPub() == $strKeyPub ){
+										#$this->log('debug', 'ssl public key ok');
 										
-										if( $node->getSslKeyPub() == $strKeyPub ){
-											#$this->log('debug', 'ssl public key ok');
-											
-											$idOk = true;
-										}
-										else{
-											$msgHandleReturnValue .= $this->sendError(2030, $msgName);
-											#$this->log('warning', 'ssl public key changed since last handshake');
-										}
+										$idOk = true;
 									}
 									else{
-										$sslPubKey = openssl_pkey_get_public($strKeyPub);
-										if($sslPubKey !== false){
-											$sslPubKeyDetails = openssl_pkey_get_details($sslPubKey);
-											
-											if($sslPubKeyDetails['bits'] >= Node::SSL_KEY_LEN_MIN){
-												#$this->log('debug', 'no old ssl public key found. good. set new.');
-												
-												$strKeyPubFingerprint = Node::genSslKeyFingerprint($strKeyPub);
-												$fpnode = $this->getTable()->nodeFindByKeyPubFingerprint($strKeyPubFingerprint);
-												if(!$fpnode){
-													$idOk = true;
-												}
-												else{
-													$msgHandleReturnValue .= $this->sendError(2035, $msgName);
-												}
-											}
-											else{
-												$msgHandleReturnValue .= $this->sendError(2020, $msgName);
-											}
-										}
-										else{
-											$msgHandleReturnValue .= $this->sendError(2040, $msgName);
-										}
+										// Public key changed since last handshake.
+										$msgHandleReturnValue .= $this->sendError(2030, $msgName);
+										$this->log('error', static::getErrorMsg(2030));
 									}
 								}
 								else{
-									$msgHandleReturnValue .= $this->sendError(1020, $msgName);
+									$sslPubKey = openssl_pkey_get_public($strKeyPub);
+									if($sslPubKey !== false){
+										$sslPubKeyDetails = openssl_pkey_get_details($sslPubKey);
+										
+										if($sslPubKeyDetails['bits'] >= Node::SSL_KEY_LEN_MIN){
+											#$this->log('debug', 'no old ssl public key found. good. set new.');
+											
+											$strKeyPubFingerprint = Node::genSslKeyFingerprint($strKeyPub);
+											$fpnode = $this->getTable()->nodeFindByKeyPubFingerprint($strKeyPubFingerprint);
+											if(!$fpnode){
+												$idOk = true;
+											}
+											else{
+												$msgHandleReturnValue .= $this->sendError(2035, $msgName);
+												$this->log('error', static::getErrorMsg(2035));
+											}
+										}
+										else{
+											$msgHandleReturnValue .= $this->sendError(2020, $msgName);
+											$this->log('error', static::getErrorMsg(2020));
+										}
+									}
+									else{
+										$msgHandleReturnValue .= $this->sendError(2040, $msgName);
+										$this->log('error', static::getErrorMsg(2040));
+									}
 								}
-							#}
-							#else{
-							#	$this->sendError(4000, $msgName);
-							#}
+								
+							}
+							else{
+								// It's the ID from the Local Node. Something is wrong.
+								$msgHandleReturnValue .= $this->sendError(1020, $msgName);
+								$this->log('error', static::getErrorMsg(1020));
+							}
 						}
 						else{
 							$msgHandleReturnValue .= $this->sendError(2000, $msgName);
+							$this->log('error', static::getErrorMsg(2000));
 						}
 					}
 					else{
 						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
+						$this->log('error', static::getErrorMsg(9000));
 					}
 					
 					if($idOk){
@@ -551,10 +559,12 @@ class Client{
 				}
 				else{
 					$msgHandleReturnValue .= $this->sendError(1010, $msgName);
+					$this->log('error', static::getErrorMsg(1010));
 				}
 			}
 			else{
 				$msgHandleReturnValue .= $this->sendError(9010, $msgName);
+				$this->log('error', static::getErrorMsg(9010));
 			}
 		}
 		elseif($msgName == 'id_ok'){
@@ -2125,7 +2135,7 @@ class Client{
 		return $errors;
 	}
 	
-	private function getErrorMsg($errorCode = 9999){
+	public static function getErrorMsg($errorCode = 9999){
 		$errors = static::getError();
 		
 		if(!isset($errors[$errorCode])){
@@ -2136,7 +2146,7 @@ class Client{
 	}
 	
 	public function sendError($errorCode = 9999, $msgName = ''){
-		$msg = $this->getErrorMsg($errorCode);
+		$msg = static::getErrorMsg($errorCode);
 		$this->log('debug', 'send ERROR: '.$errorCode.', '.$msg);
 		$data = array(
 			'code'   => $errorCode,

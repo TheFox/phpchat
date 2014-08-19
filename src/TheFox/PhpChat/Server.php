@@ -150,7 +150,7 @@ class Server{
 			
 		}
 		
-		$this->log->notice('listen failed');
+		#$this->log->notice('listen failed');
 		return false;
 	}
 	
