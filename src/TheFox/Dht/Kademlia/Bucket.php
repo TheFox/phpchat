@@ -130,6 +130,7 @@ class Bucket extends YamlStorage{
 	}
 	
 	public function nodeFindByIdHexStr($id){
+		$id = strtolower($id);
 		foreach($this->nodes as $nodeId => $node){
 			if($node->getIdHexStr() == $id){
 				return $node;

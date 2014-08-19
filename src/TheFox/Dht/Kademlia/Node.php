@@ -85,7 +85,7 @@ class Node extends YamlStorage{
 	
 	public function setIdHexStr($id){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
+		$id = strtolower($id);
 		$this->id = array_fill(0, static::ID_LEN, 0);
 		
 		if(strIsUuid($id)){
