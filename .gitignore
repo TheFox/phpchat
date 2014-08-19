@@ -3,6 +3,7 @@ composer.lock
 composer.phar
 test
 tests/*.yml
+tests/client*_tcp
 log
 pid
 data
