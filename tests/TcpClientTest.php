@@ -519,6 +519,11 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$this->assertEquals('10000000-1000-4000-8000-100000000005', $json[0]['data']['nodes'][2]['id']);
 		$this->assertEquals('10000000-1000-4000-8000-100000000006', $json[0]['data']['nodes'][3]['id']);
 		$this->assertEquals('10000000-1000-4000-8000-100000000007', $json[0]['data']['nodes'][4]['id']);
+		$this->assertEquals('tcp://192.168.241.8', $json[0]['data']['nodes'][0]['uri']);
+		$this->assertEquals('tcp://192.168.241.9', $json[0]['data']['nodes'][1]['uri']);
+		$this->assertEquals('tcp://192.168.241.5', $json[0]['data']['nodes'][2]['uri']);
+		$this->assertEquals('tcp://192.168.241.6', $json[0]['data']['nodes'][3]['uri']);
+		$this->assertEquals('tcp://192.168.241.7', $json[0]['data']['nodes'][4]['uri']);
 		
 		$raw = $client1->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
