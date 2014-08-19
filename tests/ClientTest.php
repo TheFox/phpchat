@@ -197,7 +197,9 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$kernel->setLog($log);
 		$kernel->setSettings($settings);
 		$kernel->init();
+		
 		$server = $kernel->getServer();
+		$server->setLog($log);
 		
 		$client = new Client();
 		$client->setSslPrv($settings->data['node']['sslKeyPrvPath'], $settings->data['node']['sslKeyPrvPass']);
@@ -253,7 +255,9 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$kernel->setLog($log);
 		$kernel->setSettings($settings);
 		$kernel->init();
+		
 		$server = $kernel->getServer();
+		$server->setLog($log);
 		
 		$client = new Client();
 		$client->setSslPrv($settings->data['node']['sslKeyPrvPath'], $settings->data['node']['sslKeyPrvPass']);
@@ -298,7 +302,9 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$kernel->setLog($log);
 		$kernel->setSettings($settings);
 		$kernel->init();
+		
 		$server = $kernel->getServer();
+		$server->setLog($log);
 		
 		$client = new Client();
 		$client->setSslPrv($settings->data['node']['sslKeyPrvPath'], $settings->data['node']['sslKeyPrvPass']);
@@ -340,7 +346,9 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$kernel->setLog($log);
 		$kernel->setSettings($settings);
 		$kernel->init();
+		
 		$server = $kernel->getServer();
+		$server->setLog($log);
 		
 		$client = new Client();
 		$client->setSslPrv($settings->data['node']['sslKeyPrvPath'], $settings->data['node']['sslKeyPrvPass']);
