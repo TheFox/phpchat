@@ -1,6 +1,7 @@
 <?php
 
 use Symfony\Component\Finder\Finder;
+use Rhumsaa\Uuid\Uuid;
 
 use TheFox\PhpChat\Msg;
 
@@ -221,7 +222,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		#$this->markTestIncomplete('This test has not been implemented yet.');
 		$msg = new Msg();
 		
-		$this->assertTrue( strIsUuid($msg->getId()) );
+		$this->assertTrue(Uuid::isValid($msg->getId()));
 	}
 	
 	public function testStatus(){

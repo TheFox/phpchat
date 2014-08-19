@@ -2,6 +2,7 @@
 
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Filesystem\Filesystem;
+use Rhumsaa\Uuid\Uuid;
 
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler as LoggerStreamHandler;
@@ -513,7 +514,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
 		$this->assertEquals('node_found', $json[0]['name']);
-		$this->assertTrue(strIsUuid($json[0]['data']['rid']));
+		$this->assertTrue(Uuid::isValid($json[0]['data']['rid']));
 		$this->assertEquals('10000000-1000-4000-8000-100000000008', $json[0]['data']['nodes'][0]['id']);
 		$this->assertEquals('10000000-1000-4000-8000-100000000009', $json[0]['data']['nodes'][1]['id']);
 		$this->assertEquals('10000000-1000-4000-8000-100000000005', $json[0]['data']['nodes'][2]['id']);

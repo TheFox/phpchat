@@ -5,6 +5,7 @@ namespace TheFox\Dht\Kademlia;
 use RuntimeException;
 
 use Zend\Uri\UriFactory;
+use Rhumsaa\Uuid\Uuid;
 
 use TheFox\Storage\YamlStorage;
 use TheFox\Utilities\Hex;
@@ -90,8 +91,8 @@ class Node extends YamlStorage{
 		$id = strtolower($id);
 		$this->id = array_fill(0, static::ID_LEN, 0);
 		
-		if(strIsUuid($id)){
-			#print __CLASS__.'->'.__FUNCTION__.': strIsUuid'."\n";
+		if(Uuid::isValid($id)){
+			#print __CLASS__.'->'.__FUNCTION__.': check valid UUID'."\n";
 			$this->data['id'] = $id;
 			
 			$id = str_replace('-', '', $id);
@@ -100,7 +101,7 @@ class Node extends YamlStorage{
 				$id = substr($id, 2);
 			}
 		}
-		#else{ print __CLASS__.'->'.__FUNCTION__.': strIsUuid FAILED: '.$id."\n"; }
+		#else{ print __CLASS__.'->'.__FUNCTION__.': check valid UUID FAILED: '.$id."\n"; }
 	}
 	
 	public function getIdHexStr(){

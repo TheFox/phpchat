@@ -469,7 +469,7 @@ class Client{
 					$idOk = false;
 					$node = new Node();
 					
-					if(strIsUuid($id)){
+					if(Uuid::isValid($id) && $id != Uuid::NIL){
 						if($strKeyPub){
 							$node->setIdHexStr($id);
 							$node->setUri('tcp://'.$this->getUri()->getHost().':'.$port);

@@ -732,7 +732,7 @@ class Console extends Thread{
 		
 		if($data){
 			$uuid = '';
-			if(strIsUuid($data)){
+			if(Uuid::isValid($data)){
 				$uuid = $data;
 			}
 			else{
@@ -888,7 +888,7 @@ class Console extends Thread{
 			#$this->printPs1(true, 'handleCommandMsg A');
 			
 			if(($args[0] == 'new' || $args[0] == 'n')){
-				if(strIsUuid($args[1])){
+				if(Uuid::isValid($args[1])){
 					if($args[1] != $table->getLocalNode()->getIdHexStr()){
 						$this->sttyExitIcanonMode();
 						$this->sttyEchoOn();
@@ -1012,7 +1012,7 @@ class Console extends Thread{
 			elseif($args[0] == 'read' || $args[0] == 'r'){
 				if(isset($args[1])){
 					$msg = null;
-					if(strIsUuid($args[1])){
+					if(Uuid::isValid($args[1])){
 						if(isset($msgs[$args[1]])){
 							$msg = $msgs[$args[1]];
 						}
