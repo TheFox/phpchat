@@ -95,8 +95,8 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		$this->assertEquals('00000000-0000-4000-8000-000000000000', $node->getIdHexStr());
 		
 		$node = new Node();
-		$node->setIdHexStr('cafed00d-2131-1159-8e11-0b4dbadb1738');
-		$this->assertEquals('00000000-0000-4000-8000-000000000000', $node->getIdHexStr());
+		$node->setIdHexStr('cafed00d-2131-0159-0e11-0b4dbadb1738');
+		$this->assertEquals('cafed00d-2131-0159-0e11-0b4dbadb1738', $node->getIdHexStr());
 	}
 	
 	public function testUri(){
