@@ -2125,14 +2125,18 @@ class Client{
 		return $errors;
 	}
 	
-	public function sendError($errorCode = 9999, $msgName = ''){
+	private function getErrorMsg($errorCode = 9999){
 		$errors = static::getError();
 		
 		if(!isset($errors[$errorCode])){
 			throw new RuntimeException('Error '.$errorCode.' not defined.');
 		}
 		
-		$msg = $errors[$errorCode];
+		return $errors[$errorCode];
+	}
+	
+	public function sendError($errorCode = 9999, $msgName = ''){
+		$msg = $this->getErrorMsg($errorCode);
 		$this->log('debug', 'send ERROR: '.$errorCode.', '.$msg);
 		$data = array(
 			'code'   => $errorCode,
