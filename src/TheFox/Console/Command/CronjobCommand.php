@@ -21,6 +21,7 @@ class CronjobCommand extends BasicCommand{
 		$this->setDescription('Run the Cronjob.');
 		$this->addOption('daemon', 'd', InputOption::VALUE_NONE, 'Run in daemon mode.');
 		$this->addOption('cycle', 'c', InputOption::VALUE_NONE, 'Run only one cycle.');
+		$this->addOption('msg', 'm', InputOption::VALUE_NONE, 'Run only one cycle with Msgs.');
 		$this->addOption('shutdown', 's', InputOption::VALUE_NONE, 'Shutdown.');
 	}
 	
@@ -40,6 +41,9 @@ class CronjobCommand extends BasicCommand{
 		
 		if($input->hasOption('cycle') && $input->getOption('cycle')){
 			$this->cronjob->cycle();
+		}
+		elseif($input->hasOption('msg') && $input->getOption('msg')){
+			$this->cronjob->cycleMsg();
 		}
 		else{
 			try{

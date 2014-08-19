@@ -104,6 +104,21 @@ class Cronjob extends Thread{
 		$this->shutdown();
 	}
 	
+	public function cycleMsg(){
+		if(!$this->getIpcKernelConnection()){
+			throw new RuntimeException('You must first run init().');
+		}
+		
+		$this->msgDbInit();
+		
+		$this->log->debug('save');
+		$this->getIpcKernelConnection()->execAsync('save');
+		
+		$this->getIpcKernelConnection()->run();
+		
+		$this->shutdown();
+	}
+	
 	private function run(){
 		if(!$this->getIpcKernelConnection()){
 			throw new RuntimeException('You must first run init().');
