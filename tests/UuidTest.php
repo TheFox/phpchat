@@ -31,6 +31,12 @@ O5mYMzSLyuOXR5xhBhG7fjsCAwEAAQ==
 		#$id = (string)Uuid::uuid4();
 		#$id = (string)Uuid::uuid5(Uuid::NAMESPACE_DNS, 'php.net');
 		
+		$key = sslKeyPubClean(static::SSL_KEY_PUB1);
+		$keyBin = base64_decode($key);
+		
+		$id = (string)Uuid::uuid5(Uuid::NAMESPACE_X500, $keyBin);
+		$this->assertEquals('d4773c00-6a11-540a-b72c-ed106ef8309b', $id);
+		
 		$id = (string)Uuid::uuid5(Uuid::NAMESPACE_X500, static::SSL_KEY_PUB1);
 		$this->assertEquals('91a3d7b5-28fe-52d1-a56d-b09093c63c84', $id);
 		

@@ -440,6 +440,7 @@ class Client{
 					$id = '';
 					$port = 0;
 					$strKeyPub = '';
+					$strKeyPubSign = '';
 					$strKeyPubFingerprint = '';
 					$isChannelPeer = false;
 					$hashcash = '';
@@ -455,86 +456,94 @@ class Client{
 					if(array_key_exists('sslKeyPub', $msgData)){
 						$strKeyPub = base64_decode($msgData['sslKeyPub']);
 					}
+					if(array_key_exists('sslKeyPubSign', $msgData)){
+						$strKeyPubSign = base64_decode($msgData['sslKeyPubSign']);
+					}
 					if(array_key_exists('isChannel', $msgData)){ // isChannelPeer
 						$isChannelPeer = (bool)$msgData['isChannel'];
 					}
-					#if(array_key_exists('hashcash', $msgData)){
-					#	$hashcash = $msgData['hashcash'];
-					#}
 					
 					if($isChannelPeer){
 						$this->setStatus('isChannelPeer', true);
 					}
 					
+					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$id.', '.$port);
+					#$this->log('debug', $this->getUri().' recv '.$msgName.' sign: '.$msgData['sslKeyPubSign']); # TODO
+					
 					$idOk = false;
 					$node = new Node();
 					
 					if(Uuid::isValid($id) && $id != Uuid::NIL){
-						if($strKeyPub){
-							$node->setIdHexStr($id);
-							$node->setUri('tcp://'.$this->getUri()->getHost().':'.$port);
-							$node->setTimeLastSeen(time());
+						$node->setIdHexStr($id);
+						$node->setUri('tcp://'.$this->getUri()->getHost().':'.$port);
+						$node->setTimeLastSeen(time());
+						
+						$node = $this->getTable()->nodeEnclose($node);
+						
+						// Check if not Local Node
+						if(! $this->getLocalNode()->isEqual($node)){
 							
-							$node = $this->getTable()->nodeEnclose($node);
-							
-							// Check if not Local Node
-							if(! $this->getLocalNode()->isEqual($node)){
-								
-								// Check if a public key already exists.
-								if($node->getSslKeyPub()){
-									#$this->log('debug', 'found old ssl public key');
-									
-									// When old public key exists check if it's the same we got.
-									if( $node->getSslKeyPub() == $strKeyPub ){
-										#$this->log('debug', 'ssl public key ok');
-										
-										$idOk = true;
-									}
-									else{
-										// Public key changed since last handshake.
-										$msgHandleReturnValue .= $this->sendError(2030, $msgName);
-										$this->log('error', static::getErrorMsg(2030));
-									}
-								}
-								else{
-									$sslPubKey = openssl_pkey_get_public($strKeyPub);
-									if($sslPubKey !== false){
-										$sslPubKeyDetails = openssl_pkey_get_details($sslPubKey);
-										
-										if($sslPubKeyDetails['bits'] >= Node::SSL_KEY_LEN_MIN){
-											#$this->log('debug', 'no old ssl public key found. good. set new.');
+							if($strKeyPub){
+								if($strKeyPubSign){
+									if(openssl_verify($strKeyPub, $strKeyPubSign, $strKeyPub, OPENSSL_ALGO_SHA1)){
+										$nodeId = Node::genIdHexStr($strKeyPub);
+										if($nodeId == $id){
 											
-											$strKeyPubFingerprint = Node::genSslKeyFingerprint($strKeyPub);
-											$fpnode = $this->getTable()->nodeFindByKeyPubFingerprint($strKeyPubFingerprint);
-											if(!$fpnode){
+											// Check if a public key already exists.
+											if($node->getSslKeyPub()){
+												$this->log('debug', 'SSL public key ok [A]');
 												$idOk = true;
 											}
 											else{
-												$msgHandleReturnValue .= $this->sendError(2035, $msgName);
-												$this->log('error', static::getErrorMsg(2035));
+												// No public key found.
+												$sslPubKey = openssl_pkey_get_public($strKeyPub);
+												if($sslPubKey !== false){
+													$sslPubKeyDetails = openssl_pkey_get_details($sslPubKey);
+													
+													if($sslPubKeyDetails['bits'] >= Node::SSL_KEY_LEN_MIN){
+														$this->log('debug', 'SSL public key ok [B]');
+														$idOk = true;
+													}
+													else{
+														$msgHandleReturnValue .= $this->sendError(2020, $msgName);
+														$this->log('error', static::getErrorMsg(2020));
+													}
+												}
+												else{
+													$msgHandleReturnValue .= $this->sendError(2040, $msgName);
+													$this->log('error', static::getErrorMsg(2040));
+												}
 											}
+											
 										}
 										else{
-											$msgHandleReturnValue .= $this->sendError(2020, $msgName);
-											$this->log('error', static::getErrorMsg(2020));
+											$msgHandleReturnValue .= $this->sendError(1030, $msgName);
+											$this->log('error', static::getErrorMsg(1030));
 										}
 									}
 									else{
-										$msgHandleReturnValue .= $this->sendError(2040, $msgName);
-										$this->log('error', static::getErrorMsg(2040));
+										$msgHandleReturnValue .= $this->sendError(2080, $msgName);
+										$this->log('error', static::getErrorMsg(2080));
+										while($openSslErrorStr = openssl_error_string()){
+											$this->log('error', 'SSL: '.$openSslErrorStr);
+										}
 									}
 								}
-								
+								else{
+									$msgHandleReturnValue .= $this->sendError(2005, $msgName);
+									$this->log('error', static::getErrorMsg(2005));
+								}
 							}
 							else{
-								// It's the ID from the Local Node. Something is wrong.
-								$msgHandleReturnValue .= $this->sendError(1020, $msgName);
-								$this->log('error', static::getErrorMsg(1020));
+								$msgHandleReturnValue .= $this->sendError(2000, $msgName);
+								$this->log('error', static::getErrorMsg(2000));
 							}
+							
 						}
 						else{
-							$msgHandleReturnValue .= $this->sendError(2000, $msgName);
-							$this->log('error', static::getErrorMsg(2000));
+							// It's the ID from the Local Node. Something is wrong.
+							$msgHandleReturnValue .= $this->sendError(1020, $msgName);
+							$this->log('error', static::getErrorMsg(1020));
 						}
 					}
 					else{
@@ -543,14 +552,12 @@ class Client{
 					}
 					
 					if($idOk){
-						$node->setSslKeyPub($strKeyPub);
-						
 						$this->setStatus('hasId', true);
 						$this->setNode($node);
 						
 						$msgHandleReturnValue .= $this->sendIdOk();
 						
-						$this->log('debug', $this->getUri().' recv '.$msgName.': '.$id.', '.$port);
+						$this->log('debug', $this->getUri().' recv '.$msgName.': ID OK');
 					}
 					else{
 						$msgHandleReturnValue .= $this->sendQuit();
@@ -757,7 +764,7 @@ class Client{
 								});
 								$clientActions[] = $action;
 								
-								$this->getServer()->connect($uri, $clientActions);
+								#$this->getServer()->connect($uri, $clientActions); # TODO
 							}
 						}
 						else{
@@ -852,8 +859,13 @@ class Client{
 						}
 					}
 					else{
-						if($srcNode->setSslKeyPub($srcSslKeyPub)){
-							$srcNode->setDataChanged(true);
+						if(Node::genIdHexStr($srcSslKeyPub) == $srcNodeId){
+							if($srcNode->setSslKeyPub($srcSslKeyPub)){
+								$srcNode->setDataChanged(true);
+							}
+						}
+						else{
+							$status = 3; // Error
 						}
 					}
 					
@@ -1740,17 +1752,28 @@ class Client{
 			throw new RuntimeException('localNode not set.');
 		}
 		
-		$sslKeyPub = base64_encode($this->getLocalNode()->getSslKeyPub());
+		$sslKeyPub = $this->getLocalNode()->getSslKeyPub();
+		$sslKeyPubBase64 = base64_encode($sslKeyPub);
 		
-		$data = array(
-			'release'   => PhpChat::RELEASE,
-			'id'        => $this->getLocalNode()->getIdHexStr(),
-			'port'      => $this->getLocalNode()->getUri()->getPort(),
-			'sslKeyPub' => $sslKeyPub,
-			'isChannel' => $this->getStatus('isChannelLocal'),
-			#'hashcash'  => $this->hashcashMint(static::HASHCASH_BITS_MIN),
-		);
-		return $this->msgCreate('id', $data);
+		$sslKeyPubSign = '';
+		if(openssl_sign($sslKeyPub, $sign, $this->getSsl(), OPENSSL_ALGO_SHA1)){
+			$sslKeyPubSign = base64_encode($sign);
+		}
+		
+		if($sslKeyPubSign){
+			$data = array(
+				'release'   => PhpChat::RELEASE,
+				'id'        => $this->getLocalNode()->getIdHexStr(),
+				'port'      => $this->getLocalNode()->getUri()->getPort(),
+				'sslKeyPub' => $sslKeyPubBase64,
+				'sslKeyPubSign' => $sslKeyPubSign,
+				'isChannel' => $this->getStatus('isChannelLocal'),
+			);
+			return $this->msgCreate('id', $data);
+		}
+		else{
+			return '';
+		}
 	}
 	
 	public function sendId(){
@@ -2106,9 +2129,11 @@ class Client{
 			1000 => 'You need to identify',
 			1010 => 'You already identified',
 			1020 => 'You are using my ID',
+			1030 => 'ID does not match public key',
 			
 			// 2000-3999: SSL
 			2000 => 'SSL: no public key found',
+			2005 => 'SSL: no signature found',
 			2010 => 'SSL: you need a key with minimum length of '.Node::SSL_KEY_LEN_MIN.' bits',
 			2020 => 'SSL: public key too short',
 			2030 => 'SSL: public key changed since last handshake',

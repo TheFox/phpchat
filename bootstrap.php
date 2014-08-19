@@ -74,6 +74,7 @@ use Zend\Uri\UriFactory;
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler;
 use TheFox\Phpchat\Settings;
+use TheFox\Dht\Kademlia\Node;
 
 
 $filesystem = new Filesystem();
@@ -94,23 +95,6 @@ if(isset($settings->data['datadir']) && !file_exists($settings->data['datadir'])
 	$filesystem->mkdir($settings->data['datadir'], 0700);
 }
 
-if(!$settings->data['node']['id']){
-	$nodeId = '';
-	try{
-		$nodeId = (string)Uuid::uuid4();
-		$log->info('node id: '.$nodeId);
-	}
-	catch(UnsatisfiedDependencyException $e){
-		$log->critical('uuid4: '.$e->getMessage());
-		exit(1);
-	}
-	
-	if($nodeId){
-		$settings->data['node']['id'] = $nodeId;
-		$settings->setDataChanged(true);
-	}
-}
-
 if(!$settings->data['node']['sslKeyPrvPass']){
 	$sslKeyPrvPass = '';
 	try{
@@ -126,11 +110,20 @@ if(!$settings->data['node']['sslKeyPrvPass']){
 	$settings->setDataChanged(true);
 }
 
-if(!file_exists($settings->data['node']['sslKeyPrvPath'])){
+$keyPub = null;
+if(file_exists($settings->data['node']['sslKeyPrvPath'])){
+	$sslPubKey = openssl_pkey_get_public(file_get_contents($settings->data['node']['sslKeyPubPath']));
+	if($sslPubKey){
+		$sslPubKeyDetails = openssl_pkey_get_details($sslPubKey);
+		if(isset($sslPubKeyDetails['key'])){
+			$keyPub = $sslPubKeyDetails['key'];
+		}
+	}
+}
+else{
 	$log->info('SSL: key pair generation.  this may take a while...');
 	
 	$keyPrv = null;
-	$keyPub = null;
 	
 	$sslConfig = array(
 		'digest_alg' => 'sha512',
@@ -185,6 +178,19 @@ if(!file_exists($settings->data['node']['sslKeyPrvPath'])){
 	openssl_pkey_free($ssl);
 	
 	$log->info('SSL: key pair generation done');
+}
+
+if($keyPub && !$settings->data['node']['id']){
+	$nodeId = '';
+	$nodeId = Node::genIdHexStr($keyPub);
+	if($nodeId){
+		$settings->data['node']['id'] = $nodeId;
+		$settings->setDataChanged(true);
+	}
+	else{
+		$log->critical('node ID generation failed');
+		exit(1);
+	}
 }
 
 $settings->save();

@@ -6,6 +6,7 @@ use RuntimeException;
 
 use Zend\Uri\UriFactory;
 use Rhumsaa\Uuid\Uuid;
+use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
 
 use TheFox\Storage\YamlStorage;
 use TheFox\Utilities\Hex;
@@ -207,6 +208,20 @@ class Node extends YamlStorage{
 		}
 		
 		return false;
+	}
+	
+	public static function genIdHexStr($key){
+		$key = sslKeyPubClean($key);
+		
+		$keyBin = base64_decode($key);
+		
+		try{
+			$id = (string)Uuid::uuid5(Uuid::NAMESPACE_X500, $keyBin);
+			return $id;
+		}
+		catch(UnsatisfiedDependencyException $e){
+			return null;
+		}
 	}
 	
 	public function setTimeCreated($timeCreated){

@@ -197,6 +197,12 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		$this->assertFalse(Node::sslKeyPubFingerprintVerify(''));
 	}
 	
+	public function testGenIdHexStr(){
+		$this->assertEquals('d4773c00-6a11-540a-b72c-ed106ef8309b', Node::genIdHexStr(static::SSL_KEY_PUB1));
+		$this->assertEquals('4a5b4d4e-0025-5d8d-ae5c-ca1c5548dfba', Node::genIdHexStr(static::SSL_KEY_PUB2_A));
+		$this->assertEquals('4a5b4d4e-0025-5d8d-ae5c-ca1c5548dfba', Node::genIdHexStr(static::SSL_KEY_PUB2_B));
+	}
+	
 	public function testDistanceHexStr(){
 		$node_a = new Node();
 		$node_a->setIdHexStr('11111111-1111-4111-8111-111111111100');
