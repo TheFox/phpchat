@@ -496,19 +496,25 @@ class Cronjob extends Thread{
 								
 								$nodeObj = new Node();
 								
-								if(isset($node['uri'])){
-									$nodeObj->setUri($node['uri']);
-									
-									if(isset($node['id'])){
-										$nodeObj->setIdHexStr($node['id']);
-										$this->getIpcKernelConnection()->execAsync('tableNodeEnclose', array($nodeObj));
-									}
-									else{
-										$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeAdd', array((string)$nodeObj->getUri()));
-									}
+								$active = true;
+								if(isset($node['active'])){
+									$active = (bool)$node['active'];
 								}
-								
-								$this->log->debug('node: '.$nodeObj->getUri());
+								if($active){
+									if(isset($node['uri'])){
+										$nodeObj->setUri($node['uri']);
+										
+										if(isset($node['id'])){
+											$nodeObj->setIdHexStr($node['id']);
+											$this->getIpcKernelConnection()->execAsync('tableNodeEnclose', array($nodeObj));
+										}
+										else{
+											$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeAdd', array((string)$nodeObj->getUri()));
+										}
+									}
+									
+									$this->log->debug('node: '.$nodeObj->getUri());
+								}
 							}
 						}
 					}
