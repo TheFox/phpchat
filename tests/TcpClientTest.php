@@ -524,6 +524,11 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$this->assertEquals('tcp://192.168.241.5', $json[0]['data']['nodes'][2]['uri']);
 		$this->assertEquals('tcp://192.168.241.6', $json[0]['data']['nodes'][3]['uri']);
 		$this->assertEquals('tcp://192.168.241.7', $json[0]['data']['nodes'][4]['uri']);
+		$this->assertTrue(array_key_exists('sslKeyPub', $json[0]['data']['nodes'][0]));
+		$this->assertTrue(array_key_exists('sslKeyPub', $json[0]['data']['nodes'][1]));
+		$this->assertTrue(array_key_exists('sslKeyPub', $json[0]['data']['nodes'][2]));
+		$this->assertTrue(array_key_exists('sslKeyPub', $json[0]['data']['nodes'][3]));
+		$this->assertTrue(array_key_exists('sslKeyPub', $json[0]['data']['nodes'][4]));
 		
 		$raw = $client1->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
