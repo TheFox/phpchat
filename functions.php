@@ -37,3 +37,12 @@ function strIsIp($ip){
 	}
 	return false;
 }
+
+function sslKeyPubClean($key){
+	$key = str_replace("\r", '', $key);
+	$key = str_replace("\n", '', $key);
+	$key = str_replace('-----BEGIN PUBLIC KEY-----', '', $key);
+	$key = str_replace('-----END PUBLIC KEY-----', '', $key);
+	
+	return $key;
+}
