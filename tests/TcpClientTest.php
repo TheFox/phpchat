@@ -1157,4 +1157,208 @@ qFdLCnlGsFNPrOqpUoKmudkCAwEAAQ==
 		$client2->getServer()->getKernel()->shutdown();
 	}
 	
+	public function testDuplicateNodeIds(){
+		$filesystem = new Filesystem();
+		$filesystem->mkdir('tests/client3_tcp', $mode = 0777);
+		$filesystem->mkdir('tests/client4_tcp', $mode = 0777);
+		$filesystem->mkdir('tests/client5_tcp', $mode = 0777);
+		$filesystem->mkdir('tests/client6_tcp', $mode = 0777);
+		
+		file_put_contents('tests/client3_tcp/id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV3);
+		file_put_contents('tests/client3_tcp/id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB3);
+		
+		file_put_contents('tests/client4_tcp/id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV4);
+		file_put_contents('tests/client4_tcp/id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB4);
+		
+		file_put_contents('tests/client5_tcp/id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV5);
+		file_put_contents('tests/client5_tcp/id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB5);
+		
+		file_put_contents('tests/client6_tcp/id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV6);
+		file_put_contents('tests/client6_tcp/id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB6);
+		
+		
+		// Node3: Original
+		$settings3 = new Settings();
+		$settings3->data['datadir'] = 'tests/client3_tcp';
+		$settings3->data['firstRun'] = false;
+		$settings3->data['node']['timeCreated'] = time();
+		$settings3->data['node']['ip'] = '127.0.0.3';
+		$settings3->data['node']['port'] = 0;
+		$settings3->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
+		$settings3->data['node']['sslKeyPrvPass'] = 'my_password';
+		$settings3->data['node']['sslKeyPrvPath'] = $settings3->data['datadir'].'/id_rsa.prv';
+		$settings3->data['node']['sslKeyPubPath'] = $settings3->data['datadir'].'/id_rsa.pub';
+		$settings3->data['user']['nickname'] = 'user1';
+		
+		// Node4 Evil1: sends data about Node5 instead of Node3
+		$settings4 = new Settings();
+		$settings4->data['datadir'] = 'tests/client4_tcp';
+		$settings4->data['firstRun'] = false;
+		$settings4->data['node']['timeCreated'] = time();
+		$settings4->data['node']['ip'] = '127.0.0.4';
+		$settings4->data['node']['port'] = 0;
+		$settings4->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1739';
+		$settings4->data['node']['sslKeyPrvPass'] = 'my_password';
+		$settings4->data['node']['sslKeyPrvPath'] = $settings4->data['datadir'].'/id_rsa.prv';
+		$settings4->data['node']['sslKeyPubPath'] = $settings4->data['datadir'].'/id_rsa.pub';
+		$settings4->data['user']['nickname'] = 'user2';
+		
+		// Node5 Evil2: duplicate from original
+		$settings5 = new Settings();
+		$settings5->data['datadir'] = 'tests/client4_tcp';
+		$settings5->data['firstRun'] = false;
+		$settings5->data['node']['timeCreated'] = time();
+		$settings5->data['node']['ip'] = '127.0.0.5';
+		$settings5->data['node']['port'] = 0;
+		$settings5->data['node']['id'] = $settings3->data['node']['id'];
+		$settings5->data['node']['sslKeyPrvPass'] = 'my_password';
+		$settings5->data['node']['sslKeyPrvPath'] = $settings5->data['datadir'].'/id_rsa.prv';
+		$settings5->data['node']['sslKeyPubPath'] = $settings5->data['datadir'].'/id_rsa.pub';
+		$settings5->data['user']['nickname'] = 'user2';
+		
+		// Node6: Target
+		$settings6 = new Settings();
+		$settings6->data['datadir'] = 'tests/client6_tcp';
+		$settings6->data['firstRun'] = false;
+		$settings6->data['node']['timeCreated'] = time();
+		$settings6->data['node']['ip'] = '127.0.0.6';
+		$settings6->data['node']['port'] = 0;
+		$settings6->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1740';
+		$settings6->data['node']['sslKeyPrvPass'] = 'my_password';
+		$settings6->data['node']['sslKeyPrvPath'] = $settings6->data['datadir'].'/id_rsa.prv';
+		$settings6->data['node']['sslKeyPubPath'] = $settings6->data['datadir'].'/id_rsa.pub';
+		$settings6->data['user']['nickname'] = 'user3';
+		
+		
+		$log3 = new Logger('client_3');
+		$log3->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
+		
+		$log4 = new Logger('client_4');
+		$log4->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
+		
+		$log5 = new Logger('client_5');
+		$log5->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
+		
+		$log6 = new Logger('client_5');
+		$log6->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
+		
+		
+		$kernel3 = new Kernel();
+		$kernel3->setLog($log3);
+		$kernel3->setSettings($settings3);
+		$kernel3->init();
+		
+		$kernel4 = new Kernel();
+		$kernel4->setLog($log4);
+		$kernel4->setSettings($settings4);
+		$kernel4->init();
+		
+		$kernel5 = new Kernel();
+		$kernel5->setLog($log5);
+		$kernel5->setSettings($settings5);
+		$kernel5->init();
+		
+		$kernel6 = new Kernel();
+		$kernel6->setLog($log6);
+		$kernel6->setSettings($settings6);
+		$kernel6->init();
+		
+		
+		$server3 = $kernel3->getServer();
+		$server3->setLog($log3);
+		
+		$server4 = $kernel4->getServer();
+		$server4->setLog($log4);
+		
+		$server5 = $kernel5->getServer();
+		$server5->setLog($log5);
+		
+		$server6 = $kernel6->getServer();
+		$server6->setLog($log6);
+		
+		
+		$client3 = new TcpClient();
+		$client3->setSslPrv($settings3->data['node']['sslKeyPrvPath'], $settings3->data['node']['sslKeyPrvPass']);
+		$client3->setId(3);
+		$client3->setUri('tcp://'.$settings3->data['node']['ip']);
+		$client3->setServer($server3);
+		
+		$client4 = new TcpClient();
+		$client4->setSslPrv($settings4->data['node']['sslKeyPrvPath'], $settings4->data['node']['sslKeyPrvPass']);
+		$client4->setId(4);
+		$client4->setUri('tcp://'.$settings4->data['node']['ip']);
+		$client4->setServer($server4);
+		
+		$client5 = new TcpClient();
+		$client5->setSslPrv($settings5->data['node']['sslKeyPrvPath'], $settings5->data['node']['sslKeyPrvPass']);
+		$client5->setId(5);
+		$client5->setUri('tcp://'.$settings5->data['node']['ip']);
+		$client5->setServer($server5);
+		
+		$client6 = new TcpClient();
+		$client6->setSslPrv($settings6->data['node']['sslKeyPrvPath'], $settings6->data['node']['sslKeyPrvPass']);
+		$client6->setId(6);
+		$client6->setUri('tcp://'.$settings6->data['node']['ip']);
+		$client6->setServer($server6);
+		
+		
+		// Hello Client4
+		$raw = $client4->sendHello();
+		$json = $this->rawMsgToJson($raw);
+		
+		// ID Client4
+		$raw = $client6->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		
+		$raw = $client4->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		
+		$raw = $client6->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		
+		// Hello Client6
+		$raw = $client6->sendHello();
+		$json = $this->rawMsgToJson($raw);
+		
+		// ID Client6
+		$raw = $client4->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		
+		$raw = $client6->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		
+		
+		
+		$msg = new Msg();
+		$msg->setVersion(1);
+		$msg->setSrcNodeId($settings4->data['node']['id']);
+		$msg->setSrcSslKeyPub(static::NODE_LOCAL_SSL_KEY_PUB4);
+		$msg->setSrcUserNickname('thefox');
+		$msg->setDstNodeId($settings6->data['node']['id']);
+		$msg->setDstSslPubKey(static::NODE_LOCAL_SSL_KEY_PUB5);
+		$msg->setSubject('my first subject');
+		$msg->setText('hello world! this is a test');
+		$msg->setSslKeyPrv(static::NODE_LOCAL_SSL_KEY_PRV4, 'my_password');
+		$msg->encrypt();
+		
+		$raw = $client4->sendMsg($msg);
+		$json = $this->rawMsgToJson($raw);
+		ve($json);
+		
+		$raw = $client6->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		ve($json);
+		
+		# TODO
+		
+		
+		
+		
+		$client3->getServer()->getKernel()->shutdown();
+		$client4->getServer()->getKernel()->shutdown();
+		$client6->getServer()->getKernel()->shutdown();
+		
+		$this->assertTrue(true);
+	}
+	
 }
