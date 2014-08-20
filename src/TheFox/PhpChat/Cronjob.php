@@ -239,13 +239,13 @@ class Cronjob extends Thread{
 				&& $msg->getStatus() == 'O'
 				&& $msg->getEncryptionMode() == 'S'
 			){
-				#fwrite(STDOUT, __METHOD__.' find node: '.$msg->getId().' -> '.$msg->getDstNodeId()."\n"); # TODO
+				#fwrite(STDOUT, 'msg db, init nodes: find node: '.$msg->getId().' -> '.$msg->getDstNodeId()."\n"); # TODO
 				
 				$node = new Node();
 				$node->setIdHexStr($msg->getDstNodeId());
 				$onode = $this->table->nodeFindInBuckets($node);
 				if($onode && $onode->getSslKeyPub()){
-					#fwrite(STDOUT, __METHOD__.'     found node: '.$onode->getIdHexStr()."\n"); # TODO
+					#fwrite(STDOUT, 'msg db, init nodes:     found node: '.$onode->getIdHexStr()."\n"); # TODO
 					
 					$msg->setSrcSslKeyPub($this->localNode->getSslKeyPub());
 					$msg->setDstSslPubKey($this->localNode->getSslKeyPub());
@@ -262,7 +262,9 @@ class Cronjob extends Thread{
 					}
 					
 				}
-				
+				else{
+					#fwrite(STDOUT, 'msg db, init nodes:     unknown node: '.$node->getIdHexStr()."\n"); # TODO
+				}
 			}
 		}
 		

@@ -61,15 +61,14 @@ class TcpClient extends Client{
 	}
 	
 	public function dataRecv($data = null){
-		#fwrite(STDOUT, 'dataRecv'."\n");
+		#fwrite(STDOUT, $this->getId().' dataRecv'."\n");
 		
 		$dataRecvReturnValue = '';
 		if($data === null && $this->getSocket()){
-			#fwrite(STDOUT, 'data read from socket'."\n");
 			$data = $this->getSocket()->read();
 		}
 		
-		#fwrite(STDOUT, 'data: /'.$data.'/'."\n");
+		#fwrite(STDOUT, $this->getId().' data: /'.$data.'/'."\n");
 		
 		do{
 			$separatorPos = strpos($data, static::MSG_SEPARATOR);
@@ -82,7 +81,7 @@ class TcpClient extends Client{
 				$this->recvBufferTmp = '';
 				
 				$msg = base64_decode($msg);
-				#fwrite(STDOUT, 'dataRecv: /'.$msg.'/'."\n");
+				#fwrite(STDOUT, $this->getId().' dataRecv msg: /'.$msg.'/'."\n");
 				
 				#$dataRecvReturnValue .= $this->msgHandle($msg);
 				$msgHandleReturnValue = $this->msgHandle($msg);
@@ -95,7 +94,8 @@ class TcpClient extends Client{
 		}
 		while($data);
 		
-		#fwrite(STDOUT, 'dataRecv'."\n"); ve($dataRecvReturnValue);
+		#fwrite(STDOUT, 'dataRecv: /'.base64_decode($dataRecvReturnValue).'/'."\n");
+		#fwrite(STDOUT, 'dataRecv: /'.$dataRecvReturnValue.'/'."\n");
 		
 		return $dataRecvReturnValue;
 		#return join(static::MSG_SEPARATOR, $dataRecvReturnValue);

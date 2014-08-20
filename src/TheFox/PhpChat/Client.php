@@ -1003,6 +1003,9 @@ class Client{
 							$this->setStatus('hasSslInit', true);
 							$msgHandleReturnValue .= $this->sendSslInit();
 							$msgHandleReturnValue .= $this->sendSslInitResponse(1);
+							
+							#fwrite(STDOUT, 'ssl init: /'.$msgHandleReturnValue.'/'."\n");
+							#ve($msgHandleReturnValue);
 						}
 						else{
 							$this->resetStatusSsl();
