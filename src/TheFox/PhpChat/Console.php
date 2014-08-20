@@ -126,42 +126,47 @@ class Console extends Thread{
 		fwrite(STDOUT, $output);
 	}
 	
-	private function cursorUp(){
-		print static::CHAR_ESCAPE.'[1A';
+	public static function cursorUp($lines = 1){
+		print static::CHAR_ESCAPE.'['.$lines.'A';
 	}
 	
-	private function cursorJumpToTop(){
+	public static function cursorJumpToTop(){
 		print static::CHAR_ESCAPE.'[1;1f';
 	}
 	
-	private function cursorJumpToColumn($column = 1){
+	public static function cursorJumpToColumn($column = 1){
 		print static::CHAR_ESCAPE.'['.$column.'G';
 	}
 	
-	private function cursorRight($offset = 1){
+	public static function cursorRight($offset = 1){
 		print static::CHAR_ESCAPE.'['.$offset.'C';
 	}
 	
-	private function cursorLeft($offset = 1){
+	public static function cursorLeft($offset = 1){
 		print static::CHAR_ESCAPE.'['.$offset.'D';
 	}
 	
-	private function lineClear(){
+	public static function lineClear(){
 		#$this->log->debug('line clear');
 		print "\r".static::CHAR_ESCAPE.'[K';
 	}
 	
-	private function lineClearRight(){
+	public static function lineClearRight(){
 		#$this->log->debug('line clear');
+		#print static::CHAR_ESCAPE.'[J';
+		print static::CHAR_ESCAPE.'[0K';
+	}
+	
+	public static function screenClearToBottom(){
 		print static::CHAR_ESCAPE.'[J';
 	}
 	
-	private function scrollUp(){
+	public static function scrollUp(){
 		#$this->log->debug('scrollUp');
 		print static::CHAR_ESCAPE.'[S';
 	}
 	
-	private function scrollDown(){
+	public static function scrollDown(){
 		#$this->log->debug('scrollDown');
 		print static::CHAR_ESCAPE.'[T';
 	}

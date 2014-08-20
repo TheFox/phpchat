@@ -28,6 +28,7 @@ class Kernel extends Thread{
 	private $ipcCronjobConnection = null;
 	private $ipcImapServerConnection = null;
 	private $ipcSmtpServerConnection = null;
+	private $ipcInfoConnection = null;
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -190,6 +191,17 @@ class Kernel extends Thread{
 			$this->ipcSmtpServerConnection->functionAdd($functionName, $this, $functionName);
 		}
 		$this->ipcSmtpServerConnection->connect();
+		
+		// Info Connection
+		$this->getLog()->info('setup info connection');
+		$this->ipcInfoConnection = new ConnectionServer();
+		$this->ipcInfoConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20004));
+		foreach(array(
+			'serverClientsInfo'
+		) as $functionName){
+			$this->ipcInfoConnection->functionAdd($functionName, $this, $functionName);
+		}
+		$this->ipcInfoConnection->connect();
 	}
 	
 	public function serverConnect($uri, $isTalkRequest = false, $isPingOnly = false, $msgIds = array()){
@@ -322,6 +334,14 @@ class Kernel extends Thread{
 		}
 	}
 	
+	public function serverClientsInfo(){
+		if($this->getServer()){
+			return $this->getServer()->clientsInfo();
+		}
+		
+		return array();
+	}
+	
 	public function getTable(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		return $this->table;
@@ -420,12 +440,17 @@ class Kernel extends Thread{
 		return $this->ipcSmtpServerConnection;
 	}
 	
+	public function getIpcInfoConnection(){
+		return $this->ipcInfoConnection;
+	}
+	
 	public function run(){
 		$this->server->run();
 		$this->ipcConsoleConnection->run();
 		$this->ipcCronjobConnection->run();
 		$this->ipcImapServerConnection->run();
 		$this->ipcSmtpServerConnection->run();
+		$this->ipcInfoConnection->run();
 	}
 	
 	public function loop(){
@@ -474,6 +499,9 @@ class Kernel extends Thread{
 		
 		$this->getLog()->info('IPC SMTP server send shutdown');
 		$this->ipcSmtpServerConnection->execSync('shutdown');
+		
+		$this->getLog()->info('IPC Info send shutdown');
+		$this->ipcInfoConnection->execSync('shutdown');
 		
 		
 		$nodesNum = (int)$this->getTable()->getNodesNum();

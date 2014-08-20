@@ -54,11 +54,14 @@ class Client{
 		
 		$this->uri = new TcpUri();
 		
+		$this->status['hasId'] = false;
+		$this->status['hasTalkRequest'] = false;
+		$this->status['hasTalk'] = false;
+		$this->status['hasTalkClose'] = false;
 		$this->status['hasShutdown'] = false;
+		
 		$this->status['isChannelLocal'] = false;
 		$this->status['isChannelPeer'] = false;
-		
-		$this->status['hasId'] = false;
 		
 		$this->resetStatusSsl();
 	}
@@ -1407,6 +1410,7 @@ class Client{
 					if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MAX)){
 						if($rid){
 							if($this->getServer() && $this->getServer()->kernelHasConsole()){
+								$this->setStatus('hasTalkRequest', true);
 								$this->consoleTalkRequestAdd($rid, $userNickname);
 							}
 							else{
@@ -1459,6 +1463,7 @@ class Client{
 						//if($status == 0){} // Undefined
 						if($status == 1){
 							// Accepted
+							$this->setStatus('hasTalk', true);
 							$this->consoleMsgAdd('Talk request accepted.', true, false);
 							$this->consoleMsgAdd('Now talking to "'.$userNickname.'".', true, true);
 							
@@ -1575,6 +1580,7 @@ class Client{
 					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.$userNickname);
 					
 					$msgHandleReturnValue .= $this->sendQuit();
+					$this->setStatus('hasTalkClose', true);
 					$this->shutdown();
 					
 					$this->consoleMsgAdd('Talk closed by "'.$userNickname.'".', true, true, true);
@@ -1956,6 +1962,8 @@ class Client{
 	public function sendTalkRequest($userNickname){
 		$rid = (string)Uuid::uuid4();
 		
+		$this->setStatus('hasTalkRequest', true);
+		
 		$this->requestAdd('talk_request', $rid, array(
 			'userNickname' => $userNickname,
 		));
@@ -1969,6 +1977,10 @@ class Client{
 	}
 	
 	public function sendTalkResponse($rid, $status, $userNickname = ''){
+		if($status == 1){
+			$this->setStatus('hasTalk', true);
+		}
+		
 		$data = array(
 			'rid' => $rid,
 			'status' => (int)$status,
