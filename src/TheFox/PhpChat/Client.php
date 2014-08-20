@@ -468,7 +468,7 @@ class Client{
 					}
 					
 					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$id.', '.$port);
-					#$this->log('debug', $this->getUri().' recv '.$msgName.' sign: '.$msgData['sslKeyPubSign']); # TODO
+					$this->log('debug', $this->getUri().' recv '.$msgName.' sign: /'.$msgData['sslKeyPubSign'].'/'); # TODO
 					
 					$idOk = false;
 					$node = new Node();
@@ -1764,6 +1764,14 @@ class Client{
 		if(openssl_sign($sslKeyPub, $sign, $this->getSsl(), OPENSSL_ALGO_SHA1)){
 			$sslKeyPubSign = base64_encode($sign);
 		}
+		else{
+			$this->log('error', 'msgCreateId: openssl_sign failed');
+			while($openSslErrorStr = openssl_error_string()){
+				$this->log('error', 'SSL: '.$openSslErrorStr);
+			}
+		}
+		
+		$this->log('debug', 'msgCreateId sign: /'.$sslKeyPubSign.'/');
 		
 		if($sslKeyPubSign){
 			$data = array(
