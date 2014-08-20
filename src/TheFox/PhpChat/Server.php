@@ -422,4 +422,24 @@ class Server{
 		}
 	}
 	
+	public function nodeFind($nodeIdToFind){
+		#fwrite(STDOUT, 'nodeFind: '.$nodeIdToFind.''."\n");
+		
+		if($this->getTable()){
+			foreach($this->getTable()->getNodesClosest() as $nodeId => $node){
+				#fwrite(STDOUT, 'send nodeFind to '.$node->getIdHexStr().''."\n");
+				
+				$clientActions = array();
+				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
+				$action->functionSet(function($action, $client) use($nodeIdToFind) {
+					#fwrite(STDOUT, 'action function: '.$nodeIdToFind.''."\n");
+					$client->sendNodeFind($nodeIdToFind);
+				});
+				$clientActions[] = $action;
+				
+				$this->connect($node->getUri(), $clientActions);
+			}
+		}
+	}
+	
 }

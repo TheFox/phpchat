@@ -161,8 +161,9 @@ class Kernel extends Thread{
 			'getSettings', 'getLocalNode',
 			'getTable', 'tableNodeEnclose',
 			'getMsgDb', 'msgDbMsgUpdate', 'msgDbMsgIncForwardCyclesById', 'msgDbMsgSetStatusById',
-			'getNodesNewDb', 'nodesNewDbNodeAdd', 'nodesNewDbNodeIncConnectAttempt', 'nodesNewDbNodeRemove',
-			'serverConnect', 'save', 
+			'getNodesNewDb', 'nodesNewDbNodeAddUri', 'nodesNewDbNodeAddId', 'nodesNewDbNodeIncConnectAttempt', 'nodesNewDbNodeIncFindAttempt', 'nodesNewDbNodeRemove',
+			'serverConnect', 'serverNodeFind',
+			'save', 
 		) as $functionName){
 			$this->ipcCronjobConnection->functionAdd($functionName, $this, $functionName);
 		}
@@ -313,6 +314,14 @@ class Kernel extends Thread{
 		}
 	}
 	
+	public function serverNodeFind($nodeId){
+		#fwrite(STDOUT, 'serverNodeFind: '.$nodeId.''."\n");
+		
+		if($this->getServer()){
+			$this->getServer()->nodeFind($nodeId);
+		}
+	}
+	
 	public function getTable(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		return $this->table;
@@ -379,12 +388,20 @@ class Kernel extends Thread{
 		return $this->nodesNewDb;
 	}
 	
-	public function nodesNewDbNodeAdd($uri){
-		return $this->getNodesNewDb()->nodeAdd($uri);
+	public function nodesNewDbNodeAddUri($uri){
+		return $this->getNodesNewDb()->nodeAddUri($uri);
+	}
+	
+	public function nodesNewDbNodeAddId($id){
+		return $this->getNodesNewDb()->nodeAddId($id);
 	}
 	
 	public function nodesNewDbNodeIncConnectAttempt($id){
 		return $this->getNodesNewDb()->nodeIncConnectAttempt($id);
+	}
+	
+	public function nodesNewDbNodeIncFindAttempt($id){
+		return $this->getNodesNewDb()->nodeIncFindAttempt($id);
 	}
 	
 	public function nodesNewDbNodeRemove($id){

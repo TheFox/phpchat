@@ -168,7 +168,7 @@ class MsgDb extends YamlStorage{
 				$this->setDataChanged(true);
 			}
 			if($msgOld->getStatus() != $msgNew->getStatus()){
-				print __CLASS__.'->'.__FUNCTION__.': changed: status'."\n";
+				#print __CLASS__.'->'.__FUNCTION__.': changed: status'."\n";
 				$msgOld->setStatus($msgNew->getStatus());
 				$this->setDataChanged(true);
 			}
@@ -179,7 +179,7 @@ class MsgDb extends YamlStorage{
 			}
 			
 			if($msgOld->getDataChanged() != $msgNew->getDataChanged()){
-				print __CLASS__.'->'.__FUNCTION__.': changed: dataChanged'."\n"; # TODO
+				#print __CLASS__.'->'.__FUNCTION__.': changed: dataChanged'."\n"; # TODO
 				$msgOld->setDataChanged($msgNew->getDataChanged());
 			}
 			

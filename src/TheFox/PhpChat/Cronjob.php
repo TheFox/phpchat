@@ -119,6 +119,21 @@ class Cronjob extends Thread{
 		$this->shutdown();
 	}
 	
+	public function cycleNodesNew(){
+		if(!$this->getIpcKernelConnection()){
+			throw new RuntimeException('You must first run init().');
+		}
+		
+		$this->nodesNewEnclose();
+		
+		$this->log->debug('save');
+		$this->getIpcKernelConnection()->execAsync('save');
+		
+		$this->getIpcKernelConnection()->run();
+		
+		$this->shutdown();
+	}
+	
 	private function run(){
 		if(!$this->getIpcKernelConnection()){
 			throw new RuntimeException('You must first run init().');
@@ -219,6 +234,7 @@ class Cronjob extends Thread{
 	public function msgDbInitNodes(){
 		#$this->log->debug(__FUNCTION__);
 		#print __FUNCTION__.''."\n";
+		$this->log->debug('msgs init nodes');
 		
 		if(!$this->msgDb){
 			throw new RuntimeException('msgDb not set', 1);
@@ -239,13 +255,13 @@ class Cronjob extends Thread{
 				&& $msg->getStatus() == 'O'
 				&& $msg->getEncryptionMode() == 'S'
 			){
-				#fwrite(STDOUT, 'msg db, init nodes: find node: '.$msg->getId().' -> '.$msg->getDstNodeId()."\n"); # TODO
+				fwrite(STDOUT, 'msg db, init nodes: find node: '.$msg->getId().' -> '.$msg->getDstNodeId()."\n"); # TODO
 				
 				$node = new Node();
 				$node->setIdHexStr($msg->getDstNodeId());
 				$onode = $this->table->nodeFindInBuckets($node);
 				if($onode && $onode->getSslKeyPub()){
-					#fwrite(STDOUT, 'msg db, init nodes:     found node: '.$onode->getIdHexStr()."\n"); # TODO
+					fwrite(STDOUT, 'msg db, init nodes:     found node: '.$onode->getIdHexStr()."\n"); # TODO
 					
 					$msg->setSrcSslKeyPub($this->localNode->getSslKeyPub());
 					$msg->setDstSslPubKey($this->localNode->getSslKeyPub());
@@ -263,7 +279,11 @@ class Cronjob extends Thread{
 					
 				}
 				else{
-					#fwrite(STDOUT, 'msg db, init nodes:     unknown node: '.$node->getIdHexStr()."\n"); # TODO
+					fwrite(STDOUT, 'msg db, init nodes:     unknown node: '.$node->getIdHexStr()."\n"); # TODO
+					
+					if($this->getIpcKernelConnection()){
+						$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeAddId', array($node->getIdHexStr()));
+					}
 				}
 			}
 		}
@@ -277,6 +297,7 @@ class Cronjob extends Thread{
 	public function msgDbSendAll(){
 		#$this->log->debug(__FUNCTION__);
 		#print __FUNCTION__.''."\n";
+		$this->log->debug('msgs send all');
 		
 		if(!$this->msgDb){
 			throw new RuntimeException('msgDb not set', 1);
@@ -526,7 +547,7 @@ class Cronjob extends Thread{
 											$this->getIpcKernelConnection()->execAsync('tableNodeEnclose', array($nodeObj));
 										}
 										else{
-											$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeAdd', array((string)$nodeObj->getUri()));
+											$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeAddUri', array((string)$nodeObj->getUri()));
 										}
 									}
 									
@@ -549,27 +570,53 @@ class Cronjob extends Thread{
 	private function nodesNewEnclose(){
 		$this->log->debug('nodes new enclose');
 		
+		if(!$this->table){
+			$this->setTable($this->getIpcKernelConnection()->execSync('getTable'));
+		}
+		
+		$this->log->debug('nodes new enclose, table: '.get_class($this->table));
+		
 		$nodesNewDb = $this->getIpcKernelConnection()->execSync('getNodesNewDb', array(), 10);
 		#ve($nodesNewDb);
 		
 		foreach($nodesNewDb->getNodes() as $nodeId => $node){
-			if($node['connectAttempt'] >= 4){
-				$this->log->debug('node remove: '.$nodeId);
-				$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeRemove', array($nodeId));
-			}
-			else{
-				$nodeObj = new Node();
-				$nodeObj->setUri($node['uri']);
-				
-				$this->log->debug('node connect: '.(string)$nodeObj->getUri());
-				$connected = $this->getIpcKernelConnection()->execSync('serverConnect', array($nodeObj->getUri(), false, true));
-				if($connected){
+			if($node['type'] == 'connect'){
+				if($node['connectAttempts'] >= 10){
 					$this->log->debug('node remove: '.$nodeId);
 					$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeRemove', array($nodeId));
 				}
 				else{
-					$this->log->debug('node inc connect attempt: '.$nodeId);
-					$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeIncConnectAttempt', array($nodeId));
+					$nodeObj = new Node();
+					$nodeObj->setUri($node['uri']);
+					
+					$this->log->debug('node connect: '.(string)$nodeObj->getUri());
+					$connected = $this->getIpcKernelConnection()->execSync('serverConnect', array($nodeObj->getUri(), false, true));
+					if($connected){
+						$this->log->debug('node remove: '.$nodeId);
+						$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeRemove', array($nodeId));
+					}
+					else{
+						$this->log->debug('node inc connect attempt: '.$nodeId);
+						$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeIncConnectAttempt', array($nodeId));
+					}
+				}
+			}
+			elseif($node['type'] == 'find'){
+				$nodeObj = new Node();
+				$nodeObj->setIdHexStr($node['id']);
+				
+				if($this->table->nodeFindInBuckets($nodeObj)){
+					$this->log->debug('node remove: '.$nodeId);
+					$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeRemove', array($nodeId));
+				}
+				elseif($node['findAttempts'] >= 5){
+					$this->log->debug('node remove: '.$nodeId);
+					$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeRemove', array($nodeId));
+				}
+				else{
+					$this->log->debug('node find: '.$node['id']);
+					$this->getIpcKernelConnection()->execAsync('serverNodeFind', array($node['id']));
+					$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeIncFindAttempt', array($nodeId));
 				}
 			}
 		}
@@ -577,7 +624,7 @@ class Cronjob extends Thread{
 	
 	public function shutdown(){
 		#print __FUNCTION__.''."\n";  # TODO
-		$this->log->debug('shutdown');
+		$this->log->info('shutdown');
 	}
 	
 	public function ipcKernelShutdown(){

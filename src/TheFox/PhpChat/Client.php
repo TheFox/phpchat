@@ -486,13 +486,18 @@ class Client{
 							if($strKeyPub){
 								if($strKeyPubSign){
 									if(openssl_verify($strKeyPub, $strKeyPubSign, $strKeyPub, OPENSSL_ALGO_SHA1)){
-										$nodeId = Node::genIdHexStr($strKeyPub);
-										if($nodeId == $id){
+										if(Node::genIdHexStr($strKeyPub) == $id){
 											
 											// Check if a public key already exists.
 											if($node->getSslKeyPub()){
-												$this->log('debug', 'SSL public key ok [A]');
+												$this->log('debug', 'SSL public key ok [Aa]');
 												$idOk = true;
+												
+												if($node->getSslKeyPub() == $strKeyPub){
+													$this->log('debug', 'SSL public key ok [Ab]');
+													$node->setSslKeyPubStatus('C');
+													$node->setDataChanged(true);
+												}
 											}
 											else{
 												// No public key found.
@@ -506,6 +511,7 @@ class Client{
 														
 														$node->setSslKeyPub($strKeyPub);
 														$node->setSslKeyPubStatus('C');
+														$node->setDataChanged(true);
 													}
 													else{
 														$msgHandleReturnValue .= $this->sendError(2020, $msgName);
@@ -700,58 +706,86 @@ class Client{
 								// Find the smallest distance.
 								foreach($nodes as $nodeArId => $nodeAr){
 									
+									$nodeArId = '';
+									$nodeArSslPubKey = '';
+									
 									$node = new Node();
 									if(isset($nodeAr['id'])){
-										$node->setIdHexStr($nodeAr['id']);
+										$nodeArId = $nodeAr['id'];
 									}
 									if(isset($nodeAr['uri'])){
 										$node->setUri($nodeAr['uri']);
 									}
 									if(isset($nodeAr['sslKeyPub']) && $nodeAr['sslKeyPub']){
-										$node->setSslKeyPub(base64_decode($nodeAr['sslKeyPub']));
+										$nodeArSslPubKey = base64_decode($nodeAr['sslKeyPub']);
 									}
 									$node->setTimeLastSeen(time());
 									
 									$distanceNew = $this->getLocalNode()->distanceHexStr($node);
 									
-									$this->log('debug', 'node found: '.$nodeArId.', '.$nodeAr['id'].', do='.$distanceOld.', dn='.$distanceNew);
+									$this->log('debug', 'node found: '.$nodeArId.', do=/'.$distanceOld.'/ dn=/'.$distanceNew.'/');
 									
-									if(!$this->getLocalNode()->isEqual($node)){
-										if($this->getSettings()->data['node']['ipPub'] != $node->getUri()->getHost()
-											|| $this->getLocalNode()->getUri()->getPort() != $node->getUri()->getPort()){
-											if(!in_array($node->getIdHexStr(), $nodesFoundIds)){
-												
-												$nodesFoundIds[] = $nodeAr['id'];
-												if(count($nodesFoundIds) > static::NODE_FIND_MAX_NODE_IDS){
-													array_shift($nodesFoundIds);
-												}
-												
-												if($nodeAr['id'] == $nodeId){
-													$this->log('debug', 'node found: find completed');
-													$uri = '';
-												}
-												else{
-													if($distanceOld != $distanceNew){
-														$distanceMin = Node::idMinHexStr($distanceOld, $distanceNew);
-														if($distanceMin == $distanceNew){ // Is smaller then $distanceOld.
-															$distanceOld = $distanceNew;
-															$uri = $node->getUri();
+									
+									if($nodeArId){
+										$node->setIdHexStr($nodeArId);
+										
+										if($nodeArSslPubKey){
+											if(Node::genIdHexStr($nodeArSslPubKey) == $nodeArId){
+												if($node->setSslKeyPub($nodeArSslPubKey)){
+													if(!$this->getLocalNode()->isEqual($node)){
+														if(
+															$this->getSettings()->data['node']['ipPub'] != $node->getUri()->getHost()
+															|| $this->getLocalNode()->getUri()->getPort() != $node->getUri()->getPort()
+														){
+															if(!in_array($node->getIdHexStr(), $nodesFoundIds)){
+																
+																$nodesFoundIds[] = $nodeAr['id'];
+																if(count($nodesFoundIds) > static::NODE_FIND_MAX_NODE_IDS){
+																	array_shift($nodesFoundIds);
+																}
+																
+																if($nodeAr['id'] == $nodeId){
+																	$this->log('debug', 'node found: find completed');
+																	$uri = '';
+																}
+																else{
+																	if($distanceOld != $distanceNew){
+																		$distanceMin = Node::idMinHexStr($distanceOld, $distanceNew);
+																		if($distanceMin == $distanceNew){ // Is smaller then $distanceOld.
+																			$distanceOld = $distanceNew;
+																			$uri = $node->getUri();
+																		}
+																	}
+																}
+																
+																$this->getTable()->nodeEnclose($node);
+															}
+															else{
+																$this->log('debug', 'node found: already known');
+															}
+														}
+														else{
+															$this->log('debug', 'node found: myself, uri equal ('.$node->getUri().')');
 														}
 													}
+													else{
+														$this->log('debug', 'node found: myself, node equal');
+													}
 												}
-												
-												$this->getTable()->nodeEnclose($node);
+												else{
+													$this->log('debug', 'node found: public key invalid');
+												}
 											}
 											else{
-												$this->log('debug', 'node found: already known');
+												$this->log('debug', 'node found: ID does not match public key');
 											}
 										}
 										else{
-											$this->log('debug', 'node found: myself, uri equal ('.$node->getUri().')');
+											$this->log('debug', 'node found: no public key set');
 										}
 									}
 									else{
-										$this->log('debug', 'node found: myself, node equal');
+										$this->log('debug', 'node found: no node id set');
 									}
 								}
 							}
@@ -767,7 +801,7 @@ class Client{
 								});
 								$clientActions[] = $action;
 								
-								#$this->getServer()->connect($uri, $clientActions); # TODO
+								$this->getServer()->connect($uri, $clientActions);
 							}
 						}
 						else{

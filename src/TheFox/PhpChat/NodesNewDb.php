@@ -20,29 +20,66 @@ class NodesNewDb extends YamlStorage{
 		return array('data');
 	}
 	
-	public function nodeAdd($uri){
+	public function nodeAddUri($uri){
 		#print __CLASS__.'->'.__FUNCTION__.': '.$uri."\n";
 		
-		$found = false;
+		$oldId = 0;
 		foreach($this->data['nodes'] as $nodeId => $node){
 			if($node['uri'] == $uri){
-				$found = true;
+				$oldId = $nodeId;
 				break;
 			}
 		}
-		if(!$found){
+		if($oldId){
+			$this->data['nodes'][$oldId]['insertAttempts']++;
+		}
+		else{
 			$this->data['nodesId']++;
 			$this->data['nodes'][$this->data['nodesId']] = array(
+				'type' => 'connect',
 				'uri' => $uri,
-				'connectAttempt' => 0,
+				'connectAttempts' => 0,
+				'insertAttempts' => 0,
 			);
-			$this->setDataChanged(true);
 		}
+		$this->setDataChanged(true);
+	}
+	
+	public function nodeAddId($id){
+		#print __CLASS__.'->'.__FUNCTION__.': '.$uri."\n";
+		
+		$oldId = false;
+		foreach($this->data['nodes'] as $nodeId => $node){
+			if($node['id'] == $id){
+				$oldId = $nodeId;
+				break;
+			}
+		}
+		if($oldId){
+			$this->data['nodes'][$oldId]['insertAttempts']++;
+		}
+		else{
+			$this->data['nodesId']++;
+			$this->data['nodes'][$this->data['nodesId']] = array(
+				'type' => 'find',
+				'id' => $id,
+				'findAttempts' => 0,
+				'insertAttempts' => 0,
+			);
+		}
+		$this->setDataChanged(true);
 	}
 	
 	public function nodeIncConnectAttempt($id){
 		if(isset($this->data['nodes'][$id])){
-			$this->data['nodes'][$id]['connectAttempt']++;
+			$this->data['nodes'][$id]['connectAttempts']++;
+			$this->setDataChanged(true);
+		}
+	}
+	
+	public function nodeIncFindAttempt($id){
+		if(isset($this->data['nodes'][$id])){
+			$this->data['nodes'][$id]['findAttempts']++;
 			$this->setDataChanged(true);
 		}
 	}
