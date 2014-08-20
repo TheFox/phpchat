@@ -503,6 +503,8 @@ class Client{
 													if($sslPubKeyDetails['bits'] >= Node::SSL_KEY_LEN_MIN){
 														$this->log('debug', 'SSL public key ok [B]');
 														$idOk = true;
+														
+														$node->setSslKeyPub($strKeyPub);
 													}
 													else{
 														$msgHandleReturnValue .= $this->sendError(2020, $msgName);
@@ -1923,6 +1925,9 @@ class Client{
 		$data = array(
 			'token' => $this->sslTestToken,
 		);
+		
+		#$this->log('debug', 'send SSL Test: '.$this->sslTestToken);
+		
 		return $this->dataSend($this->sslMsgCreatePublicEncrypt('ssl_test', $data));
 	}
 	
@@ -2189,6 +2194,7 @@ class Client{
 	}
 	
 	private function sslMsgCreatePublicEncrypt($name, $data){
+		#fwrite(STDOUT, 'sslMsgCreatePublicEncrypt'."\n");
 		#print __CLASS__.'->'.__FUNCTION__.': "'.$name.'"'."\n";
 		#ve($data);
 		
@@ -2196,6 +2202,8 @@ class Client{
 		
 		#ve($data);
 		$dataEnc = $this->sslPublicEncrypt($data);
+		
+		#fwrite(STDOUT, 'sslMsgCreatePublicEncrypt data: /'.$dataEnc.'/'."\n");
 		
 		if($dataEnc){
 			#ve($dataEnc);
@@ -2267,6 +2275,21 @@ class Client{
 				
 				return $rv;
 			}
+			else{
+				$this->log('error', 'sslPublicEncrypt: SSL openssl_public_encrypt failed');
+				$this->log('error', 'sslPublicEncrypt data: /'.$data.'/');
+				$this->log('error', 'sslPublicEncrypt sign: /'.$sign.'/');
+				$this->log('error', 'sslPublicEncrypt key pub: /'.$this->getNode()->getSslKeyPub().'/');
+				while($openSslErrorStr = openssl_error_string()){
+					$this->log('error', 'SSL: '.$openSslErrorStr);
+				}
+			}
+		}
+		else{
+			$this->log('error', 'sslPublicEncrypt: SSL openssl_sign failed');
+			while($openSslErrorStr = openssl_error_string()){
+				$this->log('error', 'SSL: '.$openSslErrorStr);
+			}
 		}
 		
 		return null;
@@ -2287,7 +2310,25 @@ class Client{
 					
 					return $rv;
 				}
+				else{
+					$this->log('error', 'sslPrivateDecrypt: SSL openssl_verify failed');
+					$this->log('error', 'sslPrivateDecrypt data: /'.$data.'/');
+					$this->log('error', 'sslPrivateDecrypt sign: /'.$sign.'/');
+					$this->log('error', 'sslPrivateDecrypt key pub: /'.$this->getNode()->getSslKeyPub().'/');
+					while($openSslErrorStr = openssl_error_string()){
+						$this->log('error', 'SSL: '.$openSslErrorStr);
+					}
+				}
 			}
+			else{
+				$this->log('error', 'sslPrivateDecrypt: SSL openssl_sign failed');
+				while($openSslErrorStr = openssl_error_string()){
+					$this->log('error', 'SSL: '.$openSslErrorStr);
+				}
+			}
+		}
+		else{
+			$this->log('error', 'sslPrivateDecrypt failed: data field and sign field not set');
 		}
 		
 		return null;

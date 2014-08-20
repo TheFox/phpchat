@@ -68,7 +68,7 @@ class TcpClient extends Client{
 			$data = $this->getSocket()->read();
 		}
 		
-		#fwrite(STDOUT, $this->getId().' data: /'.$data.'/'."\n");
+		#fwrite(STDOUT, $this->getId().' dataRecv data: /'.$data.'/'."\n");
 		
 		do{
 			$separatorPos = strpos($data, static::MSG_SEPARATOR);
@@ -87,7 +87,8 @@ class TcpClient extends Client{
 				$msgHandleReturnValue = $this->msgHandle($msg);
 				$dataRecvReturnValue .= $msgHandleReturnValue;
 				#$dataRecvReturnValue = array_merge($dataRecvReturnValue, $msgHandleReturnValue);
-				#fwrite(STDOUT, 'rv: /'.$dataRecvReturnValue.'/'."\n");
+				#fwrite(STDOUT, 'msgHandle rv:         /'.$msgHandleReturnValue.'/'."\n");
+				#fwrite(STDOUT, 'msgHandle rv:         /'.base64_decode($msgHandleReturnValue).'/'."\n");
 				
 				$data = substr($data, $separatorPos + 1);
 			}
@@ -95,7 +96,8 @@ class TcpClient extends Client{
 		while($data);
 		
 		#fwrite(STDOUT, 'dataRecv: /'.base64_decode($dataRecvReturnValue).'/'."\n");
-		#fwrite(STDOUT, 'dataRecv: /'.$dataRecvReturnValue.'/'."\n");
+		#fwrite(STDOUT, 'dataRecv rv: /'.$dataRecvReturnValue.'/'."\n");
+		#fwrite(STDOUT, 'dataRecv rv: /'.preg_split('/\n/', substr($dataRecvReturnValue, 0, -1)).'/'."\n");
 		
 		return $dataRecvReturnValue;
 		#return join(static::MSG_SEPARATOR, $dataRecvReturnValue);

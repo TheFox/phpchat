@@ -626,6 +626,7 @@ qFdLCnlGsFNPrOqpUoKmudkCAwEAAQ==
 		// ID Client2
 		$raw = $client1->dataRecv($raw);
 		$raw = $client2->dataRecv($raw);
+		$raw = $client1->dataRecv($raw);
 	}
 	
 	public function testSendBasic(){
@@ -645,6 +646,8 @@ qFdLCnlGsFNPrOqpUoKmudkCAwEAAQ==
 		#ve($json);
 		$this->assertEquals('id', $json[0]['name']);
 		$this->assertEquals('07fb5f61-5565-58f2-891e-1337e8b747ac', $json[0]['data']['id']);
+		$this->assertTrue(array_key_exists('sslKeyPub', $json[0]['data']));
+		$this->assertTrue(array_key_exists('sslKeyPubSign', $json[0]['data']));
 		$this->assertFalse($json[0]['data']['isChannel']);
 		
 		$raw = $client1->dataRecv($raw);
@@ -656,6 +659,8 @@ qFdLCnlGsFNPrOqpUoKmudkCAwEAAQ==
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
 		$this->assertEquals(null, $json[0]);
+		$this->assertEquals(static::NODE_LOCAL_SSL_KEY_PUB2, $client1->getNode()->getSslKeyPub());
+		
 		
 		// Hello Client2
 		$raw = $client2->sendHello();
@@ -670,12 +675,21 @@ qFdLCnlGsFNPrOqpUoKmudkCAwEAAQ==
 		#ve($json);
 		$this->assertEquals('id', $json[0]['name']);
 		$this->assertEquals('264bfdaf-e558-5547-b4b2-a7c1ce75478c', $json[0]['data']['id']);
+		$this->assertTrue(array_key_exists('sslKeyPub', $json[0]['data']));
+		$this->assertTrue(array_key_exists('sslKeyPubSign', $json[0]['data']));
 		$this->assertFalse($json[0]['data']['isChannel']);
 		
 		$raw = $client2->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
 		$this->assertEquals('id_ok', $json[0]['name']);
+		
+		$raw = $client1->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals(null, $json[0]);
+		$this->assertEquals(static::NODE_LOCAL_SSL_KEY_PUB1, $client2->getNode()->getSslKeyPub());
+		
 		
 		
 		// re-ID should cause an error.
@@ -842,7 +856,7 @@ qFdLCnlGsFNPrOqpUoKmudkCAwEAAQ==
 		list($client1, $client2) = $this->sendGenTestData();
 		
 		// SSL before ID should cause an error.
-		/*$raw = $client1->sendSslInit();
+		$raw = $client1->sendSslInit();
 		$raw = $client2->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
@@ -854,38 +868,38 @@ qFdLCnlGsFNPrOqpUoKmudkCAwEAAQ==
 		#ve($json);
 		$this->assertEquals('error', $json[0]['name']);
 		$this->assertEquals(3100, $json[0]['data']['code']);
-		*/
+		
 		
 		$this->sendClientsId($client1, $client2);
 		
-		/*
+		
 		// SSL without Hashcash should cause an error.
 		$raw = $client1->sendSslInit(false);
 		$raw = $client2->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
-		ve($json);
+		#ve($json);
 		$this->assertEquals('ssl_init_response', $json[0]['name']);
 		$this->assertEquals(4000, $json[0]['data']['code']);
 		
 		$raw = $client1->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
-		ve($json);
+		#ve($json);
 		$this->assertEquals('error', $json[0]['name']);
 		$this->assertEquals(3100, $json[0]['data']['code']);
-		*/
+		
 		
 		
 		
 		// SSL
 		$raw = $client1->sendSslInit();
 		$json = $this->rawMsgToJson($raw);
-		ve($json);
+		#ve($json);
 		$this->assertEquals('ssl_init', $json[0]['name']);
 		#return;
 		
 		$raw = $client2->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
-		ve($json);
+		#ve($json);
 		$this->assertEquals('ssl_init', $json[0]['name']);
 		$this->assertEquals('ssl_init_response', $json[1]['name']);
 		#return;
@@ -893,16 +907,17 @@ qFdLCnlGsFNPrOqpUoKmudkCAwEAAQ==
 		// SSL response
 		$raw = $client1->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
-		ve($json);
+		#ve($json);
 		$this->assertEquals('ssl_init_response', $json[0]['name']);
 		$this->assertEquals('ssl_test', $json[1]['name']);
-		return;
+		#return;
 		
 		$raw = $client2->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
-		ve($json);
+		#ve($json);
 		$this->assertEquals('ssl_test', $json[0]['name']);
 		$this->assertEquals('ssl_verify', $json[1]['name']);
+		#return;
 		
 		$raw = $client1->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
