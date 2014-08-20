@@ -71,7 +71,7 @@ class CronjobCommand extends BasicCommand{
 				$this->log->notice('signal: SIGTERM');
 				break;
 			case SIGINT:
-				print "\n";
+				print PHP_EOL;
 				$this->log->notice('signal: SIGINT');
 				break;
 			case SIGHUP:

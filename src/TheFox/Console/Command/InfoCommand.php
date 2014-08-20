@@ -71,7 +71,7 @@ class InfoCommand extends BasicCommand{
 			print PhpChat::VERSION;
 		}
 		elseif($input->hasOption('connections') && $input->getOption('connections')){
-			print 'Live Connections'."\n\n";
+			print 'Live Connections'.PHP_EOL.PHP_EOL;
 			
 			$this->executePre($input, $output);
 			
@@ -98,10 +98,10 @@ class InfoCommand extends BasicCommand{
 			$tcols = (int)exec('tput cols');
 			$tlines = (int)exec('tput lines');
 			
-			#print 'cols: '.$tcols."\n";
-			#print 'lines: '.$tlines."\n";
+			#print 'cols: '.$tcols.PHP_EOL;
+			#print 'lines: '.$tlines.PHP_EOL;
 			
-			#print 'Clients: N/A'."\n";
+			#print 'Clients: N/A'.PHP_EOL;
 			print ' Clients: '."\r";
 			
 			while(!$this->getExit()){
@@ -230,7 +230,7 @@ class InfoCommand extends BasicCommand{
 					Console::cursorJumpToColumn(11);
 					print $oldClientsLen;
 					Console::lineClearRight();
-					print "\n".' ';
+					print PHP_EOL.' ';
 					
 					$line = 0;
 					$lineClients = 0;
@@ -253,12 +253,12 @@ class InfoCommand extends BasicCommand{
 						if($lineClients >= $tcols - 2){
 							$lineClients = 0;
 							$line++;
-							print "\n".' ';
+							print PHP_EOL.' ';
 						}
 					}
 					
 					Console::screenClearToBottom();
-					print "\n";
+					print PHP_EOL;
 					Console::cursorUp($line + 2);
 					Console::cursorJumpToColumn(1);
 					
@@ -283,18 +283,18 @@ class InfoCommand extends BasicCommand{
 			$localNode->setUri('tcp://'.$settings->data['node']['ip'].':'.$settings->data['node']['port']);
 			$localNode->setSslKeyPub(file_get_contents($settings->data['node']['sslKeyPubPath']));
 			
-			print '--------'."\n";
-			print 'Informations about your node:'."\n";
-			print '   Version: '.PhpChat::NAME.'/'.PhpChat::VERSION.' ('.PhpChat::RELEASE.')'."\n";
-			print '   ID: '.$localNode->getIdHexStr()."\n";
-			print '   Public key fingerprint: '.$localNode->getSslKeyPubFingerprint()."\n";
-			print '   Last public IP: '.$settings->data['node']['ipPub']."\n";
-			print '   Listen IP:Port: '.$settings->data['node']['ip'].':'.$settings->data['node']['port']."\n";
-			print '   Nickname: '.$settings->data['user']['nickname']."\n";
-			print '   SSL version: '.OPENSSL_VERSION_TEXT."\n";
-			print '--------'."\n";
-			print '   Pub Key Base64:'."\n".base64_encode($localNode->getSslKeyPub())."\n";
-			print '--------'."\n";
+			print '--------'.PHP_EOL;
+			print 'Informations about your node:'.PHP_EOL;
+			print '   Version: '.PhpChat::NAME.'/'.PhpChat::VERSION.' ('.PhpChat::RELEASE.')'.PHP_EOL;
+			print '   ID: '.$localNode->getIdHexStr().PHP_EOL;
+			print '   Public key fingerprint: '.$localNode->getSslKeyPubFingerprint().PHP_EOL;
+			print '   Last public IP: '.$settings->data['node']['ipPub'].PHP_EOL;
+			print '   Listen IP:Port: '.$settings->data['node']['ip'].':'.$settings->data['node']['port'].PHP_EOL;
+			print '   Nickname: '.$settings->data['user']['nickname'].PHP_EOL;
+			print '   SSL version: '.OPENSSL_VERSION_TEXT.PHP_EOL;
+			print '--------'.PHP_EOL;
+			print '   Pub Key Base64:'.PHP_EOL.base64_encode($localNode->getSslKeyPub()).PHP_EOL;
+			print '--------'.PHP_EOL;
 		}
 		
 		
@@ -310,7 +310,7 @@ class InfoCommand extends BasicCommand{
 				$this->log->notice('signal: SIGTERM');
 				break;
 			case SIGINT:
-				print "\n";
+				print PHP_EOL;
 				$this->log->notice('signal: SIGINT');
 				break;
 			case SIGHUP:
