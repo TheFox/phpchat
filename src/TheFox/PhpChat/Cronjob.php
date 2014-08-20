@@ -140,24 +140,24 @@ class Cronjob extends Thread{
 		}
 		
 		if($this->hours == 0 && $this->minutes == 1 && $this->seconds == 0){
-			#print 'ping'."\n";  # TODO
+			#print 'ping'."\n";
 			$this->pingClosestNodes();
 			$this->bootstrapNodesEnclose();
 			$this->nodesNewEnclose();
 		}
 		
 		if($this->seconds == 0){
-			#print 'msgs'."\n";  # TODO
+			#print 'msgs'."\n";
 			$this->msgDbInit();
 			$this->nodesNewEnclose();
 		}
 		if($this->minutes % 5 == 0 && $this->seconds == 0){
-			#print 'save'."\n";  # TODO
+			#print 'save'."\n";
 			$this->log->debug('save');
 			$this->getIpcKernelConnection()->execAsync('save');
 		}
 		if($this->minutes % 15 == 0 && $this->seconds == 0){
-			#print 'ping'."\n";  # TODO
+			#print 'ping'."\n";
 			$this->pingClosestNodes();
 			$this->bootstrapNodesEnclose();
 		}
@@ -169,7 +169,7 @@ class Cronjob extends Thread{
 			$this->seconds = 0;
 			$this->minutes++;
 			
-			#print __FUNCTION__.': '.$this->getExit().', '.$this->hours.':'.$this->minutes.':'.$this->seconds."\n";  # TODO
+			#print __FUNCTION__.': '.$this->getExit().', '.$this->hours.':'.$this->minutes.':'.$this->seconds."\n";
 			$this->log->debug($this->getExit().' '.$this->hours.':'.$this->minutes.':'.$this->seconds);
 		}
 		if($this->minutes >= 60){
@@ -210,7 +210,7 @@ class Cronjob extends Thread{
 	public function msgDbInit(){
 		$this->log->debug('msgs');
 		#$this->log->debug(__FUNCTION__);
-		#print __FUNCTION__.''."\n"; # TODO
+		#print __FUNCTION__.''."\n";
 		
 		$this->msgDb = $this->getIpcKernelConnection()->execSync('getMsgDb', array(), 10);
 		$this->settings = $this->getIpcKernelConnection()->execSync('getSettings');
@@ -227,7 +227,7 @@ class Cronjob extends Thread{
 		}
 		catch(Exception $e){
 			$this->log->debug(__FUNCTION__.': '.$e->getMessage());
-			print __FUNCTION__.': '.$e->getMessage()."\n";  # TODO
+			#print __FUNCTION__.': '.$e->getMessage()."\n";
 		}
 	}
 	
@@ -255,13 +255,13 @@ class Cronjob extends Thread{
 				&& $msg->getStatus() == 'O'
 				&& $msg->getEncryptionMode() == 'S'
 			){
-				fwrite(STDOUT, 'msg db, init nodes: find node: '.$msg->getId().' -> '.$msg->getDstNodeId()."\n"); # TODO
+				#fwrite(STDOUT, 'msg db, init nodes: find node: '.$msg->getId().' -> '.$msg->getDstNodeId()."\n");
 				
 				$node = new Node();
 				$node->setIdHexStr($msg->getDstNodeId());
 				$onode = $this->table->nodeFindInBuckets($node);
 				if($onode && $onode->getSslKeyPub()){
-					fwrite(STDOUT, 'msg db, init nodes:     found node: '.$onode->getIdHexStr()."\n"); # TODO
+					#fwrite(STDOUT, 'msg db, init nodes:     found node: '.$onode->getIdHexStr()."\n");
 					
 					$msg->setSrcSslKeyPub($this->localNode->getSslKeyPub());
 					$msg->setDstSslPubKey($this->localNode->getSslKeyPub());
@@ -279,7 +279,7 @@ class Cronjob extends Thread{
 					
 				}
 				else{
-					fwrite(STDOUT, 'msg db, init nodes:     unknown node: '.$node->getIdHexStr()."\n"); # TODO
+					#fwrite(STDOUT, 'msg db, init nodes:     unknown node: '.$node->getIdHexStr()."\n");
 					
 					if($this->getIpcKernelConnection()){
 						$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeAddId', array($node->getIdHexStr()));
@@ -325,7 +325,7 @@ class Cronjob extends Thread{
 				&& $msg->getStatus() == 'O'
 				&& $msg->getSrcNodeId() == $this->localNode->getIdHexStr()
 			){
-				#fwrite(STDOUT, __METHOD__.' unsent own: '.$msg->getId()."\n"); # TODO
+				#fwrite(STDOUT, __METHOD__.' unsent own: '.$msg->getId()."\n");
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
@@ -342,7 +342,7 @@ class Cronjob extends Thread{
 				&& $msg->getStatus() == 'U'
 				&& $msg->getDstNodeId() != $this->localNode->getIdHexStr()
 			){
-				#fwrite(STDOUT, __METHOD__.' unsent foreign: '.$msg->getId()."\n"); # TODO
+				#fwrite(STDOUT, __METHOD__.' unsent foreign: '.$msg->getId()."\n");
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
@@ -358,7 +358,7 @@ class Cronjob extends Thread{
 				&& $msg->getEncryptionMode() == 'D'
 				&& $msg->getStatus() == 'S'
 			){
-				#fwrite(STDOUT, __METHOD__.' other: '.$msg->getId()."\n"); # TODO
+				#fwrite(STDOUT, __METHOD__.' other: '.$msg->getId()."\n");
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
@@ -380,7 +380,7 @@ class Cronjob extends Thread{
 				
 				|| $sentNodesC >= static::MSG_FORWARD_TO_NODES_MAX
 			){
-				#fwrite(STDOUT, __METHOD__.': set X: '.$msg->getId()."\n"); # TODO
+				#fwrite(STDOUT, __METHOD__.': set X: '.$msg->getId()."\n");
 				
 				$msg->setStatus('X');
 				
@@ -392,7 +392,7 @@ class Cronjob extends Thread{
 			}
 			
 			elseif( in_array($msg->getDstNodeId(), $msg->getSentNodes()) ){
-				#fwrite(STDOUT, __METHOD__.': set D: '.$msg->getId()."\n"); # TODO
+				#fwrite(STDOUT, __METHOD__.': set D: '.$msg->getId()."\n");
 				
 				$msg->setStatus('D');
 				
@@ -408,8 +408,8 @@ class Cronjob extends Thread{
 		$nodes = array();
 		$nodeIds = array();
 		foreach($processedMsgs as $msgId => $msg){
-			#fwrite(STDOUT, __METHOD__.' msg: '.$msg->getId().', '.$msg->getStatus().', '.$msg->getEncryptionMode()."\n"); # TODO
-			#fwrite(STDOUT, __METHOD__.'      dst:   '.$msg->getDstNodeId()."\n"); # TODO
+			#fwrite(STDOUT, __METHOD__.' msg: '.$msg->getId().', '.$msg->getStatus().', '.$msg->getEncryptionMode()."\n");
+			#fwrite(STDOUT, __METHOD__.'      dst:   '.$msg->getDstNodeId()."\n");
 			#fwrite(STDOUT, __METHOD__.'      relay: '.$msg->getRelayNodeId()."\n");
 			
 			$dstNode = new Node();
@@ -421,7 +421,7 @@ class Cronjob extends Thread{
 			
 			$onode = $this->table->nodeFindInBuckets($dstNode);
 			if($onode && $onode->getUri()->getHost() && $onode->getUri()->getPort()){
-				#fwrite(STDOUT, __METHOD__.'      dst node found in table'."\n"); # TODO
+				#fwrite(STDOUT, __METHOD__.'      dst node found in table'."\n");
 				
 				$nodes[$onode->getIdHexStr()] = $onode;
 				
@@ -431,7 +431,7 @@ class Cronjob extends Thread{
 				$nodeIds[$onode->getIdHexStr()][$msg->getId()] = $msg;
 			}
 			
-			#fwrite(STDOUT, __METHOD__.'      close nodes'."\n"); # TODO
+			#fwrite(STDOUT, __METHOD__.'      close nodes'."\n");
 			$closestNodes = $this->table->nodeFindClosest($dstNode, static::MSG_FORWARD_TO_NODES_MAX);
 			foreach($closestNodes as $nodeId => $node){
 				if(
@@ -439,7 +439,7 @@ class Cronjob extends Thread{
 					&& !in_array($node->getIdHexStr(), $msg->getSentNodes())
 					&& $node->getUri()->getHost() && $node->getUri()->getPort()
 				){
-					#fwrite(STDOUT, __METHOD__.'             n '.$node->getIdHexStr()."\n"); # TODO
+					#fwrite(STDOUT, __METHOD__.'             n '.$node->getIdHexStr()."\n");
 					
 					$nodes[$node->getIdHexStr()] = $node;
 					
@@ -454,24 +454,25 @@ class Cronjob extends Thread{
 		$updateMsgs = array();
 		foreach($nodeIds as $nodeId => $msgs){
 			$node = $nodes[$nodeId];
-			#fwrite(STDOUT, __METHOD__.' node: '.$node->getIdHexStr().', '.$node->getIpPort()."\n"); # TODO
+			#fwrite(STDOUT, __METHOD__.' node: '.$node->getIdHexStr().', '.$node->getIpPort()."\n");
 			
 			$msgs = array_unique($msgs);
 			$msgIds = array();
 			
 			foreach($msgs as $msgId => $msg){
-				$direct = (int)($msg->getDstNodeId() == $node->getIdHexStr()
+				/*$direct = (int)($msg->getDstNodeId() == $node->getIdHexStr()
 					&& $node->getUri()->getHost() && $node->getUri()->getPort());
-				$tmp = $msg->getId().', '.$msg->getStatus().', '.$msg->getEncryptionMode(); # TODO
-				$tmp .= ', direct='.$direct; # TODO
-				#fwrite(STDOUT, __METHOD__.'      msg: '.$tmp."\n"); # TODO
+				$tmp = $msg->getId().', '.$msg->getStatus().', '.$msg->getEncryptionMode();
+				$tmp .= ', direct='.$direct;
+				fwrite(STDOUT, __METHOD__.'      msg: '.$tmp."\n");
+				*/
 				
 				$updateMsgs[$msg->getId()] = $msg;
 				$msgIds[] = $msg->getId();
 			}
 			
 			if($msgs && $this->getIpcKernelConnection()){
-				#fwrite(STDOUT, __METHOD__.'      msgs: '.count($msgs)."\n"); # TODO
+				#fwrite(STDOUT, __METHOD__.'      msgs: '.count($msgs)."\n");
 				
 				$serverConnectArgs = array($node->getUri(), false, false, $msgIds);
 				$this->getIpcKernelConnection()->execSync('serverConnect', $serverConnectArgs);
@@ -479,7 +480,7 @@ class Cronjob extends Thread{
 		}
 		
 		foreach($updateMsgs as $msgId => $msg){
-			#fwrite(STDOUT, __METHOD__.' update msg: '.$msg->getId()."\n"); # TODO
+			#fwrite(STDOUT, __METHOD__.' update msg: '.$msg->getId()."\n");
 			if($this->getIpcKernelConnection()){
 				$this->getIpcKernelConnection()->execAsync('msgDbMsgIncForwardCyclesById', array($msg->getId()));
 			}
@@ -494,6 +495,7 @@ class Cronjob extends Thread{
 		$urls = array(
 			'http://phpchat.fox21.at/nodes.json',
 		);
+		$userAgent = PhpChat::NAME.'/'.PhpChat::VERSION.' PHP/'.PHP_VERSION.' curl/'.curl_version()['version'];
 		
 		foreach($urls as $url){
 			$client = new \GuzzleHttp\Client();
@@ -504,7 +506,7 @@ class Cronjob extends Thread{
 				$this->log->debug('get url "'.$url.'"');
 				$response = $client->get($url, array(
 					'headers' => array(
-						'User-Agent' => PhpChat::NAME.'/'.PhpChat::VERSION.' PHP/'.PHP_VERSION.' curl/'.curl_version()['version'],
+						'User-Agent' => $userAgent,
 						'Accept' => 'application/json',
 					),
 					'connect_timeout' => 3,
@@ -623,12 +625,12 @@ class Cronjob extends Thread{
 	}
 	
 	public function shutdown(){
-		#print __FUNCTION__.''."\n";  # TODO
+		#print __FUNCTION__.''."\n";
 		$this->log->info('shutdown');
 	}
 	
 	public function ipcKernelShutdown(){
-		#print __FUNCTION__.''."\n";  # TODO
+		#print __FUNCTION__.''."\n";
 		$this->setExit(1);
 	}
 	

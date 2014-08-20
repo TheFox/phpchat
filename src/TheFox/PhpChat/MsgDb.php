@@ -179,7 +179,7 @@ class MsgDb extends YamlStorage{
 			}
 			
 			if($msgOld->getDataChanged() != $msgNew->getDataChanged()){
-				#print __CLASS__.'->'.__FUNCTION__.': changed: dataChanged'."\n"; # TODO
+				#print __CLASS__.'->'.__FUNCTION__.': changed: dataChanged'."\n";
 				$msgOld->setDataChanged($msgNew->getDataChanged());
 			}
 			

@@ -183,7 +183,11 @@ class Console extends Thread{
 			
 			$this->msgStackPrintPs1 = true;
 			foreach($this->msgStack as $msgId => $msg){
-				$this->log->debug('msg d='.(int)$msg['showDate'].' ps1='.(int)$msg['printPs1'].' cl='.(int)$msg['clearLine'].' "'.$msg['text'].'"');
+				$logMsg = 'msg d='.(int)$msg['showDate'].' ';
+				$logMsg .= 'ps1='.(int)$msg['printPs1'].' ';
+				$logMsg .= 'cl='.(int)$msg['clearLine'].' ';
+				$logMsg .= '"'.$msg['text'].'"';
+				$this->log->debug($logMsg);
 				if($msg['clearLine']){
 					$this->lineClear();
 				}
@@ -414,7 +418,8 @@ class Console extends Thread{
 							
 						}
 						elseif($this->bufferCursorPos){
-							$this->buffer = substr($this->buffer, 0, $this->bufferCursorPos - 1).substr($this->buffer, $this->bufferCursorPos);
+							$this->buffer = substr($this->buffer, 0, $this->bufferCursorPos - 1);
+							$this->buffer .= substr($this->buffer, $this->bufferCursorPos);
 							
 							#sleep(1);
 							$this->cursorLeft();
@@ -506,7 +511,6 @@ class Console extends Thread{
 						
 						$this->log->debug('got arrow l: '.$this->bufferCursorPos);
 					}
-					
 					elseif($char == "\x1b" && $buffer[$bufferIndex + 1] == "\x5b"
 							&& $buffer[$bufferIndex + 2] == "\x33"
 							&& $buffer[$bufferIndex + 3] == "\x7e"
@@ -515,7 +519,8 @@ class Console extends Thread{
 						$this->log->debug('got delete');
 						
 						if($this->bufferCursorPos < strlen($this->buffer)){
-							$this->buffer = substr($this->buffer, 0, $this->bufferCursorPos).substr($this->buffer, $this->bufferCursorPos + 1);
+							$this->buffer = substr($this->buffer, 0, $this->bufferCursorPos);
+							$this->buffer .= substr($this->buffer, $this->bufferCursorPos + 1);
 							
 							#sleep(1);
 							$this->lineClearRight();
@@ -529,7 +534,6 @@ class Console extends Thread{
 						
 						$this->log->debug('buffer '.$this->bufferCursorPos.', '.strlen($this->buffer).' "'.$this->buffer.'"');
 					}
-					
 					else{
 						#$this->log->debug('user input raw: '.sprintf('%02x ', ord($char)).'');
 						
@@ -544,7 +548,8 @@ class Console extends Thread{
 						else{
 							$end = 'NOT end';
 							
-							$this->buffer = substr($this->buffer, 0, $this->bufferCursorPos).$char.substr($this->buffer, $this->bufferCursorPos);
+							$this->buffer = substr($this->buffer, 0, $this->bufferCursorPos);
+							$this->buffer .= $char.substr($this->buffer, $this->bufferCursorPos);
 							
 							#sleep(1);
 							$this->lineClearRight();
@@ -710,7 +715,8 @@ class Console extends Thread{
 			
 			$this->msgAdd(' ID UUID                                  USERNAME', false, false);
 			foreach($this->ipcKernelConnection->execSync('getAddressbook')->getContacts() as $contactId => $contact){
-				$this->msgAdd(sprintf($format, $contact->getId(), $contact->getNodeId(), $contact->getUserNickname()), false, false);
+				$this->msgAdd(sprintf($format,
+					$contact->getId(), $contact->getNodeId(), $contact->getUserNickname()), false, false);
 			}
 			$this->msgAdd('END OF LIST', false, true);
 		}
@@ -750,7 +756,8 @@ class Console extends Thread{
 					$this->msgAdd('Delete old nodes or use UUID instead.', false, false);
 					$this->msgAdd(' ID UUID                                  USERNAME', false, false);
 					foreach($contacts as $contactId => $contact){
-						$this->msgAdd(sprintf($format, $contact->getId(), $contact->getNodeId(), $contact->getUserNickname()), false, false);
+						$this->msgAdd(sprintf($format,
+							$contact->getId(), $contact->getNodeId(), $contact->getUserNickname()), false, false);
 					}
 					$this->msgAdd('END OF LIST', false, true);
 				}
@@ -964,7 +971,8 @@ class Console extends Thread{
 								
 								$msg->setSubject($subject);
 								$msg->setText($text);
-								$msg->setSslKeyPrvPath($this->settings->data['node']['sslKeyPrvPath'], $this->settings->data['node']['sslKeyPrvPass']);
+								$msg->setSslKeyPrvPath($this->settings->data['node']['sslKeyPrvPath'],
+									$this->settings->data['node']['sslKeyPrvPass']);
 								$msg->setStatus('O');
 								
 								$encrypted = false;
@@ -1188,12 +1196,14 @@ class Console extends Thread{
 		
 		#if(!$this->ipcKernelShutdown){ $this->ipcKernelConnection->execSync('shutdown'); }
 		
-		if($this->settings->data['console']['history']['enabled'] && $this->settings->data['console']['history']['saveToFile']){
+		if($this->settings->data['console']['history']['enabled']
+			&& $this->settings->data['console']['history']['saveToFile']){
 			$historyStoragePath = $this->settings->data['datadir'].'/history.yml';
 			$historyStorage = new YamlStorage($historyStoragePath);
 			
 			if($this->settings->data['console']['history']['entriesMax']){
-				$historyStorage->data = array_slice($this->history, 0, $this->settings->data['console']['history']['entriesMax']);
+				$historyStorage->data = array_slice($this->history, 0,
+					$this->settings->data['console']['history']['entriesMax']);
 			}
 			else{
 				$historyStorage->data = $this->history;

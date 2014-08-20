@@ -148,7 +148,8 @@ class Kernel extends Thread{
 			'serverConnect', 'serverTalkResponseSend', 'serverTalkMsgSend', 'serverTalkUserNicknameChangeSend',
 				'serverTalkCloseSend',
 			'getAddressbook', 'addressbookContactAdd', 'addressbookContactRemove',
-			'getMsgDb', 'msgDbMsgAdd', 'msgDbMsgUpdate', 'msgDbMsgGetMsgsForDst', 'getSettings', 'getLocalNode', 'getTable', 'save', 
+			'getMsgDb', 'msgDbMsgAdd', 'msgDbMsgUpdate', 'msgDbMsgGetMsgsForDst',
+			'getSettings', 'getLocalNode', 'getTable', 'save', 
 		) as $functionName){
 			$this->ipcConsoleConnection->functionAdd($functionName, $this, $functionName);
 		}
@@ -162,7 +163,8 @@ class Kernel extends Thread{
 			'getSettings', 'getLocalNode',
 			'getTable', 'tableNodeEnclose',
 			'getMsgDb', 'msgDbMsgUpdate', 'msgDbMsgIncForwardCyclesById', 'msgDbMsgSetStatusById',
-			'getNodesNewDb', 'nodesNewDbNodeAddUri', 'nodesNewDbNodeAddId', 'nodesNewDbNodeIncConnectAttempt', 'nodesNewDbNodeIncFindAttempt', 'nodesNewDbNodeRemove',
+			'getNodesNewDb', 'nodesNewDbNodeAddUri', 'nodesNewDbNodeAddId', 'nodesNewDbNodeIncConnectAttempt',
+				'nodesNewDbNodeIncFindAttempt', 'nodesNewDbNodeRemove',
 			'serverConnect', 'serverNodeFind',
 			'save', 
 		) as $functionName){

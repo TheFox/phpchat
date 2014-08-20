@@ -97,7 +97,7 @@ class Msg extends YamlStorage{
 				#print __CLASS__.'->'.__FUNCTION__.': new id: '.$this->data['id']."\n";
 			}
 			catch(UnsatisfiedDependencyException $e){
-				# TODO
+				throw $e;
 			}
 		}
 		return $this->data['id'];
@@ -567,7 +567,8 @@ class Msg extends YamlStorage{
 		return $rv;
 	}
 	
-	public static function createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey, $text, $timeCreated, $password){
+	public static function createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey,
+		$text, $timeCreated, $password){
 		$checksumData = json_encode(array(
 			'version' => $version,
 			'id' => $id,

@@ -451,7 +451,11 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$dstSslPubKey = static::DST1_SSL_KEY_PUB;
 		$text = 'hello world! this is a test';
 		$timeCreated = '1407137420';
-		$password = 'tt9M/WdvXyChAWthKDFaP/tUAG6bZsdalTOxrFNsYX+4NgTNQ7iNCUng0jDPNzoMOYVuDdV/ZVnja5pamipawuw71wyIa6vDGoJKJ1yOUbVkH9YO34gZTRVz6MfZu2BQ680YIJou5J3aPMTcet5jYU2b2ffJSPkYqaEmV2DzLQr/M0bGn3rHml4OovKgX9m1vN7XlTQL+EwW5MCLqPYsethgoKahKh2O17oZ6VDGVa/b2P4KzM3d41NzUXz/s31Bce+blR2o6oM+nKIbXNoxs9dZbbCSqDzLk8AZ1+dGI2ZX7hovL+XSv0Ta7S0lgEf44zwDttGvdWpIaFvW+uL70w==';
+		$password = 'tt9M/WdvXyChAWthKDFaP/tUAG6bZsdalTOxrFNsYX+4NgTNQ7iNCUng0jDPNzoMOYVu';
+		$password .= 'DdV/ZVnja5pamipawuw71wyIa6vDGoJKJ1yOUbVkH9YO34gZTRVz6MfZu2BQ680YIJo';
+		$password .= 'u5J3aPMTcet5jYU2b2ffJSPkYqaEmV2DzLQr/M0bGn3rHml4OovKgX9m1vN7XlTQL+E';
+		$password .= 'wW5MCLqPYsethgoKahKh2O17oZ6VDGVa/b2P4KzM3d41NzUXz/s31Bce+blR2o6oM+n';
+		$password .= 'KIbXNoxs9dZbbCSqDzLk8AZ1+dGI2ZX7hovL+XSv0Ta7S0lgEf44zwDttGvdWpIaFvW+uL70w==';
 		$checksum = Msg::createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey, $text, $timeCreated, $password);
 		
 		$this->assertEquals('7c4459a9bc0ec4b19ebae6d9ded536aa6ee55ba13552dc81', $checksum);

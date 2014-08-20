@@ -229,7 +229,7 @@ class Server{
 	
 	private function clientNewTcp($socket){
 		$this->clientsId++;
-		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.$this->clientsId."\n"); # TODO
+		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.$this->clientsId."\n");
 		$this->log->debug('new tcp client: '.$this->clientsId);
 		
 		$client = new TcpClient();
@@ -369,14 +369,16 @@ class Server{
 						return true;
 					}
 				}
-				elseif($uri->getScheme() == 'http'){
-					/*$client = $this->clientNewHttp($uri);
-					$client->actionsAdd($clientActions);
-					return true;*/
-				}
 				else{
 					$this->log->warning('connection to '.$uri.' failed: invalid uri scheme ('.$uri->getScheme().')');
 				}
+				
+				/*elseif($uri->getScheme() == 'http'){
+					$client = $this->clientNewHttp($uri);
+					$client->actionsAdd($clientActions);
+					return true;
+				}*/
+				
 			}
 			else{
 				$this->log->warning('connection to '.$uri.' failed: uri is no object');

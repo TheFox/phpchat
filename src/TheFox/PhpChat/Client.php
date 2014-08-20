@@ -249,7 +249,11 @@ class Client{
 			if($hashcash->verify($hashcashStr)){
 				#$this->log('debug', 'bits: '.$hashcash->getBits());
 				$added = false;
-				if($hashcash->getVersion() >= 1 && $hashcash->getBits() >= $bits && $hashcash->getResource() == $resource && $added = $this->getHashcashDb()->addHashcash($hashcash)){
+				if(
+					$hashcash->getVersion() >= 1
+					&& $hashcash->getBits() >= $bits
+					&& $hashcash->getResource() == $resource
+					&& $added = $this->getHashcashDb()->addHashcash($hashcash)){
 					$this->log('debug', 'hashcash: OK');
 					return true;
 				}
@@ -471,7 +475,6 @@ class Client{
 					}
 					
 					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$id.', '.$port);
-					#$this->log('debug', $this->getUri().' recv '.$msgName.' sign: /'.$msgData['sslKeyPubSign'].'/'); # TODO
 					
 					$idOk = false;
 					$node = new Node();
@@ -878,7 +881,7 @@ class Client{
 					
 					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$id);
 					
-					#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.' body: '.$body."\n"); # TODO
+					#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.' body: '.$body."\n");
 					#$this->log('debug', 'msg '.$id.' body: '.$body);
 					
 					$status = 1; // New
@@ -890,7 +893,7 @@ class Client{
 					$srcNode->setIdHexStr($srcNodeId);
 					$srcNode = $this->getTable()->nodeEnclose($srcNode);
 					
-					#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': srcNode: '.$srcNode->getIdHexStr()."\n"); # TODO
+					#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': srcNode: '.$srcNode->getIdHexStr()."\n");
 					$this->log('debug', 'msg '.$id.' srcNode: '.$srcNode->getIdHexStr());
 					
 					if($srcNode->getSslKeyPub()){
@@ -935,33 +938,33 @@ class Client{
 								
 								try{
 									if($msg->decrypt()){
-										fwrite(STDOUT, 'msg '.$id.': decrypt ok'."\n"); # TODO
+										#fwrite(STDOUT, 'msg '.$id.': decrypt ok'."\n");
 										$this->log('debug', 'msg '.$id.' decrypt ok');
 										
 										if(!$msg->getIgnore()){
-											fwrite(STDOUT, 'msg '.$id.': not ignore'."\n"); # TODO
+											#fwrite(STDOUT, 'msg '.$id.': not ignore'."\n");
 											$this->log('debug', 'msg '.$id.' not ignore');
 											$this->log('debug', 'msg '.$id.' subject: '.$msg->getSubject());
 											$this->getServer()->imapMailAdd($msg);
 											$this->getServer()->consoleMsgAdd('You got mail.', true, true, true);
 										}
 										else{
-											fwrite(STDOUT, 'msg '.$id.': ignore'."\n"); # TODO
+											#fwrite(STDOUT, 'msg '.$id.': ignore'."\n");
 											$this->log('debug', 'msg '.$id.' ignore');
 										}
 									}
 									else{
-										fwrite(STDOUT, 'msg '.$id.': decrypt failed B'."\n"); # TODO
+										#fwrite(STDOUT, 'msg '.$id.': decrypt failed B'."\n");
 										$this->log('debug', 'msg '.$id.' decrypt failed B');
 									}
 								}
 								catch(Exception $e){
-									fwrite(STDOUT, 'msg '.$id.': decrypt failed A: '.$e->getMessage()."\n"); # TODO
+									#fwrite(STDOUT, 'msg '.$id.': decrypt failed A: '.$e->getMessage()."\n");
 									$this->log('debug', 'msg '.$id.' decrypt failed A: '.$e->getMessage());
 								}
 							}
 							else{
-								fwrite(STDOUT, 'msg '.$id.': msg not for me'."\n"); # TODO
+								#fwrite(STDOUT, 'msg '.$id.': msg not for me'."\n");
 								$this->log('debug', 'msg '.$id.' not for me');
 							}
 							
@@ -1230,7 +1233,10 @@ class Client{
 			}
 			else{
 				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
-				$this->log('warning', $msgName.' re-SSL: you need to initialize ssl, hasSsl=/'.(int)$this->getStatus('hasSsl').'/ hasReSslPasswortPut=/'.(int)$this->getStatus('hasReSslPasswortPut').'/');
+				$logMsg = $msgName.' re-SSL: you need to initialize ssl, ';
+				$logMsg .= 'hasSsl=/'.(int)$this->getStatus('hasSsl').'/ ';
+				$logMsg .= 'hasReSslPasswortPut=/'.(int)$this->getStatus('hasReSslPasswortPut').'/';
+				$this->log('warning', $logMsg);
 			}
 		}
 		elseif($msgName == 'ssl_password_test'){
@@ -1286,7 +1292,10 @@ class Client{
 			}
 			else{
 				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
-				$this->log('warning', $msgName.' re-SSL: you need to initialize ssl, hasSsl=/'.(int)$this->getStatus('hasSsl').'/ hasReSslPasswortTest=/'.(int)$this->getStatus('hasReSslPasswortTest').'/');
+				$logMsg = $msgName.' re-SSL: you need to initialize ssl, ';
+				$logMsg .= 'hasSsl=/'.(int)$this->getStatus('hasSsl').'/ ';
+				$logMsg .= 'hasReSslPasswortTest=/'.(int)$this->getStatus('hasReSslPasswortTest').'/';
+				$this->log('warning', $logMsg);
 			}
 		}
 		elseif($msgName == 'ssl_password_verify'){
@@ -1380,7 +1389,10 @@ class Client{
 			}
 			else{
 				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
-				$this->log('warning', $msgName.' re-SSL: you need to initialize ssl, hasSsl=/'.(int)$this->getStatus('hasSsl').'/ hasReSslPasswortTest=/'.(int)$this->getStatus('hasReSslPasswortTest').'/');
+				$logMsg = $msgName.' re-SSL: you need to initialize ssl, ';
+				$logMsg .= 'hasSsl=/'.(int)$this->getStatus('hasSsl').'/ ';
+				$logMsg .= 'hasReSslPasswortTest=/'.(int)$this->getStatus('hasReSslPasswortTest').'/';
+				$this->log('warning', $logMsg);
 			}
 			
 			$this->sslPasswordToken = '';
@@ -1928,7 +1940,8 @@ class Client{
 		$data = array(
 			'token' => $this->sslPasswordToken,
 		);
-		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('ssl_password_retest', $data, $this->sslPasswordLocalNew, $this->sslPasswordPeerNew));
+		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('ssl_password_retest',
+			$data, $this->sslPasswordLocalNew, $this->sslPasswordPeerNew));
 	}
 	
 	private function sendSslPasswordVerify($token){
@@ -1956,7 +1969,8 @@ class Client{
 		$data = array(
 			'token' => $token,
 		);
-		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('ssl_password_reverify', $data, $this->sslPasswordLocalNew, $this->sslPasswordPeerNew));
+		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('ssl_password_reverify',
+			$data, $this->sslPasswordLocalNew, $this->sslPasswordPeerNew));
 	}
 	
 	public function sendTalkRequest($userNickname){

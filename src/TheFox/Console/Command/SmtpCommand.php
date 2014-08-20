@@ -180,6 +180,7 @@ class SmtpCommand extends BasicCommand{
 	
 	public function mailNew($event, $from, $rcpt, $mail){
 		#fwrite(STDOUT, 'mail new: /'.$from.'/ a/'.join('/ /', $rcpt).'/'."\n");
+		#$this->log->debug('mailNew: '.$event->getTrigger().' /'.$from.'/');
 		
 		$table = $this->ipcKernelConnection->execSync('getTable');
 		$text = $mail->getBody();
@@ -206,7 +207,8 @@ class SmtpCommand extends BasicCommand{
 			
 			$msg->setSubject($mail->getSubject());
 			$msg->setText($text);
-			$msg->setSslKeyPrvPath($this->settings->data['node']['sslKeyPrvPath'], $this->settings->data['node']['sslKeyPrvPass']);
+			$msg->setSslKeyPrvPath($this->settings->data['node']['sslKeyPrvPath'],
+				$this->settings->data['node']['sslKeyPrvPass']);
 			$msg->setStatus('O');
 			
 			$encrypted = false;
