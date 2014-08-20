@@ -81,13 +81,6 @@ class InfoCommand extends BasicCommand{
 			
 			$this->initIpcKernelConnection();
 			
-			/*
-			print 'get settings'."\n";
-			$this->log->info('get settings');
-			$settings = $this->ipcKernelConnection->execSync('getSettings');
-			print 'get settings: done'."\n";
-			$this->log->info('get settings: done');
-			*/
 			
 			$color = new Color();
 			
