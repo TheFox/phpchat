@@ -856,6 +856,9 @@ class Console extends Thread{
 	}
 	
 	private function handleCommandClose(){
+		$this->log->debug('command: close');
+		
+		$this->msgAdd('', false, true);
 		$this->talkCloseSend();
 		
 		$this->setModeChannel(false);
@@ -1298,12 +1301,14 @@ class Console extends Thread{
 	}
 	
 	private function talkCloseSend(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
-		$rid = (string)Uuid::uuid4();
-		
-		$args = array($this->getModeChannelClient(), $rid, $this->userNickname);
-		$this->ipcKernelConnection->execAsync('serverTalkCloseSend', $args);
+		if($this->getModeChannelClient()){
+			$rid = (string)Uuid::uuid4();
+			$args = array($this->getModeChannelClient(), $rid, $this->userNickname);
+			$this->ipcKernelConnection->execAsync('serverTalkCloseSend', $args);
+		}
+		/*else{
+			$this->msgAdd('Nothing done.', true, true);
+		}*/
 	}
 	
 	private function sendRandomMsg(){
