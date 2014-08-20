@@ -36,8 +36,8 @@ test_phpunit: $(PHPUNIT) phpunit.xml
 	$(RM) tests/*.yml
 	$(RM) tests/*.log
 	$(RM) tests/*.prv tests/*.pub
-	$(RM) tests/client{1,2}
-	$(RM) tests/client{1,2}_tcp
+	$(RM) tests/client[1-6]
+	$(RM) tests/client[1-6]_tcp
 
 release:
 	./release.sh
@@ -49,5 +49,5 @@ clean:
 	$(RM) tests/*.yml
 	$(RM) tests/*.log
 	$(RM) tests/*.prv tests/*.pub
-	$(RM) tests/client{1,2}
-	$(RM) tests/client{1,2}_tcp
+	$(RM) tests/client[1-6]
+	$(RM) tests/client[1-6]_tcp
