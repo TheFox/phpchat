@@ -852,6 +852,18 @@ qFdLCnlGsFNPrOqpUoKmudkCAwEAAQ==
 		$client2->getServer()->getKernel()->shutdown();
 	}
 	
+	private function sendClientsSsl($client1, $client2){
+		$raw = $client1->sendSslInit();
+		$raw = $client2->dataRecv($raw);
+		$raw = $client1->dataRecv($raw);
+		$raw = $client2->dataRecv($raw);
+		$raw = $client1->dataRecv($raw);
+		$raw = $client2->dataRecv($raw);
+		$raw = $client1->dataRecv($raw);
+		$raw = $client2->dataRecv($raw);
+		$raw = $client1->dataRecv($raw);
+	}
+	
 	public function testSendSsl(){
 		list($client1, $client2) = $this->sendGenTestData();
 		
@@ -954,7 +966,7 @@ qFdLCnlGsFNPrOqpUoKmudkCAwEAAQ==
 	public function testSendTalk(){
 		list($client1, $client2) = $this->sendGenTestData();
 		
-		/*
+		
 		// Talk Request before ID should cause an error.
 		$raw = $client1->sendTalkRequest('user1');
 		#ve($raw);
@@ -999,11 +1011,10 @@ qFdLCnlGsFNPrOqpUoKmudkCAwEAAQ==
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
 		$this->assertEquals(null, $json[0]);
-		*/
 		
-		# TODO
-		#$this->sendClientsId($client1, $client2);
-		#$this->sendClientsSsl($client1, $client2);
+		
+		$this->sendClientsId($client1, $client2);
+		$this->sendClientsSsl($client1, $client2);
 		
 		// Talk Request
 		$raw = $client1->sendTalkRequest('user1');
