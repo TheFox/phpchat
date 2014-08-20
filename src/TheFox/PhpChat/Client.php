@@ -468,7 +468,7 @@ class Client{
 					}
 					
 					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$id.', '.$port);
-					$this->log('debug', $this->getUri().' recv '.$msgName.' sign: /'.$msgData['sslKeyPubSign'].'/'); # TODO
+					#$this->log('debug', $this->getUri().' recv '.$msgName.' sign: /'.$msgData['sslKeyPubSign'].'/'); # TODO
 					
 					$idOk = false;
 					$node = new Node();
@@ -1771,7 +1771,7 @@ class Client{
 			}
 		}
 		
-		$this->log('debug', 'msgCreateId sign: /'.$sslKeyPubSign.'/');
+		#$this->log('debug', 'msgCreateId sign: /'.$sslKeyPubSign.'/');
 		
 		if($sslKeyPubSign){
 			$data = array(
