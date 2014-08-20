@@ -5,6 +5,7 @@ test
 tests/*.yml
 tests/client*_tcp
 log
+*.log
 pid
 data
 id_rsa*
