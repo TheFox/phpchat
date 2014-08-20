@@ -179,11 +179,11 @@ class Console extends Thread{
 	
 	private function printMsgStack(){
 		if($this->msgStack){
-			$this->log->debug('printMsgStack begin '.(int)$this->msgStackPrintPs1);
+			#$this->log->debug('printMsgStack begin '.(int)$this->msgStackPrintPs1);
 			
 			$this->msgStackPrintPs1 = true;
 			foreach($this->msgStack as $msgId => $msg){
-				$this->log->debug('msg '.(int)$msg['printPs1'].' '.(int)$msg['clearLine'].' "'.$msg['text'].'"');
+				$this->log->debug('msg d='.(int)$msg['showDate'].' ps1='.(int)$msg['printPs1'].' cl='.(int)$msg['clearLine'].' "'.$msg['text'].'"');
 				if($msg['clearLine']){
 					$this->lineClear();
 				}
@@ -196,7 +196,7 @@ class Console extends Thread{
 				$this->printPs1(true, 'printMsgStack');
 			}
 			
-			$this->log->debug('printMsgStack end '.(int)$this->msgStackPrintPs1);
+			#$this->log->debug('printMsgStack end '.(int)$this->msgStackPrintPs1);
 		}
 	}
 	

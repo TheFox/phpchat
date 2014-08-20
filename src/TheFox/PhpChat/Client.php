@@ -1464,7 +1464,7 @@ class Client{
 						if($status == 1){
 							// Accepted
 							$this->setStatus('hasTalk', true);
-							$this->consoleMsgAdd('Talk request accepted.', true, false);
+							$this->consoleMsgAdd('Talk request accepted.', true, false, true);
 							$this->consoleMsgAdd('Now talking to "'.$userNickname.'".', true, true);
 							
 							$this->consoleSetModeChannel(true);
@@ -1481,15 +1481,15 @@ class Client{
 						}
 						elseif($status == 2){
 							// Declined
-							$this->consoleMsgAdd('Talk request declined.', true, true);
+							$this->consoleMsgAdd('Talk request declined.', true, true, true);
 						}
 						elseif($status == 3){
 							// Timeout
-							$this->consoleMsgAdd('Talk request timed out.', true, true);
+							$this->consoleMsgAdd('Talk request timed out.', true, true, true);
 						}
 						elseif($status == 4){
 							// No console, standalone server.
-							$this->consoleMsgAdd($this->getUri().' has no user interface. Can\'t talk to you.', true, true);
+							$this->consoleMsgAdd($this->getUri().' has no user interface. Can\'t talk to you.', true, true, true);
 							$msgHandleReturnValue .= $this->sendQuit();
 							$this->shutdown();
 						}

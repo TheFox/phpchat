@@ -318,8 +318,8 @@ class Server{
 			$this->consoleSetModeChannel(false);
 			$this->consoleSetModeChannelClient(null);
 			
-			$this->consoleMsgAdd();
-			$this->consoleMsgAdd('Connection to '.$client->getUri().' closed.', true, true);
+			#$this->consoleMsgAdd();
+			$this->consoleMsgAdd('Connection to '.$client->getUri().' closed.', true, true, true);
 		}
 		
 		$client->shutdown();
