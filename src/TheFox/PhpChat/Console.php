@@ -1306,9 +1306,9 @@ class Console extends Thread{
 			$args = array($this->getModeChannelClient(), $rid, $this->userNickname);
 			$this->ipcKernelConnection->execAsync('serverTalkCloseSend', $args);
 		}
-		/*else{
+		else{
 			$this->msgAdd('Nothing done.', true, true);
-		}*/
+		}
 	}
 	
 	private function sendRandomMsg(){
