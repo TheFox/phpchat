@@ -159,6 +159,290 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 -----END PUBLIC KEY-----
 ';
 	
+	const NODE_LOCAL_SSL_KEY_PRV3 = '-----BEGIN RSA PRIVATE KEY-----
+Proc-Type: 4,ENCRYPTED
+DEK-Info: DES-EDE3-CBC,218E8574D5B151B3
+
+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
+-----END RSA PRIVATE KEY-----
+';
+	const NODE_LOCAL_SSL_KEY_PUB3 = '-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEArNdfCOGsNSwO5+1gCYtQ
+K8QpVVPSCwodhz5Wl8JY/ojuJmLPDjcR1b5WxTrXZ30UouMIxJeiYN3/NgqAYO+K
+nYqhBH9bZrHWRgwtlcJBHjX0+xwP6vqkQLVzKVoTX0JXGj1rI3pBdO/QpAbgQFw0
+adjPSJf3pA9F/c4UQon2UMk2IhH49hrbWBcXJEJ+PrVpW1M8iOVM+5+6LzMCy6Bf
+0q2BcmbyvB8sqYP4sj6XjRnY0yUsBFB4DZrIIaVE6fUkcTvA/2UChJxNpbenha8r
+OYyhoYD+fsGRErgkSP1fc1InrX9ns3Q09/ats3oyehGdmOuY9SypZoq2t7ZsQqWC
+tBjyyWckwlhEQW1GiEsfsRAHWFQaepVsq7HPuz4dLQY7QvwyFkby6zVmvR2x/TGw
+VUAjk42rseVckoWCEOsPHiIRLP/BsG3RutKMvkGbdM8Vhse+IFtXTBC0gOEr8RGG
+B4O4LKWRKC5ciynFJjUWvULspbSxxXIHxk6Y/DTONCvwZUkB69UphhhA852CFfVy
+cNciHJLzM7Wns1iFPRQHAl1JTIeUcbsGfm/IrqRm87vUMyLbV00PeZEeKF2JI/Nb
+by2YU2Mm9gTatj5TJEj8Dj5QtY9p7NgbQG70BHfTxl39GF4nqC+bDMn8CF9sW/5O
+rP8NyKCpywlwexQ48Jtz3F8CAwEAAQ==
+-----END PUBLIC KEY-----
+';
+	
+	const NODE_LOCAL_SSL_KEY_PRV4 = '-----BEGIN RSA PRIVATE KEY-----
+Proc-Type: 4,ENCRYPTED
+DEK-Info: DES-EDE3-CBC,3EC14CEE16D77897
+
+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
+-----END RSA PRIVATE KEY-----
+';
+	const NODE_LOCAL_SSL_KEY_PUB4 = '-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAo27jeopOvaC9mOhAm+ab
+oKOhtG/8DVCDe4yRShiz+jx/VwAC15Nh1zHZWI2B4Hc6i4GGtRTGqiXfhG9H0/ks
+PMAf2Doi3RtvqEcJv98Lir7/fViWXl4VttATTwqo6ZgUS44+5IRomKP3juXy93cl
+VsqPp0OTa0Z57vnn3NDncrtbRdmzCWtPM9cyx6ChH63FkPcJDlnD8Vkm4JxAExSJ
+vBUeZl+X2rFJDEZVJEm+otKWDUXGHjqYmS1ZQfZQGnpmVrLLOeHQvhnxeKyxtV8P
+58tT5U1D+kekk/slxRF+tHaWN1xxsC9QG0WDj98ZtqX0jniyg3mHT+++OKIDiG8J
+fChCehI6iEdgQ5eejZjCDN98M/uuwv7EHlpvL5l7fWOYUeM9l/tN1m8oF/StuqXs
+FDF0zKiJrNfaok48lXyiYcedYqhXGWTvrflZFLh7c2VG9H+6l7zm5zUxxS99ZZIW
+zYKc/NRKL37hBpb1PqGuzfVjiJZuJSY7zW+IXu7gVBYYg05l8kFyDRd5Z6JXkhO7
+SSduOxjNYuAZFbf+rJZi4nvdpaeaJs0GUlgWde6JBrkP5CYD9km9tlZJknlQr3Mv
+3+x0fhWGdVJK8kVIRvjFSyWbafONUQmABFYxSVhw/UlSLwRWnQhl1ZVsOdldxYkq
+zskDiXdx3y7W/4Htp9j6SD0CAwEAAQ==
+-----END PUBLIC KEY-----
+';
+	
+	const NODE_LOCAL_SSL_KEY_PRV5 = '-----BEGIN RSA PRIVATE KEY-----
+Proc-Type: 4,ENCRYPTED
+DEK-Info: DES-EDE3-CBC,648012F6C8A84BC1
+
+e+1sYyUwGzeBMaULH6CdJjQYcwg0l9q/wW9mmTuVbSZFfX1qWScTqlgSMb3q2Z59
+nwjXaFCcZiRrIoKaFDbM3PMt0K/ZD5SlZRR2fc8NQxX9se9vkELshDfTwniUCl/m
+I3m9xwHDo2mUgNBr4ejAPItijUHKDXRobR9oBpa77vran8NPKvUxNl8gJfTtz0Iv
+DclnI4CqhLl+K0fsgIHe/Ogu6B+BTzVHogpzYPLE+pwF1+H1g2kh3XRh5PbRPQRQ
+mgcqr5mryQLnYPFxP7YdszjEUwWplh6NKauwEVNEc4VeEj4wJ6CKJhLU/Pau6G9i
+6O64Gg9PwJYPNUT2apQUTD55JtrBgZmv9EP2EtTGhfQsvPYossTcmx3tZSAheVea
+SCQY9AtB9DK4TdLBZZfAqZmvBIUO2azExK0wGTzOheEQ6E3zeJwsyVi5AdjXtbKi
+2D6FXpk9XJny08Zg2N2sgUPKUkWrZKc49X+OfiD1solkjGepCHuXojU2dSs5vx5o
+ctCSE0qnNfl2BNV1qMShQHH2QzEQfsgm8XJEtCI5GUwlhiEyaL5ys7UxcKCVG1+O
+Wt521u/8JKHwl6vnsvruY1TGVuonzrH6lXogWoLVRvNkJCTDhJ8Z01cXe4gICDHI
+lxW2UubFbRJRrsHWcxowUz25g5T5Q9gRd5RiXWzoZwxseyifhbN2CTPkkE2DogGM
+u9cgtZeEN16ugC4U1g4o0XhEGrfM6QoCBMLCC0wSZwerq5h3xRDYO1acg7CjzSq4
+SWaNVxXelRWiwzzZer9gwa9j08v3RaDNhAoF007pw9zHKlzYED3s+t0JN0iPVALk
+QhXOsgK4txEegY7ua68kuBccnXmG2DY/0WBpMBctQqcs0XSel2vA8lm/tSJVSb2I
+I69g66m5HA8f28Wvp+4g6rWQ0ui3o/YwsOjzsahKOWXcoJGcromLk1kpwfQOBGX6
+D4BzRaW+cxR9YTPNRbLk9SbAjBVniN32eOoM+iyX/6g+RDa0iBc9pbVnZ5KfUKcX
+yW50DJ8pkU5xWXTDWNxmyuQAUBylrndF6bYYJ58fQckIggJAOA1mD+oQAez5QnGu
+9Z9wC4K8CKuVJceV5SGOgtPM774QT8DqNi9iwBW1eJMhLCfrhH8bUA0l5XhXa3t6
+qEhM80Oz+1KvdRmdfwztMtXbZCTb2lk5NxYpgVxuAb9cwHtKJgCmsMflAEQ8XHTa
+lV0pQVZcpWt0YIdSz7SHTPtaFOvCpuvwued7cNDE2fLKHsbz5ogiJERFiK0LxZk4
+rlZBEbt33VnPSgV9nVuSGkGMS1pw7zEB0CbIDDJxgyHbNgCD9N8ISGk2IirQe70B
+8apKBrBF97krCb8p14uzIfcaZfjoTaqOUbR7gzs3MwCp99t4JjjJtWQw7bk4/Iiy
+LxizMD+QqRayDC3VKxahQ0zw4/wymyFuBIkNh/ElDFjLKDyCsbss5ZCW/ibD3quM
+Ri+u+QHf915paTH4CMHYHkShEqHaozvdk4LPu4+6x3kXLGJ+Wur0qpN7eekjUQ6m
+1oDsOy3opqszWnP7TP1qrdw7ErVnl5GSWcldgmhMIPbbbeQG/Aw34r8Uu9S3+ZlH
+gf8tg+94F1GrNwCg6AMdHaaao3RR4iXzWVB7+d8niH26XUuXOlMH4YXFOGLVnfwO
+kyarRKUJAfWiIoNFmZTFb3kxbTXXdYCf2lplP+QE1P+EiVQ+A7gnUkrXT7XuZHar
+RkJi/YPA0PUb2iYLvcrHyoKS9RLqaoT1s4T0i2Xjn2nrUK1AWYXLe4iUh1zCBMZo
+C3KmXUBHIlLDnhUJNKR94EY5oC/LpKnMtCRflI1crqYK+V9ZT7yZlBB89Se0Wq66
+oWHHQc55jW5DSC3KdIxmdybq0cpc0xDxeKAUkHTX30mi5hKK+uUXuhegrsmshDf4
+N3cxO9Ckgx6J1jXZCslx+ckub4QnuMpMXz6DOIW8M8w5S8cDpdWnnCzPDlzJsa3G
+Jqk/M8e1COkL9MhbJL4F6SpqNUu4O3NTx4swGBb4+lud6ll19RcJwSoM4HOBn8tr
+LWr1FTirAIEL1xN6C//mCiF3rnGxpKP8b+iCpWQQL+cah8niTm43d0O1l5NMmeFl
+UpEb8Yw94RPuFY9QbloLQL2S5982RXxiYuNxXujVn8P7TSwHgpDxLofkgHzTlc+A
+2kbhs8oGYrKsUMNvzSNospamDPPxRBaVfluPexv+aZTX71ksnOZMRKrQ+/RSYlg2
+pbCWUpblcs2dNso5jjwlw6DYiThvbo/wNtc1RkGW2J2i0d3dYf4qT7Eh9mlJLdr+
+uLSXcWrlLe5o4GLiKz+sQnxcQf4MterregnS3SY+sAe7eOGqOzao7DQPL+eyhAcy
+mbrnqki5Y+ssquoTlkG+BjiO0EceIcM8jx1McN2zfFhCwGYWZbTWO6ImiY2AQhp/
+ymYo9cJteWa5c7UZ2JGTDMHHahGjOZ1uBRZ2hjHoclM4VOE+xjnAxLWHH90dzAbV
+QvG5ATF/z2B0b5+5PugA1m5IAw2iECoXAclCKMnBJcMVxrCxAV2rdsxFnfukY32P
+SFNEzp5P0kA0vrwTWxQ5g9R7zoFqMp/50gkI4SY2qh64XuQmv5KzztdTa484Ti6G
+vKU/fgRqb76l+nshFbPvlIDzBFw/J8idXvXgR9UgvEV813tM77djVm/aTPt7d0Tc
+4TX5xjvSPP4mto+rmr4rJVPNL4FL7zihBiKmlWNyKwccWd8LJp9Qp9Lo1O1UIuOb
+pXwkIn+8Etn8mxaUYJEhu7uNBDvPgA6E6enfuYp+xmIq2FqHF5pMIfm6N6xk7jEU
+91rx8KTooMSFBtJT0XHSQuSUg25+dhbj5iV0HGTFruNKbUBbykuoi9moM075a1GY
+9emAXhyjwBagy188rtJ/zGaMDTr1QX70Nl77Ai8qidAzvDzGVpCHXnuY+AOOXqov
+47I2pRjZisdv1srxktRPfr5z7fi2xao0Q1oDir2+dOykgQ1Lc3W5e5rY+CAaghtB
+ivdxC4U6ca9JlP30WLEFZQ28WIq4Y66aqf9Xa47aLtdFnwmL1rDNBaDjf9osUfea
+3DKTRei8iEqOGkJEeyaHaNI2iRuBT/UyaAeOWom1+sF+xl4d3lvj+CICm0f9kmN3
+-----END RSA PRIVATE KEY-----
+';
+	const NODE_LOCAL_SSL_KEY_PUB5 = '-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA1TaWyMlW6/CwjJser4Wi
+/mxnHmnSX+ZD+ixiNW8JNOATcBP2jGW/91tB88l7eglDSpCk+F26C015PQs6Ckve
+Yb0fTW3B8XZ1RMfaVzRsT7gGacOu64EHpL4OB2J+jD90y3+7KN8jCBNvixXE+EsN
+YZiVMY2MJaAgE58hAW609emTN2WTms4vnLBTGsx3IZ4T24TVbSpgXNBDIV7wNQDh
+2gCng+CHAWkyotpCwarh+z3sMk2ogBxN3yR1PaSTg0BmZyZMeMS+jdCvhpC4J+xT
+JnpdAWopD98m+J+n4HnIFfeC/AOGtLzxa8H8Xb8c000pww1dQRV/HZENJFrFQ/2h
+8no+7p4d4zGMklrPe+lMc5O+QvUgx6F9vLxKZEwXp/93Mqy2gO4mb3aBzOJe8wLH
+Dl+XArTtkQWdI4UA8qhZm2q3aS63lYvu21Bxb6xrdhiKGxRYDgG8oMY7sOC4bfNT
+HSO+CGkNuTKXVv1D1CqV62f+VFW88WVb5n/0I2+X7rou8NgBYEGj7+e2vx8nET3I
+aCym1PZLFQhkI2wyZIt46Vgf2yVCdUSmNdX7IMFQUK22AFy82+Lq7jBynw8eNpyK
+SFBNDssxI9wK76cJd8Vk1FNMhpGCuGb4/wlHWndz55LqmtQMRXijk5KhdLanROX4
+QfZblZnpC5QbcMmBenRqcuECAwEAAQ==
+-----END PUBLIC KEY-----
+';
+	
+	const NODE_LOCAL_SSL_KEY_PRV6 = '-----BEGIN RSA PRIVATE KEY-----
+Proc-Type: 4,ENCRYPTED
+DEK-Info: DES-EDE3-CBC,F3DD41126EB0B369
+
+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
+-----END RSA PRIVATE KEY-----
+';
+	const NODE_LOCAL_SSL_KEY_PUB6 = '-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAt6AGAhYwZPRmEkGsIoFl
+bbUnzg2hTeH8UjVuw90TdxdHwBWP8Z5OpbkPy5mk0tQplcjRI9f2EyKjEfRwaZv5
+iljq8fR+sE9b0nFRXjTA49AmXlJVOuYc/TuWhWEN8aTFonU2+PVIUUyGyk6wdf+P
+A7FHxbFf5rElD7e2HMilPfPRJEAEittLXAA4XiVTXt0nP8ua2JECSPoXjRIKgbC0
+6f63oF/pXl3NZ7tH4/hCZp0ymY1jdOqz8cqYhX8zwBz5voj6i53C6W8OmLypuzfZ
+bwyJm76NxnPCUDvLjLdCcIyA6BuLEiLJ5WFjw5fGc9ymwURVJxFAzt9nFvlAxKuJ
+tnW1CABL/pYpTVBcUPsEzdeyBIctJFMKLKDwHoAsq0YAAfnvv7Gjn+FyN7W+clPW
+nGMQFFFqb9IoLOLBb0GkNeQFQmG6Nf4vp42VcNquYWhmXPe7kZg7pMRqtdVxJT++
+uptUMKcmy+/rgWp73NcwJEJQWPyZF/n/E/wsZFfMFqpv9wIBNK+fH+Hax/cuKnmP
+LAmMeEsNcgIA5gmiAY18MMYMJC7lwHIe8kJ/GJZ4J7wShD+BIpq+KGCw9TTZa1lq
+OnU819AJVH6EacoY2kyl6BxrbObilkFwn6okCM9S1OxzeMgSH5ehTW2pG/LLJxNM
+qFdLCnlGsFNPrOqpUoKmudkCAwEAAQ==
+-----END PUBLIC KEY-----
+';
+	
 	public function testSerialize(){
 		$node = new Node();
 		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
@@ -176,7 +460,45 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$this->assertEquals($node, $client->getNode());
 	}
 	
-	public function genFiles(){
+	public function rawMsgToArray($raw){
+		$ar = array();
+		
+		if(substr($raw, -Client::MSG_SEPARATOR_LEN) == Client::MSG_SEPARATOR){
+			$raw = substr($raw, 0, -Client::MSG_SEPARATOR_LEN);
+		}
+		
+		$ar = array_map(function($item){
+			return base64_decode($item);
+		}, preg_split('/'.Client::MSG_SEPARATOR.'/', $raw));
+		
+		/*
+		foreach($raw as $msg){
+			$msg = substr($msg, 0, -Client::MSG_SEPARATOR_LEN);
+			$msg = base64_decode($msg);
+			#fwrite(STDOUT, 'rawMsgToArray msg: '.$msg."\n");
+			$ar[] = $msg;
+		}
+		*/
+		
+		#fwrite(STDOUT, 'rawMsgToArray'."\n"); ve($ar);
+		return $ar;
+	}
+	
+	public function rawMsgToJson($raw){
+		#ve($raw);
+		$ar = $this->rawMsgToArray($raw);
+		
+		#fwrite(STDOUT, 'rawMsgToJson'."\n"); ve($ar);
+		$rv = array_map(function($item){
+			#fwrite(STDOUT, 'rawMsgToJson item: /'.$item.'/'."\n");
+			return json_decode($item, true);
+		}, $ar);
+		
+		#fwrite(STDOUT, 'rawMsgToJson'."\n"); ve($rv);
+		return $rv;
+	}
+	
+	private function sendGenTestData(){
 		$filesystem = new Filesystem();
 		$filesystem->mkdir('tests/client1_tcp', $mode = 0777);
 		$filesystem->mkdir('tests/client2_tcp', $mode = 0777);
@@ -222,16 +544,15 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		}
 		$table2->setDataChanged(true);
 		$table2->save();
-	}
-	
-	public function genClients(){
+		
+		
 		$settings1 = new Settings();
 		$settings1->data['datadir'] = 'tests/client1_tcp';
 		$settings1->data['firstRun'] = false;
 		$settings1->data['node']['timeCreated'] = time();
 		$settings1->data['node']['ip'] = '127.0.0.1';
 		$settings1->data['node']['port'] = 0;
-		$settings1->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
+		$settings1->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB1);
 		$settings1->data['node']['sslKeyPrvPass'] = 'my_password';
 		$settings1->data['node']['sslKeyPrvPath'] = 'tests/client1_tcp/id_rsa.prv';
 		$settings1->data['node']['sslKeyPubPath'] = 'tests/client1_tcp/id_rsa.pub';
@@ -243,7 +564,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings2->data['node']['timeCreated'] = time();
 		$settings2->data['node']['ip'] = '127.0.0.2';
 		$settings2->data['node']['port'] = 0;
-		$settings2->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1739';
+		$settings2->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB2);
 		$settings2->data['node']['sslKeyPrvPass'] = 'my_password';
 		$settings2->data['node']['sslKeyPrvPath'] = 'tests/client2_tcp/id_rsa.prv';
 		$settings2->data['node']['sslKeyPubPath'] = 'tests/client2_tcp/id_rsa.pub';
@@ -290,162 +611,25 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		return array($client1, $client2);
 	}
 	
-	public function rawMsgToArray($raw){
-		$ar = array();
+	private function sendClientsId($client1, $client2){
+		// Hello Client1
+		$raw = $client1->sendHello();
 		
-		if(substr($raw, -Client::MSG_SEPARATOR_LEN) == Client::MSG_SEPARATOR){
-			$raw = substr($raw, 0, -Client::MSG_SEPARATOR_LEN);
-		}
-		
-		$ar = array_map(function($item){
-			return base64_decode($item);
-		}, preg_split('/'.Client::MSG_SEPARATOR.'/', $raw));
-		
-		/*
-		foreach($raw as $msg){
-			$msg = substr($msg, 0, -Client::MSG_SEPARATOR_LEN);
-			$msg = base64_decode($msg);
-			#fwrite(STDOUT, 'rawMsgToArray msg: '.$msg."\n");
-			$ar[] = $msg;
-		}
-		*/
-		
-		#fwrite(STDOUT, 'rawMsgToArray'."\n"); ve($ar);
-		return $ar;
-	}
-	
-	public function rawMsgToJson($raw){
-		#ve($raw);
-		$ar = $this->rawMsgToArray($raw);
-		
-		#fwrite(STDOUT, 'rawMsgToJson'."\n"); ve($ar);
-		$rv = array_map(function($item){
-			#fwrite(STDOUT, 'rawMsgToJson item: /'.$item.'/'."\n");
-			return json_decode($item, true);
-		}, $ar);
-		
-		#fwrite(STDOUT, 'rawMsgToJson'."\n"); ve($rv);
-		return $rv;
-	}
-	
-	public function testSend(){
-		$this->genFiles();
-		list($client1, $client2) = $this->genClients();
-		
-		#ve($client1);
-		
-		// Node Find before ID should cause an error.
-		$raw = $client1->sendNodeFind($client1->getSettings()->data['node']['id']);
-		#ve('testSend raw A'); ve($raw);
+		// ID Client1
 		$raw = $client2->dataRecv($raw);
-		#ve('testSend raw B'); ve($raw);
-		$json = $this->rawMsgToJson($raw);
-		#ve('testSend json'); ve($json);
-		$this->assertEquals('error', $json[0]['name']);
-		$this->assertEquals(1000, $json[0]['data']['code']);
-		
-		// Node Find before ID should cause an error.
-		$raw = $client1->sendNodeFind($client1->getSettings()->data['node']['id']);
-		$json = $this->rawMsgToJson($raw);
-		#ve($json);
-		$raw = $client2->dataRecv($raw);
-		$json = $this->rawMsgToJson($raw);
-		#ve($json);
-		$this->assertEquals('error', $json[0]['name']);
-		$this->assertEquals(1000, $json[0]['data']['code']);
-		
-		#return;
-		
-		// Send Msg before ID should cause an error.
-		$msg = new Msg();
-		$msg->setVersion(1);
-		$msg->setSrcNodeId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcSslKeyPub(static::NODE_LOCAL_SSL_KEY_PUB1);
-		$msg->setSrcUserNickname('thefox');
-		$msg->setDstNodeId('cafed00d-2131-4159-8e11-0b4dbadb1739');
-		$msg->setDstSslPubKey(static::NODE_LOCAL_SSL_KEY_PUB2);
-		$msg->setSubject('my first subject');
-		$msg->setText('hello world! this is a test');
-		$msg->setSslKeyPrv(static::NODE_LOCAL_SSL_KEY_PRV1, 'my_password');
-		$msg->encrypt();
-		
-		$raw = $client1->sendMsg($msg);
-		#ve($raw);
-		$raw = $client2->dataRecv($raw);
-		#ve($raw);
-		$json = $this->rawMsgToJson($raw);
-		#ve($json);
-		$this->assertEquals('error', $json[0]['name']);
-		$this->assertEquals(1000, $json[0]['data']['code']);
-		
-		// SSL before ID should cause an error.
-		$raw = $client1->sendSslInit();
-		$raw = $client2->dataRecv($raw);
-		$json = $this->rawMsgToJson($raw);
-		#ve($json);
-		$this->assertEquals('ssl_init_response', $json[0]['name']);
-		$this->assertEquals(1000, $json[0]['data']['code']);
-		
 		$raw = $client1->dataRecv($raw);
-		$json = $this->rawMsgToJson($raw);
-		#ve($json);
-		$this->assertEquals('error', $json[0]['name']);
-		$this->assertEquals(3100, $json[0]['data']['code']);
-		
-		// Talk Request before ID should cause an error.
-		$raw = $client1->sendTalkRequest('user1');
-		#ve($raw);
 		$raw = $client2->dataRecv($raw);
-		#ve($raw);
-		$json = $this->rawMsgToJson($raw);
-		#ve($json);
-		$this->assertEquals(null, $json[0]);
 		
-		// Talk Response before ID should cause an error.
-		$raw = $client1->sendTalkResponse('rid1', 1, 'user1');
-		#ve($raw);
+		// Hello Client2
+		$raw = $client2->sendHello();
+		
+		// ID Client2
+		$raw = $client1->dataRecv($raw);
 		$raw = $client2->dataRecv($raw);
-		#ve($raw);
-		$json = $this->rawMsgToJson($raw);
-		#ve($json);
-		$this->assertEquals(null, $json[0]);
-		
-		// Talk Msg before ID should cause an error.
-		$raw = $client1->sendTalkMsg('rid1', 'user1', 'hello world', false);
-		#ve($raw);
-		$raw = $client2->dataRecv($raw);
-		#ve($raw);
-		$json = $this->rawMsgToJson($raw);
-		#ve($json);
-		$this->assertEquals(null, $json[0]);
-		
-		// Talk User Nickname Change before ID should cause an error.
-		$raw = $client1->sendTalkUserNicknameChange('user1', 'user1b');
-		#ve($raw);
-		$raw = $client2->dataRecv($raw);
-		#ve($raw);
-		$json = $this->rawMsgToJson($raw);
-		#ve($json);
-		$this->assertEquals(null, $json[0]);
-		
-		// Talk Close before ID should cause an error.
-		$raw = $client1->sendTalkClose('rid1', 'user1b');
-		#ve($raw);
-		$raw = $client2->dataRecv($raw);
-		#ve($raw);
-		$json = $this->rawMsgToJson($raw);
-		#ve($json);
-		$this->assertEquals(null, $json[0]);
-		
-		
-		
-		
-		
-		// NoOp
-		$raw = $client1->sendNoop();
-		$json = $this->rawMsgToJson($raw);
-		#ve($json);
-		$this->assertEquals('noop', $json[0]['name']);
+	}
+	
+	public function testSendBasic(){
+		list($client1, $client2) = $this->sendGenTestData();
 		
 		// Hello Client1
 		$raw = $client1->sendHello();
@@ -460,7 +644,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
 		$this->assertEquals('id', $json[0]['name']);
-		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1739', $json[0]['data']['id']);
+		$this->assertEquals('07fb5f61-5565-58f2-891e-1337e8b747ac', $json[0]['data']['id']);
 		$this->assertFalse($json[0]['data']['isChannel']);
 		
 		$raw = $client1->dataRecv($raw);
@@ -485,7 +669,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
 		$this->assertEquals('id', $json[0]['name']);
-		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $json[0]['data']['id']);
+		$this->assertEquals('264bfdaf-e558-5547-b4b2-a7c1ce75478c', $json[0]['data']['id']);
 		$this->assertFalse($json[0]['data']['isChannel']);
 		
 		$raw = $client2->dataRecv($raw);
@@ -493,7 +677,8 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		#ve($json);
 		$this->assertEquals('id_ok', $json[0]['name']);
 		
-		// re-ID
+		
+		// re-ID should cause an error.
 		$raw = $client1->sendId();
 		$raw = $client2->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
@@ -502,13 +687,45 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$this->assertEquals(1010, $json[0]['data']['code']);
 		
 		
+		
+		$client1->getServer()->getKernel()->shutdown();
+		$client2->getServer()->getKernel()->shutdown();
+	}
+	
+	public function testSendNodeFind(){
+		list($client1, $client2) = $this->sendGenTestData();
+		
+		// Node Find before ID should cause an error.
+		$raw = $client1->sendNodeFind($client1->getSettings()->data['node']['id']);
+		#ve('testSend raw A'); ve($raw);
+		$raw = $client2->dataRecv($raw);
+		#ve('testSend raw B'); ve($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve('testSend json'); ve($json);
+		$this->assertEquals('error', $json[0]['name']);
+		$this->assertEquals(1000, $json[0]['data']['code']);
+		
+		// Node Find before ID should cause an error.
+		$raw = $client1->sendNodeFind($client1->getSettings()->data['node']['id']);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('error', $json[0]['name']);
+		$this->assertEquals(1000, $json[0]['data']['code']);
+		
+		
+		$this->sendClientsId($client1, $client2);
+		
+		
 		// Node Find
 		$raw = $client1->sendNodeFind($client1->getSettings()->data['node']['id']);
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
 		$this->assertEquals('node_find', $json[0]['name']);
 		$this->assertEquals(8, $json[0]['data']['num']);
-		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $json[0]['data']['nodeId']);
+		$this->assertEquals('264bfdaf-e558-5547-b4b2-a7c1ce75478c', $json[0]['data']['nodeId']);
 		
 		$raw = $client2->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
@@ -556,7 +773,37 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$this->assertEquals('error', $json[0]['name']);
 		$this->assertEquals(9000, $json[0]['data']['code']);
 		
+		$client1->getServer()->getKernel()->shutdown();
+		$client2->getServer()->getKernel()->shutdown();
+	}
+	
+	public function testSendMsg(){
+		list($client1, $client2) = $this->sendGenTestData();
 		
+		// Send Msg before ID should cause an error.
+		$msg = new Msg();
+		$msg->setVersion(1);
+		$msg->setSrcNodeId($client1->getSettings()->data['node']['id']);
+		$msg->setSrcSslKeyPub(static::NODE_LOCAL_SSL_KEY_PUB1);
+		$msg->setSrcUserNickname('thefox');
+		$msg->setDstNodeId($client2->getSettings()->data['node']['id']);
+		$msg->setDstSslPubKey(static::NODE_LOCAL_SSL_KEY_PUB2);
+		$msg->setSubject('my first subject');
+		$msg->setText('hello world! this is a test');
+		$msg->setSslKeyPrv(static::NODE_LOCAL_SSL_KEY_PRV1, 'my_password');
+		$msg->encrypt();
+		
+		$raw = $client1->sendMsg($msg);
+		#ve($raw);
+		$raw = $client2->dataRecv($raw);
+		#ve($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('error', $json[0]['name']);
+		$this->assertEquals(1000, $json[0]['data']['code']);
+		
+		
+		$this->sendClientsId($client1, $client2);
 		
 		
 		// Send Msg
@@ -587,43 +834,73 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$this->assertEquals('msg_response', $json[0]['name']);
 		$this->assertEquals($rid, $json[0]['data']['rid']);
 		
+		$client1->getServer()->getKernel()->shutdown();
+		$client2->getServer()->getKernel()->shutdown();
+	}
+	
+	public function testSendSsl(){
+		list($client1, $client2) = $this->sendGenTestData();
 		
-		// SSL without Hashcash should cause an error.
-		$raw = $client1->sendSslInit(false);
+		// SSL before ID should cause an error.
+		/*$raw = $client1->sendSslInit();
 		$raw = $client2->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
 		$this->assertEquals('ssl_init_response', $json[0]['name']);
-		$this->assertEquals(4000, $json[0]['data']['code']);
+		$this->assertEquals(1000, $json[0]['data']['code']);
 		
 		$raw = $client1->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
 		$this->assertEquals('error', $json[0]['name']);
 		$this->assertEquals(3100, $json[0]['data']['code']);
+		*/
+		
+		$this->sendClientsId($client1, $client2);
+		
+		/*
+		// SSL without Hashcash should cause an error.
+		$raw = $client1->sendSslInit(false);
+		$raw = $client2->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		ve($json);
+		$this->assertEquals('ssl_init_response', $json[0]['name']);
+		$this->assertEquals(4000, $json[0]['data']['code']);
+		
+		$raw = $client1->dataRecv($raw);
+		$json = $this->rawMsgToJson($raw);
+		ve($json);
+		$this->assertEquals('error', $json[0]['name']);
+		$this->assertEquals(3100, $json[0]['data']['code']);
+		*/
+		
+		
 		
 		// SSL
 		$raw = $client1->sendSslInit();
 		$json = $this->rawMsgToJson($raw);
-		#ve($json);
+		ve($json);
 		$this->assertEquals('ssl_init', $json[0]['name']);
+		#return;
 		
 		$raw = $client2->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
-		#ve($json);
+		ve($json);
 		$this->assertEquals('ssl_init', $json[0]['name']);
 		$this->assertEquals('ssl_init_response', $json[1]['name']);
+		#return;
 		
 		// SSL response
 		$raw = $client1->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
-		#ve($json);
+		ve($json);
 		$this->assertEquals('ssl_init_response', $json[0]['name']);
 		$this->assertEquals('ssl_test', $json[1]['name']);
+		return;
 		
 		$raw = $client2->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
-		#ve($json);
+		ve($json);
 		$this->assertEquals('ssl_test', $json[0]['name']);
 		$this->assertEquals('ssl_verify', $json[1]['name']);
 		
@@ -655,6 +932,63 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		#ve($json);
 		$this->assertEquals(null, $json[0]);
 		
+		$client1->getServer()->getKernel()->shutdown();
+		$client2->getServer()->getKernel()->shutdown();
+	}
+	
+	public function testSendTalk(){
+		list($client1, $client2) = $this->sendGenTestData();
+		
+		/*
+		// Talk Request before ID should cause an error.
+		$raw = $client1->sendTalkRequest('user1');
+		#ve($raw);
+		$raw = $client2->dataRecv($raw);
+		#ve($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals(null, $json[0]);
+		
+		// Talk Response before ID should cause an error.
+		$raw = $client1->sendTalkResponse('rid1', 1, 'user1');
+		#ve($raw);
+		$raw = $client2->dataRecv($raw);
+		#ve($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals(null, $json[0]);
+		
+		// Talk Msg before ID should cause an error.
+		$raw = $client1->sendTalkMsg('rid1', 'user1', 'hello world', false);
+		#ve($raw);
+		$raw = $client2->dataRecv($raw);
+		#ve($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals(null, $json[0]);
+		
+		// Talk User Nickname Change before ID should cause an error.
+		$raw = $client1->sendTalkUserNicknameChange('user1', 'user1b');
+		#ve($raw);
+		$raw = $client2->dataRecv($raw);
+		#ve($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals(null, $json[0]);
+		
+		// Talk Close before ID should cause an error.
+		$raw = $client1->sendTalkClose('rid1', 'user1b');
+		#ve($raw);
+		$raw = $client2->dataRecv($raw);
+		#ve($raw);
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals(null, $json[0]);
+		*/
+		
+		# TODO
+		#$this->sendClientsId($client1, $client2);
+		#$this->sendClientsSsl($client1, $client2);
 		
 		// Talk Request
 		$raw = $client1->sendTalkRequest('user1');
@@ -711,6 +1045,13 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		#ve($json);
 		$this->assertEquals(null, $json[0]);
 		
+		$client1->getServer()->getKernel()->shutdown();
+		$client2->getServer()->getKernel()->shutdown();
+	}
+	
+	public function testSendPingPong(){
+		list($client1, $client2) = $this->sendGenTestData();
+		
 		// Ping - Pong
 		$raw = $client1->sendPing();
 		$json = $this->rawMsgToJson($raw);
@@ -732,19 +1073,29 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		
 		$raw = $client2->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
-		#ve($json);
+		ve($json);
 		$this->assertEquals('pong', $json[0]['name']);
 		$this->assertEquals('de0bb575-cead-4ffe-adcb-311388511ed7', $json[0]['data']['id']);
 		
+		$client1->getServer()->getKernel()->shutdown();
+		$client2->getServer()->getKernel()->shutdown();
+	}
+	
+	public function testSendNoop(){
+		list($client1, $client2) = $this->sendGenTestData();
 		
-		// Unknown Command
-		$raw = $client2->msgHandle('{"name":"blaaaaa"}');
+		// NoOp
+		$raw = $client1->sendNoop();
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
-		$this->assertEquals('error', $json[0]['name']);
-		$this->assertEquals(9020, $json[0]['data']['code']);
-		$this->assertEquals('blaaaaa', $json[0]['data']['name']);
+		$this->assertEquals('noop', $json[0]['name']);
 		
+		$client1->getServer()->getKernel()->shutdown();
+		$client2->getServer()->getKernel()->shutdown();
+	}
+	
+	public function testSendError(){
+		list($client1, $client2) = $this->sendGenTestData();
 		
 		// Error
 		$raw = $client1->sendError();
@@ -761,10 +1112,20 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 			$this->assertEquals($errorCode, $json[0]['data']['code']);
 		}
 		
+		$client1->getServer()->getKernel()->shutdown();
+		$client2->getServer()->getKernel()->shutdown();
+	}
+	
+	public function testSendUnknownCommand(){
+		list($client1, $client2) = $this->sendGenTestData();
 		
-		#fwrite(STDOUT, 'return: /'.($raw).'/'."\n");
-		#fwrite(STDOUT, 'return: /'.base64_decode($raw).'/'."\n");
-		
+		// Unknown Command
+		$raw = $client2->msgHandle('{"name":"blaaaaa"}');
+		$json = $this->rawMsgToJson($raw);
+		#ve($json);
+		$this->assertEquals('error', $json[0]['name']);
+		$this->assertEquals(9020, $json[0]['data']['code']);
+		$this->assertEquals('blaaaaa', $json[0]['data']['name']);
 		
 		$client1->getServer()->getKernel()->shutdown();
 		$client2->getServer()->getKernel()->shutdown();
