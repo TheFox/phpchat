@@ -32,6 +32,7 @@ class Node extends YamlStorage{
 		$this->data['id'] = '00000000-0000-4000-8000-000000000000';
 		$this->data['uri'] = '';
 		$this->data['sslKeyPubFingerprint'] = '';
+		$this->data['sslKeyPubStatus'] = 'U';
 		$this->data['timeCreated'] = time();
 		$this->data['timeLastSeen'] = 0;
 		
@@ -167,6 +168,19 @@ class Node extends YamlStorage{
 	
 	public function getSslKeyPubFingerprint(){
 		return $this->data['sslKeyPubFingerprint'];
+	}
+	
+	public function setSslKeyPubStatus($sslKeyPubStatus){
+		// U = unconfirmed
+		// C = confirmed by ID
+		
+		if($this->data['sslKeyPubStatus'] != 'C'){
+			$this->data['sslKeyPubStatus'] = $sslKeyPubStatus;
+		}
+	}
+	
+	public function getSslKeyPubStatus(){
+		return $this->data['sslKeyPubStatus'];
 	}
 	
 	public static function genSslKeyFingerprint($key){

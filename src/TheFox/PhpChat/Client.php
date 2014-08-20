@@ -505,6 +505,7 @@ class Client{
 														$idOk = true;
 														
 														$node->setSslKeyPub($strKeyPub);
+														$node->setSslKeyPubStatus('C');
 													}
 													else{
 														$msgHandleReturnValue .= $this->sendError(2020, $msgName);
