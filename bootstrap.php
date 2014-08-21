@@ -63,8 +63,8 @@ if(!file_exists('vendor')){
 	exit(1);
 }
 
-require_once __DIR__.'/vendor/autoload.php';
 require_once __DIR__.'/functions.php';
+require_once __DIR__.'/vendor/autoload.php';
 
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
@@ -73,7 +73,7 @@ use Zend\Uri\UriFactory;
 
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler;
-use TheFox\Phpchat\Settings;
+use TheFox\PhpChat\Settings;
 use TheFox\Dht\Kademlia\Node;
 
 
