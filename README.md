@@ -25,17 +25,14 @@ I also like the [Bitmessage](https://bitmessage.org) project. But building think
 
 		make
 
-3. You must forward TCP port 25000 (default) on your modem to your computer. After the chat has been started once there will be a `settings.yml`. Edit this file to change the incoming port. After changing the settings file you must restart the chat.
-4. Run
+3. You need to forward TCP port 25000 (default) on your modem to your computer. After the chat has been started once there will be a `settings.yml`. Edit this file to change the incoming port. After changing the settings file you must restart the chat.
+4. Start:
 
 		./start.sh
 	
-	in your shell to start the PHPChat. And
+	Stop:
 	
 		./stop.sh
-	
-	to stop the PHPChat.
-
 
 ## Contribute
 You're welcome to contribute to this project. Fork this project at <https://github.com/TheFox/phpchat>. You should read GitHub's [How to Fork a Repo](https://help.github.com/articles/fork-a-repo).
