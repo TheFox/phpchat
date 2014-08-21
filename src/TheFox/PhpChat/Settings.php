@@ -42,8 +42,11 @@ class Settings extends YamlStorage{
 		
 		$this->load();
 		
-		if(!$this->isLoaded()){
-			$this->data['node']['timeCreated'] = time();
+		if($this->isLoaded()){
+			$this->data['version'] = PhpChat::VERSION;
+			$this->data['release'] = PhpChat::RELEASE;
+		}
+		else{
 			$this->data['user']['nickname'] = 'user_'.substr(md5(time()), 0, 4);
 			
 			$this->setDataChanged(true);
