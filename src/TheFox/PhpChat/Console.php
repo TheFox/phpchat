@@ -459,6 +459,16 @@ class Console extends Thread{
 						
 						$this->log->debug('buffer '.$this->bufferCursorPos.', '.strlen($this->buffer).' /'.$this->buffer.'/');
 					}
+					elseif($char == "\x0b"){
+						$this->log->debug('got vertical tab');
+						
+						$this->buffer = substr($this->buffer, 0, $this->bufferCursorPos);
+						
+						#sleep(1);
+						Console::lineClearRight();
+						
+						$this->log->debug('buffer '.$this->bufferCursorPos.', '.strlen($this->buffer).' /'.$this->buffer.'/');
+					}
 					elseif($char == "\x1b" && $buffer[$bufferIndex + 1] == "\x5b"
 						&& $buffer[$bufferIndex + 2] == "\x41"){
 						$bufferIndex += 2;
