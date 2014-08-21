@@ -63,7 +63,6 @@ if(!file_exists('vendor')){
 	exit(1);
 }
 
-require_once __DIR__.'/functions.php';
 require_once __DIR__.'/vendor/autoload.php';
 
 use Rhumsaa\Uuid\Uuid;
