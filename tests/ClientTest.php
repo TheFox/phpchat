@@ -181,7 +181,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings = new Settings();
 		$settings->data['datadir'] = 'tests';
 		$settings->data['firstRun'] = false;
-		$settings->data['node']['timeCreated'] = time();
+		$settings->data['timeCreated'] = time();
 		$settings->data['node']['ip'] = '';
 		$settings->data['node']['port'] = 0;
 		$settings->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
@@ -239,7 +239,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings = new Settings();
 		$settings->data['datadir'] = 'tests';
 		$settings->data['firstRun'] = false;
-		$settings->data['node']['timeCreated'] = time();
+		$settings->data['timeCreated'] = time();
 		$settings->data['node']['ip'] = '';
 		$settings->data['node']['port'] = 0;
 		$settings->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
@@ -286,7 +286,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings = new Settings();
 		$settings->data['datadir'] = 'tests';
 		$settings->data['firstRun'] = false;
-		$settings->data['node']['timeCreated'] = time();
+		$settings->data['timeCreated'] = time();
 		$settings->data['node']['ip'] = '';
 		$settings->data['node']['port'] = 0;
 		$settings->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
@@ -330,7 +330,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings = new Settings();
 		$settings->data['datadir'] = 'tests';
 		$settings->data['firstRun'] = false;
-		$settings->data['node']['timeCreated'] = time();
+		$settings->data['timeCreated'] = time();
 		$settings->data['node']['ip'] = '';
 		$settings->data['node']['port'] = 0;
 		$settings->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1738';

@@ -15,10 +15,9 @@ class Settings extends YamlStorage{
 		$this->data['release'] = PhpChat::RELEASE;
 		$this->data['datadir'] = 'data';
 		$this->data['firstRun'] = true;
-		#$this->data['isBootstrap'] = true;
+		$this->data['timeCreated'] = time();
 		
 		$this->data['node'] = array();
-		$this->data['node']['timeCreated'] = 0;
 		$this->data['node']['ip'] = '0.0.0.0';
 		$this->data['node']['ipPub'] = null;
 		$this->data['node']['port'] = 25000;

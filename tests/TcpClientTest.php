@@ -265,7 +265,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings1 = new Settings();
 		$settings1->data['datadir'] = 'tests/client1_tcp';
 		$settings1->data['firstRun'] = false;
-		$settings1->data['node']['timeCreated'] = time();
+		$settings1->data['timeCreated'] = time();
 		$settings1->data['node']['ip'] = '127.0.0.1';
 		$settings1->data['node']['port'] = 0;
 		$settings1->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB1);
@@ -277,7 +277,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings2 = new Settings();
 		$settings2->data['datadir'] = 'tests/client2_tcp';
 		$settings2->data['firstRun'] = false;
-		$settings2->data['node']['timeCreated'] = time();
+		$settings2->data['timeCreated'] = time();
 		$settings2->data['node']['ip'] = '127.0.0.2';
 		$settings2->data['node']['port'] = 0;
 		$settings2->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB2);
