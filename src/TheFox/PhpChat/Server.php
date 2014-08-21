@@ -329,12 +329,14 @@ class Server{
 	}
 	
 	public function clientsInfo(){
-		$rv = array();
-		
+		$rv = array(
+			'clients' => array(),
+			'clientsId' => 0,
+		);
 		foreach($this->clients as $clientId => $client){
-			#$this->log->debug('client: '.$client->getUri());
+			$this->log->debug('client: '.$client->getUri());
 			
-			$rv[$clientId] = array(
+			$rv['clients'][$clientId] = array(
 				'hasId' => $client->getStatus('hasId'),
 				'hasTalkRequest' => $client->getStatus('hasTalkRequest'),
 				'hasTalk' => $client->getStatus('hasTalk'),
@@ -344,8 +346,9 @@ class Server{
 				'isChannelPeer' => $client->getStatus('isChannelPeer'),
 				'isChannelLocal' => $client->getStatus('isChannelLocal'),
 			);
-			
 		}
+		
+		$rv['clientsId'] = $this->clientsId;
 		
 		return $rv;
 	}

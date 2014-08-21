@@ -88,14 +88,14 @@ class InfoCommand extends BasicCommand{
 			$time = time();
 			$seconds = 0;
 			$oldClients = array();
+			$clientsIdMax = 0;
 			$tcols = (int)exec('tput cols');
 			$tlines = (int)exec('tput lines');
 			
 			#print 'cols: '.$tcols.PHP_EOL;
 			#print 'lines: '.$tlines.PHP_EOL;
 			
-			#print 'Clients: N/A'.PHP_EOL;
-			print ' Clients: '."\r";
+			print ' Clients: N/A'."\r";
 			
 			while(!$this->getExit()){
 				#$this->log->debug('run');
@@ -119,11 +119,14 @@ class InfoCommand extends BasicCommand{
 				$update = true;
 				
 				if($update){
-					$newClients = $this->ipcKernelConnection->execSync('serverClientsInfo');
-					#ve($newClients);
+					$clientsInfo = $this->ipcKernelConnection->execSync('serverClientsInfo');
+					#ve($clientsInfo);
+					
+					#$clientsIdMax = max($clientsIdMax, $clientsInfo['clientsId']);
+					$clientsId = $clientsInfo['clientsId'];
 					
 					$clientsChanged = 0;
-					foreach($newClients as $newClientId => $newClient){
+					foreach($clientsInfo['clients'] as $newClientId => $newClient){
 						if(isset($oldClients[$newClientId])){
 							$oldClient = $oldClients[$newClientId];
 							
@@ -188,7 +191,7 @@ class InfoCommand extends BasicCommand{
 					}
 					
 					foreach($oldClients as $oldClientId => $oldClient){
-						if(!isset($newClients[$oldClientId]) || $oldClient['hasShutdown']){
+						if(!isset($clientsInfo['clients'][$oldClientId]) || $oldClient['hasShutdown']){
 							if(!$oldClients[$oldClientId]['shutdown']){
 								$this->log->debug('update '.$oldClientId.': shutdown=1');
 								$oldClients[$oldClientId]['shutdown'] = time();
@@ -219,11 +222,16 @@ class InfoCommand extends BasicCommand{
 					}
 					
 					$oldClientsLen = count($oldClients);
+					#$oldClientsLen = mt_rand(1, 100000000);
 					
 					Console::cursorJumpToColumn(11);
-					print $oldClientsLen;
+					#sleep(1);
+					print $oldClientsLen.'/'.$clientsId;
+					#sleep(1);
 					Console::lineClearRight();
+					#sleep(1);
 					print PHP_EOL.' ';
+					#sleep(1);
 					
 					$line = 0;
 					$lineClients = 0;
@@ -251,9 +259,13 @@ class InfoCommand extends BasicCommand{
 					}
 					
 					Console::screenClearToBottom();
+					#sleep(1);
 					print PHP_EOL;
+					#sleep(1);
 					Console::cursorUp($line + 2);
+					#sleep(1);
 					Console::cursorJumpToColumn(1);
+					#sleep(1);
 					
 					#print 'run /'.$time.'/ /'.$seconds.'/ /'.$clientLines.'/ /'.$tcols.'/ /'.$tlines.'/'."\r";
 				}
