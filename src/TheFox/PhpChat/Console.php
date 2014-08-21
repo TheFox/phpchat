@@ -583,13 +583,9 @@ class Console extends Thread{
 							
 							$this->log->debug('buffer old: /'.$this->buffer.'/');
 							
-							#$this->buffer = substr($this->buffer, 0, $this->bufferCursorPos).$char.substr($this->buffer, $this->bufferCursorPos);
-							
 							$bufferOld = $this->buffer;
-							
 							$this->buffer = substr($bufferOld, 0, $this->bufferCursorPos);
 							$this->buffer .= $char.substr($bufferOld, $this->bufferCursorPos);
-							
 							$this->log->debug('buffer new: /'.$this->buffer.'/');
 							
 							#sleep(1);

@@ -499,7 +499,6 @@ class Cronjob extends Thread{
 		
 		foreach($urls as $url){
 			$client = new \GuzzleHttp\Client();
-			#$success = false;
 			$response = null;
 			
 			try{
@@ -512,8 +511,6 @@ class Cronjob extends Thread{
 					'connect_timeout' => 3,
 					'timeout' => 5,
 				));
-				
-				#$success = true;
 			}
 			catch(Exception $e){
 				$this->log->error('url failed, "'.$url.'": '.$e->getMessage());
