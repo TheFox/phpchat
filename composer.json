@@ -1,7 +1,7 @@
 {
 	"name": "thefox/phpchat",
 	"description": "A decentralized, peer-to-peer, encrypted chat in PHP.",
-	"license": "GPLv3",
+	"license": "GPL-3.0",
 	"type": "project",
 	"keywords": [ "chat", "im", "messaging", "p2p", "peer-to-peer", "decentralized", "serverless" ],
 	"homepage": "http://fox21.at",
@@ -14,6 +14,7 @@
 	],
 	"require": {
 		"php": ">=5.3",
+		"lib-curl": "~7.0",
 		"symfony/yaml": "~2.5",
 		"symfony/console": "~2.5",
 		"symfony/filesystem": "~2.5",
