@@ -134,6 +134,21 @@ class Cronjob extends Thread{
 		$this->shutdown();
 	}
 	
+	public function cycleBootstrapNodes(){
+		if(!$this->getIpcKernelConnection()){
+			throw new RuntimeException('You must first run init().');
+		}
+		
+		$this->bootstrapNodesEnclose();
+		
+		$this->log->debug('save');
+		$this->getIpcKernelConnection()->execAsync('save');
+		
+		$this->getIpcKernelConnection()->run();
+		
+		$this->shutdown();
+	}
+	
 	private function run(){
 		if(!$this->getIpcKernelConnection()){
 			throw new RuntimeException('You must first run init().');
@@ -497,6 +512,13 @@ class Cronjob extends Thread{
 		);
 		$userAgent = PhpChat::NAME.'/'.PhpChat::VERSION.' PHP/'.PHP_VERSION.' curl/'.curl_version()['version'];
 		
+		if(!$this->table){
+			$this->log->debug('get table');
+			$this->setTable($this->getIpcKernelConnection()->execSync('getTable'));
+		}
+		
+		$this->log->debug('local node: /'.$this->table->getLocalNode()->getIdHexStr().'/');
+		
 		foreach($urls as $url){
 			$client = new \GuzzleHttp\Client();
 			$response = null;
@@ -543,14 +565,23 @@ class Cronjob extends Thread{
 										
 										if(isset($node['id'])){
 											$nodeObj->setIdHexStr($node['id']);
-											$this->getIpcKernelConnection()->execAsync('tableNodeEnclose', array($nodeObj));
+											
+											$this->log->debug('node: /'.$nodeObj->getUri().'/ /'.$nodeObj->getIdHexStr().'/');
+											
+											if(!$nodeObj->isEqual($this->table->getLocalNode())){
+												$this->getIpcKernelConnection()->execAsync('tableNodeEnclose', array($nodeObj));
+											}
+											else{
+												$this->log->debug('ignore local node');
+											}
 										}
 										else{
+											$this->log->debug('node: /'.$nodeObj->getUri().'/');
 											$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeAddUri', array((string)$nodeObj->getUri()));
 										}
 									}
 									
-									$this->log->debug('node: '.$nodeObj->getUri());
+									
 								}
 							}
 						}

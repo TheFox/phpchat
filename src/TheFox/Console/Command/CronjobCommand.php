@@ -23,6 +23,7 @@ class CronjobCommand extends BasicCommand{
 		$this->addOption('cycle', 'c', InputOption::VALUE_NONE, 'Run only one cycle.');
 		$this->addOption('msg', 'm', InputOption::VALUE_NONE, 'Run only one cycle with Msgs.');
 		$this->addOption('nodes', null, InputOption::VALUE_NONE, 'Run only one cycle with Nodes New DB.');
+		$this->addOption('bootstrap', null, InputOption::VALUE_NONE, 'Run only one cycle with Boostrap Nodes.');
 		$this->addOption('shutdown', 's', InputOption::VALUE_NONE, 'Shutdown.');
 	}
 	
@@ -48,6 +49,9 @@ class CronjobCommand extends BasicCommand{
 		}
 		elseif($input->hasOption('nodes') && $input->getOption('nodes')){
 			$this->cronjob->cycleNodesNew();
+		}
+		elseif($input->hasOption('bootstrap') && $input->getOption('bootstrap')){
+			$this->cronjob->cycleBootstrapNodes();
 		}
 		else{
 			try{
