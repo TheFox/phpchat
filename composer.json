@@ -15,6 +15,7 @@
 	"require": {
 		"php": ">=5.3",
 		"lib-curl": "~7.0",
+		"lib-openssl": ">=0.9.8",
 		"symfony/yaml": "~2.5",
 		"symfony/console": "~2.5",
 		"symfony/filesystem": "~2.5",
