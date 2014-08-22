@@ -1,5 +1,5 @@
 # PHPChat
-A decentralized, peer-to-peer, encrypted chat in PHP.
+A decentralized, peer-to-peer, encrypted chat in PHP. If nobody on the Internet cares about security and privacy we must take care about ourselves.
 
 ## Why this project?
 Because we need to encrypt and secure the Internet. The Internet is broken and we need to fix it. Thanks people like [Edward Snowden](https://en.wikipedia.org/wiki/Edward_Snowden) we know today that the [NSA](https://en.wikipedia.org/wiki/National_Security_Agency) (and also other [intelligence agencies](https://en.wikipedia.org/wiki/Intelligence_agency) too) operates a [global surveillance](https://en.wikipedia.org/wiki/Global_surveillance_disclosures_(2013%E2%80%93present)) on citizens. We can't loose our right of freedom, our right of privacy to centralized governmental authorities. Now it's our move. It's time to fight back!
