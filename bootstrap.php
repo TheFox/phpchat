@@ -193,3 +193,5 @@ if($keyPub && !$settings->data['node']['id']){
 }
 
 $settings->save();
+
+$filesystem->chmod(__DIR__.'/settings.yml', 0600);
