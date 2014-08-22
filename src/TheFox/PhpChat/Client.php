@@ -1317,7 +1317,7 @@ class Client{
 					
 					if($token){
 						$testToken = hash('sha512',
-							$this->sslPasswordToken.'_'.$this->getNode()->getSslKeyPubFingerprint());
+							$this->sslPasswordToken.'_'.$this->getNode()->getIdHexStr());
 						if($this->sslPasswordToken && $token == $testToken){
 							$this->log('debug', 'SSL: password verified');
 							$this->log('debug', 'SSL: OK');
@@ -1954,7 +1954,7 @@ class Client{
 			throw new RuntimeException('ssl not set.');
 		}
 		
-		$token = hash('sha512', $token.'_'.$this->getLocalNode()->getSslKeyPubFingerprint());
+		$token = hash('sha512', $token.'_'.$this->getLocalNode()->getIdHexStr());
 		
 		$data = array(
 			'token' => $token,
