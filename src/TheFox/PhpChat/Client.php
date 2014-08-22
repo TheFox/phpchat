@@ -1571,14 +1571,18 @@ class Client{
 								$userNicknameOld = $contact->getUserNickname();
 							}
 							
-							$contact->setUserNickname($userNicknameNew);
-							$this->getServer()->getKernel()->getAddressbook()->setDataChanged(true);
+							if($userNicknameNew){
+								$contact->setUserNickname($userNicknameNew);
+								$this->getServer()->getKernel()->getAddressbook()->setDataChanged(true);
+							}
 						}
 					}
 					
-					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$userNicknameOld.', '.$userNicknameNew);
-					$this->consoleMsgAdd('User "'.$userNicknameOld.'" is now known as "'.$userNicknameNew.'".',
-						true, true, true);
+					if($userNicknameNew){
+						$this->log('debug', $this->getUri().' recv '.$msgName.': '.$userNicknameOld.', '.$userNicknameNew);
+						$this->consoleMsgAdd('User "'.$userNicknameOld.'" is now known as "'.$userNicknameNew.'".',
+							true, true, true);
+					}
 				}
 			}
 		}
