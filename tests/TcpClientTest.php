@@ -799,25 +799,25 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
 		$this->assertEquals('ping', $json[0]['name']);
-		$this->assertEquals('', $json[0]['data']['id']);
+		$this->assertEquals('', $json[0]['data']['rid']);
 		
 		$raw = $client2->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
 		$this->assertEquals('pong', $json[0]['name']);
-		$this->assertEquals('', $json[0]['data']['id']);
+		$this->assertEquals('', $json[0]['data']['rid']);
 		
 		$raw = $client1->sendPing('de0bb575-cead-4ffe-adcb-311388511ed7');
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
 		$this->assertEquals('ping', $json[0]['name']);
-		$this->assertEquals('de0bb575-cead-4ffe-adcb-311388511ed7', $json[0]['data']['id']);
+		$this->assertEquals('de0bb575-cead-4ffe-adcb-311388511ed7', $json[0]['data']['rid']);
 		
 		$raw = $client2->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
-		ve($json);
+		#ve($json);
 		$this->assertEquals('pong', $json[0]['name']);
-		$this->assertEquals('de0bb575-cead-4ffe-adcb-311388511ed7', $json[0]['data']['id']);
+		$this->assertEquals('de0bb575-cead-4ffe-adcb-311388511ed7', $json[0]['data']['rid']);
 		
 		$client1->getServer()->getKernel()->shutdown();
 		$client2->getServer()->getKernel()->shutdown();
