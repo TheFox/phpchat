@@ -642,38 +642,44 @@ class Client{
 				
 				$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.$nodeId.', '.(int)($this->getNode() != null));
 				
-				if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MIN)){
-					if($nodeId){
-						$node = new Node();
-						$node->setIdHexStr($nodeId);
-						
-						if( $node->isEqual($this->getLocalNode()) ){
-							$this->log('debug', 'node find: find myself');
+				if($rid){
+					if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MIN)){
+						if($nodeId){
+							$node = new Node();
+							$node->setIdHexStr($nodeId);
 							
-							$msgHandleReturnValue .= $this->sendNodeFound($rid);
-						}
-						elseif( !$node->isEqual($this->getNode()) && $onode = $this->getTable()->nodeFindInBuckets($node) ){
-							$this->log('debug', 'node find: find in buckets');
-							
-							$msgHandleReturnValue .= $this->sendNodeFound($rid, array($onode));
-						}
-						else{
-							$this->log('debug', 'node find: closest to "'.$node->getIdHexStr().'"');
-							
-							$nodes = $this->getTable()->nodeFindClosest($node, $num);
-							foreach($nodes as $cnodeId => $cnode){
-								if($cnode->isEqual($this->getNode())){
-									unset($nodes[$cnodeId]);
-									break;
-								}
+							if( $node->isEqual($this->getLocalNode()) ){
+								$this->log('debug', 'node find: find myself');
+								
+								$msgHandleReturnValue .= $this->sendNodeFound($rid);
 							}
-							
-							$msgHandleReturnValue .= $this->sendNodeFound($rid, $nodes);
+							elseif( !$node->isEqual($this->getNode()) && $onode = $this->getTable()->nodeFindInBuckets($node) ){
+								$this->log('debug', 'node find: find in buckets');
+								
+								$msgHandleReturnValue .= $this->sendNodeFound($rid, array($onode));
+							}
+							else{
+								$this->log('debug', 'node find: closest to "'.$node->getIdHexStr().'"');
+								
+								$nodes = $this->getTable()->nodeFindClosest($node, $num);
+								foreach($nodes as $cnodeId => $cnode){
+									if($cnode->isEqual($this->getNode())){
+										unset($nodes[$cnodeId]);
+										break;
+									}
+								}
+								
+								$msgHandleReturnValue .= $this->sendNodeFound($rid, $nodes);
+							}
 						}
+					}
+					else{
+						$msgHandleReturnValue .= $this->sendError(4000, $msgName);
 					}
 				}
 				else{
-					$msgHandleReturnValue .= $this->sendError(4000, $msgName);
+					$msgHandleReturnValue .= $this->sendError(9000, $msgName);
+					$this->log('error', static::getErrorMsg(9000));
 				}
 			}
 			else{
