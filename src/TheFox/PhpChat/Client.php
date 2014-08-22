@@ -1613,16 +1613,16 @@ class Client{
 		}
 		
 		elseif($msgName == 'ping'){
-			$id = '';
-			if(array_key_exists('id', $msgData)){
-				$id = $msgData['id'];
+			$rid = '';
+			if(array_key_exists('rid', $msgData)){
+				$rid = $msgData['rid'];
 			}
-			$msgHandleReturnValue .= $this->sendPong($id);
+			$msgHandleReturnValue .= $this->sendPong($rid);
 		}
 		elseif($msgName == 'pong'){
-			$id = '';
-			if(array_key_exists('id', $msgData)){
-				$id = $msgData['id'];
+			$rid = '';
+			if(array_key_exists('rid', $msgData)){
+				$rid = $msgData['rid'];
 			}
 			$this->pongTime = time();
 		}
@@ -2038,18 +2038,18 @@ class Client{
 		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('talk_close', $data));
 	}
 	
-	public function sendPing($id = ''){
+	public function sendPing($rid = ''){
 		$this->pingTime = time();
 		
 		$data = array(
-			'id' => $id,
+			'rid' => $rid,
 		);
 		return $this->dataSend($this->msgCreate('ping', $data));
 	}
 	
-	public function sendPong($id = ''){
+	public function sendPong($rid = ''){
 		$data = array(
-			'id' => $id,
+			'rid' => $rid,
 		);
 		return $this->dataSend($this->msgCreate('pong', $data));
 	}
