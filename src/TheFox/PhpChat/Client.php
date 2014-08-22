@@ -1801,7 +1801,6 @@ class Client{
 			'id' => $msg->getId(),
 			'srcNodeId' => $msg->getSrcNodeId(),
 			'srcSslKeyPub' => base64_encode($msg->getSrcSslKeyPub()),
-			'srcUserNickname' => $msg->getSrcUserNickname(),
 			'dstNodeId' => $msg->getDstNodeId(),
 			'body' => $msg->getBody(),
 			'password' => $msg->getPassword(),
