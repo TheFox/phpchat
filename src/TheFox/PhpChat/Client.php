@@ -1076,15 +1076,15 @@ class Client{
 			}
 		}
 		elseif($msgName == 'ssl_init_response'){
-			$code = 0;
-			if(array_key_exists('code', $msgData)){
-				$code = $msgData['code'];
+			$status = 0;
+			if(array_key_exists('status', $msgData)){
+				$status = $msgData['status'];
 			}
 			
-			$this->log('debug', 'SSL: init response: '.$code);
+			$this->log('debug', 'SSL: init response: '.$status);
 			
-			if($code){
-				if($code == 1){
+			if($status){
+				if($status == 1){
 					// Ok
 					if($this->getStatus('hasSslInit') && !$this->getStatus('hasSslInitOk')){
 						$this->log('debug', 'SSL: init ok');
@@ -1098,7 +1098,7 @@ class Client{
 					}
 				}
 				else{
-					$this->log('warning', $msgName.' SSL: failed. code = '.$code);
+					$this->log('warning', $msgName.' SSL: failed. status = '.$status);
 					$this->resetStatusSsl();
 					$msgHandleReturnValue .= $this->sendError(3100, $msgName);
 				}
@@ -1846,12 +1846,12 @@ class Client{
 		}
 	}
 	
-	private function sendSslInitResponse($code){
+	private function sendSslInitResponse($status){
 		if(!$this->getSsl()){
 			throw new RuntimeException('ssl not set.');
 		}
 		
-		$data = array('code' => $code);
+		$data = array('status' => $status);
 		
 		return $this->dataSend($this->msgCreate('ssl_init_response', $data));
 	}

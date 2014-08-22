@@ -589,7 +589,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
 		$this->assertEquals('ssl_init_response', $json[0]['name']);
-		$this->assertEquals(1000, $json[0]['data']['code']);
+		$this->assertEquals(1000, $json[0]['data']['status']);
 		
 		$raw = $client1->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
@@ -607,7 +607,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
 		$this->assertEquals('ssl_init_response', $json[0]['name']);
-		$this->assertEquals(4000, $json[0]['data']['code']);
+		$this->assertEquals(4000, $json[0]['data']['status']);
 		
 		$raw = $client1->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
