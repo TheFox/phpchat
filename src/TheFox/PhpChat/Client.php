@@ -1541,7 +1541,7 @@ class Client{
 						$ignore = $msgData['ignore'];
 					}
 					
-					$debugText = $rid.', '.$userNickname.', '.(int)$ignore.', '.$text;
+					$debugText = '/'.$rid.'/ /'.$userNickname.'/ '.(int)$ignore.' /'.$text.'/';
 					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$debugText);
 					if(!$ignore){
 						$this->consoleTalkMsgAdd($rid, $userNickname, $text);
