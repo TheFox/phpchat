@@ -1425,8 +1425,8 @@ class Client{
 					
 					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.$userNickname);
 					
-					if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MAX)){
-						if($rid){
+					if($rid){
+						if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MAX)){
 							if($this->getServer() && $this->getServer()->kernelHasConsole()){
 								$this->setStatus('hasTalkRequest', true);
 								$this->consoleTalkRequestAdd($rid, $userNickname);
@@ -1438,11 +1438,11 @@ class Client{
 							}
 						}
 						else{
-							$msgHandleReturnValue .= $this->sendError(9000, $msgName);
+							$msgHandleReturnValue .= $this->sendError(4000, $msgName);
 						}
 					}
 					else{
-						$msgHandleReturnValue .= $this->sendError(4000, $msgName);
+						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
 					}
 				}
 				else{
