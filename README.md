@@ -25,7 +25,7 @@ I also like the [Bitmessage](https://bitmessage.org) project. But building think
 
 		make
 
-3. You need to forward TCP port 25000 (default) on your modem to your computer. After the chat has been started once there will be a `settings.yml`. Edit this file to change the incoming port. After changing the settings file you must restart the chat.
+3. You need to forward TCP port 25000 (default) on your modem to your computer. After the chat has been started once there will be a `settings.yml`. Edit this file to change the incoming port. Change the `settings.yml` only when PHPChat is not running.
 4. Start:
 
 		./start.sh
