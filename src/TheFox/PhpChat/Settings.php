@@ -27,9 +27,6 @@ class Settings extends YamlStorage{
 		$this->data['node']['sslKeyPrvPath'] = 'id_rsa.prv';
 		$this->data['node']['sslKeyPubPath'] = 'id_rsa.pub';
 		
-		$this->data['nodes'] = array();
-		$this->data['nodes']['timeLastCheck'] = 0;
-		
 		$this->data['user'] = array();
 		$this->data['user']['nickname'] = '';
 		
