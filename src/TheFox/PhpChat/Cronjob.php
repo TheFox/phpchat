@@ -385,7 +385,7 @@ class Cronjob extends Thread{
 		
 		// Don't use messages which reached MSG_FORWARD_TO_NODES_MIN or MSG_FORWARD_TO_NODES_MAX.
 		foreach($processedMsgs as $msgId => $msg){
-			$this->log->debug(__FUNCTION__.' search for unset: '. $msg->getId() );
+			$this->log->debug(__FUNCTION__.' search for unset: '.$msg->getId());
 			
 			$sentNodesC = count($msg->getSentNodes());
 			$forwardCycles = $msg->getForwardCycles();
@@ -455,7 +455,7 @@ class Cronjob extends Thread{
 					&& !in_array($node->getIdHexStr(), $msg->getSentNodes())
 					&& $node->getUri()->getHost() && $node->getUri()->getPort()
 				){
-					$this->log->debug(__FUNCTION__.'             n '.$node->getIdHexStr());
+					$this->log->debug(__FUNCTION__.'             node: '.$node->getIdHexStr());
 					
 					$nodes[$node->getIdHexStr()] = $node;
 					
