@@ -35,9 +35,9 @@ class Client{
 	private $ssl = null;
 	private $sslTestToken = '';
 	private $sslPasswordToken = '';
-	private $sslPasswordLocal = '';
+	private $sslPasswordLocalCurrent = '';
 	private $sslPasswordLocalNew = '';
-	private $sslPasswordPeer = '';
+	private $sslPasswordPeerCurrent = '';
 	private $sslPasswordPeerNew = '';
 	private $sslPasswordTime = 0;
 	
@@ -1181,8 +1181,8 @@ class Client{
 						$this->log('debug', 'SSL: password put');
 						
 						$this->setStatus('hasSslPasswortPut', true);
-						$this->sslPasswordPeer = $password;
-						$this->log('debug', 'SSL: peer password: '.substr($this->sslPasswordPeer, 0, 20));
+						$this->sslPasswordPeerCurrent = $password;
+						$this->log('debug', 'SSL: peer password: '.substr($this->sslPasswordPeerCurrent, 0, 20));
 						
 						$msgHandleReturnValue .= $this->sendSslPasswordTest();
 					}
@@ -1214,7 +1214,7 @@ class Client{
 						
 						$this->sslPasswordPeerNew = $password;
 						
-						#$this->log('debug', 'SSL: peer password: '.substr($this->sslPasswordPeer, 0, 20));
+						#$this->log('debug', 'SSL: peer password: '.substr($this->sslPasswordPeerCurrent, 0, 20));
 						#$this->log('debug', 'SSL: peer password new: '.substr($this->sslPasswordPeerNew, 0, 20));
 						
 						if(!$this->getStatus('hasReSslPasswortPutInit')){
@@ -1371,8 +1371,8 @@ class Client{
 							
 							$this->setStatus('hasReSslPasswortPutInit', false);
 							
-							$this->sslPasswordLocal = $this->sslPasswordLocalNew;
-							$this->sslPasswordPeer = $this->sslPasswordPeerNew;
+							$this->sslPasswordLocalCurrent = $this->sslPasswordLocalNew;
+							$this->sslPasswordPeerCurrent = $this->sslPasswordPeerNew;
 							
 							$action = $this->actionGetByCriterion(ClientAction::CRITERION_AFTER_HAS_RESSL);
 							if($action){
@@ -1897,12 +1897,12 @@ class Client{
 			throw new RuntimeException('ssl not set.');
 		}
 		
-		$this->sslPasswordLocal = $this->genSslPassword();
+		$this->sslPasswordLocalCurrent = $this->genSslPassword();
 		$this->sslPasswordTime = time();
-		#$this->log('debug', 'SSL: local password: '.substr($this->sslPasswordLocal, 0, 20));
+		#$this->log('debug', 'SSL: local password: '.substr($this->sslPasswordLocalCurrent, 0, 20));
 		
 		$data = array(
-			'password' => $this->sslPasswordLocal,
+			'password' => $this->sslPasswordLocalCurrent,
 		);
 		return $this->dataSend($this->sslMsgCreatePublicEncrypt('ssl_password_put', $data));
 	}
@@ -1914,9 +1914,9 @@ class Client{
 		
 		$this->sslPasswordLocalNew = $this->genSslPassword();
 		$this->sslPasswordTime = time();
-		#$this->log('debug', 're-SSL: local password:     '.substr($this->sslPasswordLocal, 0, 20));
+		#$this->log('debug', 're-SSL: local password:     '.substr($this->sslPasswordLocalCurrent, 0, 20));
 		#$this->log('debug', 're-SSL: local password new: '.substr($this->sslPasswordLocalNew, 0, 20));
-		#$this->log('debug', 're-SSL: peer password:      '.substr($this->sslPasswordPeer, 0, 20));
+		#$this->log('debug', 're-SSL: peer password:      '.substr($this->sslPasswordPeerCurrent, 0, 20));
 		#$this->log('debug', 're-SSL: peer password new:  '.substr($this->sslPasswordPeerNew, 0, 20));
 		
 		$data = array(
@@ -2154,12 +2154,13 @@ class Client{
 		return null;
 	}
 	
-	private function sslMsgCreatePasswordEncrypt($name, $data, $sslPasswordLocal = null, $sslPasswordPeer = null){
+	private function sslMsgCreatePasswordEncrypt($name, $data,
+		$sslPasswordLocalCurrent = null, $sslPasswordPeerCurrent = null){
 		$this->sslMsgCount++;
 		#print __CLASS__.'->'.__FUNCTION__.': /'.$name.'/ '.$this->sslMsgCount."\n";
 		
 		$data = json_encode($data);
-		$dataEnc = $this->sslPasswordEncrypt($data, $sslPasswordLocal, $sslPasswordPeer);
+		$dataEnc = $this->sslPasswordEncrypt($data, $sslPasswordLocalCurrent, $sslPasswordPeerCurrent);
 		
 		if($dataEnc){
 			$json = array(
@@ -2174,8 +2175,9 @@ class Client{
 		return null;
 	}
 	
-	private function sslMsgDataPasswordDecrypt($dataEnc, $sslPasswordLocal = null, $sslPasswordPeer = null){
-		$data = $this->sslPasswordDecrypt($dataEnc, $sslPasswordLocal, $sslPasswordPeer);
+	private function sslMsgDataPasswordDecrypt($dataEnc,
+		$sslPasswordLocalCurrent = null, $sslPasswordPeerCurrent = null){
+		$data = $this->sslPasswordDecrypt($dataEnc, $sslPasswordLocalCurrent, $sslPasswordPeerCurrent);
 		if($data){
 			$data = json_decode($data, true);
 			return $data;
@@ -2257,20 +2259,20 @@ class Client{
 		return null;
 	}
 	
-	private function sslPasswordEncrypt($data, $sslPasswordLocal = null, $sslPasswordPeer = null){
-		#$this->log('debug', 'SSL password encrypt: /'.$sslPasswordLocal.'/ /'.$sslPasswordPeer.'/');
+	private function sslPasswordEncrypt($data, $sslPasswordLocalCurrent = null, $sslPasswordPeerCurrent = null){
+		#$this->log('debug', 'SSL password encrypt: /'.$sslPasswordLocalCurrent.'/ /'.$sslPasswordPeerCurrent.'/');
 		
-		if($sslPasswordLocal === null){
+		if($sslPasswordLocalCurrent === null){
 			#$this->log('debug', 'SSL password encrypt: no local password set');
-			$sslPasswordLocal = $this->sslPasswordLocal;
+			$sslPasswordLocalCurrent = $this->sslPasswordLocalCurrent;
 		}
-		if($sslPasswordPeer === null){
+		if($sslPasswordPeerCurrent === null){
 			#$this->log('debug', 'SSL password encrypt: no peer password set');
-			$sslPasswordPeer = $this->sslPasswordPeer;
+			$sslPasswordPeerCurrent = $this->sslPasswordPeerCurrent;
 		}
 		
-		if($sslPasswordLocal && $sslPasswordPeer){
-			$password = $sslPasswordLocal.'_'.$sslPasswordPeer;
+		if($sslPasswordLocalCurrent && $sslPasswordPeerCurrent){
+			$password = $sslPasswordLocalCurrent.'_'.$sslPasswordPeerCurrent;
 			#$this->log('debug', 'SSL password encrypt pwd: '.$password);
 			
 			if(openssl_sign($data, $sign, $this->getSsl(), OPENSSL_ALGO_SHA1)){
@@ -2298,20 +2300,20 @@ class Client{
 		return null;
 	}
 	
-	private function sslPasswordDecrypt($data, $sslPasswordLocal = null, $sslPasswordPeer = null){
-		#$this->log('debug', 'SSL password decrypt: /'.$sslPasswordLocal.'/ /'.$sslPasswordPeer.'/');
+	private function sslPasswordDecrypt($data, $sslPasswordLocalCurrent = null, $sslPasswordPeerCurrent = null){
+		#$this->log('debug', 'SSL password decrypt: /'.$sslPasswordLocalCurrent.'/ /'.$sslPasswordPeerCurrent.'/');
 		
-		if($sslPasswordLocal === null){
+		if($sslPasswordLocalCurrent === null){
 			#$this->log('debug', 'SSL password decrypt: no local password set');
-			$sslPasswordLocal = $this->sslPasswordLocal;
+			$sslPasswordLocalCurrent = $this->sslPasswordLocalCurrent;
 		}
-		if($sslPasswordPeer === null){
+		if($sslPasswordPeerCurrent === null){
 			#$this->log('debug', 'SSL password decrypt: no peer password set');
-			$sslPasswordPeer = $this->sslPasswordPeer;
+			$sslPasswordPeerCurrent = $this->sslPasswordPeerCurrent;
 		}
 		
-		if($sslPasswordLocal && $sslPasswordPeer){
-			$password = $sslPasswordPeer.'_'.$sslPasswordLocal;
+		if($sslPasswordLocalCurrent && $sslPasswordPeerCurrent){
+			$password = $sslPasswordPeerCurrent.'_'.$sslPasswordLocalCurrent;
 			#$this->log('debug', 'SSL password decrypt pwd: '.$password);
 			
 			$data = base64_decode($data);
