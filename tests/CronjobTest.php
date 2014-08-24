@@ -137,6 +137,7 @@ KG43fr2B2ba/b77pCJZCB1/pDFYsViirsfqW0P4UAR6vIHKgcHYz1gvtrBuu61JO
 nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 -----END PUBLIC KEY-----';
 	
+	protected static $settings = null;
 	protected static $cronjob = null;
 	protected static $nodes = array();
 	protected static $msgs = array();
@@ -147,18 +148,18 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		file_put_contents('tests/id_rsa2.prv', static::NODE_LOCAL_SSL_KEY_PRV);
 		file_put_contents('tests/id_rsa2.pub', static::NODE_LOCAL_SSL_KEY_PUB);
 		
-		$settings = new Settings('tests/settings.yml');
-		$settings->data['datadir'] = 'tests';
-		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'tests/id_rsa2.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'tests/id_rsa2.pub';
-		$settings->setDataChanged(true);
-		$settings->save();
+		self::$settings = new Settings('tests/settings.yml');
+		self::$settings->data['datadir'] = 'tests';
+		self::$settings->data['node']['sslKeyPrvPass'] = 'my_password';
+		self::$settings->data['node']['sslKeyPrvPath'] = 'tests/id_rsa2.prv';
+		self::$settings->data['node']['sslKeyPubPath'] = 'tests/id_rsa2.pub';
+		self::$settings->setDataChanged(true);
+		self::$settings->save();
 		
 		$localNode = new Node();
-		$localNode->setIdHexStr($settings->data['node']['id']);
-		$localNode->setUri('tcp://'.$settings->data['node']['ip'].':'.$settings->data['node']['port']);
-		$localNode->setSslKeyPub(file_get_contents($settings->data['node']['sslKeyPubPath']));
+		$localNode->setIdHexStr(self::$settings->data['node']['id']);
+		$localNode->setUri('tcp://'.self::$settings->data['node']['ip'].':'.self::$settings->data['node']['port']);
+		$localNode->setSslKeyPub(file_get_contents(self::$settings->data['node']['sslKeyPubPath']));
 		self::assertEquals(static::NODE_LOCAL_SSL_KEY_PUB, $localNode->getSslKeyPub());
 		self::assertEquals('FC_WwG2GdTmCLSKhpEmJso6pejm9c6oACjX', Node::genSslKeyFingerprint($localNode->getSslKeyPub()));
 		
@@ -185,7 +186,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		self::$nodes[5]->setSslKeyPub(static::NODE5_SSL_KEY_PUB);
 		
 		$table = new Table();
-		$table->setDatadirBasePath($settings->data['datadir']);
+		$table->setDatadirBasePath(self::$settings->data['datadir']);
 		$table->setLocalNode($localNode);
 		$table->nodeEnclose(self::$nodes[0]);
 		$table->nodeEnclose(self::$nodes[1]);
@@ -195,7 +196,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		#$table->nodeEnclose(self::$nodes[5]);
 		
 		$msgDb = new MsgDb();
-		$msgDb->setDatadirBasePath($settings->data['datadir']);
+		$msgDb->setDatadirBasePath(self::$settings->data['datadir']);
 		
 		for($nodeNo = 1000; $nodeNo <= 1011; $nodeNo++){
 			$msg = new Msg();
@@ -203,12 +204,13 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 			$msg->setId('20000000-2000-4002-8002-20000000'.$nodeNo);
 			self::assertEquals('20000000-2000-4002-8002-20000000'.$nodeNo, $msg->getId());
 			
-			$msg->setSrcNodeId($settings->data['node']['id']);
+			$msg->setSrcNodeId(self::$settings->data['node']['id']);
 			$msg->setSrcSslKeyPub($table->getLocalNode()->getSslKeyPub());
-			$msg->setSrcUserNickname($settings->data['user']['nickname']);
+			$msg->setSrcUserNickname(self::$settings->data['user']['nickname']);
 			
 			$msg->setText('this is  a test. '.date('Y/m/d H:i:s'));
-			$msg->setSslKeyPrvPath($settings->data['node']['sslKeyPrvPath'], $settings->data['node']['sslKeyPrvPass']);
+			$msg->setSslKeyPrvPath(
+				self::$settings->data['node']['sslKeyPrvPath'], self::$settings->data['node']['sslKeyPrvPass']);
 			$msg->setStatus('O');
 			
 			$msg->setDstNodeId( self::$nodes[0]->getIdHexStr() );
@@ -262,7 +264,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		
 		self::$cronjob = new Cronjob();
 		self::$cronjob->setMsgDb($msgDb);
-		self::$cronjob->setSettings($settings);
+		self::$cronjob->setSettings(self::$settings);
 		self::$cronjob->setTable($table);
 	}
 	
