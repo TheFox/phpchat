@@ -1411,12 +1411,12 @@ class Client{
 				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
 				if($msgData){
 					$rid = '';
-					$userNickname = '';
+					$userNickname = '[unknown]';
 					$hashcash = '';
 					if(array_key_exists('rid', $msgData)){
 						$rid = $msgData['rid'];
 					}
-					if(array_key_exists('userNickname', $msgData)){
+					if(array_key_exists('userNickname', $msgData) && $msgData['userNickname']){
 						$userNickname = $msgData['userNickname'];
 					}
 					if(array_key_exists('hashcash', $msgData)){
@@ -1460,14 +1460,14 @@ class Client{
 				if($msgData){
 					$rid = '';
 					$status = 0;
-					$userNickname = '';
+					$userNickname = '[unknown]';
 					if(array_key_exists('rid', $msgData)){
 						$rid = $msgData['rid'];
 					}
 					if(array_key_exists('status', $msgData)){
 						$status = (int)$msgData['status'];
 					}
-					if(array_key_exists('userNickname', $msgData)){
+					if(array_key_exists('userNickname', $msgData) && $msgData['userNickname']){
 						$userNickname = $msgData['userNickname'];
 					}
 					
@@ -1525,13 +1525,13 @@ class Client{
 				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
 				if($msgData){
 					$rid = '';
-					$userNickname = '';
+					$userNickname = '[unknown]';
 					$text = '';
 					$ignore = false;
 					if(array_key_exists('rid', $msgData)){
 						$rid = $msgData['rid'];
 					}
-					if(array_key_exists('userNickname', $msgData)){
+					if(array_key_exists('userNickname', $msgData) && $msgData['userNickname']){
 						$userNickname = $msgData['userNickname'];
 					}
 					if(array_key_exists('text', $msgData)){
@@ -1555,9 +1555,9 @@ class Client{
 			if($this->getStatus('hasSsl')){
 				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
 				if($msgData){
-					$userNicknameOld = '';
+					$userNicknameOld = '[unknown]';
 					$userNicknameNew = '';
-					if(array_key_exists('userNicknameOld', $msgData)){
+					if(array_key_exists('userNicknameOld', $msgData) && $msgData['userNicknameOld']){
 						$userNicknameOld = $msgData['userNicknameOld'];
 					}
 					if(array_key_exists('userNicknameNew', $msgData)){
@@ -1591,11 +1591,11 @@ class Client{
 				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
 				if($msgData){
 					$rid = '';
-					$userNickname = '';
+					$userNickname = '[unknown]';
 					if(array_key_exists('rid', $msgData)){
 						$rid = $msgData['rid'];
 					}
-					if(array_key_exists('userNickname', $msgData)){
+					if(array_key_exists('userNickname', $msgData) && $msgData['userNickname']){
 						$userNickname = $msgData['userNickname'];
 					}
 					
