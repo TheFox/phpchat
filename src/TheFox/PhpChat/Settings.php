@@ -36,6 +36,9 @@ class Settings extends YamlStorage{
 		$this->data['console']['history']['entriesMax'] = 1000;
 		$this->data['console']['history']['saveToFile'] = false;
 		
+		$this->data['message'] = array();
+		$this->data['message']['directDelivery'] = true;
+		
 		
 		$this->load();
 		

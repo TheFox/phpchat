@@ -93,7 +93,23 @@ StRMjmmfNXb47TeLhFS+OlCQlLBHwvXaHGl3wZ7f7eumUfhy3AOx5/8tsuUeItfp
 CoEHq/SeWAUt4rxD/HW6gRf/cdY0GhbLgqwTIs8keft7BHQokwOvTI/o1sNFEGh1
 cL7QNOI5Cv1SHZ0j85N1XmuHuIldXrjYkFRDJXifqgofMzM8M6J+0f74iupQLNwx
 X7E/kioxMTLuoxs1R1+aatsCAwEAAQ==
------END PUBLIC KEY-----';
+-----END PUBLIC KEY-----
+';
+	const NODE1_SSL_KEY_PUB = '-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAwXvEYPhRNDaPkoaPrqYD
+deHPg6V3tG+g30S1FEWD8Lgb20adYuglrdKq1uUmjACWl5QB38I++1+UUUmez+eq
+6/ow9XteenCmznAlXtfo8eFGrw6XsldgIashU3Z9LM3aoVTW5rDrLh14m3Lc56CK
+YpakTX53czECRkuUlOxB68VoIJKTOjtFWRSvSpfD3GMKKkgKbdC/kBHEfWc5KkIy
+RrOxEGSX+B1/Oa9YN85xUIqmW8MgetLTZOyzZObOUDgtqnnrGXa98vE74xfT48zD
+wPmXlPdc8Djy0i63GxiDqrHHMEmsflILS3yt9qo/ewRX73p61NUQibv8TtDYRleF
+fKRaPO534VB3nN38DTWhzYPAooxhEM+14L2aV63iD8HsepSPvq6MFLsTh2Z3qVTq
+rOVg26MDri063F2cHdhHszzoUeL717uyMuAnkJkRpAql7Y3Vq8/qFdNQWoSTntk5
+pmStANQaXEKIiboX0nU2ZkQjTidaqEEAwt4fqFMsPHBcQqyZHTSc365TVi/IU6q6
+w1EUlWW8zUtHhlSZdy9FGJZjOYlSENuDSwLD2FeeJRfTUqe1oAyhTaHWZI639Vxo
+miGuHBLwWgNEuYk/awstYK8RAHzkQ3A0QaaegG7n8iHQpIwe5zp+PmI+VF2j1Jxx
+0RZS+oG3g68cy4U/IklrFWECAwEAAQ==
+-----END PUBLIC KEY-----
+';
 	const NODE2_SSL_KEY_PUB = '-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAq8TIxa14ktxxDd7nyppI
 a5ic4bNDCPyNkzIrps78uH9rALeZGMVqJSt1BizPTCJdL9Uy4BZ4dv2qE5n1IN9E
@@ -107,7 +123,23 @@ C6+rvBhPPnCrK4rd0q9lz0H8SAtu18W+EQB8cc4323jis1vs6vkZ9c6LxnTLe2pO
 kvgfS69CROdHHFmsZI8y0Lqlo6aC7JIEW5vtMWPNvBmc/GlsZDerK3I3R17JGnB0
 xs0c/uLAMzZRFhqwaH2lOsMrU9RD75dKDPF5o3hV7ZQ8knlkDXhk+5WCL6UK9SVQ
 oBtclXATtUzixobkK04g4KMCAwEAAQ==
------END PUBLIC KEY-----';
+-----END PUBLIC KEY-----
+';
+	const NODE3_SSL_KEY_PUB = '-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAzZ6R9xKIyasuKdgqBT6i
+ZabdF2C28APtE3/Fk0bwMI2arWIaZndc0LTXc7cjGJIkHwr/PE4sEPMijN4OzhJU
+wsygK7XALYFc1z4U95uG7A581pjJbcIjrwdCvyq225ULdN9yfUkcp8LBM68oa0Y1
+FuebqThdzh6g4rH9fxxfoxf/M9SMmTni2XSUvp+NJ46ej1HvgtOduy/+wL6MDaFD
+DKWrLCseaNHJ8e0FOGwziuH70k2o1tEK6G71exRYjO4j7yRAC9wyJbSUyA19yhO8
+rnYewt5clS0ztIrJwGhuv5VIjgTb+yO9SFK+Xu+HEmYRafO7KAkF6VQj4ZE+3wyR
+3zO4sOcB/IgK0GqYqK4JDqCXoakzWTMLsEyFaFNuhFnjcVNIi6pMW0BYj6nkd7x1
+j5gfNhw6qAp+FtfNIPqBtosh16Ejr82BPrNH361x5gQC5nTSCE0qEvJbmWcWlHfl
+EImj9TRZu8uE3jRh3If8padF1KSGvEVxIC1m/UDGwdls2V9lJ7THXXC+S/dosrr5
+zv/Db7Jze0ciMz/GEZuxawhdeSLgnlwYaUqjebh27o+Md47T94iIiNMrp0bYZ2ts
+t6QRVUqOCJfest5TsW4aXYbdBLXdPe+w7qZn8nd74yHX8Dn378JR9tLd2bJcZRZ4
+ADnq5PkXUx130syhP4qjMDUCAwEAAQ==
+-----END PUBLIC KEY-----
+';
 	const NODE4_SSL_KEY_PUB = '-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAq9iZCsGcuwT1hVAwZ7ea
 ZMmpKgbANR9Sta0cjdhl6pKE27gX89d7jne1wSHvyQ8CF+Kfzn3UbEHHY9xI/Rr/
@@ -121,7 +153,8 @@ qDJlpPvhXQwxcanwpSS7LOe87NlIxyt2LMLr6VmOryeTcLdebPDZhUTaCxKdoqUy
 eCN5XntYsLIcE+zk4EgQoAEatFj2N72t0n///1Zprsps2CZEE6FWAfyvgp4sPKnf
 HpiAVgRN79aIegqfrjin0jTizJfpLhOMICpuRCBec2BthRbuBR5aXSPQ8LXyzJFN
 6Vo3RwyC0PBci/OQxABgUKkCAwEAAQ==
------END PUBLIC KEY-----';
+-----END PUBLIC KEY-----
+';
 	const NODE5_SSL_KEY_PUB = '-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAs/VYhvwdV9ww8XQTlcCU
 BOa6fdKhcJ19tfedSZ/UxILRJdJIaO/vmgXlBg9+K8PagkxABgzz83OcZwp4XsS6
@@ -135,17 +168,19 @@ y9MvarGoDXg9JJ4ofZ6epysV2iW/JiPFzAmaVPgWEOaEh+WA+9WxFp5YAp9Uf8oh
 VLm/ARle/gLdp0/pra8B1AWSpvkaYbmCJEiOvuM8tzxLfX5O10UdcR67jooHdsU7
 KG43fr2B2ba/b77pCJZCB1/pDFYsViirsfqW0P4UAR6vIHKgcHYz1gvtrBuu61JO
 nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
------END PUBLIC KEY-----';
+-----END PUBLIC KEY-----
+';
 	
-	public function testMsgDb(){
-		file_put_contents('tests/id_rsa2.prv', static::NODE_LOCAL_SSL_KEY_PRV);
-		file_put_contents('tests/id_rsa2.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+	public function testMsgDbDefault(){
+		file_put_contents('tests/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('tests/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
 		
-		$settings = new Settings('tests/settings.yml');
+		$settings = new Settings('tests/testfile_cronjob_settings.yml');
 		$settings->data['datadir'] = 'tests';
+		$settings->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB);
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'tests/id_rsa2.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'tests/id_rsa2.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_cronjob_id_rsa.prv';
+		$settings->data['node']['sslKeyPubPath'] = 'tests/testfile_cronjob_id_rsa.pub';
 		#$settings->setDataChanged(true);
 		#$settings->save();
 		
@@ -196,8 +231,6 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		#$table->nodeEnclose($nodes[4]);
 		#$table->nodeEnclose($nodes[5]);
 		
-		$msgDb = new MsgDb();
-		$msgDb->setDatadirBasePath($settings->data['datadir']);
 		$msgs = array();
 		for($nodeNo = 1000; $nodeNo <= 1011; $nodeNo++){
 			$msg = new Msg();
@@ -221,7 +254,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 			
 			$msgs[$nodeNo] = $msg;
 			
-			fwrite(STDOUT, __METHOD__.' msg setup: '.$nodeNo."\n");
+			#fwrite(STDOUT, __METHOD__.' msg setup: '.$nodeNo.''.PHP_EOL);
 		}
 		
 		$msgs[1001]->setDstNodeId( $nodes[1]->getIdHexStr() );
@@ -238,8 +271,6 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$msgs[1003]->setEncryptionMode('S');
 		$msgs[1003]->setDstSslPubKey($table->getLocalNode()->getSslKeyPub());
 		$this->assertEquals('S', $msgs[1003]->getEncryptionMode());
-		
-		#ve($table->getLocalNode()->getSslKeyPub());
 		
 		$msgs[1004]->setSentNodes(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
 		$this->assertEquals(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), $msgs[1004]->getSentNodes());
@@ -265,6 +296,9 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$msgs[1011]->setStatus('U');
 		
 		
+		$msgDb = new MsgDb();
+		$msgDb->setDatadirBasePath($settings->data['datadir']);
+		
 		$cronjob = new Cronjob();
 		$cronjob->setMsgDb($msgDb);
 		$cronjob->setSettings($settings);
@@ -272,7 +306,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		
 		// Encrypt
 		foreach($msgs as $msgId => $msg){
-			fwrite(STDOUT, __METHOD__.' encrypt: '.$msgId."\n");
+			#fwrite(STDOUT, __METHOD__.' encrypt: '.$msgId.PHP_EOL);
 			
 			$encrypted = false;
 			try{
@@ -289,13 +323,13 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		
 		
 		// Init Nodes
-		fwrite(STDOUT, __METHOD__.' init nodes'."\n");
+		#fwrite(STDOUT, __METHOD__.' init nodes'.PHP_EOL);
 		$cronjob->msgDbInitNodes();
 		
 		$cronjobMsgs = $cronjob->getMsgDb()->getMsgs();
 		
 		#foreach($cronjobMsgs as $msgId => $msg){
-		#	fwrite(STDOUT, __METHOD__.' cronjobMsgs: '.$msg->getId().', '.$msg->getStatus().', '.$msg->getEncryptionMode()."\n");
+		#	fwrite(STDOUT, __METHOD__.' cronjobMsgs: '.$msg->getId().', '.$msg->getStatus().', '.$msg->getEncryptionMode().PHP_EOL);
 		#}
 		
 		$this->assertEquals(12, count($cronjobMsgs));
@@ -329,21 +363,229 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		
 		$updateMsgs = $cronjob->msgDbSendAll();
 		
-		#foreach($updateMsgs as $msgId => $msg){
-		#	fwrite(STDOUT, __METHOD__.': '.$msgId.', '.$msg->getId().', '.$msg->getStatus().', '.$msg->getDstNodeId()."\n");
-		#}
+		foreach($updateMsgs as $msgId => $msg){
+			#fwrite(STDOUT, __METHOD__.': '.$msgId.', '.$msg->getStatus().', '.$msg->getEncryptionMode().PHP_EOL);
+			fwrite(STDOUT, __METHOD__.' update msg: /'.$msg['obj']->getId().'/ /'.$msg['obj']->getStatus().'/ /'.$msg['obj']->getEncryptionMode().'/'.' '.count($msg['nodes']).PHP_EOL);
+			#ve($msg['nodes']);
+		}
 		
-		$this->assertEquals(3, count($updateMsgs));
+		$this->assertEquals(6, count($updateMsgs));
 		
-		$this->assertTrue(array_key_exists('20000000-2000-4002-8002-200000001005', $updateMsgs));
+		$this->assertEquals('O', $msgs[1000]->getStatus());
+		$this->assertEquals('O', $msgs[1002]->getStatus());
 		$this->assertEquals('U', $msgs[1005]->getStatus());
-		
-		$this->assertTrue(array_key_exists('20000000-2000-4002-8002-200000001006', $updateMsgs));
 		$this->assertEquals('S', $msgs[1006]->getStatus());
-		
-		$this->assertTrue(array_key_exists('20000000-2000-4002-8002-200000001011', $updateMsgs));
+		$this->assertEquals('O', $msgs[1010]->getStatus());
 		$this->assertEquals('U', $msgs[1011]->getStatus());
 		
+		$this->assertEquals('D', $msgs[1000]->getEncryptionMode());
+		$this->assertEquals('D', $msgs[1002]->getEncryptionMode());
+		$this->assertEquals('D', $msgs[1005]->getEncryptionMode());
+		$this->assertEquals('D', $msgs[1006]->getEncryptionMode());
+		$this->assertEquals('D', $msgs[1010]->getEncryptionMode());
+		$this->assertEquals('D', $msgs[1011]->getEncryptionMode());
+		
+		$this->assertTrue(array_key_exists('20000000-2000-4002-8002-200000001000', $updateMsgs));
+		$this->assertTrue(array_key_exists('20000000-2000-4002-8002-200000001002', $updateMsgs));
+		$this->assertTrue(array_key_exists('20000000-2000-4002-8002-200000001005', $updateMsgs));
+		$this->assertTrue(array_key_exists('20000000-2000-4002-8002-200000001006', $updateMsgs));
+		$this->assertTrue(array_key_exists('20000000-2000-4002-8002-200000001010', $updateMsgs));
+		$this->assertTrue(array_key_exists('20000000-2000-4002-8002-200000001011', $updateMsgs));
+		
+		$this->assertEquals(3, count($updateMsgs['20000000-2000-4002-8002-200000001000']['nodes']));
+		$this->assertEquals(3, count($updateMsgs['20000000-2000-4002-8002-200000001002']['nodes']));
+		$this->assertEquals(3, count($updateMsgs['20000000-2000-4002-8002-200000001005']['nodes']));
+		$this->assertEquals(3, count($updateMsgs['20000000-2000-4002-8002-200000001006']['nodes']));
+		$this->assertEquals(2, count($updateMsgs['20000000-2000-4002-8002-200000001010']['nodes']));
+		$this->assertEquals(3, count($updateMsgs['20000000-2000-4002-8002-200000001011']['nodes']));
+		
+		$this->assertTrue(array_key_exists('10000000-1000-4001-8001-100000000000', $updateMsgs['20000000-2000-4002-8002-200000001000']['nodes']));
+		$this->assertTrue(array_key_exists('10000000-1000-4001-8001-100000000001', $updateMsgs['20000000-2000-4002-8002-200000001000']['nodes']));
+		$this->assertTrue(array_key_exists('10000000-1000-4001-8001-100000000002', $updateMsgs['20000000-2000-4002-8002-200000001000']['nodes']));
+		
+		$this->assertTrue(array_key_exists('10000000-1000-4001-8001-100000000000', $updateMsgs['20000000-2000-4002-8002-200000001002']['nodes']));
+		$this->assertTrue(array_key_exists('10000000-1000-4001-8001-100000000001', $updateMsgs['20000000-2000-4002-8002-200000001002']['nodes']));
+		$this->assertTrue(array_key_exists('10000000-1000-4001-8001-100000000002', $updateMsgs['20000000-2000-4002-8002-200000001002']['nodes']));
+		
+		$this->assertTrue(array_key_exists('10000000-1000-4001-8001-100000000000', $updateMsgs['20000000-2000-4002-8002-200000001005']['nodes']));
+		$this->assertTrue(array_key_exists('10000000-1000-4001-8001-100000000001', $updateMsgs['20000000-2000-4002-8002-200000001005']['nodes']));
+		$this->assertTrue(array_key_exists('10000000-1000-4001-8001-100000000002', $updateMsgs['20000000-2000-4002-8002-200000001005']['nodes']));
+		
+		$this->assertTrue(array_key_exists('10000000-1000-4001-8001-100000000000', $updateMsgs['20000000-2000-4002-8002-200000001006']['nodes']));
+		$this->assertTrue(array_key_exists('10000000-1000-4001-8001-100000000001', $updateMsgs['20000000-2000-4002-8002-200000001006']['nodes']));
+		$this->assertTrue(array_key_exists('10000000-1000-4001-8001-100000000002', $updateMsgs['20000000-2000-4002-8002-200000001006']['nodes']));
+		
+		$this->assertTrue(array_key_exists('10000000-1000-4001-8001-100000000000', $updateMsgs['20000000-2000-4002-8002-200000001010']['nodes']));
+		$this->assertTrue(array_key_exists('10000000-1000-4001-8001-100000000002', $updateMsgs['20000000-2000-4002-8002-200000001010']['nodes']));
+		
+		$this->assertTrue(array_key_exists('10000000-1000-4001-8001-100000000000', $updateMsgs['20000000-2000-4002-8002-200000001011']['nodes']));
+		$this->assertTrue(array_key_exists('10000000-1000-4001-8001-100000000001', $updateMsgs['20000000-2000-4002-8002-200000001011']['nodes']));
+		$this->assertTrue(array_key_exists('10000000-1000-4001-8001-100000000002', $updateMsgs['20000000-2000-4002-8002-200000001011']['nodes']));
+	}
+	
+	public function testMsgDbIndirectDelivery(){
+		file_put_contents('tests/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('tests/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+		
+		$settings = new Settings('tests/testfile_cronjob_settings.yml');
+		$settings->data['datadir'] = 'tests';
+		$settings->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB);
+		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
+		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_cronjob_id_rsa.prv';
+		$settings->data['node']['sslKeyPubPath'] = 'tests/testfile_cronjob_id_rsa.pub';
+		$settings->data['message']['directDelivery'] = false;
+		
+		$localNode = new Node();
+		$localNode->setIdHexStr($settings->data['node']['id']);
+		$localNode->setUri('tcp://'.$settings->data['node']['ip'].':'.$settings->data['node']['port']);
+		$localNode->setSslKeyPub(file_get_contents($settings->data['node']['sslKeyPubPath']));
+		
+		
+		$nodes = array();
+		$nodes[0] = new Node();
+		$nodes[0]->setIdHexStr('11000000-1000-4001-8001-100000000000');
+		$nodes[0]->setUri('tcp://127.0.0.0:25000');
+		$nodes[0]->setSslKeyPub(static::NODE0_SSL_KEY_PUB);
+		
+		$nodes[1] = new Node();
+		$nodes[1]->setIdHexStr('11000000-1000-4001-8001-100000000001');
+		$nodes[1]->setUri('tcp://127.0.0.1:25000');
+		$nodes[1]->setSslKeyPub(static::NODE1_SSL_KEY_PUB);
+		
+		$nodes[2] = new Node();
+		$nodes[2]->setIdHexStr('11000000-1000-4001-8001-100000000002');
+		$nodes[2]->setUri('tcp://127.0.0.2:25000');
+		$nodes[2]->setSslKeyPub(static::NODE2_SSL_KEY_PUB);
+		
+		$nodes[3] = new Node();
+		$nodes[3]->setIdHexStr('11000000-1000-4001-8001-100000000003');
+		$nodes[3]->setUri('tcp://127.0.0.3:25000');
+		$nodes[3]->setSslKeyPub(static::NODE3_SSL_KEY_PUB);
+		
+		$nodes[4] = new Node();
+		$nodes[4]->setIdHexStr('11000000-1000-4001-8001-100000000004');
+		$nodes[4]->setUri('tcp://127.0.0.4:25000');
+		$nodes[4]->setSslKeyPub(static::NODE4_SSL_KEY_PUB);
+		
+		$nodes[5] = new Node();
+		$nodes[5]->setIdHexStr('11000000-1000-4001-8001-100000000005');
+		$nodes[5]->setUri('tcp://127.0.0.5:25000');
+		$nodes[5]->setSslKeyPub(static::NODE5_SSL_KEY_PUB);
+		
+		$table = new Table();
+		$table->setDatadirBasePath($settings->data['datadir']);
+		$table->setLocalNode($localNode);
+		#$table->nodeEnclose($nodes[0]);
+		$table->nodeEnclose($nodes[1]);
+		$table->nodeEnclose($nodes[2]);
+		#$table->nodeEnclose($nodes[3]);
+		#$table->nodeEnclose($nodes[4]);
+		$table->nodeEnclose($nodes[5]);
+		
+		
+		$msgs = array();
+		for($nodeNo = 2001; $nodeNo <= 2004; $nodeNo++){
+			$msg = new Msg();
+			
+			$msg->setId('21000000-2000-4002-8002-20000000'.$nodeNo);
+			$msg->setSrcNodeId($settings->data['node']['id']);
+			$msg->setSrcSslKeyPub($table->getLocalNode()->getSslKeyPub());
+			$msg->setSrcUserNickname($settings->data['user']['nickname']);
+			$msg->setText('this is  a test. '.date('Y/m/d H:i:s'));
+			$msg->setSslKeyPrvPath($settings->data['node']['sslKeyPrvPath'], $settings->data['node']['sslKeyPrvPass']);
+			$msg->setStatus('O');
+			#$msg->setDstNodeId($nodes[0]->getIdHexStr());
+			#$msg->setDstSslPubKey($nodes[0]->getSslKeyPub());
+			$msg->setEncryptionMode('D');
+			
+			$msgs[$nodeNo] = $msg;
+			
+			#fwrite(STDOUT, __METHOD__.' msg setup: '.$nodeNo.' /'.$msg->getId().'/ /'.$msg->getStatus().'/ /'.$msg->getEncryptionMode().'/'.PHP_EOL);
+		}
+		
+		$msgs[2001]->setDstNodeId($nodes[1]->getIdHexStr());
+		$msgs[2001]->setDstSslPubKey($nodes[1]->getSslKeyPub());
+		
+		$msgs[2002]->setDstNodeId($nodes[2]->getIdHexStr());
+		$msgs[2002]->setDstSslPubKey($nodes[2]->getSslKeyPub());
+		
+		$msgs[2003]->setDstNodeId($nodes[3]->getIdHexStr());
+		$msgs[2003]->setDstSslPubKey($nodes[3]->getSslKeyPub());
+		
+		$msgs[2004]->setSrcNodeId($nodes[4]->getIdHexStr());
+		$msgs[2004]->setDstNodeId($nodes[5]->getIdHexStr());
+		$msgs[2004]->setDstSslPubKey($nodes[5]->getSslKeyPub());
+		$msgs[2004]->setStatus('U');
+		
+		
+		$msgDb = new MsgDb();
+		$msgDb->setDatadirBasePath($settings->data['datadir']);
+		
+		$cronjob = new Cronjob();
+		$cronjob->setMsgDb($msgDb);
+		$cronjob->setSettings($settings);
+		$cronjob->setTable($table);
+		
+		// Encrypt
+		foreach($msgs as $msgId => $msg){
+			#fwrite(STDOUT, __METHOD__.' encrypt: '.$msgId.PHP_EOL);
+			
+			try{
+				$msg->encrypt();
+			}
+			catch(Exception $e){
+				fwrite(STDOUT, 'ERROR: '.$e->getMessage().PHP_EOL);
+			}
+			
+			$cronjob->getMsgDb()->msgAdd($msg);
+		}
+		
+		
+		// Init Nodes
+		#fwrite(STDOUT, __METHOD__.' init nodes'.PHP_EOL);
+		$cronjob->msgDbInitNodes();
+		
+		$cronjobMsgs = $cronjob->getMsgDb()->getMsgs();
+		
+		#foreach($cronjobMsgs as $msgId => $msg){
+		#	fwrite(STDOUT, __METHOD__.' cronjob msg: /'.$msg->getId().'/ /'.$msg->getStatus().'/ /'.$msg->getEncryptionMode().'/'.PHP_EOL);
+		#}
+		
+		$updateMsgs = $cronjob->msgDbSendAll();
+		
+		#foreach($updateMsgs as $msgId => $msg){
+		#	fwrite(STDOUT, __METHOD__.' update msg: /'.$msg['obj']->getId().'/ /'.$msg['obj']->getStatus().'/ /'.$msg['obj']->getEncryptionMode().'/'.' '.count($msg['nodes']).PHP_EOL);
+		#	ve($msg['nodes']);
+		#}
+		
+		$this->assertEquals('O', $msgs[2001]->getStatus());
+		$this->assertEquals('O', $msgs[2002]->getStatus());
+		$this->assertEquals('O', $msgs[2003]->getStatus());
+		$this->assertEquals('U', $msgs[2004]->getStatus());
+		
+		$this->assertEquals('D', $msgs[2001]->getEncryptionMode());
+		$this->assertEquals('D', $msgs[2002]->getEncryptionMode());
+		$this->assertEquals('D', $msgs[2003]->getEncryptionMode());
+		$this->assertEquals('D', $msgs[2004]->getEncryptionMode());
+		
+		$this->assertEquals(2, count($updateMsgs['21000000-2000-4002-8002-200000002001']['nodes']));
+		$this->assertEquals(2, count($updateMsgs['21000000-2000-4002-8002-200000002002']['nodes']));
+		$this->assertEquals(3, count($updateMsgs['21000000-2000-4002-8002-200000002003']['nodes']));
+		$this->assertEquals(3, count($updateMsgs['21000000-2000-4002-8002-200000002004']['nodes']));
+		
+		$this->assertTrue(array_key_exists('11000000-1000-4001-8001-100000000002', $updateMsgs['21000000-2000-4002-8002-200000002001']['nodes']));
+		$this->assertTrue(array_key_exists('11000000-1000-4001-8001-100000000005', $updateMsgs['21000000-2000-4002-8002-200000002001']['nodes']));
+		
+		$this->assertTrue(array_key_exists('11000000-1000-4001-8001-100000000001', $updateMsgs['21000000-2000-4002-8002-200000002002']['nodes']));
+		$this->assertTrue(array_key_exists('11000000-1000-4001-8001-100000000005', $updateMsgs['21000000-2000-4002-8002-200000002002']['nodes']));
+		
+		$this->assertTrue(array_key_exists('11000000-1000-4001-8001-100000000001', $updateMsgs['21000000-2000-4002-8002-200000002003']['nodes']));
+		$this->assertTrue(array_key_exists('11000000-1000-4001-8001-100000000002', $updateMsgs['21000000-2000-4002-8002-200000002003']['nodes']));
+		$this->assertTrue(array_key_exists('11000000-1000-4001-8001-100000000005', $updateMsgs['21000000-2000-4002-8002-200000002003']['nodes']));
+		
+		$this->assertTrue(array_key_exists('11000000-1000-4001-8001-100000000001', $updateMsgs['21000000-2000-4002-8002-200000002004']['nodes']));
+		$this->assertTrue(array_key_exists('11000000-1000-4001-8001-100000000002', $updateMsgs['21000000-2000-4002-8002-200000002004']['nodes']));
+		$this->assertTrue(array_key_exists('11000000-1000-4001-8001-100000000005', $updateMsgs['21000000-2000-4002-8002-200000002004']['nodes']));
 	}
 	
 }
