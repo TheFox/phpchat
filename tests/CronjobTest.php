@@ -137,140 +137,142 @@ KG43fr2B2ba/b77pCJZCB1/pDFYsViirsfqW0P4UAR6vIHKgcHYz1gvtrBuu61JO
 nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 -----END PUBLIC KEY-----';
 	
-	protected static $settings = null;
-	protected static $cronjob = null;
-	protected static $nodes = array();
-	protected static $msgs = array();
-	
-	public static function setUpBeforeClass(){
-		#fwrite(STDOUT, __METHOD__.''."\n");
-		
+	public function testMsgDb(){
 		file_put_contents('tests/id_rsa2.prv', static::NODE_LOCAL_SSL_KEY_PRV);
 		file_put_contents('tests/id_rsa2.pub', static::NODE_LOCAL_SSL_KEY_PUB);
 		
-		self::$settings = new Settings('tests/settings.yml');
-		self::$settings->data['datadir'] = 'tests';
-		self::$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		self::$settings->data['node']['sslKeyPrvPath'] = 'tests/id_rsa2.prv';
-		self::$settings->data['node']['sslKeyPubPath'] = 'tests/id_rsa2.pub';
-		self::$settings->setDataChanged(true);
-		self::$settings->save();
+		$settings = new Settings('tests/settings.yml');
+		$settings->data['datadir'] = 'tests';
+		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
+		$settings->data['node']['sslKeyPrvPath'] = 'tests/id_rsa2.prv';
+		$settings->data['node']['sslKeyPubPath'] = 'tests/id_rsa2.pub';
+		#$settings->setDataChanged(true);
+		#$settings->save();
 		
 		$localNode = new Node();
-		$localNode->setIdHexStr(self::$settings->data['node']['id']);
-		$localNode->setUri('tcp://'.self::$settings->data['node']['ip'].':'.self::$settings->data['node']['port']);
-		$localNode->setSslKeyPub(file_get_contents(self::$settings->data['node']['sslKeyPubPath']));
-		self::assertEquals(static::NODE_LOCAL_SSL_KEY_PUB, $localNode->getSslKeyPub());
-		self::assertEquals('FC_WwG2GdTmCLSKhpEmJso6pejm9c6oACjX', Node::genSslKeyFingerprint($localNode->getSslKeyPub()));
+		$localNode->setIdHexStr($settings->data['node']['id']);
+		$localNode->setUri('tcp://'.$settings->data['node']['ip'].':'.$settings->data['node']['port']);
+		$localNode->setSslKeyPub(file_get_contents($settings->data['node']['sslKeyPubPath']));
 		
-		self::$nodes[0] = new Node();
-		self::$nodes[0]->setIdHexStr('10000000-1000-4001-8001-100000000000');
-		self::$nodes[0]->setSslKeyPub(static::NODE0_SSL_KEY_PUB);
+		$this->assertEquals(static::NODE_LOCAL_SSL_KEY_PUB, $localNode->getSslKeyPub());
+		$this->assertEquals('FC_WwG2GdTmCLSKhpEmJso6pejm9c6oACjX', Node::genSslKeyFingerprint($localNode->getSslKeyPub()));
 		
-		self::$nodes[1] = new Node();
-		self::$nodes[1]->setIdHexStr('10000000-1000-4001-8001-100000000001');
+		$nodes = array();
+		$nodes[0] = new Node();
+		$nodes[0]->setIdHexStr('10000000-1000-4001-8001-100000000000');
+		$nodes[0]->setUri('tcp://127.0.0.0:25000');
+		$nodes[0]->setSslKeyPub(static::NODE0_SSL_KEY_PUB);
 		
-		self::$nodes[2] = new Node();
-		self::$nodes[2]->setIdHexStr('10000000-1000-4001-8001-100000000002');
-		self::$nodes[2]->setSslKeyPub(static::NODE2_SSL_KEY_PUB);
+		$nodes[1] = new Node();
+		$nodes[1]->setIdHexStr('10000000-1000-4001-8001-100000000001');
+		$nodes[1]->setUri('tcp://127.0.0.1:25000');
 		
-		self::$nodes[3] = new Node();
-		self::$nodes[3]->setIdHexStr('10000000-1000-4001-8001-100000000003');
+		$nodes[2] = new Node();
+		$nodes[2]->setIdHexStr('10000000-1000-4001-8001-100000000002');
+		$nodes[2]->setUri('tcp://127.0.0.2:25000');
+		$nodes[2]->setSslKeyPub(static::NODE2_SSL_KEY_PUB);
 		
-		self::$nodes[4] = new Node();
-		self::$nodes[4]->setIdHexStr('10000000-1000-4001-8001-100000000004');
-		self::$nodes[4]->setSslKeyPub(static::NODE4_SSL_KEY_PUB);
+		$nodes[3] = new Node();
+		$nodes[3]->setIdHexStr('10000000-1000-4001-8001-100000000003');
+		$nodes[3]->setUri('tcp://127.0.0.3:25000');
 		
-		self::$nodes[5] = new Node();
-		self::$nodes[5]->setIdHexStr('10000000-1000-4001-8001-100000000005');
-		self::$nodes[5]->setSslKeyPub(static::NODE5_SSL_KEY_PUB);
+		$nodes[4] = new Node();
+		$nodes[4]->setIdHexStr('10000000-1000-4001-8001-100000000004');
+		$nodes[4]->setUri('tcp://127.0.0.4:25000');
+		$nodes[4]->setSslKeyPub(static::NODE4_SSL_KEY_PUB);
+		
+		$nodes[5] = new Node();
+		$nodes[5]->setIdHexStr('10000000-1000-4001-8001-100000000005');
+		$nodes[5]->setUri('tcp://127.0.0.5:25000');
+		$nodes[5]->setSslKeyPub(static::NODE5_SSL_KEY_PUB);
 		
 		$table = new Table();
-		$table->setDatadirBasePath(self::$settings->data['datadir']);
+		$table->setDatadirBasePath($settings->data['datadir']);
 		$table->setLocalNode($localNode);
-		$table->nodeEnclose(self::$nodes[0]);
-		$table->nodeEnclose(self::$nodes[1]);
-		$table->nodeEnclose(self::$nodes[2]);
-		#$table->nodeEnclose(self::$nodes[3]); // Test not in table.
-		#$table->nodeEnclose(self::$nodes[4]);
-		#$table->nodeEnclose(self::$nodes[5]);
+		$table->nodeEnclose($nodes[0]);
+		$table->nodeEnclose($nodes[1]);
+		$table->nodeEnclose($nodes[2]);
+		#$table->nodeEnclose($nodes[3]); // Test not in table.
+		#$table->nodeEnclose($nodes[4]);
+		#$table->nodeEnclose($nodes[5]);
 		
 		$msgDb = new MsgDb();
-		$msgDb->setDatadirBasePath(self::$settings->data['datadir']);
-		
+		$msgDb->setDatadirBasePath($settings->data['datadir']);
+		$msgs = array();
 		for($nodeNo = 1000; $nodeNo <= 1011; $nodeNo++){
 			$msg = new Msg();
 			
 			$msg->setId('20000000-2000-4002-8002-20000000'.$nodeNo);
-			self::assertEquals('20000000-2000-4002-8002-20000000'.$nodeNo, $msg->getId());
+			$this->assertEquals('20000000-2000-4002-8002-20000000'.$nodeNo, $msg->getId());
 			
-			$msg->setSrcNodeId(self::$settings->data['node']['id']);
+			$msg->setSrcNodeId($settings->data['node']['id']);
 			$msg->setSrcSslKeyPub($table->getLocalNode()->getSslKeyPub());
-			$msg->setSrcUserNickname(self::$settings->data['user']['nickname']);
+			$msg->setSrcUserNickname($settings->data['user']['nickname']);
 			
 			$msg->setText('this is  a test. '.date('Y/m/d H:i:s'));
 			$msg->setSslKeyPrvPath(
-				self::$settings->data['node']['sslKeyPrvPath'], self::$settings->data['node']['sslKeyPrvPass']);
+				$settings->data['node']['sslKeyPrvPath'], $settings->data['node']['sslKeyPrvPass']);
 			$msg->setStatus('O');
 			
-			$msg->setDstNodeId( self::$nodes[0]->getIdHexStr() );
+			$msg->setDstNodeId( $nodes[0]->getIdHexStr() );
 			
 			$msg->setEncryptionMode('D');
-			$msg->setDstSslPubKey( self::$nodes[0]->getSslKeyPub() );
+			$msg->setDstSslPubKey( $nodes[0]->getSslKeyPub() );
 			
-			self::$msgs[$nodeNo] = $msg;
+			$msgs[$nodeNo] = $msg;
+			
+			fwrite(STDOUT, __METHOD__.' msg setup: '.$nodeNo."\n");
 		}
 		
-		self::$msgs[1001]->setDstNodeId( self::$nodes[1]->getIdHexStr() );
-		self::$msgs[1001]->setEncryptionMode('S');
-		self::$msgs[1001]->setDstSslPubKey($table->getLocalNode()->getSslKeyPub());
-		self::assertEquals('S', self::$msgs[1001]->getEncryptionMode());
+		$msgs[1001]->setDstNodeId( $nodes[1]->getIdHexStr() );
+		$msgs[1001]->setEncryptionMode('S');
+		$msgs[1001]->setDstSslPubKey($table->getLocalNode()->getSslKeyPub());
+		$this->assertEquals('S', $msgs[1001]->getEncryptionMode());
 		
-		self::$msgs[1002]->setDstNodeId( self::$nodes[2]->getIdHexStr() );
-		self::$msgs[1002]->setEncryptionMode('S');
-		self::$msgs[1002]->setDstSslPubKey($table->getLocalNode()->getSslKeyPub());
-		self::assertEquals('S', self::$msgs[1002]->getEncryptionMode());
+		$msgs[1002]->setDstNodeId( $nodes[2]->getIdHexStr() );
+		$msgs[1002]->setEncryptionMode('S');
+		$msgs[1002]->setDstSslPubKey($table->getLocalNode()->getSslKeyPub());
+		$this->assertEquals('S', $msgs[1002]->getEncryptionMode());
 		
-		self::$msgs[1003]->setDstNodeId( self::$nodes[3]->getIdHexStr() );
-		self::$msgs[1003]->setEncryptionMode('S');
-		self::$msgs[1003]->setDstSslPubKey($table->getLocalNode()->getSslKeyPub());
-		self::assertEquals('S', self::$msgs[1003]->getEncryptionMode());
+		$msgs[1003]->setDstNodeId( $nodes[3]->getIdHexStr() );
+		$msgs[1003]->setEncryptionMode('S');
+		$msgs[1003]->setDstSslPubKey($table->getLocalNode()->getSslKeyPub());
+		$this->assertEquals('S', $msgs[1003]->getEncryptionMode());
 		
 		#ve($table->getLocalNode()->getSslKeyPub());
 		
-		self::$msgs[1004]->setSentNodes(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
-		self::assertEquals(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), self::$msgs[1004]->getSentNodes());
+		$msgs[1004]->setSentNodes(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+		$this->assertEquals(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), $msgs[1004]->getSentNodes());
 		
-		self::$msgs[1005]->setStatus('U');
+		$msgs[1005]->setStatus('U');
 		
-		self::$msgs[1006]->setStatus('S');
+		$msgs[1006]->setStatus('S');
 		
-		self::$msgs[1007]->setStatus('S');
-		self::$msgs[1007]->setSentNodes(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-			12, 13, 14, 15, 16, 17, 18, 19, 20, 21));
+		$msgs[1007]->setStatus('S');
+		$msgs[1007]->setSentNodes(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21));
 		
-		self::$msgs[1008]->setStatus('S');
-		self::$msgs[1008]->setForwardCycles(110);
-		self::$msgs[1008]->setSentNodes(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+		$msgs[1008]->setStatus('S');
+		$msgs[1008]->setForwardCycles(110);
+		$msgs[1008]->setSentNodes(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
 		
-		self::$msgs[1009]->setStatus('S');
-		self::$msgs[1009]->setSentNodes(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, '10000000-1000-4001-8001-100000000000'));
+		$msgs[1009]->setStatus('S');
+		$msgs[1009]->setSentNodes(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, '10000000-1000-4001-8001-100000000000'));
 		
-		self::$msgs[1010]->setRelayNodeId('10000000-1000-4001-8001-100000000001');
+		$msgs[1010]->setRelayNodeId('10000000-1000-4001-8001-100000000001');
 		
-		self::$msgs[1011]->setSrcNodeId( self::$nodes[4]->getIdHexStr() );
-		self::$msgs[1011]->setDstNodeId( self::$nodes[5]->getIdHexStr() );
-		self::$msgs[1011]->setStatus('U');
+		$msgs[1011]->setSrcNodeId( $nodes[4]->getIdHexStr() );
+		$msgs[1011]->setDstNodeId( $nodes[5]->getIdHexStr() );
+		$msgs[1011]->setStatus('U');
 		
-		self::$cronjob = new Cronjob();
-		self::$cronjob->setMsgDb($msgDb);
-		self::$cronjob->setSettings(self::$settings);
-		self::$cronjob->setTable($table);
-	}
-	
-	public function testEncrpt(){
-		foreach(self::$msgs as $msgId => $msg){
-			#fwrite(STDOUT, __METHOD__.': '.$msgId."\n");
+		
+		$cronjob = new Cronjob();
+		$cronjob->setMsgDb($msgDb);
+		$cronjob->setSettings($settings);
+		$cronjob->setTable($table);
+		
+		// Encrypt
+		foreach($msgs as $msgId => $msg){
+			fwrite(STDOUT, __METHOD__.' encrypt: '.$msgId."\n");
 			
 			$encrypted = false;
 			try{
@@ -281,50 +283,66 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 			}
 			$this->assertTrue($encrypted);
 			
-			$rv = self::$cronjob->getMsgDb()->msgAdd($msg);
+			$rv = $cronjob->getMsgDb()->msgAdd($msg);
 		}
-	}
-	
-	public function testMsgDbInitNodes(){
-		self::$cronjob->msgDbInitNodes();
+		$this->assertEquals(12, $cronjob->getMsgDb()->getMsgsCount());
 		
-		$msgs = self::$cronjob->getMsgDb()->getMsgs();
 		
-		$this->assertGreaterThanOrEqual(3, self::$cronjob->getMsgDb()->getMsgsCount() );
-		$this->assertGreaterThanOrEqual(3, count($msgs));
+		// Init Nodes
+		fwrite(STDOUT, __METHOD__.' init nodes'."\n");
+		$cronjob->msgDbInitNodes();
 		
-		$this->assertEquals(self::$msgs[1000], $msgs['20000000-2000-4002-8002-200000001000']);
-		$this->assertEquals(self::$msgs[1001], $msgs['20000000-2000-4002-8002-200000001001']);
-		$this->assertEquals(self::$msgs[1002], $msgs['20000000-2000-4002-8002-200000001002']);
-		$this->assertEquals(self::$msgs[1003], $msgs['20000000-2000-4002-8002-200000001003']);
-		$this->assertEquals(self::$msgs[1004], $msgs['20000000-2000-4002-8002-200000001004']);
+		$cronjobMsgs = $cronjob->getMsgDb()->getMsgs();
 		
-		$this->assertEquals('D', $msgs['20000000-2000-4002-8002-200000001000']->getEncryptionMode());
-		$this->assertEquals('S', $msgs['20000000-2000-4002-8002-200000001001']->getEncryptionMode());
-		$this->assertEquals('D', $msgs['20000000-2000-4002-8002-200000001002']->getEncryptionMode());
-		$this->assertEquals('S', $msgs['20000000-2000-4002-8002-200000001003']->getEncryptionMode());
-	}
-	
-	public function testMsgDbSendAll(){
-		#$this->markTestIncomplete('This test has not been implemented yet.');
-		
-		$updateMsgs = self::$cronjob->msgDbSendAll();
-		#ve($updateMsgs);
-		
-		#fwrite(STDOUT, __METHOD__.': '.self::$msgs[1007]->getStatus()."\n");
-		
-		#foreach($updateMsgs as $msgId => $msg){
-		#	fwrite(STDOUT, __METHOD__.': '.$msg->getId().', '.$msg->getStatus().', '.$msg->getDstNodeId()."\n");
+		#foreach($cronjobMsgs as $msgId => $msg){
+		#	fwrite(STDOUT, __METHOD__.' cronjobMsgs: '.$msg->getId().', '.$msg->getStatus().', '.$msg->getEncryptionMode()."\n");
 		#}
 		
-		$this->assertFalse(array_key_exists('20000000-2000-4002-8002-200000001007', $updateMsgs));
-		$this->assertEquals('X', self::$msgs[1007]->getStatus());
+		$this->assertEquals(12, count($cronjobMsgs));
 		
-		$this->assertFalse(array_key_exists('20000000-2000-4002-8002-200000001008', $updateMsgs));
-		$this->assertEquals('X', self::$msgs[1008]->getStatus());
+		$this->assertEquals($msgs[1000], $cronjobMsgs['20000000-2000-4002-8002-200000001000']);
+		$this->assertEquals($msgs[1001], $cronjobMsgs['20000000-2000-4002-8002-200000001001']);
+		$this->assertEquals($msgs[1002], $cronjobMsgs['20000000-2000-4002-8002-200000001002']);
+		$this->assertEquals($msgs[1003], $cronjobMsgs['20000000-2000-4002-8002-200000001003']);
+		$this->assertEquals($msgs[1004], $cronjobMsgs['20000000-2000-4002-8002-200000001004']);
+		$this->assertEquals($msgs[1005], $cronjobMsgs['20000000-2000-4002-8002-200000001005']);
+		$this->assertEquals($msgs[1006], $cronjobMsgs['20000000-2000-4002-8002-200000001006']);
+		$this->assertEquals($msgs[1007], $cronjobMsgs['20000000-2000-4002-8002-200000001007']);
+		$this->assertEquals($msgs[1008], $cronjobMsgs['20000000-2000-4002-8002-200000001008']);
+		$this->assertEquals($msgs[1009], $cronjobMsgs['20000000-2000-4002-8002-200000001009']);
+		$this->assertEquals($msgs[1010], $cronjobMsgs['20000000-2000-4002-8002-200000001010']);
+		$this->assertEquals($msgs[1011], $cronjobMsgs['20000000-2000-4002-8002-200000001011']);
 		
-		$this->assertFalse(array_key_exists('20000000-2000-4002-8002-200000001009', $updateMsgs));
-		$this->assertEquals('D', self::$msgs[1009]->getStatus());
+		$this->assertEquals('D', $cronjobMsgs['20000000-2000-4002-8002-200000001000']->getEncryptionMode());
+		$this->assertEquals('S', $cronjobMsgs['20000000-2000-4002-8002-200000001001']->getEncryptionMode());
+		$this->assertEquals('D', $cronjobMsgs['20000000-2000-4002-8002-200000001002']->getEncryptionMode());
+		$this->assertEquals('S', $cronjobMsgs['20000000-2000-4002-8002-200000001003']->getEncryptionMode());
+		$this->assertEquals('D', $cronjobMsgs['20000000-2000-4002-8002-200000001004']->getEncryptionMode());
+		$this->assertEquals('D', $cronjobMsgs['20000000-2000-4002-8002-200000001005']->getEncryptionMode());
+		$this->assertEquals('D', $cronjobMsgs['20000000-2000-4002-8002-200000001006']->getEncryptionMode());
+		$this->assertEquals('D', $cronjobMsgs['20000000-2000-4002-8002-200000001007']->getEncryptionMode());
+		$this->assertEquals('D', $cronjobMsgs['20000000-2000-4002-8002-200000001008']->getEncryptionMode());
+		$this->assertEquals('D', $cronjobMsgs['20000000-2000-4002-8002-200000001009']->getEncryptionMode());
+		$this->assertEquals('D', $cronjobMsgs['20000000-2000-4002-8002-200000001010']->getEncryptionMode());
+		$this->assertEquals('D', $cronjobMsgs['20000000-2000-4002-8002-200000001011']->getEncryptionMode());
+		
+		
+		$updateMsgs = $cronjob->msgDbSendAll();
+		
+		#foreach($updateMsgs as $msgId => $msg){
+		#	fwrite(STDOUT, __METHOD__.': '.$msgId.', '.$msg->getId().', '.$msg->getStatus().', '.$msg->getDstNodeId()."\n");
+		#}
+		
+		$this->assertEquals(3, count($updateMsgs));
+		
+		$this->assertTrue(array_key_exists('20000000-2000-4002-8002-200000001005', $updateMsgs));
+		$this->assertEquals('U', $msgs[1005]->getStatus());
+		
+		$this->assertTrue(array_key_exists('20000000-2000-4002-8002-200000001006', $updateMsgs));
+		$this->assertEquals('S', $msgs[1006]->getStatus());
+		
+		$this->assertTrue(array_key_exists('20000000-2000-4002-8002-200000001011', $updateMsgs));
+		$this->assertEquals('U', $msgs[1011]->getStatus());
 		
 	}
 	
