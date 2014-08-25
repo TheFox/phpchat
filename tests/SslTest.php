@@ -61,15 +61,15 @@ O5mYMzSLyuOXR5xhBhG7fjsCAwEAAQ==
 		$ssl = openssl_pkey_new($sslConfig);
 		$this->assertTrue($ssl ? true : false);
 		
-		openssl_pkey_export_to_file($ssl, 'tests/id_rsa.prv');
+		openssl_pkey_export_to_file($ssl, 'tests/testfile_ssl_id_rsa.prv');
 		#fwrite(STDOUT, 'SSL ERROR: '.openssl_error_string()."\n");
-		openssl_pkey_export_to_file($ssl, 'tests/id_rsa_pass.prv', 'my_password');
+		openssl_pkey_export_to_file($ssl, 'tests/testfile_ssl_id_rsa_pass.prv', 'my_password');
 		#fwrite(STDOUT, 'SSL ERROR: '.openssl_error_string()."\n");
 		
 		$keyPub = openssl_pkey_get_details($ssl);
 		#ve($keyPub);
 		$keyPub = $keyPub['key'];
-		file_put_contents('tests/id_rsa.pub', $keyPub);
+		file_put_contents('tests/testfile_ssl_id_rsa.pub', $keyPub);
 		
 		openssl_public_encrypt('test my keys', $encrypted, $keyPub);
 		#fwrite(STDOUT, 'SSL ERROR: '.openssl_error_string()."\n");

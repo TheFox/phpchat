@@ -127,7 +127,7 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 	}
 	
 	public function testSaveTcpnode(){
-		$node = new Node('tests/test_node_tcp.yml');
+		$node = new Node('tests/testfile_node_tcp.yml');
 		$node->setDatadirBasePath('tests');
 		$node->setDataChanged(true);
 		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
@@ -142,7 +142,7 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 	}
 	
 	public function testSaveHttpnode(){
-		$node = new Node('tests/test_node_http.yml');
+		$node = new Node('tests/testfile_node_http.yml');
 		$node->setDatadirBasePath('tests');
 		$node->setDataChanged(true);
 		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
@@ -162,7 +162,7 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 	* @depends testSaveTcpnode
 	*/
 	public function testLoadTcpnode(){
-		$node = new Node('tests/test_node_tcp.yml');
+		$node = new Node('tests/testfile_node_tcp.yml');
 		$node->setDatadirBasePath('tests');
 		
 		$this->assertTrue($node->load());
@@ -177,7 +177,7 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 	* @depends testSaveHttpnode
 	*/
 	public function testLoadHttpnode(){
-		$node = new Node('tests/test_node_http.yml');
+		$node = new Node('tests/testfile_node_http.yml');
 		$node->setDatadirBasePath('tests');
 		
 		$this->assertTrue($node->load());

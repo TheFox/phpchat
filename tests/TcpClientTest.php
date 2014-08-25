@@ -216,22 +216,22 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 	
 	private function sendGenTestData(){
 		$filesystem = new Filesystem();
-		$filesystem->mkdir('tests/client1_tcp', $mode = 0777);
-		$filesystem->mkdir('tests/client2_tcp', $mode = 0777);
+		$filesystem->mkdir('tests/testdir_tcpclient1', $mode = 0777);
+		$filesystem->mkdir('tests/testdir_tcpclient2', $mode = 0777);
 		
-		file_put_contents('tests/client1_tcp/id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV1);
-		file_put_contents('tests/client1_tcp/id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB1);
+		file_put_contents('tests/testdir_tcpclient1/id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV1);
+		file_put_contents('tests/testdir_tcpclient1/id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB1);
 		
-		file_put_contents('tests/client2_tcp/id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV2);
-		file_put_contents('tests/client2_tcp/id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB2);
+		file_put_contents('tests/testdir_tcpclient2/id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV2);
+		file_put_contents('tests/testdir_tcpclient2/id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB2);
 		
 		
 		$localNode1 = new Node();
 		$localNode1->setUri('tcp://127.0.0.1:25000');
 		$localNode1->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
 		
-		$table1 = new Table('tests/client1_tcp/table.yml');
-		$table1->setDatadirBasePath('tests/client1_tcp');
+		$table1 = new Table('tests/testdir_tcpclient1/table.yml');
+		$table1->setDatadirBasePath('tests/testdir_tcpclient1');
 		$table1->setLocalNode($localNode1);
 		for($n = 0; $n < 5; $n++){
 			$node = new Node();
@@ -248,8 +248,8 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$localNode1->setUri('tcp://127.0.0.2:25000');
 		$localNode2->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1739');
 		
-		$table2 = new Table('tests/client2_tcp/table.yml');
-		$table2->setDatadirBasePath('tests/client2_tcp');
+		$table2 = new Table('tests/testdir_tcpclient2/table.yml');
+		$table2->setDatadirBasePath('tests/testdir_tcpclient2');
 		$table2->setLocalNode($localNode2);
 		for($n = 5; $n < 10; $n++){
 			$node = new Node();
@@ -263,27 +263,27 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		
 		
 		$settings1 = new Settings();
-		$settings1->data['datadir'] = 'tests/client1_tcp';
+		$settings1->data['datadir'] = 'tests/testdir_tcpclient1';
 		$settings1->data['firstRun'] = false;
 		$settings1->data['timeCreated'] = time();
 		$settings1->data['node']['ip'] = '127.0.0.1';
 		$settings1->data['node']['port'] = 0;
 		$settings1->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB1);
 		$settings1->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings1->data['node']['sslKeyPrvPath'] = 'tests/client1_tcp/id_rsa.prv';
-		$settings1->data['node']['sslKeyPubPath'] = 'tests/client1_tcp/id_rsa.pub';
+		$settings1->data['node']['sslKeyPrvPath'] = 'tests/testdir_tcpclient1/id_rsa.prv';
+		$settings1->data['node']['sslKeyPubPath'] = 'tests/testdir_tcpclient1/id_rsa.pub';
 		$settings1->data['user']['nickname'] = 'user1';
 		
 		$settings2 = new Settings();
-		$settings2->data['datadir'] = 'tests/client2_tcp';
+		$settings2->data['datadir'] = 'tests/testdir_tcpclient2';
 		$settings2->data['firstRun'] = false;
 		$settings2->data['timeCreated'] = time();
 		$settings2->data['node']['ip'] = '127.0.0.2';
 		$settings2->data['node']['port'] = 0;
 		$settings2->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB2);
 		$settings2->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings2->data['node']['sslKeyPrvPath'] = 'tests/client2_tcp/id_rsa.prv';
-		$settings2->data['node']['sslKeyPubPath'] = 'tests/client2_tcp/id_rsa.pub';
+		$settings2->data['node']['sslKeyPrvPath'] = 'tests/testdir_tcpclient2/id_rsa.prv';
+		$settings2->data['node']['sslKeyPubPath'] = 'tests/testdir_tcpclient2/id_rsa.pub';
 		$settings2->data['user']['nickname'] = 'user2';
 		
 		

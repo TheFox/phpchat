@@ -43,13 +43,13 @@ class LogTest extends PHPUnit_Framework_TestCase{
      * @dataProvider providerLog
      */
 	public function testLog($level, $expected){
-		if(file_exists('tests/test.log')){
+		if(file_exists('tests/testfile_log.log')){
 			$filesystem = new Filesystem();
-			$filesystem->remove('tests/test.log');
+			$filesystem->remove('tests/testfile_log.log');
 		}
 		
 		$log = new Logger('tester');
-		$log->pushHandler(new StreamHandler('tests/test.log', $level));
+		$log->pushHandler(new StreamHandler('tests/testfile_log.log', $level));
 		
 		$log->debug('test1');
 		$log->info('test2');
@@ -60,7 +60,7 @@ class LogTest extends PHPUnit_Framework_TestCase{
 		$log->alert('test7');
 		$log->emergency('test8');
 		
-		$this->assertRegExp('/^'.$expected.'/s', file_get_contents('tests/test.log'));
+		$this->assertRegExp('/^'.$expected.'/s', file_get_contents('tests/testfile_log.log'));
 	}
 	
 	public function providerLevel(){

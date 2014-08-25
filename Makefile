@@ -8,7 +8,7 @@ PHPCS = vendor/bin/phpcs
 PHPUNIT = vendor/bin/phpunit
 
 
-.PHONY: all install tests test_phpcs test_phpunit release clean
+.PHONY: all install tests test_phpcs test_phpunit test_clean release clean
 
 all: install tests
 
@@ -33,21 +33,15 @@ test_phpcs: $(PHPCS) vendor/thefox/phpcsrs/Standards/TheFox
 
 test_phpunit: $(PHPUNIT) phpunit.xml
 	$(PHPUNIT)
-	$(RM) tests/*.yml
-	$(RM) tests/*.log
-	$(RM) tests/*.prv tests/*.pub
-	$(RM) tests/client[1-6]
-	$(RM) tests/client[1-6]_tcp
+
+test_clean:
+	$(RM) tests/testdir_*
+	$(RM) tests/testfile_*
 
 release:
 	./release.sh
 
-clean:
+clean: test_clean
 	$(RM) composer.lock composer.phar
 	$(RM) vendor/*
 	$(RM) vendor
-	$(RM) tests/*.yml
-	$(RM) tests/*.log
-	$(RM) tests/*.prv tests/*.pub
-	$(RM) tests/client[1-6]
-	$(RM) tests/client[1-6]_tcp

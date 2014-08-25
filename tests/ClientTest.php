@@ -175,8 +175,8 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 	}
 	
 	public function testBasic(){
-		file_put_contents('tests/id_rsa_client1.prv', static::NODE_LOCAL_SSL_KEY_PRV1);
-		file_put_contents('tests/id_rsa_client1.pub', static::NODE_LOCAL_SSL_KEY_PUB1);
+		file_put_contents('tests/testfile_client_id_rsa1.prv', static::NODE_LOCAL_SSL_KEY_PRV1);
+		file_put_contents('tests/testfile_client_id_rsa1.pub', static::NODE_LOCAL_SSL_KEY_PUB1);
 		
 		$settings = new Settings();
 		$settings->data['datadir'] = 'tests';
@@ -186,8 +186,8 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings->data['node']['port'] = 0;
 		$settings->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'tests/id_rsa_client1.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'tests/id_rsa_client1.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_client_id_rsa1.prv';
+		$settings->data['node']['sslKeyPubPath'] = 'tests/testfile_client_id_rsa1.pub';
 		$settings->data['user']['nickname'] = 'user_'.substr(md5(time()), 0, 4);
 		
 		$log = new Logger('test_application');
@@ -232,9 +232,11 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 	
 	public function testHashcashMint(){
 		@unlink('tests/hashcashdb.yml');
+		@unlink('tests/msgdb.yml');
+		@unlink('tests/nodesnewdb.yml');
 		
-		file_put_contents('tests/id_rsa_client1.prv', static::NODE_LOCAL_SSL_KEY_PRV1);
-		file_put_contents('tests/id_rsa_client1.pub', static::NODE_LOCAL_SSL_KEY_PUB1);
+		file_put_contents('tests/testfile_client_id_rsa1.prv', static::NODE_LOCAL_SSL_KEY_PRV1);
+		file_put_contents('tests/testfile_client_id_rsa1.pub', static::NODE_LOCAL_SSL_KEY_PUB1);
 		
 		$settings = new Settings();
 		$settings->data['datadir'] = 'tests';
@@ -244,8 +246,8 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings->data['node']['port'] = 0;
 		$settings->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'tests/id_rsa_client1.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'tests/id_rsa_client1.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_client_id_rsa1.prv';
+		$settings->data['node']['sslKeyPubPath'] = 'tests/testfile_client_id_rsa1.pub';
 		$settings->data['user']['nickname'] = 'user_'.substr(md5(time()), 0, 4);
 		
 		$log = new Logger('test_application');
@@ -273,15 +275,17 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		
 		$finder = new Finder();
 		$files = $finder->in('tests')->depth(0)->name('hashcashdb.yml')->files();
-		foreach($files as $file){
-			ve($file->getRealpath());
-		}
+		#foreach($files as $file){ ve($file->getRealpath()); }
 		$this->assertEquals(1, count($files));
+		
+		@unlink('tests/hashcashdb.yml');
+		@unlink('tests/msgdb.yml');
+		@unlink('tests/nodesnewdb.yml');
 	}
 	
 	public function testRequest(){
-		file_put_contents('tests/id_rsa_client1.prv', static::NODE_LOCAL_SSL_KEY_PRV1);
-		file_put_contents('tests/id_rsa_client1.pub', static::NODE_LOCAL_SSL_KEY_PUB1);
+		file_put_contents('tests/testfile_client_id_rsa1.prv', static::NODE_LOCAL_SSL_KEY_PRV1);
+		file_put_contents('tests/testfile_client_id_rsa1.pub', static::NODE_LOCAL_SSL_KEY_PUB1);
 		
 		$settings = new Settings();
 		$settings->data['datadir'] = 'tests';
@@ -291,8 +295,8 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings->data['node']['port'] = 0;
 		$settings->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'tests/id_rsa_client1.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'tests/id_rsa_client1.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_client_id_rsa1.prv';
+		$settings->data['node']['sslKeyPubPath'] = 'tests/testfile_client_id_rsa1.pub';
 		$settings->data['user']['nickname'] = 'user_'.substr(md5(time()), 0, 4);
 		
 		$log = new Logger('test_application');
@@ -321,11 +325,15 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$this->assertEquals(null, $request);
 		
 		$kernel->shutdown();
+		
+		@unlink('tests/hashcashdb.yml');
+		@unlink('tests/msgdb.yml');
+		@unlink('tests/nodesnewdb.yml');
 	}
 	
 	public function testAction(){
-		file_put_contents('tests/id_rsa_client1.prv', static::NODE_LOCAL_SSL_KEY_PRV1);
-		file_put_contents('tests/id_rsa_client1.pub', static::NODE_LOCAL_SSL_KEY_PUB1);
+		file_put_contents('tests/testfile_client_id_rsa1.prv', static::NODE_LOCAL_SSL_KEY_PRV1);
+		file_put_contents('tests/testfile_client_id_rsa1.pub', static::NODE_LOCAL_SSL_KEY_PUB1);
 		
 		$settings = new Settings();
 		$settings->data['datadir'] = 'tests';
@@ -335,8 +343,8 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings->data['node']['port'] = 0;
 		$settings->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'tests/id_rsa_client1.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'tests/id_rsa_client1.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_client_id_rsa1.prv';
+		$settings->data['node']['sslKeyPubPath'] = 'tests/testfile_client_id_rsa1.pub';
 		$settings->data['user']['nickname'] = 'user_'.substr(md5(time()), 0, 4);
 		
 		$log = new Logger('test_application');
@@ -374,6 +382,10 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$this->assertEquals(null, $oldAction);
 		
 		$kernel->shutdown();
+		
+		@unlink('tests/hashcashdb.yml');
+		@unlink('tests/msgdb.yml');
+		@unlink('tests/nodesnewdb.yml');
 	}
 	
 }

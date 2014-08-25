@@ -2,8 +2,8 @@ vendor
 composer.lock
 composer.phar
 test
-tests/*.yml
-tests/client*_tcp
+tests/testdir_*
+tests/testfile_*
 log
 *.log
 pid

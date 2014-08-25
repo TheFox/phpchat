@@ -29,6 +29,8 @@ class ConsoleTest extends PHPUnit_Framework_TestCase{
 		$finder = new Finder();
 		$files = $finder->in('tests')->name('history.yml');
 		$this->assertEquals(0, count($files));
+		
+		@unlink('tests/history.yml');
 	}
 	
 	public function testHistory1(){
@@ -52,6 +54,8 @@ class ConsoleTest extends PHPUnit_Framework_TestCase{
 		$finder = new Finder();
 		$files = $finder->in('tests')->name('history.yml');
 		$this->assertEquals(0, count($files));
+		
+		@unlink('tests/history.yml');
 	}
 	
 	public function testHistory2(){
@@ -74,6 +78,8 @@ class ConsoleTest extends PHPUnit_Framework_TestCase{
 		$finder = new Finder();
 		$files = $finder->in('tests')->name('history.yml');
 		$this->assertEquals(0, count($files));
+		
+		@unlink('tests/history.yml');
 	}
 	
 	public function testHistory3(){
@@ -102,6 +108,8 @@ class ConsoleTest extends PHPUnit_Framework_TestCase{
 		$expect .= '- /help'."\n";
 
 		$this->assertEquals($expect, file_get_contents('tests/history.yml'));
+		
+		@unlink('tests/history.yml');
 	}
 	
 }
