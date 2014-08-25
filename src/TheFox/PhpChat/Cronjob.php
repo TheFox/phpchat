@@ -331,7 +331,7 @@ class Cronjob extends Thread{
 		$processedMsgs = array();
 		
 		// Send own unsent msgs.
-		$this->log->debug(__FUNCTION__.': unsent own');
+		#$this->log->debug(__FUNCTION__.' unsent own');
 		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
 			if(
 				!in_array($msg->getId(), $processedMsgIds)
@@ -340,7 +340,7 @@ class Cronjob extends Thread{
 				&& $msg->getStatus() == 'O'
 				&& $msg->getSrcNodeId() == $this->localNode->getIdHexStr()
 			){
-				$this->log->debug(__FUNCTION__.' unsent own: '.$msg->getId());
+				#$this->log->debug(__FUNCTION__.' unsent own: '.$msg->getId());
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
@@ -348,7 +348,7 @@ class Cronjob extends Thread{
 		}
 		
 		// Send foreign unsent msgs.
-		$this->log->debug(__FUNCTION__.': unsent foreign');
+		#$this->log->debug(__FUNCTION__.' unsent foreign');
 		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
 			if(
 				!in_array($msg->getId(), $processedMsgIds)
@@ -357,7 +357,7 @@ class Cronjob extends Thread{
 				&& $msg->getStatus() == 'U'
 				&& $msg->getDstNodeId() != $this->localNode->getIdHexStr()
 			){
-				$this->log->debug(__FUNCTION__.' unsent foreign: '.$msg->getId());
+				#$this->log->debug(__FUNCTION__.' unsent foreign: '.$msg->getId());
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
@@ -365,7 +365,7 @@ class Cronjob extends Thread{
 		}
 		
 		// Relay all other msgs.
-		$this->log->debug(__FUNCTION__.': other');
+		#$this->log->debug(__FUNCTION__.' other');
 		foreach($this->msgDb->getMsgs() as $msgId => $msg){
 			if(
 				!in_array($msg->getId(), $processedMsgIds)
@@ -373,7 +373,7 @@ class Cronjob extends Thread{
 				&& $msg->getEncryptionMode() == 'D'
 				&& $msg->getStatus() == 'S'
 			){
-				$this->log->debug(__FUNCTION__.' other: '.$msg->getId());
+				#$this->log->debug(__FUNCTION__.' other: '.$msg->getId());
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
@@ -381,11 +381,11 @@ class Cronjob extends Thread{
 		}
 		
 		$processedMsgs = array_unique($processedMsgs);
-		$this->log->debug(__FUNCTION__.' processedMsgs: '.count($processedMsgs));
+		#$this->log->debug(__FUNCTION__.' processedMsgs: '.count($processedMsgs));
 		
 		// Don't use messages which reached MSG_FORWARD_TO_NODES_MIN or MSG_FORWARD_TO_NODES_MAX.
 		foreach($processedMsgs as $msgId => $msg){
-			$this->log->debug(__FUNCTION__.' search for unset: '.$msg->getId());
+			#$this->log->debug(__FUNCTION__.' search for unset: '.$msg->getId());
 			
 			$sentNodesC = count($msg->getSentNodes());
 			$forwardCycles = $msg->getForwardCycles();
@@ -396,7 +396,7 @@ class Cronjob extends Thread{
 				
 				|| $sentNodesC >= static::MSG_FORWARD_TO_NODES_MAX
 			){
-				$this->log->debug(__FUNCTION__.' set X: '.$msg->getId());
+				#$this->log->debug(__FUNCTION__.'      set X: '.$msg->getId());
 				
 				$msg->setStatus('X');
 				
@@ -408,7 +408,7 @@ class Cronjob extends Thread{
 			}
 			
 			elseif( in_array($msg->getDstNodeId(), $msg->getSentNodes()) ){
-				$this->log->debug(__FUNCTION__.' set D: '.$msg->getId());
+				#$this->log->debug(__FUNCTION__.'      set D: '.$msg->getId());
 				
 				$msg->setStatus('D');
 				
@@ -420,13 +420,13 @@ class Cronjob extends Thread{
 			}
 		}
 		
-		
+		// Process valid messages.
 		$nodes = array();
 		$nodeIds = array();
 		foreach($processedMsgs as $msgId => $msg){
-			$this->log->debug(__FUNCTION__.' msg: '.$msg->getId().', '.$msg->getStatus().', '.$msg->getEncryptionMode());
-			$this->log->debug(__FUNCTION__.'      dst:   '.$msg->getDstNodeId());
-			$this->log->debug(__FUNCTION__.'      relay: /'.$msg->getRelayNodeId().'/');
+			#$this->log->debug(__FUNCTION__.' msg: '.$msg->getId().', '.$msg->getStatus().', '.$msg->getEncryptionMode());
+			#$this->log->debug(__FUNCTION__.'      dst:   '.$msg->getDstNodeId());
+			#$this->log->debug(__FUNCTION__.'      relay: /'.$msg->getRelayNodeId().'/');
 			
 			$dstNode = new Node();
 			$dstNode->setIdHexStr($msg->getDstNodeId());
@@ -435,9 +435,10 @@ class Cronjob extends Thread{
 				$nodes[$dstNode->getIdHexStr()] = $dstNode;
 			}
 			
+			// Send it direct.
 			$onode = $this->table->nodeFindInBuckets($dstNode);
 			if($onode && $onode->getUri()->getHost() && $onode->getUri()->getPort()){
-				$this->log->debug(__FUNCTION__.'      dst node found in table');
+				#$this->log->debug(__FUNCTION__.'      dst node found in table');
 				
 				$nodes[$onode->getIdHexStr()] = $onode;
 				
@@ -447,7 +448,8 @@ class Cronjob extends Thread{
 				$nodeIds[$onode->getIdHexStr()][$msg->getId()] = $msg;
 			}
 			
-			$this->log->debug(__FUNCTION__.'      close nodes');
+			// Send it to close nodes.
+			#$this->log->debug(__FUNCTION__.'      close nodes');
 			$closestNodes = $this->table->nodeFindClosest($dstNode, static::MSG_FORWARD_TO_NODES_MAX);
 			foreach($closestNodes as $nodeId => $node){
 				if(
@@ -455,7 +457,7 @@ class Cronjob extends Thread{
 					&& !in_array($node->getIdHexStr(), $msg->getSentNodes())
 					&& $node->getUri()->getHost() && $node->getUri()->getPort()
 				){
-					$this->log->debug(__FUNCTION__.'             node: '.$node->getIdHexStr());
+					#$this->log->debug(__FUNCTION__.'             node: '.$node->getIdHexStr());
 					
 					$nodes[$node->getIdHexStr()] = $node;
 					
@@ -467,6 +469,7 @@ class Cronjob extends Thread{
 			}
 		}
 		
+		// Nodes for messages.
 		$updateMsgs = array();
 		foreach($nodeIds as $nodeId => $msgs){
 			$node = $nodes[$nodeId];
@@ -475,6 +478,7 @@ class Cronjob extends Thread{
 			$msgs = array_unique($msgs);
 			$msgIds = array();
 			
+			// Messages per node.
 			foreach($msgs as $msgId => $msg){
 				$direct = (int)($msg->getDstNodeId() == $node->getIdHexStr()
 					&& $node->getUri()->getHost() && $node->getUri()->getPort());
@@ -487,9 +491,8 @@ class Cronjob extends Thread{
 				$msgIds[] = $msg->getId();
 			}
 			
+			#$this->log->debug(__FUNCTION__.'      msgs sending: '.count($msgs));
 			if($msgs && $this->getIpcKernelConnection()){
-				#$this->log->debug(__FUNCTION__.'      msgs: '.count($msgs));
-				
 				$serverConnectArgs = array($node->getUri(), false, false, $msgIds);
 				$this->getIpcKernelConnection()->execSync('serverConnect', $serverConnectArgs);
 			}
@@ -605,7 +608,7 @@ class Cronjob extends Thread{
 			$this->setTable($this->getIpcKernelConnection()->execSync('getTable'));
 		}
 		
-		$this->log->debug('nodes new enclose, table: '.get_class($this->table));
+		$this->log->debug('nodes new enclose, table');
 		
 		$nodesNewDb = $this->getIpcKernelConnection()->execSync('getNodesNewDb', array(), 10);
 		#ve($nodesNewDb);
