@@ -427,18 +427,21 @@ class Table extends YamlStorage{
 	}
 	
 	public function nodeEnclose2(Node $node){
-		fwrite(STDOUT, __FUNCTION__.''."\n");
+		#fwrite(STDOUT, __FUNCTION__.''."\n");
 		
 		if(!$this->getLocalNode()){
 			throw new RuntimeException('localNode not set.');
 		}
 		
-		#$returnNode = $node;
-		
 		if(!$this->rootBucket){
 			$filePath = null;
 			if($this->getDatadirBasePath()){
-				$filePath = $this->getDatadirBasePath().'/bucket_root_'.time().'_'.mt_rand(1000, 9999).'.yml';
+				#$filePath = $this->getDatadirBasePath().'/bucket_root_'.time().'_'.mt_rand(1000, 9999).'.yml';
+				$filePath = $this->getDatadirBasePath().'/bucket_root.yml';
+				if(file_exists($filePath)){
+					// This should never happen.
+					throw new RuntimeException('path for bucket alread exists: '.$filePath);
+				}
 			}
 			
 			$bucket = new Bucket($filePath);
@@ -449,78 +452,8 @@ class Table extends YamlStorage{
 			$this->setDataChanged(true);
 		}
 		
-		$returnNode = $this->rootBucket->nodeEnclose($node);
-		
-		/*if( !$this->getLocalNode()->isEqual($node) ){
-			$distance = $this->getLocalNode()->distance($node);
-			#ve($distance);
-			#ve($this->getLocalNode()->distanceBitStr($node));
-			
-			#fwrite(STDOUT, __FUNCTION__.'     new node: /'.$node->getIdHexStr().'/ /'.$this->getLocalNode()->distanceBitStr($node).'/'."\n");
-			fwrite(STDOUT, __FUNCTION__.' new node: /'.$node->getIdHexStr().'/ /'.substr($node->getIdBitStr(), -3).'/ /'.substr($this->getLocalNode()->distanceBitStr($node), -3).'/'."\n");
-			
-			#$bucket = $this->bucketForNode($node);
-			
-			$bucket = null;
-			
-			$mask = 1 << 2;
-			$newMask = $mask;
-			
-			#if(($distance[15] >> 2) & 1){
-			if($distance[15] & $mask){
-				fwrite(STDOUT, __FUNCTION__.' upper: '.intToBin($mask)."\n");
-				if($this->childBucketUpper){
-					#$bucket = $this->childBucketUpper->bucketForNode($node);
-					$bucket = $this->childBucketUpper;
-				}
-				else{
-					$filePath = null;
-					if($this->getDatadirBasePath()){
-						#$filePath = $this->getDatadirBasePath().'/bucket_upper_'.intToBin($mask).'.yml';
-						#$filePath = $this->getDatadirBasePath().'/bucket_upper_'.intToBin($mask).'_'.mt_rand(1000, 9999).'.yml';
-						$filePath = $this->getDatadirBasePath().'/bucket_'.intToBin($mask).'_1_'.time().'.yml';
-					}
-					
-					$bucket = new Bucket($filePath);
-					$bucket->setMask($newMask);
-					$bucket->setDatadirBasePath($this->getDatadirBasePath());
-					$bucket->setLocalNode($this->getLocalNode());
-					$this->setDataChanged(true);
-					
-					$this->childBucketUpper = $bucket;
-				}
-			}
-			else{
-				fwrite(STDOUT, __FUNCTION__.' lower: '.intToBin($mask)."\n");
-				if($this->childBucketLower){
-					#$bucket = $this->childBucketLower->bucketForNode($node);
-					$bucket = $this->childBucketLower;
-				}
-				else{
-					$filePath = null;
-					if($this->getDatadirBasePath()){
-						#$filePath = $this->getDatadirBasePath().'/bucket_lower_'.intToBin($mask).'.yml';
-						#$filePath = $this->getDatadirBasePath().'/bucket_lower_'.intToBin($mask).'_'.mt_rand(1000, 9999).'.yml';
-						$filePath = $this->getDatadirBasePath().'/bucket_'.intToBin($mask).'_0_'.time().'.yml';
-					}
-					
-					$bucket = new Bucket($filePath);
-					$bucket->setMask($newMask);
-					$bucket->setDatadirBasePath($this->getDatadirBasePath());
-					$bucket->setLocalNode($this->getLocalNode());
-					$this->setDataChanged(true);
-					
-					$this->childBucketLower = $bucket;
-				}
-			}
-			
-			fwrite(STDOUT, __FUNCTION__.' bucket: '.(is_object($bucket) ? 'OK' : 'N/A')."\n");
-			if($bucket){
-				fwrite(STDOUT, __FUNCTION__.' bucket mask: '.intToBin($bucket->getMask())."\n");
-				$bucket->nodeEnclose($node);
-			}
-			fwrite(STDOUT, "\n");
-		}*/
+		#$returnNode = $this->rootBucket->nodeEnclose($node);
+		$returnNode = $this->rootBucket->nodeEnclose($node, false);
 		
 		return $returnNode;
 	}

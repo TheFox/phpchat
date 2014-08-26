@@ -4,6 +4,7 @@ composer.phar
 test
 tests/testdir_*
 tests/testfile_*
+tests/*.yml
 log
 *.log
 pid
