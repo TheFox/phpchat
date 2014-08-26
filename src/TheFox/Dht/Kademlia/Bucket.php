@@ -2,24 +2,34 @@
 
 namespace TheFox\Dht\Kademlia;
 
+use RuntimeException;
+
 use TheFox\Storage\YamlStorage;
 
 class Bucket extends YamlStorage{
 	
-	const SIZE_MAX = 20;
+	static $SIZE_MAX = 20;
 	
 	private $nodesId = 0;
 	private $nodes = array();
 	private $localNode = null;
+	private $childBucketUpper = null;
+	private $childBucketLower = null;
 	
 	public function __construct($filePath = null){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		parent::__construct($filePath);
 		
 		$this->data['id'] = 0;
+		#$this->data['prefix'] = '';
+		#$this->data['prefixName'] = '';
 		$this->data['mask'] = '';
+		#$this->data['mask'] = array_fill(0, Node::ID_LEN, 0);
+		$this->data['maskName'] = '';
 		$this->data['isFull'] = false;
-		$this->data['sizeMax'] = static::SIZE_MAX;
+		$this->data['isUpper'] = false;
+		$this->data['isLower'] = false;
+		$this->data['sizeMax'] = static::$SIZE_MAX;
 		$this->data['timeCreated'] = time();
 	}
 	
@@ -30,8 +40,10 @@ class Bucket extends YamlStorage{
 	public function save(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
-		$this->data['nodes'] = array();
+		#$this->data['prefixName'] = intToBin($this->getPrefix());
+		$this->data['maskName'] = intToBin($this->getMask());
 		
+		$this->data['nodes'] = array();
 		foreach($this->nodes as $nodeId => $node){
 			#print __CLASS__.'->'.__FUNCTION__.': '.$nodeId.', '.(int)$node->getDataChanged()."\n";
 			
@@ -41,8 +53,22 @@ class Bucket extends YamlStorage{
 			$node->save();
 		}
 		
+		$this->data['childBucketUpper'] = null;
+		if($this->childBucketUpper){
+			$this->data['childBucketUpper'] = $this->childBucketUpper->getFilePath();
+			$this->childBucketUpper->save();
+		}
+		
+		$this->data['childBucketLower'] = null;
+		if($this->childBucketLower){
+			$this->data['childBucketLower'] = $this->childBucketLower->getFilePath();
+			$this->childBucketLower->save();
+		}
+		
 		$rv = parent::save();
 		unset($this->data['nodes']);
+		unset($this->data['childBucketUpper']);
+		unset($this->data['childBucketLower']);
 		
 		return $rv;
 	}
@@ -52,22 +78,38 @@ class Bucket extends YamlStorage{
 		
 		if(parent::load()){
 			
-			if($this->data && array_key_exists('nodes', $this->data) && $this->data['nodes']){
-				foreach($this->data['nodes'] as $nodeId => $nodeAr){
-					if(file_exists($nodeAr['path'])){
-						$this->nodesId = $nodeId;
-						
-						$node = new Node($nodeAr['path']);
-						$node->setDatadirBasePath($this->getDatadirBasePath());
-						$node->setBucket($this);
-						if($node->load()){
-							$this->nodes[$this->nodesId] = $node;
+			if($this->data){
+				if(array_key_exists('nodes', $this->data) && $this->data['nodes']){
+					foreach($this->data['nodes'] as $nodeId => $nodeAr){
+						if(file_exists($nodeAr['path'])){
+							$this->nodesId = $nodeId;
+							
+							$node = new Node($nodeAr['path']);
+							$node->setDatadirBasePath($this->getDatadirBasePath());
+							$node->setBucket($this);
+							if($node->load()){
+								$this->nodes[$this->nodesId] = $node;
+							}
 						}
 					}
+				}
+				if(array_key_exists('childBucketUpper', $this->data) && $this->data['childBucketUpper']){
+					$this->childBucketUpper = new Bucket($this->data['childBucketUpper']);
+					$this->childBucketUpper->setDatadirBasePath($this->getDatadirBasePath());
+					$this->childBucketUpper->setLocalNode($this->getLocalNode());
+					$this->childBucketUpper->load();
+				}
+				if(array_key_exists('childBucketLower', $this->data) && $this->data['childBucketLower']){
+					$this->childBucketLower = new Bucket($this->data['childBucketLower']);
+					$this->childBucketLower->setDatadirBasePath($this->getDatadirBasePath());
+					$this->childBucketLower->setLocalNode($this->getLocalNode());
+					$this->childBucketLower->load();
 				}
 			}
 			
 			unset($this->data['nodes']);
+			unset($this->data['childBucketUpper']);
+			unset($this->data['childBucketLower']);
 			
 			return true;
 		}
@@ -83,12 +125,28 @@ class Bucket extends YamlStorage{
 		return (int)$this->data['id'];
 	}
 	
+	/*public function setPrefix($prefix){
+		$this->data['prefix'] = $prefix;
+	}
+	
+	public function getPrefix(){
+		return $this->data['prefix'];
+	}*/
+	
 	public function setMask($mask){
 		$this->data['mask'] = $mask;
 	}
 	
 	public function getMask(){
 		return $this->data['mask'];
+	}
+	
+	public function getMaskHexStr(){
+		$hex = '';
+		for($pos = 0; $pos < Node::ID_LEN; $pos++){
+			$hex .= dechex($this->data['mask'][$pos]);
+		}
+		return $hex;
 	}
 	
 	public function setIsFull($isFull){
@@ -100,12 +158,28 @@ class Bucket extends YamlStorage{
 	}
 	
 	public function isFull(){
-		if($this->getNodesNum() >= static::SIZE_MAX){
+		if($this->getNodesNum() >= static::$SIZE_MAX){
 			// If full, stay full.
 			$this->setIsFull(true);
 		}
 		
 		return $this->getIsFull();
+	}
+	
+	public function setIsUpper($isUpper){
+		$this->data['isUpper'] = $isUpper;
+	}
+	
+	public function getIsUpper(){
+		return $this->data['isUpper'];
+	}
+	
+	public function setIsLower($isLower){
+		$this->data['isLower'] = $isLower;
+	}
+	
+	public function getIsLower(){
+		return $this->data['isLower'];
 	}
 	
 	public function getNodes(){
@@ -151,29 +225,218 @@ class Bucket extends YamlStorage{
 		return null;
 	}
 	
-	public function nodeAdd(Node $node, $sortNodes = true){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		$onode = $this->nodeFind($node);
-		if(!$onode && $node->getIdHexStr() != '00000000-0000-4000-8000-000000000000'){
-			#print __CLASS__.'->'.__FUNCTION__.': old node'."\n";
-			$filePath = null;
-			if($this->getDatadirBasePath()){
-				$filePath = $this->getDatadirBasePath().'/node_'.$node->getIdHexStr().'.yml';
-			}
-			
-			$node->setFilePath($filePath);
-			$node->setDatadirBasePath($this->getDatadirBasePath());
-			$node->setBucket($this);
-			$node->setDataChanged(true);
-			
-			$this->nodesId++;
-			$this->nodes[$this->nodesId] = $node;
-			
-			$this->setDataChanged(true);
+	private function nodeAdd(Node $node, $sortNodes = true){
+		$filePath = null;
+		if($this->getDatadirBasePath()){
+			#$filePath = $this->getDatadirBasePath().'/node_'.$node->getIdHexStr().'.yml';
+			#$filePath = $this->getDatadirBasePath().'/node_'.$node->getIdHexStr().'_'.mt_rand(1000, 9999).'.yml';
+			$filePath = $this->getDatadirBasePath().'/node_'.substr($node->getIdHexStr(), -5).'_'.time().'.yml';
 		}
+		if(!$node->getFilePath()){
+			$node->setFilePath($filePath);
+		}
+		$node->setDatadirBasePath($this->getDatadirBasePath());
+		$node->setBucket($this);
+		$node->setDataChanged(true);
+		
+		$this->nodesId++;
+		$this->nodes[$this->nodesId] = $node;
+		$this->isFull();
+		$this->setDataChanged(true);
+		
 		if($sortNodes){
 			$this->nodesSort();
 		}
+	}
+	
+	private function setChildBucketUpper($newMask){
+		if(!$this->getLocalNode()){
+			throw new RuntimeException('localNode not set.');
+		}
+		
+		#fwrite(STDOUT, __FUNCTION__.': '.intToBin($newMask).' /'.(int)is_object($this->getLocalNode()).'/'."\n");
+		#sleep(1);
+		
+		if(!$this->childBucketUpper){
+			fwrite(STDOUT, 'upper new: '.intToBin($newMask).' ('.$newMask.')'."\n");
+			
+			$filePath = null;
+			if($this->getDatadirBasePath()){
+				#$filePath = $this->getDatadirBasePath().'/bucket_upper_'.intToBin($mask).'.yml';
+				#$filePath = $this->getDatadirBasePath().'/bucket_upper_'.intToBin($mask).'_'.mt_rand(1000, 9999).'.yml';
+				$filePath = $this->getDatadirBasePath().'/bucket_'.intToBin($newMask).'_1_'.time().'.yml';
+			}
+			
+			$bucket = new Bucket($filePath);
+			$bucket->setMask($newMask);
+			$bucket->setIsUpper(true);
+			$bucket->setDatadirBasePath($this->getDatadirBasePath());
+			$bucket->setLocalNode($this->getLocalNode());
+			$bucket->setDataChanged(true);
+			$this->childBucketUpper = $bucket;
+			
+			$this->setDataChanged(true);
+		}
+		else{
+			#fwrite(STDOUT, 'upper is set: '.intToBin($this->childBucketUpper->getMask()).' ('.$this->childBucketUpper->getMask().')'."\n");
+		}
+	}
+	
+	private function setChildBucketLower($newMask){
+		if(!$this->getLocalNode()){
+			throw new RuntimeException('localNode not set.');
+		}
+		
+		#fwrite(STDOUT, __FUNCTION__.': '.intToBin($newMask).' /'.(int)is_object($this->getLocalNode()).'/'."\n");
+		#sleep(1);
+		
+		if(!$this->childBucketLower){
+			fwrite(STDOUT, 'lower new: '.intToBin($newMask).' ('.$newMask.')'."\n");
+			
+			$filePath = null;
+			if($this->getDatadirBasePath()){
+				#$filePath = $this->getDatadirBasePath().'/bucket_lower_'.intToBin($mask).'.yml';
+				#$filePath = $this->getDatadirBasePath().'/bucket_lower_'.intToBin($mask).'_'.mt_rand(1000, 9999).'.yml';
+				$filePath = $this->getDatadirBasePath().'/bucket_'.intToBin($newMask).'_0_'.time().'.yml';
+			}
+			
+			$bucket = new Bucket($filePath);
+			$bucket->setMask($newMask);
+			$bucket->setIsLower(true);
+			$bucket->setDatadirBasePath($this->getDatadirBasePath());
+			$bucket->setLocalNode($this->getLocalNode());
+			$bucket->setDataChanged(true);
+			$this->childBucketLower = $bucket;
+			
+			$this->setDataChanged(true);
+		}
+		else{
+			#fwrite(STDOUT, 'lower is set: '.intToBin($this->childBucketLower->getMask()).' ('.$this->childBucketLower->getMask().')'."\n");
+		}
+	}
+	
+	private function nodesReEnclose($sortNodes = true, $level = 1){
+		fwrite(STDOUT, str_repeat("\t", $level).'reenclose: '.$level."\n");
+		
+		if($level >= 10){
+			fwrite(STDOUT, str_repeat("\t", $level).'ERROR: level '.$level.' is too deep'."\n");
+			return;
+		}
+		
+		$mask = $this->getMask();
+		if($mask > 0){
+			foreach($this->nodes as $nodeId => $node){
+				fwrite(STDOUT, str_repeat("\t", $level).'reenclose node: '.$nodeId."\n");
+				
+				$distance = $this->getLocalNode()->distance($node);
+				
+				
+				$bucket = null;
+				if($distance[15] & $mask){
+					fwrite(STDOUT, str_repeat("\t", $level).'match: upper'."\n");
+					$bucket = $this->childBucketUpper;
+				}
+				else{
+					fwrite(STDOUT, str_repeat("\t", $level).'match: lower'."\n");
+					$bucket = $this->childBucketLower;
+				}
+				
+				fwrite(STDOUT, str_repeat("\t", $level).'child bucket: '.( $bucket === null ? 'N/A' : intToBin($bucket->getMask()) )."\n");
+				
+				$bucket->nodeEnclose($node, $sortNodes, $level + 1);
+			}
+			
+			$this->nodes = array();
+		}
+		else{
+			fwrite(STDOUT, str_repeat("\t", $level).'reenclose failed: '.intToBin($mask).' ('.$mask.')'."\n");
+		}
+	}
+	
+	public function nodeEnclose(Node $node, $sortNodes = true, $level = 1){
+		usleep(100000); # TODO
+		#sleep(2); # TODO
+		
+		$rv = null;
+		if($level <= 10){
+			if($node->getIdHexStr() != '00000000-0000-4000-8000-000000000000'){
+				$distance = $this->getLocalNode()->distance($node);
+				$mask = 1 << 2; // Root Mask # TODO
+				if($this->getIsUpper() || $this->getIsLower()){
+					fwrite(STDOUT, str_repeat("\t", $level).'no root bucket'."\n");
+					$mask = $this->getMask();
+				}
+				else{
+					fwrite(STDOUT, str_repeat("\t", $level).'root bucket'."\n");
+				}
+				if($mask > 0){
+					$newMask = $mask >> 1;
+					$this->setChildBucketUpper($newMask);
+					$this->setChildBucketLower($newMask);
+				}
+				
+				fwrite(STDOUT, str_repeat("\t", $level).'level: '.$level."\n");
+				fwrite(STDOUT, str_repeat("\t", $level).'node: '.$node->getIdHexStr()."\n");
+				fwrite(STDOUT, str_repeat("\t", $level).'dist: '.intToBin($distance[15])."\n");
+				fwrite(STDOUT, str_repeat("\t", $level).'mask: '.intToBin($mask)."\n");
+				#fwrite(STDOUT, str_repeat("\t", $level).'chek: '.intToBin($distance[15] & $mask)."\n");
+				
+				if($this->childBucketUpper){
+					fwrite(STDOUT, str_repeat("\t", $level).'upper: '.intToBin($this->childBucketUpper->getMask())."\n");
+				}
+				else{
+					fwrite(STDOUT, str_repeat("\t", $level).'upper: N/A'."\n");
+				}
+				if($this->childBucketLower){
+					fwrite(STDOUT, str_repeat("\t", $level).'lower: '.intToBin($this->childBucketLower->getMask())."\n");
+				}
+				else{
+					fwrite(STDOUT, str_repeat("\t", $level).'lower: N/A'."\n");
+				}
+				
+				$onode = $this->nodeFind($node);
+				if(!$onode){
+					
+					$bucket = null;
+					if($distance[15] & $mask){ # TODO
+						fwrite(STDOUT, str_repeat("\t", $level).'match: upper'."\n");
+						$bucket = $this->childBucketUpper;
+					}
+					else{
+						fwrite(STDOUT, str_repeat("\t", $level).'match: lower'."\n");
+						$bucket = $this->childBucketLower;
+					}
+					
+					fwrite(STDOUT, str_repeat("\t", $level).'child bucket: '.( $bucket === null ? 'N/A' : intToBin($bucket->getMask()) )."\n");
+					
+					if($this->getNodesNum() < static::$SIZE_MAX && !$this->getIsFull()){
+						fwrite(STDOUT, str_repeat("\t", $level).'add node'."\n");
+						
+						$this->nodeAdd($node);
+						
+						if($this->isFull()){
+							fwrite(STDOUT, str_repeat("\t", $level).'FULL end'."\n");
+							$this->nodesReEnclose($sortNodes, $level + 1);
+						}
+					}
+					else{
+						fwrite(STDOUT, str_repeat("\t", $level).'FULL new'."\n");
+						
+						$bucket->nodeEnclose($node, $sortNodes, $level + 1);
+					}
+				}
+				else{
+					$onode->update($node);
+					$rv = $onode;
+				}
+			}
+		}
+		else{
+			# TODO
+			fwrite(STDOUT, str_repeat("\t", $level).'ERROR: level '.$level.' is too deep'."\n");
+		}
+		
+		return $rv;
 	}
 	
 	public function nodeRemoveByIndex($index){
@@ -192,6 +455,26 @@ class Bucket extends YamlStorage{
 		});
 		
 		$this->setDataChanged(true);
+	}
+	
+	public static function maskByNodes($nodeA, $nodeB){
+		$idLenBits = Node::ID_LEN_BITS - 1;
+		$mbase = array_fill(0, Node::ID_LEN, 0);
+		
+		
+		for($bits = $idLenBits; $bits >= 0; $bits--){
+			$idPos = Node::ID_LEN - floor($bits / 8) - 1;
+			$mask = $mbase[$idPos] | 1 << (7 - (Node::ID_LEN_BITS - $idPos * 8 - $bits - 1));
+			#fwrite(STDOUT, __FUNCTION__.'         mask: /'.$idPos.'/ /'.$mask.'/'."\n");
+			#usleep(10000);
+			if( ($distance[$idPos] & $mask) == $mask ){
+				break;
+			}
+		}
+	}
+	
+	public function bucketForNode(Node $node){
+		
 	}
 	
 }

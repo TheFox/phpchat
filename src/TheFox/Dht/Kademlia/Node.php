@@ -103,6 +103,8 @@ class Node extends YamlStorage{
 				$id = substr($id, 2);
 			}
 		}
+		
+		#ve($this->id);
 		#else{ print __CLASS__.'->'.__FUNCTION__.': check valid UUID FAILED: '.$id."\n"; }
 	}
 	
@@ -263,14 +265,20 @@ class Node extends YamlStorage{
 	}
 	
 	public function distance(Node $node){
+		#fwrite(STDOUT, __FUNCTION__.''."\n");
 		$rv = array_fill(0, static::ID_LEN, 0);
+		#ve($rv);
 		
 		if($node && $this !== $node){
-			$nodeId = $node->getId();
 			$thisId = $this->getId();
+			$nodeId = $node->getId();
+			
+			#ve($thisId);
+			#ve($nodeId);
 			
 			for($idPos = 0; $idPos < static::ID_LEN; $idPos++){
 				$rv[$idPos] = $thisId[$idPos] ^ $nodeId[$idPos];
+				#fwrite(STDOUT, __FUNCTION__.'     pos: '.$idPos.' -> '.$rv[$idPos]."\n");
 			}
 		}
 		
@@ -282,7 +290,9 @@ class Node extends YamlStorage{
 		
 		$rv = '';
 		for($idPos = 0; $idPos < static::ID_LEN; $idPos++){
+			#fwrite(STDOUT, __FUNCTION__.' pos: '.$idPos."\n");
 			for($bits = 7; $bits >= 0; $bits--){
+				#fwrite(STDOUT, __FUNCTION__.'     bit: '.$bits.' -> '.(1 << $bits)."\n");
 				$rv .= $distance[$idPos] & (1 << $bits) ? '1' : '0';
 			}
 			#$rv .= ' ';
@@ -319,6 +329,14 @@ class Node extends YamlStorage{
 		sort($ar, SORT_STRING);
 		
 		return array_shift($ar);
+	}
+	
+	public function update(Node $node){
+		if($node->getTimeLastSeen() > $this->getTimeLastSeen()){
+			$this->setUri($node->getUri());
+			$this->setTimeLastSeen($node->getTimeLastSeen());
+			$this->setDataChanged(true);
+		}
 	}
 	
 }

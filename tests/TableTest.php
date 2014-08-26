@@ -1,6 +1,9 @@
 <?php
 
+use Symfony\Component\Finder\Finder;
+
 use TheFox\Dht\Kademlia\Table;
+use TheFox\Dht\Kademlia\Bucket;
 use TheFox\Dht\Kademlia\Node;
 
 class TableTest extends PHPUnit_Framework_TestCase{
@@ -292,6 +295,97 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$this->assertTrue($node_a === $onode);
 		
 		$this->assertEquals('192.168.241.1', $onode->getUri()->getHost());
+	}
+	
+	public function testNodeEnclose3(){
+		$this->assertEquals(20, Bucket::$SIZE_MAX);
+		
+		Bucket::$SIZE_MAX = 4;
+		$this->assertEquals(4, Bucket::$SIZE_MAX);
+		
+		Bucket::$SIZE_MAX = 1;
+		
+		$localNode = new Node();
+		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000006');
+		
+		$table = new Table('tests/testfile_table.yml');
+		$table->setDatadirBasePath('tests');
+		$table->setLocalNode($localNode);
+		$table->load();
+		
+		$node_a = new Node();
+		$node_a->setIdHexStr('10000001-2002-4004-8008-100000000000');
+		
+		$node_b = new Node();
+		$node_b->setIdHexStr('10000001-2002-4004-8008-100000000001');
+		
+		$node_c = new Node();
+		$node_c->setIdHexStr('10000001-2002-4004-8008-100000000002');
+		
+		#$node_d = new Node();
+		#$node_d->setIdHexStr('10000001-2002-4004-8008-100000000003');
+		
+		$node_e = new Node();
+		$node_e->setIdHexStr('10000001-2002-4004-8008-100000000004');
+		
+		$node_f = new Node();
+		$node_f->setIdHexStr('10000001-2002-4004-8008-100000000005');
+		
+		$node_h = new Node();
+		$node_h->setIdHexStr('10000001-2002-4004-8008-100000000007');
+		
+		
+		$baseBitStr = str_repeat('0', 125);
+		#$this->assertEquals($baseBitStr.'110', $localNode->distanceBitStr($node_a));
+		#$this->assertEquals($baseBitStr.'111', $localNode->distanceBitStr($node_b));
+		#$this->assertEquals($baseBitStr.'100', $localNode->distanceBitStr($node_c));
+		#$this->assertEquals($baseBitStr.'010', $localNode->distanceBitStr($node_e));
+		#$this->assertEquals($baseBitStr.'011', $localNode->distanceBitStr($node_f));
+		#$this->assertEquals($baseBitStr.'001', $localNode->distanceBitStr($node_h));
+		
+		
+		#$table->nodeEnclose2($node_a);
+		#$table->nodeEnclose2($node_b);
+		$table->nodeEnclose2($node_c);
+		#$table->nodeEnclose2($node_e);
+		#$table->nodeEnclose2($node_f);
+		#$table->nodeEnclose2($node_h);
+		
+		$table->save();
+		
+		#ve($table);
+	}
+	
+	/**
+	 * @group large
+	 */
+	public function testMassive(){
+		$NODES = 50;
+		
+		$localNode = new Node();
+		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
+		$table = new Table('tests/testfile_table.yml');
+		$table->setDatadirBasePath('tests');
+		$table->setLocalNode($localNode);
+		
+		$nodeNoEnd = 100000000002 + $NODES;
+		for($nodeNo = 100000000002; $nodeNo < $nodeNoEnd; $nodeNo++){
+			$node = new Node();
+			#$node = new Node('tests/testfile_node_'.$nodeNo.'.yml');
+			$node->setIdHexStr('10000001-2002-4004-8008-'.$nodeNo);
+			
+			$table->nodeEnclose($node);
+			
+			#fwrite(STDOUT, __METHOD__.' msg setup: '.$nodeNo.''.PHP_EOL);
+		}
+		
+		$table->save();
+		
+		#@unlink('tests/bucket_1.yml');
+		
+		$finder = new Finder();
+		$files = $finder->in('tests')->name('node_10000001-2002-4004-8008-*.yml');
+		$this->assertEquals($NODES, count($files));
 	}
 	
 }
