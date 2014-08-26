@@ -7,7 +7,7 @@ function ve($v = null){
 		fwrite(STDOUT, $rv."\n");
 	}
 	catch(Exception $e){
-		print "ERROR: ".$e->getMessage()."\n";
+		print 'ERROR: '.$e->getMessage()."\n";
 	}
 }
 
@@ -16,7 +16,7 @@ function vej($v = null){
 		ve(json_encode($v));
 	}
 	catch(Exception $e){
-		print "ERROR: ".$e->getMessage()."\n";
+		print 'ERROR: '.$e->getMessage()."\n";
 	}
 }
 
@@ -27,7 +27,7 @@ function vew($v = null){
 		print '</pre>';
 	}
 	catch(Exception $e){
-		print "ERROR: ".$e->getMessage()."\n";
+		print 'ERROR: '.$e->getMessage()."\n";
 	}
 }
 
@@ -49,7 +49,7 @@ function sslKeyPubClean($key){
 
 function intToBin($i){
 	$rv = '';
-	#$rv .= $i & (1 << 7) ? '1' : '0';
+	#$rv .= $i & (1 << 7) ? '1' : '0'; # TODO
 	#$rv .= $i & (1 << 6) ? '1' : '0';
 	#$rv .= $i & (1 << 5) ? '1' : '0';
 	#$rv .= $i & (1 << 4) ? '1' : '0';
