@@ -438,7 +438,7 @@ class Table extends YamlStorage{
 		if(!$this->rootBucket){
 			$filePath = null;
 			if($this->getDatadirBasePath()){
-				$filePath = $this->getDatadirBasePath().'/bucket_root_'.time().'.yml';
+				$filePath = $this->getDatadirBasePath().'/bucket_root_'.time().'_'.mt_rand(1000, 9999).'.yml';
 			}
 			
 			$bucket = new Bucket($filePath);

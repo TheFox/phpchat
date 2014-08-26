@@ -249,22 +249,20 @@ class Bucket extends YamlStorage{
 		}
 	}
 	
-	private function setChildBucketUpper($newMask){
+	private function setChildBucketUpper(){
 		if(!$this->getLocalNode()){
 			throw new RuntimeException('localNode not set.');
 		}
 		
-		#fwrite(STDOUT, __FUNCTION__.': '.intToBin($newMask).' /'.(int)is_object($this->getLocalNode()).'/'."\n");
-		#sleep(1);
-		
-		if(!$this->childBucketUpper){
+		$mask = $this->getMask();
+		if(!$this->childBucketUpper && $mask > 0){
+			$newMask = $mask >> 1;
+			
 			fwrite(STDOUT, 'upper new: '.intToBin($newMask).' ('.$newMask.')'."\n");
 			
 			$filePath = null;
 			if($this->getDatadirBasePath()){
-				#$filePath = $this->getDatadirBasePath().'/bucket_upper_'.intToBin($mask).'.yml';
-				#$filePath = $this->getDatadirBasePath().'/bucket_upper_'.intToBin($mask).'_'.mt_rand(1000, 9999).'.yml';
-				$filePath = $this->getDatadirBasePath().'/bucket_'.intToBin($newMask).'_1_'.time().'.yml';
+				$filePath = $this->getDatadirBasePath().'/bucket_'.intToBin($newMask).'_1_'.time().'_'.mt_rand(1000, 9999).'.yml';
 			}
 			
 			$bucket = new Bucket($filePath);
@@ -282,22 +280,20 @@ class Bucket extends YamlStorage{
 		}
 	}
 	
-	private function setChildBucketLower($newMask){
+	private function setChildBucketLower(){
 		if(!$this->getLocalNode()){
 			throw new RuntimeException('localNode not set.');
 		}
 		
-		#fwrite(STDOUT, __FUNCTION__.': '.intToBin($newMask).' /'.(int)is_object($this->getLocalNode()).'/'."\n");
-		#sleep(1);
-		
-		if(!$this->childBucketLower){
+		$mask = $this->getMask();
+		if(!$this->childBucketLower && $mask > 0){
+			$newMask = $mask >> 1;
+			
 			fwrite(STDOUT, 'lower new: '.intToBin($newMask).' ('.$newMask.')'."\n");
 			
 			$filePath = null;
 			if($this->getDatadirBasePath()){
-				#$filePath = $this->getDatadirBasePath().'/bucket_lower_'.intToBin($mask).'.yml';
-				#$filePath = $this->getDatadirBasePath().'/bucket_lower_'.intToBin($mask).'_'.mt_rand(1000, 9999).'.yml';
-				$filePath = $this->getDatadirBasePath().'/bucket_'.intToBin($newMask).'_0_'.time().'.yml';
+				$filePath = $this->getDatadirBasePath().'/bucket_'.intToBin($newMask).'_0_'.time().'_'.mt_rand(1000, 9999).'.yml';
 			}
 			
 			$bucket = new Bucket($filePath);
@@ -354,7 +350,7 @@ class Bucket extends YamlStorage{
 	}
 	
 	public function nodeEnclose(Node $node, $sortNodes = true, $level = 1){
-		usleep(100000); # TODO
+		#usleep(100000); # TODO
 		#sleep(2); # TODO
 		
 		$rv = null;
@@ -368,11 +364,12 @@ class Bucket extends YamlStorage{
 				}
 				else{
 					fwrite(STDOUT, str_repeat("\t", $level).'root bucket'."\n");
+					$this->setMask($mask);
 				}
 				if($mask > 0){
 					$newMask = $mask >> 1;
-					$this->setChildBucketUpper($newMask);
-					$this->setChildBucketLower($newMask);
+					#$this->setChildBucketUpper($newMask);
+					#$this->setChildBucketLower($newMask);
 				}
 				
 				fwrite(STDOUT, str_repeat("\t", $level).'level: '.$level."\n");
@@ -400,10 +397,12 @@ class Bucket extends YamlStorage{
 					$bucket = null;
 					if($distance[15] & $mask){ # TODO
 						fwrite(STDOUT, str_repeat("\t", $level).'match: upper'."\n");
+						$this->setChildBucketUpper();
 						$bucket = $this->childBucketUpper;
 					}
 					else{
 						fwrite(STDOUT, str_repeat("\t", $level).'match: lower'."\n");
+						$this->setChildBucketLower();
 						$bucket = $this->childBucketLower;
 					}
 					
