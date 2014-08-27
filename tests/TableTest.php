@@ -225,7 +225,11 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		
 		$nodes = $table->nodeFindClosest($node_e);
 		
+		$this->assertEquals(4, count($nodes));
 		$this->assertEquals(array($node_c, $node_a, $node_b, $node_d), $nodes);
+		/*foreach($nodes as $nodeId => $node){
+			fwrite(STDOUT, 'node: /'.$nodeId.'/ '.$node->getIdHexStr()."\n");
+		}*/
 	}
 	
 	public function testNodeFindByKeyPubFingerprint(){
@@ -303,7 +307,10 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 	}
 	
 	public function testNodeEnclose3(){
-		@unlink('tests/bucket_root.yml');
+		fwrite(STDOUT, 'testNodeEnclose3 '.time().PHP_EOL);
+		
+		#@unlink('tests/testfile_table_table.yml');
+		#@unlink('tests/bucket_root.yml');
 		
 		$this->assertEquals(20, Bucket::$SIZE_MAX);
 		
@@ -314,33 +321,36 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		#Bucket::$SIZE_MAX = 2;
 		
 		$localNode = new Node();
-		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000006');
+		$localNode->setIdHexStr('11000001-2002-4004-8008-100000000006');
 		
-		$table = new Table('tests/testfile_table_table3.yml');
+		$table = new Table('tests/testfile_table_table.yml');
 		$table->setDatadirBasePath('tests');
 		$table->setLocalNode($localNode);
 		$table->load();
 		
 		$node0 = new Node();
-		$node0->setIdHexStr('10000001-2002-4004-8008-100000000000');
+		$node0->setIdHexStr('11000001-2002-4004-8008-100000000000');
 		
 		$node1 = new Node();
-		$node1->setIdHexStr('10000001-2002-4004-8008-100000000001');
+		$node1->setIdHexStr('11000001-2002-4004-8008-100000000001');
 		
 		$node2 = new Node();
-		$node2->setIdHexStr('10000001-2002-4004-8008-100000000002');
+		$node2->setIdHexStr('11000001-2002-4004-8008-100000000002');
 		
 		$node3 = new Node();
-		$node3->setIdHexStr('10000001-2002-4004-8008-100000000003');
+		$node3->setIdHexStr('11000001-2002-4004-8008-100000000003');
 		
 		$node4 = new Node();
-		$node4->setIdHexStr('10000001-2002-4004-8008-100000000004');
+		$node4->setIdHexStr('11000001-2002-4004-8008-100000000004');
 		
 		$node5 = new Node();
-		$node5->setIdHexStr('10000001-2002-4004-8008-100000000005');
+		$node5->setIdHexStr('11000001-2002-4004-8008-100000000005');
 		
 		$node7 = new Node();
-		$node7->setIdHexStr('10000001-2002-4004-8008-100000000007');
+		$node7->setIdHexStr('11000001-2002-4004-8008-100000000007');
+		
+		$node20 = new Node();
+		$node20->setIdHexStr('11000001-2002-4004-8008-100000000020');
 		
 		
 		$baseBitStr = str_repeat('0', 125);
@@ -352,60 +362,33 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		#$this->assertEquals($baseBitStr.'001', $localNode->distanceBitStr($node7));
 		
 		
-		$table->nodeEnclose($node0);
+		#$table->nodeEnclose($node0);
 		#$table->nodeEnclose($node1);
 		#$table->nodeEnclose($node2);
 		#$table->nodeEnclose($node4);
 		#$table->nodeEnclose($node5);
 		#$table->nodeEnclose($node7);
+		#$table->nodeEnclose($node20);
 		
 		$table->save();
 		
 		#ve($table);
 		
-		$finder = new Finder();
-		$files = $finder->in('tests')->name('node_*.yml');
-		$filesystem = new Filesystem();
-		foreach($files as $fileId => $file){
-			$filesystem->remove($file->getRealPath());
-		}
-		
-		$finder = new Finder();
-		$files = $finder->in('tests')->name('bucket_*.yml');
-		$filesystem = new Filesystem();
-		foreach($files as $fileId => $file){
-			$filesystem->remove($file->getRealPath());
-		}
+		$this->clean();
 	}
 	
 	/**
 	 * @group large
 	 */
 	public function testNodeEnclose4(){
-		$NODES = 5000;
+		fwrite(STDOUT, 'testNodeEnclose4 '.time().PHP_EOL);
 		
-		@unlink('tests/testfile_table_table4.yml');
-		@unlink('tests/bucket_root.yml');
-		
-		$finder = new Finder();
-		$files = $finder->in('tests')->name('bucket_*.yml');
-		$filesystem = new Filesystem();
-		foreach($files as $fileId => $file){
-			$filesystem->remove($file->getRealPath());
-		}
-		
-		$finder = new Finder();
-		$files = $finder->in('tests')->name('node_*.yml');
-		$filesystem = new Filesystem();
-		foreach($files as $fileId => $file){
-			$filesystem->remove($file->getRealPath());
-		}
-		
-		sleep(1);
+		$NODES = 200;
+		Bucket::$SIZE_MAX = 20;
 		
 		$localNode = new Node();
-		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
-		$table = new Table('tests/testfile_table_table4.yml');
+		$localNode->setIdHexStr('12000001-2002-4004-8008-100000000001');
+		$table = new Table('tests/testfile_table_table.yml');
 		$table->setDatadirBasePath('tests');
 		$table->setLocalNode($localNode);
 		$table->load();
@@ -416,7 +399,7 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 			fwrite(STDOUT, __METHOD__.' node setup: '.$nodeNo.''.PHP_EOL);
 			
 			$node = new Node();
-			$node->setIdHexStr('10000001-2002-4004-8008-'.$nodeNo);
+			$node->setIdHexStr('12000001-2002-4004-8008-'.$nodeNo);
 			
 			$table->nodeEnclose($node);
 		}
@@ -431,11 +414,28 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		
 		$finder = new Finder();
 		$files = $finder->in('tests')->name('node_*.yml');
-		#$this->assertEquals(160, count($files));
+		$this->assertEquals(160, count($files));
 		
+		$this->clean();
+	}
+	
+	private function clean(){
+		@unlink('tests/testfile_table_table.yml');
+		@unlink('tests/bucket_root.yml');
 		
+		$finder = new Finder();
+		$files = $finder->in('tests')->name('bucket_*.yml');
+		$filesystem = new Filesystem();
+		foreach($files as $fileId => $file){
+			$filesystem->remove($file->getRealPath());
+		}
 		
-		
+		$finder = new Finder();
+		$files = $finder->in('tests')->name('node_*.yml');
+		$filesystem = new Filesystem();
+		foreach($files as $fileId => $file){
+			$filesystem->remove($file->getRealPath());
+		}
 	}
 	
 }
