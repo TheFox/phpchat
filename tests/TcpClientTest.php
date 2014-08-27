@@ -215,7 +215,12 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 	}
 	
 	private function sendGenTestData(){
+		@unlink('tests/testdir_tcpclient1/bucket_root.yml');
+		@unlink('tests/testdir_tcpclient2/bucket_root.yml');
+		
 		$filesystem = new Filesystem();
+		$filesystem->remove('tests/testdir_tcpclient1');
+		$filesystem->remove('tests/testdir_tcpclient2');
 		$filesystem->mkdir('tests/testdir_tcpclient1', $mode = 0777);
 		$filesystem->mkdir('tests/testdir_tcpclient2', $mode = 0777);
 		
@@ -357,7 +362,6 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		
 		// ID Client1
 		$raw = $client2->dataRecv($raw);
-		#ve($raw);
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
 		$this->assertEquals('id', $json[0]['name']);

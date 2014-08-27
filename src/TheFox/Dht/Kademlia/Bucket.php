@@ -403,7 +403,7 @@ class Bucket extends YamlStorage{
 		#usleep(100000); # TODO
 		#sleep(2); # TODO
 		
-		$nodeEncloseReturnValue = null;
+		$nodeEncloseReturnValue = $node;
 		if($level <= 1000){
 			if($node->getIdHexStr() != '00000000-0000-4000-8000-000000000000'){
 				$distance = $this->getLocalNode()->distance($node);

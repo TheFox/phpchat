@@ -486,6 +486,8 @@ class Client{
 						
 						$node = $this->getTable()->nodeEnclose($node);
 						
+						#$this->log('debug', 'node ok: '.(int)is_object($node));
+						
 						// Check if not Local Node
 						if(! $this->getLocalNode()->isEqual($node)){
 							
