@@ -379,9 +379,8 @@ class Bucket extends YamlStorage{
 				}
 				
 				if($bucket === null){
-					##fwrite(STDOUT, str_repeat("\t", $level).'reenclose child bucket: '.'N/A'."\n");
-					
-					throw new RuntimeException('reenclose bucket is full: l='.$level.' d='.intToBin($distance[15]).' m='.intToBin($mask).' n='.$node->getIdHexStr().'');
+					fwrite(STDOUT, str_repeat("\t", $level).'reenclose bucket is full: l='.$level.' d='.intToBin($distance[15]).' m='.intToBin($mask).' n='.$node->getIdHexStr().''."\n");
+					#throw new RuntimeException('reenclose bucket is full: l='.$level.' d='.intToBin($distance[15]).' m='.intToBin($mask).' n='.$node->getIdHexStr().'');
 				}
 				else{
 					#fwrite(STDOUT, str_repeat("\t", $level).'reenclose child bucket: '.intToBin($bucket->getMask()).' d='.intToBin($bucket->getDistance()).''."\n");
@@ -393,7 +392,7 @@ class Bucket extends YamlStorage{
 			$this->nodes = array();
 		}
 		else{
-			#fwrite(STDOUT, str_repeat("\t", $level).'reenclose failed: '.intToBin($mask).' ('.$mask.')'."\n");
+			fwrite(STDOUT, str_repeat("\t", $level).'reenclose failed: '.intToBin($mask).' ('.$mask.')'."\n");
 			#throw new RuntimeException('reenclose failed: l='.$level.' m='.intToBin($mask).'');
 			
 			# TODO: what happens when a bucket is full?
@@ -469,7 +468,7 @@ class Bucket extends YamlStorage{
 						}
 						
 						if($bucket === null){
-							#fwrite(STDOUT, str_repeat("\t", $level).'child bucket: '.'N/A'."\n");
+							fwrite(STDOUT, str_repeat("\t", $level).'enclose: bucket is full: l='.$level.' d='.intToBin($distance[15]).' m='.intToBin($mask).' n='.$node->getIdHexStr().''."\n");
 							
 							#throw new RuntimeException('enclose: bucket is full: l='.$level.' d='.intToBin($distance[15]).' m='.intToBin($mask).' n='.$node->getIdHexStr().'');
 							
