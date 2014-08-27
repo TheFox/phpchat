@@ -364,11 +364,6 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 	public function testNodeEnclose4(){
 		$NODES = 50;
 		$NODES = 5000;
-		$NODES = 160;
-		$NODES = 128;
-		$NODES = 120;
-		$NODES = 1;
-		#$NODES = 20;
 		
 		$localNode = new Node();
 		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
@@ -378,13 +373,6 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$table->load();
 		
 		$nodeNoBegin = 100000000002;
-		$nodeNoBegin = 100000000052;
-		$nodeNoBegin = 100000000062;
-		$nodeNoBegin = 100000000072;
-		$nodeNoBegin = 100000000082;
-		$nodeNoBegin = 100000000092;
-		$nodeNoBegin = 100000000099;
-		$nodeNoBegin = 100000000100;
 		$nodeNoEnd = $nodeNoBegin + $NODES;
 		for($nodeNo = $nodeNoBegin; $nodeNo < $nodeNoEnd; $nodeNo++){
 			fwrite(STDOUT, __METHOD__.' msg setup: '.$nodeNo.''.PHP_EOL);

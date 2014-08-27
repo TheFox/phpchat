@@ -365,7 +365,7 @@ class Bucket extends YamlStorage{
 				}
 				
 				if($bucket === null){
-					#fwrite(STDOUT, str_repeat("\t", $level).'reenclose child bucket: '.'N/A'."\n");
+					##fwrite(STDOUT, str_repeat("\t", $level).'reenclose child bucket: '.'N/A'."\n");
 					
 					throw new RuntimeException('reenclose bucket is full: l='.$level.' d='.intToBin($distance[15]).' m='.intToBin($mask).' n='.$node->getIdHexStr().'');
 				}
@@ -380,7 +380,9 @@ class Bucket extends YamlStorage{
 		}
 		else{
 			#fwrite(STDOUT, str_repeat("\t", $level).'reenclose failed: '.intToBin($mask).' ('.$mask.')'."\n");
-			throw new RuntimeException('reenclose failed: l='.$level.' m='.intToBin($mask).'');
+			#throw new RuntimeException('reenclose failed: l='.$level.' m='.intToBin($mask).'');
+			
+			# TODO: what happens when a bucket is full?
 		}
 	}
 	
@@ -394,72 +396,72 @@ class Bucket extends YamlStorage{
 				$distance = $this->getLocalNode()->distance($node);
 				$mask = 1 << 2; // Root Mask # TODO
 				if($this->getIsUpper() || $this->getIsLower()){
-					fwrite(STDOUT, str_repeat("\t", $level).'no root bucket'."\n");
+					#fwrite(STDOUT, str_repeat("\t", $level).'no root bucket'."\n");
 					$mask = $this->getMask();
 				}
 				else{
-					fwrite(STDOUT, str_repeat("\t", $level).'root bucket'."\n");
+					#fwrite(STDOUT, str_repeat("\t", $level).'root bucket'."\n");
 					$this->setMask($mask);
 				}
-				if($mask > 0){
-					$newMask = $mask >> 1; # TODO: not needed
-				}
+				#if($mask > 0){
+				#	$newMask = $mask >> 1; # TODO: not needed
+				#}
 				
-				fwrite(STDOUT, str_repeat("\t", $level).'level: '.$level."\n");
-				fwrite(STDOUT, str_repeat("\t", $level).'node: '.$node->getIdHexStr()."\n");
-				fwrite(STDOUT, str_repeat("\t", $level).'dist: '.intToBin($distance[15])."\n");
-				fwrite(STDOUT, str_repeat("\t", $level).'mask: '.intToBin($mask)."\n");
+				#fwrite(STDOUT, str_repeat("\t", $level).'level: '.$level."\n");
+				#fwrite(STDOUT, str_repeat("\t", $level).'node: '.$node->getIdHexStr()."\n");
+				#fwrite(STDOUT, str_repeat("\t", $level).'dist: '.intToBin($distance[15])."\n");
+				#fwrite(STDOUT, str_repeat("\t", $level).'mask: '.intToBin($mask)."\n");
 				
 				if($this->childBucketUpper){
-					fwrite(STDOUT, str_repeat("\t", $level).'upper: '.intToBin($this->childBucketUpper->getMask())."\n");
+					#fwrite(STDOUT, str_repeat("\t", $level).'upper: '.intToBin($this->childBucketUpper->getMask())."\n");
 				}
 				else{
-					fwrite(STDOUT, str_repeat("\t", $level).'upper: N/A'."\n");
+					#fwrite(STDOUT, str_repeat("\t", $level).'upper: N/A'."\n");
 				}
 				if($this->childBucketLower){
-					fwrite(STDOUT, str_repeat("\t", $level).'lower: '.intToBin($this->childBucketLower->getMask())."\n");
+					#fwrite(STDOUT, str_repeat("\t", $level).'lower: '.intToBin($this->childBucketLower->getMask())."\n");
 				}
 				else{
-					fwrite(STDOUT, str_repeat("\t", $level).'lower: N/A'."\n");
+					#fwrite(STDOUT, str_repeat("\t", $level).'lower: N/A'."\n");
 				}
 				
 				$onode = $this->nodeFind($node);
 				if(!$onode){
 					
 					if($this->getNodesNum() < static::$SIZE_MAX && !$this->getIsFull()){
-						fwrite(STDOUT, str_repeat("\t", $level).'add node'."\n");
+						#fwrite(STDOUT, str_repeat("\t", $level).'add node'."\n");
 						
 						$this->nodeAdd($node);
 						
 						if($this->isFull()){
-							fwrite(STDOUT, str_repeat("\t", $level).'FULL end'."\n");
+							#fwrite(STDOUT, str_repeat("\t", $level).'FULL end'."\n");
 							$this->nodesReEnclose($sortNodes, $level + 1);
 						}
 					}
 					else{
-						fwrite(STDOUT, str_repeat("\t", $level).'FULL new'."\n");
+						#fwrite(STDOUT, str_repeat("\t", $level).'FULL new'."\n");
 						
 						$bucket = null;
 						if($distance[15] & $mask){ # TODO
-							fwrite(STDOUT, str_repeat("\t", $level).'match: upper'."\n");
+							#fwrite(STDOUT, str_repeat("\t", $level).'match: upper'."\n");
 							$this->setChildBucketUpper($distance[15]); # TODO
 							$bucket = $this->childBucketUpper;
 						}
 						else{
-							fwrite(STDOUT, str_repeat("\t", $level).'match: lower'."\n");
+							#fwrite(STDOUT, str_repeat("\t", $level).'match: lower'."\n");
 							$this->setChildBucketLower($distance[15]); # TODO
 							$bucket = $this->childBucketLower;
 						}
 						
 						if($bucket === null){
-							fwrite(STDOUT, str_repeat("\t", $level).'child bucket: '.'N/A'."\n");
+							#fwrite(STDOUT, str_repeat("\t", $level).'child bucket: '.'N/A'."\n");
 							
 							#throw new RuntimeException('enclose: bucket is full: l='.$level.' d='.intToBin($distance[15]).' m='.intToBin($mask).' n='.$node->getIdHexStr().'');
 							
 							# TODO: what happens when a bucket is not found?
 						}
 						else{
-							fwrite(STDOUT, str_repeat("\t", $level).'child bucket: '.intToBin($bucket->getMask()).' d='.intToBin($bucket->getDistance()).''."\n");
+							#fwrite(STDOUT, str_repeat("\t", $level).'child bucket: '.intToBin($bucket->getMask()).' d='.intToBin($bucket->getDistance()).''."\n");
 							
 							$bucket->nodeEnclose($node, $sortNodes, $level + 1);
 						}
