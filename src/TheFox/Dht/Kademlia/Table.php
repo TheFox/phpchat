@@ -9,8 +9,8 @@ use TheFox\Storage\YamlStorage;
 
 class Table extends YamlStorage{
 	
-	private $buckets = array();
-	private $bucketsByMask = array();
+	#private $buckets = array();
+	#private $bucketsByMask = array();
 	private $localNode = null;
 	#private $childBucketUpper = null;
 	#private $childBucketLower = null;
@@ -19,25 +19,30 @@ class Table extends YamlStorage{
 	public function __construct($filePath = null){
 		parent::__construct($filePath);
 		
-		$this->data['bucketsId'] = 0;
+		#$this->data['bucketsId'] = 0;
 		$this->data['timeCreated'] = time();
 	}
 	
 	public function __sleep(){
-		return array('data', 'buckets', 'localNode');
+		return array(
+			'data',
+			#'buckets',
+			'localNode',
+			'rootBucket',
+		);
 	}
 	
 	public function save(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
-		$this->data['buckets'] = array();
+		/*$this->data['buckets'] = array();
 		foreach($this->buckets as $bucketId => $bucket){
 			$this->data['buckets'][$bucketId] = array(
 				'path' => $bucket->getFilePath(),
 			);
 			
 			$bucket->save();
-		}
+		}*/
 		
 		/*$this->data['childBucketUpper'] = null;
 		if($this->childBucketUpper){
@@ -58,7 +63,7 @@ class Table extends YamlStorage{
 		}
 		
 		$rv = parent::save();
-		unset($this->data['buckets']);
+		#unset($this->data['buckets']);
 		#unset($this->data['childBucketUpper']);
 		#unset($this->data['childBucketLower']);
 		unset($this->data['rootBucket']);
@@ -72,7 +77,7 @@ class Table extends YamlStorage{
 		if(parent::load()){
 			
 			if($this->data){
-				if(array_key_exists('buckets', $this->data) && $this->data['buckets']){
+				/*if(array_key_exists('buckets', $this->data) && $this->data['buckets']){
 					foreach($this->data['buckets'] as $bucketId => $bucketAr){
 						if(file_exists($bucketAr['path'])){
 							$bucket = new Bucket($bucketAr['path']);
@@ -85,7 +90,7 @@ class Table extends YamlStorage{
 							}
 						}
 					}
-				}
+				}*/
 				/*if(array_key_exists('childBucketUpper', $this->data) && $this->data['childBucketUpper']){
 					$this->childBucketUpper = new Bucket($this->data['childBucketUpper']);
 					$this->childBucketUpper->setDatadirBasePath($this->getDatadirBasePath());
@@ -106,12 +111,12 @@ class Table extends YamlStorage{
 				}
 			}
 			
-			unset($this->data['buckets']);
+			#unset($this->data['buckets']);
 			#unset($this->data['childBucketUpper']);
 			#unset($this->data['childBucketLower']);
 			unset($this->data['rootBucket']);
 			
-			$this->data['bucketsId'] = (int)$this->data['bucketsId'];
+			#$this->data['bucketsId'] = (int)$this->data['bucketsId'];
 			
 			return true;
 		}
@@ -119,7 +124,7 @@ class Table extends YamlStorage{
 		return false;
 	}
 	
-	private function bucketNew($mask){
+	/*private function bucketNew($mask){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		#print __CLASS__.'->'.__FUNCTION__.': '.$this->getDatadirBasePath()."\n";
 		
@@ -142,7 +147,7 @@ class Table extends YamlStorage{
 		$this->setDataChanged(true);
 		
 		return $bucket;
-	}
+	}*/
 	
 	public function setLocalNode(Node $node){
 		$this->localNode = $node;
@@ -152,16 +157,11 @@ class Table extends YamlStorage{
 		return $this->localNode;
 	}
 	
-	public function getNodes(){
-		$nodes = array();
-		
-		foreach($this->buckets as $bucketId => $bucket){
-			foreach($bucket->getNodes() as $cnodeId => $cnode){
-				$nodes[] = $cnode;
-			}
+	public function getNodes($levelMax = 0){
+		if($this->rootBucket){
+			return $this->rootBucket->getNodes($levelMax);
 		}
-		
-		return $nodes;
+		return array();
 	}
 	
 	public function getNodesNum(){
@@ -173,72 +173,59 @@ class Table extends YamlStorage{
 			throw new RuntimeException('localNode not set.');
 		}
 		
-		$nodes = array();
-		
-		foreach($this->buckets as $bucketId => $bucket){
-			foreach($bucket->getNodes() as $cnodeId => $cnode){
-				$nodes[$this->getLocalNode()->distanceHexStr($cnode)] = $cnode;
-				ksort($nodes, SORT_STRING);
-				$nodes = array_slice($nodes, 0, $num);
-			}
+		if($this->rootBucket){
+			$nodes = $this->rootBucket->getNodes();
+			$nodes = array_slice($nodes, 0, $num);
+			ksort($nodes, SORT_STRING);
+			
+			$rv = array_values($nodes);
+			return $rv;
 		}
 		
-		$rv = array_values($nodes);
-		return $rv;
+		return array();
 	}
 	
 	public function nodeFindInBuckets(Node $node){
-		foreach($this->buckets as $bucketId => $bucket){
-			if($onode = $bucket->nodeFind($node)){
-				return $onode;
-			}
+		if($this->rootBucket){
+			return $this->rootBucket->nodeFind($node);
 		}
 		
 		return null;
 	}
 	
 	public function nodeFindInBucketsByUri($uri){
-		#fwrite(STDOUT, 'nodeFindInBucketsByUri'."\n");
-		foreach($this->buckets as $bucketId => $bucket){
-			#fwrite(STDOUT, 'nodeFindInBucketsByUri: '.$bucketId."\n");
-			if($onode = $bucket->nodeFindByUri($uri)){
-				#fwrite(STDOUT, 'nodeFindInBucketsByUri: '.$bucketId.', found'."\n");
-				return $onode;
-			}
+		if($this->rootBucket){
+			return $this->rootBucket->nodeFindByUri($uri);
 		}
 		
 		return null;
 	}
 	
 	public function nodeFindClosest(Node $node, $num = 8){
-		$nodes = array();
-		
-		foreach($this->buckets as $bucketId => $bucket){
-			foreach($bucket->getNodes() as $cnodeId => $cnode){
-				if(!$cnode->isEqual($node)){
-					$nodes[$cnode->distanceHexStr($node)] = $cnode;
+		if($this->rootBucket){
+			$nodes = array();
+			foreach($this->rootBucket->getNodes() as $onodeId => $onode){
+				if(!$onode->isEqual($node)){
+					$nodes[$onode->distanceHexStr($node)] = $onode;
 					ksort($nodes, SORT_STRING);
 					$nodes = array_slice($nodes, 0, $num);
 				}
 			}
+			$rv = array_values($nodes);
+			return $rv;
 		}
 		
-		$rv = array_values($nodes);
-		return $rv;
+		return array();
 	}
 	
 	public function nodeFindByKeyPubFingerprint($fingerprint){
 		#print __CLASS__.'->'.__FUNCTION__.': '.$fingerprint."\n";
 		
-		foreach($this->buckets as $bucketId => $bucket){
-			#print __CLASS__.'->'.__FUNCTION__.': bucket '.$bucketId."\n";
+		foreach($this->rootBucket->getNodes() as $onodeId => $onode){
+			#print __CLASS__.'->'.__FUNCTION__.': node '.$onodeId."\n";
 			
-			foreach($bucket->getNodes() as $cnodeId => $cnode){
-				#print __CLASS__.'->'.__FUNCTION__.': node '.$cnodeId."\n";
-				
-				if($fingerprint == $cnode->getSslKeyPubFingerprint()){
-					return $cnode;
-				}
+			if($fingerprint == $onode->getSslKeyPubFingerprint()){
+				return $onode;
 			}
 		}
 		

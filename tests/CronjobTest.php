@@ -172,6 +172,8 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 ';
 	
 	public function testMsgDbDefault(){
+		@unlink('tests/bucket_root.yml');
+		
 		file_put_contents('tests/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
 		file_put_contents('tests/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
 		

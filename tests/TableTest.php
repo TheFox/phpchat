@@ -128,8 +128,11 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$node_e->setIdHexStr('10000001-2002-4004-8008-020000000008');
 		$node_e->setTimeCreated(1408371221);
 		
+		
 		$this->assertEquals($localNode, $table->getLocalNode());
-		$this->assertEquals(array($node_a, $node_b, $node_c, $node_d, $node_e), $table->getNodes());
+		
+		$nodes = $table->getNodes();
+		$this->assertEquals(5, count($nodes));
 	}
 	
 	public function testNodeFindInBuckets1(){
@@ -270,6 +273,7 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		
 		$node = new Node();
 		$node->setIdHexStr('10000001-2002-4004-8008-100000000002');
+		
 		$onode = $table->nodeEnclose($node);
 		
 		$this->assertEquals($node, $onode);
@@ -346,12 +350,12 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		#$this->assertEquals($baseBitStr.'001', $localNode->distanceBitStr($node7));
 		
 		
-		$table->nodeEnclose2($node0);
-		#$table->nodeEnclose2($node1);
-		#$table->nodeEnclose2($node2);
-		#$table->nodeEnclose2($node4);
-		#$table->nodeEnclose2($node5);
-		#$table->nodeEnclose2($node7);
+		$table->nodeEnclose($node0);
+		#$table->nodeEnclose($node1);
+		#$table->nodeEnclose($node2);
+		#$table->nodeEnclose($node4);
+		#$table->nodeEnclose($node5);
+		#$table->nodeEnclose($node7);
 		
 		$table->save();
 		
@@ -362,7 +366,6 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 	 * @group large
 	 */
 	public function testNodeEnclose4(){
-		$NODES = 50;
 		$NODES = 5000;
 		
 		$localNode = new Node();
@@ -375,38 +378,38 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$nodeNoBegin = 100000000002;
 		$nodeNoEnd = $nodeNoBegin + $NODES;
 		for($nodeNo = $nodeNoBegin; $nodeNo < $nodeNoEnd; $nodeNo++){
-			fwrite(STDOUT, __METHOD__.' msg setup: '.$nodeNo.''.PHP_EOL);
+			#fwrite(STDOUT, __METHOD__.' msg setup: '.$nodeNo.''.PHP_EOL);
 			
 			$node = new Node();
 			#$node = new Node('tests/testfile_node_'.$nodeNo.'.yml');
 			$node->setIdHexStr('10000001-2002-4004-8008-'.$nodeNo);
 			
-			$table->nodeEnclose2($node);
+			$table->nodeEnclose($node);
 		}
 		
 		$table->save();
 		
-		#@unlink('tests/bucket_1.yml');
+		$this->assertEquals(160, $table->getNodesNum());
 		
 		$this->assertTrue(true);
 		
 		$finder = new Finder();
 		#$files = $finder->in('tests')->name('node_10000001-2002-4004-8008-*.yml');
 		$files = $finder->in('tests')->name('node_*.yml');
-		#$this->assertEquals($NODES, count($files));
+		$this->assertEquals(160, count($files));
 		
 		$filesystem = new Filesystem();
 		foreach($files as $fileId => $file){
-			fwrite(STDOUT, 'file: '.$file->getRealPath().''.PHP_EOL);
-			#$filesystem->remove($file->getRealPath());
+			#fwrite(STDOUT, 'file: '.$file->getRealPath().''.PHP_EOL);
+			$filesystem->remove($file->getRealPath());
 		}
 		
 		$finder = new Finder();
 		$files = $finder->in('tests')->name('bucket_*.yml');
 		$filesystem = new Filesystem();
 		foreach($files as $fileId => $file){
-			fwrite(STDOUT, 'file: '.$file->getRealPath().''.PHP_EOL);
-			#$filesystem->remove($file->getRealPath());
+			#fwrite(STDOUT, 'file: '.$file->getRealPath().''.PHP_EOL);
+			$filesystem->remove($file->getRealPath());
 		}
 	}
 	

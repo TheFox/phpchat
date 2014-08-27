@@ -20,7 +20,7 @@ class Bucket extends YamlStorage{
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		parent::__construct($filePath);
 		
-		$this->data['id'] = 0;
+		#$this->data['id'] = 0;
 		#$this->data['prefix'] = '';
 		#$this->data['prefixName'] = '';
 		$this->data['distance'] = 0;
@@ -120,20 +120,12 @@ class Bucket extends YamlStorage{
 		return false;
 	}
 	
-	public function setId($id){
+	/*public function setId($id){
 		$this->data['id'] = (int)$id;
 	}
 	
 	public function getId(){
 		return (int)$this->data['id'];
-	}
-	
-	/*public function setPrefix($prefix){
-		$this->data['prefix'] = $prefix;
-	}
-	
-	public function getPrefix(){
-		return $this->data['prefix'];
 	}*/
 	
 	public function setDistance($distance){
@@ -193,8 +185,18 @@ class Bucket extends YamlStorage{
 		return $this->data['isLower'];
 	}
 	
-	public function getNodes(){
-		return $this->nodes;
+	public function getNodes($levelMax = 0, $level = 0){
+		#return $this->nodes;
+		$nodes = $this->nodes;
+		if($levelMax <= 0 || $level <= $levelMax){
+			if($this->childBucketUpper){
+				$nodes = array_merge($nodes, $this->childBucketUpper->getNodes($levelMax, $level + 1));
+			}
+			if($this->childBucketLower){
+				$nodes = array_merge($nodes, $this->childBucketLower->getNodes($levelMax, $level + 1));
+			}
+		}
+		return $nodes;
 	}
 	
 	public function getNodesNum(){
@@ -221,6 +223,12 @@ class Bucket extends YamlStorage{
 				return $node;
 			}
 		}
+		if($this->childBucketUpper){
+			return $this->childBucketUpper->nodeFindByIdHexStr($id);
+		}
+		if($this->childBucketLower){
+			return $this->childBucketLower->nodeFindByIdHexStr($id);
+		}
 		return null;
 	}
 	
@@ -232,6 +240,12 @@ class Bucket extends YamlStorage{
 				#fwrite(STDOUT, 'nodeFindByUri: '.$node->getIdHexStr().', found'."\n");
 				return $node;
 			}
+		}
+		if($this->childBucketUpper){
+			return $this->childBucketUpper->nodeFindByUri($id);
+		}
+		if($this->childBucketLower){
+			return $this->childBucketLower->nodeFindByUri($id);
 		}
 		return null;
 	}
@@ -339,7 +353,7 @@ class Bucket extends YamlStorage{
 	private function nodesReEnclose($sortNodes = true, $level = 1){
 		#fwrite(STDOUT, str_repeat("\t", $level).'reenclose: '.$level."\n");
 		
-		if($level >= 10){
+		if($level >= 1000){
 			#fwrite(STDOUT, str_repeat("\t", $level).'ERROR: level '.$level.' is too deep'."\n");
 			throw new RuntimeException('reenclose level too deep: '.$level);
 			#return;
@@ -390,8 +404,8 @@ class Bucket extends YamlStorage{
 		#usleep(100000); # TODO
 		#sleep(2); # TODO
 		
-		$rv = null;
-		if($level <= 10){ # TODO
+		$nodeEncloseReturnValue = null;
+		if($level <= 1000){
 			if($node->getIdHexStr() != '00000000-0000-4000-8000-000000000000'){
 				$distance = $this->getLocalNode()->distance($node);
 				$mask = 1 << 2; // Root Mask # TODO
@@ -431,7 +445,8 @@ class Bucket extends YamlStorage{
 					if($this->getNodesNum() < static::$SIZE_MAX && !$this->getIsFull()){
 						#fwrite(STDOUT, str_repeat("\t", $level).'add node'."\n");
 						
-						$this->nodeAdd($node);
+						$this->nodeAdd($node, $sortNodes);
+						$nodeEncloseReturnValue = $node;
 						
 						if($this->isFull()){
 							#fwrite(STDOUT, str_repeat("\t", $level).'FULL end'."\n");
@@ -469,7 +484,7 @@ class Bucket extends YamlStorage{
 				}
 				else{
 					$onode->update($node);
-					$rv = $onode;
+					$nodeEncloseReturnValue = $onode;
 				}
 			}
 		}
@@ -479,7 +494,7 @@ class Bucket extends YamlStorage{
 			throw new RuntimeException('enclose level too deep: '.$level);
 		}
 		
-		return $rv;
+		return $nodeEncloseReturnValue;
 	}
 	
 	public function nodeRemoveByIndex($index){
@@ -498,26 +513,6 @@ class Bucket extends YamlStorage{
 		});
 		
 		$this->setDataChanged(true);
-	}
-	
-	public static function maskByNodes($nodeA, $nodeB){
-		$idLenBits = Node::ID_LEN_BITS - 1;
-		$mbase = array_fill(0, Node::ID_LEN, 0);
-		
-		
-		for($bits = $idLenBits; $bits >= 0; $bits--){
-			$idPos = Node::ID_LEN - floor($bits / 8) - 1;
-			$mask = $mbase[$idPos] | 1 << (7 - (Node::ID_LEN_BITS - $idPos * 8 - $bits - 1));
-			#fwrite(STDOUT, __FUNCTION__.'         mask: /'.$idPos.'/ /'.$mask.'/'."\n");
-			#usleep(10000);
-			if( ($distance[$idPos] & $mask) == $mask ){
-				break;
-			}
-		}
-	}
-	
-	public function bucketForNode(Node $node){
-		
 	}
 	
 }
