@@ -307,7 +307,7 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 	}
 	
 	public function testNodeEnclose3(){
-		fwrite(STDOUT, 'testNodeEnclose3 '.time().PHP_EOL);
+		fwrite(STDOUT, 'testNodeEnclose3'.PHP_EOL);
 		
 		#@unlink('tests/testfile_table_table.yml');
 		#@unlink('tests/bucket_root.yml');
@@ -378,9 +378,9 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 	 * @group large
 	 */
 	public function testNodeEnclose4(){
-		fwrite(STDOUT, 'testNodeEnclose4 '.time().PHP_EOL);
+		fwrite(STDOUT, 'testNodeEnclose4'.PHP_EOL);
 		
-		$NODES = 200;
+		$NODES = 5000;
 		Bucket::$SIZE_MAX = 20;
 		
 		$localNode = new Node();

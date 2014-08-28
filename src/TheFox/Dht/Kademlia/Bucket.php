@@ -25,6 +25,8 @@ class Bucket extends YamlStorage{
 		#$this->data['prefixName'] = '';
 		$this->data['distance'] = 0;
 		$this->data['distanceName'] = '';
+		$this->data['maskByte'] = 0;
+		$this->data['maskByteName'] = 0;
 		$this->data['maskBit'] = 0;
 		$this->data['maskBitName'] = 0;
 		$this->data['isFull'] = false;
@@ -43,6 +45,7 @@ class Bucket extends YamlStorage{
 		
 		#$this->data['prefixName'] = intToBin($this->getPrefix());
 		$this->data['distanceName'] = intToBin($this->getDistance());
+		$this->data['maskBitName'] = intToBin($this->getMaskByte());
 		$this->data['maskBitName'] = intToBin($this->getMaskBit());
 		
 		$this->data['nodes'] = array();
@@ -77,6 +80,8 @@ class Bucket extends YamlStorage{
 	
 	public function load(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#fwrite(STDOUT, __FUNCTION__.': '.$this->getFilePath().''."\n");
+		#usleep(50000);
 		
 		if(parent::load()){
 			
@@ -133,6 +138,14 @@ class Bucket extends YamlStorage{
 	
 	public function getDistance(){
 		return $this->data['distance'];
+	}
+	
+	public function setMaskByte($maskByte){
+		$this->data['maskByte'] = $maskByte;
+	}
+	
+	public function getMaskByte(){
+		return $this->data['maskByte'];
 	}
 	
 	public function setMaskBit($maskBit){
@@ -267,38 +280,66 @@ class Bucket extends YamlStorage{
 		}
 	}
 	
+	private function maskDecr(){
+		$maskByte = $this->getMaskByte();
+		$maskBit = $this->getMaskBit();
+		
+		$newMaskByte = $maskByte;
+		$newMaskBit = $maskBit - 1;
+		$newMaskBitValue = 1 << $newMaskBit;
+		
+		if($newMaskBitValue <= 0){
+			$newMaskByte++;
+			$newMaskBit = 7;
+			$newMaskBitValue = 1 << $newMaskBit;
+		}
+		
+		return array($newMaskByte, $newMaskBit, $newMaskBitValue);
+	}
+	
 	private function setChildBucketUpper($distance){
 		if(!$this->getLocalNode()){
 			throw new RuntimeException('localNode not set.');
 		}
 		
-		$maskBit = $this->getMaskBit();
-		if(!$this->childBucketUpper && $maskBit > 0){
-			$newMaskBit = $maskBit >> 1;
+		if(!$this->childBucketUpper){
+			list($newMaskByte, $newMaskBit, $newMaskBitValue) = $this->maskDecr();
 			
-			#fwrite(STDOUT, 'upper new: '.intToBin($newMaskBit).' ('.$newMaskBit.')'."\n");
-			
-			$filePath = null;
-			if($this->getDatadirBasePath()){
-				#$filePath = $this->getDatadirBasePath().'/bucket_'.intToBin($newMaskBit).'_1_'.time().'_'.mt_rand(1000, 9999).'.yml';
-				#$filePath = $this->getDatadirBasePath().'/bucket_'.intToBin($newMaskBit).'_1.yml';
-				$filePath = $this->getDatadirBasePath().'/bucket_d'.intToBin($distance).'_m'.intToBin($newMaskBit).'_1.yml';
-				if(file_exists($filePath)){
-					// This should never happen.
-					throw new RuntimeException('path for bucket alread exists: '.$filePath);
+			if($newMaskByte < Node::ID_LEN_BYTE && $newMaskBitValue > 0){
+				$filePath = null;
+				if($this->getDatadirBasePath()){
+					#$filePath = $this->getDatadirBasePath().'/bucket_'.intToBin($newMaskBit).'_1_'.time().'_'.mt_rand(1000, 9999).'.yml';
+					#$filePath = $this->getDatadirBasePath().'/bucket_'.intToBin($newMaskBit).'_1.yml';
+					#$filePath = $this->getDatadirBasePath().'/bucket_d'.intToBin($distance).'_m'.intToBin($newMaskBit).'_1.yml';
+					#$filePath = $this->getDatadirBasePath().'/bucket_d'.intToBin($distance).'_m'.$newMaskByte.'.'.intToBin($newMaskBit).'_1.yml';
+					
+					$filePath = $this->getDatadirBasePath().'/bucket';
+					$filePath .= '_m'.sprintf('%02d', $newMaskByte).'.'.$newMaskBit;
+					$filePath .= '_d'.sprintf('%03d', $distance);
+					$filePath .= '_u';
+					$filePath .= '.yml';
+					
+					if(file_exists($filePath)){
+						// This should never happen.
+						throw new RuntimeException('path for bucket alread exists: '.$filePath);
+					}
 				}
+				
+				$bucket = new Bucket($filePath);
+				$bucket->setDistance($distance);
+				$bucket->setMaskByte($newMaskByte);
+				$bucket->setMaskBit($newMaskBit);
+				$bucket->setIsUpper(true);
+				$bucket->setDatadirBasePath($this->getDatadirBasePath());
+				$bucket->setLocalNode($this->getLocalNode());
+				$bucket->setDataChanged(true);
+				$this->childBucketUpper = $bucket;
+				
+				$this->setDataChanged(true);
 			}
-			
-			$bucket = new Bucket($filePath);
-			$bucket->setDistance($distance);
-			$bucket->setMaskBit($newMaskBit);
-			$bucket->setIsUpper(true);
-			$bucket->setDatadirBasePath($this->getDatadirBasePath());
-			$bucket->setLocalNode($this->getLocalNode());
-			$bucket->setDataChanged(true);
-			$this->childBucketUpper = $bucket;
-			
-			$this->setDataChanged(true);
+			else{
+				throw new RuntimeException('setChildBucketUpper: mask is at the end: /'.$maskByte.'/ /'.intToBin($maskBitValue).'/ ('.$maskBitValue.')');
+			}
 		}
 		else{
 			#fwrite(STDOUT, 'upper is set: '.intToBin($this->childBucketUpper->getMaskBit()).' ('.$this->childBucketUpper->getMaskBit().')'."\n");
@@ -310,73 +351,90 @@ class Bucket extends YamlStorage{
 			throw new RuntimeException('localNode not set.');
 		}
 		
-		$maskBit = $this->getMaskBit();
-		if(!$this->childBucketLower && $maskBit > 0){
-			$newMaskBit = $maskBit >> 1;
+		if(!$this->childBucketLower){
+			list($newMaskByte, $newMaskBit, $newMaskBitValue) = $this->maskDecr();
 			
-			#fwrite(STDOUT, 'lower new: '.intToBin($newMaskBit).' ('.$newMaskBit.')'."\n");
-			
-			$filePath = null;
-			if($this->getDatadirBasePath()){
-				#$filePath = $this->getDatadirBasePath().'/bucket_'.intToBin($newMaskBit).'_0_'.time().'_'.mt_rand(1000, 9999).'.yml';
-				#$filePath = $this->getDatadirBasePath().'/bucket_'.intToBin($newMaskBit).'_0.yml';
-				$filePath = $this->getDatadirBasePath().'/bucket_d'.intToBin($distance).'_m'.intToBin($newMaskBit).'_0.yml';
-				if(file_exists($filePath)){
-					// This should never happen.
-					throw new RuntimeException('path for bucket alread exists: '.$filePath);
+			if($newMaskByte < Node::ID_LEN_BYTE && $newMaskBitValue > 0){
+				$filePath = null;
+				if($this->getDatadirBasePath()){
+					#$filePath = $this->getDatadirBasePath().'/bucket_'.intToBin($newMaskBit).'_0_'.time().'_'.mt_rand(1000, 9999).'.yml';
+					#$filePath = $this->getDatadirBasePath().'/bucket_'.intToBin($newMaskBit).'_0.yml';
+					#$filePath = $this->getDatadirBasePath().'/bucket_d'.intToBin($distance).'_m'.intToBin($newMaskBit).'_0.yml';
+					#$filePath = $this->getDatadirBasePath().'/bucket_d'.intToBin($distance).'_m'.$newMaskByte.'.'.intToBin($newMaskBit).'_0.yml';
+					
+					$filePath = $this->getDatadirBasePath().'/bucket';
+					$filePath .= '_m'.sprintf('%02d', $newMaskByte).'.'.$newMaskBit;
+					$filePath .= '_d'.sprintf('%03d', $distance);
+					$filePath .= '_l';
+					$filePath .= '.yml';
+					
+					if(file_exists($filePath)){
+						// This should never happen.
+						throw new RuntimeException('path for bucket alread exists: '.$filePath);
+					}
 				}
+				
+				$bucket = new Bucket($filePath);
+				$bucket->setDistance($distance);
+				$bucket->setMaskByte($newMaskByte);
+				$bucket->setMaskBit($newMaskBit);
+				$bucket->setIsLower(true);
+				$bucket->setDatadirBasePath($this->getDatadirBasePath());
+				$bucket->setLocalNode($this->getLocalNode());
+				$bucket->setDataChanged(true);
+				$this->childBucketLower = $bucket;
+				
+				$this->setDataChanged(true);
 			}
-			
-			$bucket = new Bucket($filePath);
-			$bucket->setDistance($distance);
-			$bucket->setMaskBit($newMaskBit);
-			$bucket->setIsLower(true);
-			$bucket->setDatadirBasePath($this->getDatadirBasePath());
-			$bucket->setLocalNode($this->getLocalNode());
-			$bucket->setDataChanged(true);
-			$this->childBucketLower = $bucket;
-			
-			$this->setDataChanged(true);
+			else{
+				throw new RuntimeException('setChildBucketLower: mask is at the end: /'.$maskByte.'/ /'.intToBin($maskBitValue).'/ ('.$maskBitValue.')');
+			}
 		}
 		else{
-			#fwrite(STDOUT, 'lower is set: '.intToBin($this->childBucketLower->getMaskBit()).' ('.$this->childBucketLower->getMaskBit().')'."\n");
+			#fwrite(STDOUT, 'upper is set: '.intToBin($this->childBucketLower->getMaskBit()).' ('.$this->childBucketLower->getMaskBit().')'."\n");
 		}
 	}
 	
 	private function nodesReEnclose($sortNodes = true, $level = 1){
-		fwrite(STDOUT, str_repeat("\t", $level).'reenclose: '.$level."\n");
+		$printLevel = $level;
+		if($printLevel >= 5){
+			$printLevel = 5;
+		}
+		#fwrite(STDOUT, str_repeat("\t", $printLevel).'reenclose: '.$level."\n");
 		
-		if($level >= 1000){
-			fwrite(STDOUT, str_repeat("\t", $level).'ERROR: level '.$level.' is too deep'."\n");
+		/*if($level >= 129){
+			#fwrite(STDOUT, str_repeat("\t", $printLevel).'ERROR: level '.$level.' is too deep'."\n");
 			throw new RuntimeException('reenclose level too deep: '.$level);
 			#return;
-		}
+		}*/
 		
+		$maskByte = $this->getMaskByte();
 		$maskBit = $this->getMaskBit();
-		if($maskBit > 0){
+		$maskBitValue = 1 << $maskBit;
+		if($maskByte < Node::ID_LEN_BYTE && $maskBitValue > 0){
 			foreach($this->nodes as $nodeId => $node){
-				fwrite(STDOUT, str_repeat("\t", $level).'reenclose node: '.$nodeId."\n");
+				#fwrite(STDOUT, str_repeat("\t", $printLevel).'reenclose node: '.$nodeId."\n");
 				
 				$distance = $this->getLocalNode()->distance($node);
 				
 				$bucket = null;
-				if($distance[15] & $maskBit){
-					fwrite(STDOUT, str_repeat("\t", $level).'reenclose match: upper'."\n");
-					$this->setChildBucketUpper($distance[15]); # TODO
+				if($distance[$maskByte] & $maskBitValue){
+					#fwrite(STDOUT, str_repeat("\t", $printLevel).'reenclose match: upper'."\n");
+					$this->setChildBucketUpper($distance[$maskByte]);
 					$bucket = $this->childBucketUpper;
 				}
 				else{
-					fwrite(STDOUT, str_repeat("\t", $level).'reenclose match: lower'."\n");
-					$this->setChildBucketLower($distance[15]); # TODO
+					#fwrite(STDOUT, str_repeat("\t", $printLevel).'reenclose match: lower'."\n");
+					$this->setChildBucketLower($distance[$maskByte]);
 					$bucket = $this->childBucketLower;
 				}
 				
 				if($bucket === null){
-					fwrite(STDOUT, str_repeat("\t", $level).'reenclose bucket is full: l='.$level.' d='.intToBin($distance[15]).' m='.intToBin($maskBit).' n='.$node->getIdHexStr().''."\n");
-					#throw new RuntimeException('reenclose bucket is full: l='.$level.' d='.intToBin($distance[15]).' m='.intToBin($maskBit).' n='.$node->getIdHexStr().'');
+					#fwrite(STDOUT, str_repeat("\t", $printLevel).'reenclose bucket is full: l='.$level.' d='.intToBin($distance[$maskByte]).' m='.intToBin($maskBitValue).' n='.$node->getIdHexStr().''."\n");
+					#throw new RuntimeException('reenclose bucket is full: l='.$level.' d='.intToBin($distance[$maskByte]).' m='.intToBin($maskBitValue).' n='.$node->getIdHexStr().'');
 				}
 				else{
-					fwrite(STDOUT, str_repeat("\t", $level).'reenclose child bucket: '.intToBin($bucket->getMaskBit()).' d='.intToBin($bucket->getDistance()).''."\n");
+					#fwrite(STDOUT, str_repeat("\t", $printLevel).'reenclose child bucket: /'.$bucket->getMaskByte().'/ '.intToBin($bucket->getMaskBit()).' d='.intToBin($bucket->getDistance()).''."\n");
 					
 					$bucket->nodeEnclose($node, $sortNodes, $level + 1);
 				}
@@ -385,8 +443,8 @@ class Bucket extends YamlStorage{
 			$this->nodes = array();
 		}
 		else{
-			fwrite(STDOUT, str_repeat("\t", $level).'reenclose failed: '.intToBin($maskBit).' ('.$maskBit.')'."\n");
-			#throw new RuntimeException('reenclose failed: l='.$level.' m='.intToBin($maskBit).'');
+			#fwrite(STDOUT, str_repeat("\t", $printLevel).'reenclose failed: '.intToBin($maskBitValue).' ('.$maskBitValue.')'."\n");
+			#throw new RuntimeException('reenclose failed: l='.$level.' m='.intToBin($maskBitValue).'');
 			
 			# TODO: what happens when a bucket is full?
 		}
@@ -395,95 +453,105 @@ class Bucket extends YamlStorage{
 	public function nodeEnclose(Node $node, $sortNodes = true, $level = 1){
 		$nodeEncloseReturnValue = $node;
 		
-		if($level <= 1000){
-			if($node->getIdHexStr() != '00000000-0000-4000-8000-000000000000'){
-				$distance = $this->getLocalNode()->distance($node);
-				
-				$maskBit = 1 << 2; // Root MaskBit # TODO
-				
-				if($this->getIsUpper() || $this->getIsLower()){
-					fwrite(STDOUT, str_repeat("\t", $level).'no root bucket'."\n");
-					$maskBit = $this->getMaskBit();
-				}
-				else{
-					fwrite(STDOUT, str_repeat("\t", $level).'root bucket'."\n");
-					$this->setMaskBit($maskBit);
-				}
-				#if($maskBit > 0){
-				#	$newMaskBit = $maskBit >> 1; # TODO: not needed
-				#}
-				
-				fwrite(STDOUT, str_repeat("\t", $level).'level: '.$level."\n");
-				fwrite(STDOUT, str_repeat("\t", $level).'node: '.$node->getIdHexStr()."\n");
-				fwrite(STDOUT, str_repeat("\t", $level).'dist: '.intToBin($distance[15])."\n");
-				fwrite(STDOUT, str_repeat("\t", $level).'maskBit: '.intToBin($maskBit)."\n");
-				
-				if($this->childBucketUpper){
-					fwrite(STDOUT, str_repeat("\t", $level).'upper: '.intToBin($this->childBucketUpper->getMaskBit())."\n");
-				}
-				else{
-					fwrite(STDOUT, str_repeat("\t", $level).'upper: N/A'."\n");
-				}
-				if($this->childBucketLower){
-					fwrite(STDOUT, str_repeat("\t", $level).'lower: '.intToBin($this->childBucketLower->getMaskBit())."\n");
-				}
-				else{
-					fwrite(STDOUT, str_repeat("\t", $level).'lower: N/A'."\n");
-				}
-				
-				$onode = $this->nodeFind($node);
-				if(!$onode){
-					
-					if($this->getNodesNum() < static::$SIZE_MAX && !$this->getIsFull()){
-						fwrite(STDOUT, str_repeat("\t", $level).'add node'."\n");
-						
-						$this->nodeAdd($node, $sortNodes);
-						$nodeEncloseReturnValue = $node;
-						
-						if($this->isFull()){
-							fwrite(STDOUT, str_repeat("\t", $level).'FULL end'."\n");
-							$this->nodesReEnclose($sortNodes, $level + 1);
-						}
-					}
-					else{
-						fwrite(STDOUT, str_repeat("\t", $level).'FULL new'."\n");
-						
-						$bucket = null;
-						if($distance[15] & $maskBit){ # TODO
-							fwrite(STDOUT, str_repeat("\t", $level).'match: upper'."\n");
-							$this->setChildBucketUpper($distance[15]); # TODO
-							$bucket = $this->childBucketUpper;
-						}
-						else{
-							fwrite(STDOUT, str_repeat("\t", $level).'match: lower'."\n");
-							$this->setChildBucketLower($distance[15]); # TODO
-							$bucket = $this->childBucketLower;
-						}
-						
-						if($bucket === null){
-							fwrite(STDOUT, str_repeat("\t", $level).'enclose: bucket is full: l='.$level.' d='.intToBin($distance[15]).' m='.intToBin($maskBit).' n='.$node->getIdHexStr().''."\n");
-							
-							#throw new RuntimeException('enclose: bucket is full: l='.$level.' d='.intToBin($distance[15]).' m='.intToBin($maskBit).' n='.$node->getIdHexStr().'');
-							
-							# TODO: what happens when a bucket is not found?
-						}
-						else{
-							fwrite(STDOUT, str_repeat("\t", $level).'child bucket: '.intToBin($bucket->getMaskBit()).' d='.intToBin($bucket->getDistance()).''."\n");
-							
-							$bucket->nodeEnclose($node, $sortNodes, $level + 1);
-						}
-					}
-				}
-				else{
-					$onode->update($node);
-					$nodeEncloseReturnValue = $onode;
-				}
-			}
-		}
-		else{
-			# TODO
+		#usleep(50000);
+		
+		/*if($level >= 260){
 			fwrite(STDOUT, str_repeat("\t", $level).'ERROR: level '.$level.' is too deep'."\n");
 			throw new RuntimeException('enclose level too deep: '.$level);
+		}*/
+		
+		$printLevel = $level;
+		if($printLevel >= 5){
+			$printLevel = 5;
+		}
+		
+		if($node->getIdHexStr() != '00000000-0000-4000-8000-000000000000'){
+			$distance = $this->getLocalNode()->distance($node);
+			
+			$maskByte = 0;
+			$maskBit = 7; // Root MaskBit
+			
+			if($this->getIsUpper() || $this->getIsLower()){
+				#fwrite(STDOUT, str_repeat("\t", $printLevel).'no root bucket'."\n");
+				$maskByte = $this->getMaskByte();
+				$maskBit = $this->getMaskBit();
+			}
+			else{
+				#fwrite(STDOUT, str_repeat("\t", $printLevel).'root bucket'."\n");
+				$this->setMaskByte($maskByte);
+				$this->setMaskBit($maskBit);
+			}
+			
+			$maskBitValue = 1 << $maskBit;
+			
+			#fwrite(STDOUT, str_repeat("\t", $printLevel).'level: '.$level."\n");
+			#fwrite(STDOUT, str_repeat("\t", $printLevel).'node: '.$node->getIdHexStr()."\n");
+			#fwrite(STDOUT, str_repeat("\t", $printLevel).'dist: '.intToBin($distance[$maskByte])."\n");
+			#fwrite(STDOUT, str_repeat("\t", $printLevel).'maskByte: '.$maskByte."\n");
+			#fwrite(STDOUT, str_repeat("\t", $printLevel).'maskBit: '.$maskBit."\n");
+			#fwrite(STDOUT, str_repeat("\t", $printLevel).'maskBitValue: '.intToBin($maskBitValue)."\n");
+			#fwrite(STDOUT, str_repeat("\t", $printLevel).'mask: /'.$maskByte.'/ /'.$maskBit.'/ /'.intToBin($maskBitValue).'/'."\n");
+			
+			if($this->childBucketUpper){
+				#fwrite(STDOUT, str_repeat("\t", $printLevel).'upper: '.intToBin($this->childBucketUpper->getMaskBit())."\n");
+			}
+			else{
+				#fwrite(STDOUT, str_repeat("\t", $printLevel).'upper: N/A'."\n");
+			}
+			if($this->childBucketLower){
+				#fwrite(STDOUT, str_repeat("\t", $printLevel).'lower: '.intToBin($this->childBucketLower->getMaskBit())."\n");
+			}
+			else{
+				#fwrite(STDOUT, str_repeat("\t", $printLevel).'lower: N/A'."\n");
+			}
+			
+			$onode = $this->nodeFind($node);
+			if(!$onode){
+				
+				if($this->getNodesNum() < static::$SIZE_MAX && !$this->getIsFull()){
+					#fwrite(STDOUT, str_repeat("\t", $printLevel).'add node'."\n");
+					
+					$this->nodeAdd($node, $sortNodes);
+					$nodeEncloseReturnValue = $node;
+					
+					if($this->isFull()){
+						#fwrite(STDOUT, str_repeat("\t", $printLevel).'FULL end'."\n");
+						$this->nodesReEnclose($sortNodes, $level + 1);
+					}
+				}
+				else{
+					#fwrite(STDOUT, str_repeat("\t", $printLevel).'FULL new'."\n");
+					
+					$bucket = null;
+					if($distance[$maskByte] & $maskBitValue){
+						#fwrite(STDOUT, str_repeat("\t", $printLevel).'match: upper'."\n");
+						$this->setChildBucketUpper($distance[$maskByte]);
+						$bucket = $this->childBucketUpper;
+					}
+					else{
+						#fwrite(STDOUT, str_repeat("\t", $printLevel).'match: lower'."\n");
+						$this->setChildBucketLower($distance[$maskByte]);
+						$bucket = $this->childBucketLower;
+					}
+					
+					if($bucket === null){
+						#fwrite(STDOUT, str_repeat("\t", $printLevel).'enclose: bucket is full: l='.$level.' d='.intToBin($distance[$maskByte]).' m='.intToBin($maskBitValue).' n='.$node->getIdHexStr().''."\n");
+						
+						#throw new RuntimeException('enclose: bucket is full: l='.$level.' d='.intToBin($distance[$maskByte]).' m='.intToBin($maskBitValue).' n='.$node->getIdHexStr().'');
+						
+						# TODO: what happens when a bucket is not found?
+					}
+					else{
+						#fwrite(STDOUT, str_repeat("\t", $printLevel).'child bucket: '.intToBin($bucket->getMaskBit()).' d='.intToBin($bucket->getDistance()).''."\n");
+						
+						$bucket->nodeEnclose($node, $sortNodes, $level + 1);
+					}
+				}
+			}
+			else{
+				$onode->update($node);
+				$nodeEncloseReturnValue = $onode;
+			}
 		}
 		
 		return $nodeEncloseReturnValue;
