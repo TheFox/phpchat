@@ -76,12 +76,15 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		$this->assertEquals(Node::ID_LEN_BYTE, Node::ID_LEN_BIT / 8);
 		
 		// Array index.
-		$this->assertEquals(Node::ID_LEN_BYTE - 1, Node::ID_LEN_BIT / 8 - 1);
-		
-		$this->assertEquals(1, 0 / 8 - 1);
-		
-		
-		
+		$this->assertEquals(0, floor(0 / 8));
+		$this->assertEquals(0, floor(1 / 8));
+		$this->assertEquals(0, floor(7 / 8));
+		$this->assertEquals(1, floor(8 / 8));
+		$this->assertEquals(1, floor(9 / 8));
+		$this->assertEquals(1, floor(15 / 8));
+		$this->assertEquals(2, floor(16 / 8));
+		$this->assertEquals(15, floor(126 / 8));
+		$this->assertEquals(15, floor(127 / 8));
 	}
 	
 	public function testIdHexStr(){
