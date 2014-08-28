@@ -14,8 +14,8 @@ use TheFox\Utilities\Base58;
 
 class Node extends YamlStorage{
 	
-	const ID_LEN = 16;
-	const ID_LEN_BITS = 128;
+	const ID_LEN_BYTE = 16;
+	const ID_LEN_BIT = 128;
 	const SSL_KEY_LEN_MIN = 4096;
 	
 	private $id = array();
@@ -91,14 +91,14 @@ class Node extends YamlStorage{
 	public function setIdHexStr($id){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		$id = strtolower($id);
-		$this->id = array_fill(0, static::ID_LEN, 0);
+		$this->id = array_fill(0, static::ID_LEN_BYTE, 0);
 		
 		if(Uuid::isValid($id)){
 			#print __CLASS__.'->'.__FUNCTION__.': check valid UUID'."\n";
 			$this->data['id'] = $id;
 			
 			$id = str_replace('-', '', $id);
-			for($idPos = 0; $idPos < static::ID_LEN; $idPos++){
+			for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
 				$this->id[$idPos] = hexdec(substr($id, 0, 2));
 				$id = substr($id, 2);
 			}
@@ -114,7 +114,7 @@ class Node extends YamlStorage{
 	
 	public function getIdBitStr(){
 		$rv = '';
-		for($idPos = 0; $idPos < static::ID_LEN; $idPos++){
+		for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
 			for($bits = 7; $bits >= 0; $bits--){
 				$rv .= $this->id[$idPos] & (1 << $bits) ? '1' : '0';
 			}
@@ -266,7 +266,7 @@ class Node extends YamlStorage{
 	
 	public function distance(Node $node){
 		#fwrite(STDOUT, __FUNCTION__.''."\n");
-		$rv = array_fill(0, static::ID_LEN, 0);
+		$rv = array_fill(0, static::ID_LEN_BYTE, 0);
 		#ve($rv);
 		
 		if($node && $this !== $node){
@@ -276,7 +276,7 @@ class Node extends YamlStorage{
 			#ve($thisId);
 			#ve($nodeId);
 			
-			for($idPos = 0; $idPos < static::ID_LEN; $idPos++){
+			for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
 				$rv[$idPos] = $thisId[$idPos] ^ $nodeId[$idPos];
 				#fwrite(STDOUT, __FUNCTION__.'     pos: '.$idPos.' -> '.$rv[$idPos]."\n");
 			}
@@ -289,7 +289,7 @@ class Node extends YamlStorage{
 		$distance = $this->distance($node);
 		
 		$rv = '';
-		for($idPos = 0; $idPos < static::ID_LEN; $idPos++){
+		for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
 			#fwrite(STDOUT, __FUNCTION__.' pos: '.$idPos."\n");
 			for($bits = 7; $bits >= 0; $bits--){
 				#fwrite(STDOUT, __FUNCTION__.'     bit: '.$bits.' -> '.(1 << $bits)."\n");

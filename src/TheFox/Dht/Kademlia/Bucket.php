@@ -255,7 +255,9 @@ class Bucket extends YamlStorage{
 		if($this->getDatadirBasePath()){
 			#$filePath = $this->getDatadirBasePath().'/node_'.$node->getIdHexStr().'.yml';
 			#$filePath = $this->getDatadirBasePath().'/node_'.$node->getIdHexStr().'_'.mt_rand(1000, 9999).'.yml';
-			$filePath = $this->getDatadirBasePath().'/node_'.substr($node->getIdHexStr(), -5).'_'.time().'.yml';
+			#$filePath = $this->getDatadirBasePath().'/node_'.substr($node->getIdHexStr(), -5).'_'.time().'.yml';
+			$filePath = $this->getDatadirBasePath().'/node_'.substr($node->getIdHexStr(), -5).'.yml';
+			#$filePath = $this->getDatadirBasePath().'/node_'.$node->getIdHexStr().'.yml';
 		}
 		if(!$node->getFilePath()){
 			$node->setFilePath($filePath);
@@ -351,10 +353,10 @@ class Bucket extends YamlStorage{
 	}
 	
 	private function nodesReEnclose($sortNodes = true, $level = 1){
-		#fwrite(STDOUT, str_repeat("\t", $level).'reenclose: '.$level."\n");
+		fwrite(STDOUT, str_repeat("\t", $level).'reenclose: '.$level."\n");
 		
 		if($level >= 1000){
-			#fwrite(STDOUT, str_repeat("\t", $level).'ERROR: level '.$level.' is too deep'."\n");
+			fwrite(STDOUT, str_repeat("\t", $level).'ERROR: level '.$level.' is too deep'."\n");
 			throw new RuntimeException('reenclose level too deep: '.$level);
 			#return;
 		}
@@ -362,18 +364,18 @@ class Bucket extends YamlStorage{
 		$mask = $this->getMask();
 		if($mask > 0){
 			foreach($this->nodes as $nodeId => $node){
-				#fwrite(STDOUT, str_repeat("\t", $level).'reenclose node: '.$nodeId."\n");
+				fwrite(STDOUT, str_repeat("\t", $level).'reenclose node: '.$nodeId."\n");
 				
 				$distance = $this->getLocalNode()->distance($node);
 				
 				$bucket = null;
 				if($distance[15] & $mask){
-					#fwrite(STDOUT, str_repeat("\t", $level).'reenclose match: upper'."\n");
+					fwrite(STDOUT, str_repeat("\t", $level).'reenclose match: upper'."\n");
 					$this->setChildBucketUpper($distance[15]); # TODO
 					$bucket = $this->childBucketUpper;
 				}
 				else{
-					#fwrite(STDOUT, str_repeat("\t", $level).'reenclose match: lower'."\n");
+					fwrite(STDOUT, str_repeat("\t", $level).'reenclose match: lower'."\n");
 					$this->setChildBucketLower($distance[15]); # TODO
 					$bucket = $this->childBucketLower;
 				}
@@ -383,7 +385,7 @@ class Bucket extends YamlStorage{
 					#throw new RuntimeException('reenclose bucket is full: l='.$level.' d='.intToBin($distance[15]).' m='.intToBin($mask).' n='.$node->getIdHexStr().'');
 				}
 				else{
-					#fwrite(STDOUT, str_repeat("\t", $level).'reenclose child bucket: '.intToBin($bucket->getMask()).' d='.intToBin($bucket->getDistance()).''."\n");
+					fwrite(STDOUT, str_repeat("\t", $level).'reenclose child bucket: '.intToBin($bucket->getMask()).' d='.intToBin($bucket->getDistance()).''."\n");
 					
 					$bucket->nodeEnclose($node, $sortNodes, $level + 1);
 				}
@@ -400,69 +402,69 @@ class Bucket extends YamlStorage{
 	}
 	
 	public function nodeEnclose(Node $node, $sortNodes = true, $level = 1){
-		#usleep(100000); # TODO
-		#sleep(2); # TODO
-		
 		$nodeEncloseReturnValue = $node;
+		
 		if($level <= 1000){
 			if($node->getIdHexStr() != '00000000-0000-4000-8000-000000000000'){
 				$distance = $this->getLocalNode()->distance($node);
+				
 				$mask = 1 << 2; // Root Mask # TODO
+				
 				if($this->getIsUpper() || $this->getIsLower()){
-					#fwrite(STDOUT, str_repeat("\t", $level).'no root bucket'."\n");
+					fwrite(STDOUT, str_repeat("\t", $level).'no root bucket'."\n");
 					$mask = $this->getMask();
 				}
 				else{
-					#fwrite(STDOUT, str_repeat("\t", $level).'root bucket'."\n");
+					fwrite(STDOUT, str_repeat("\t", $level).'root bucket'."\n");
 					$this->setMask($mask);
 				}
 				#if($mask > 0){
 				#	$newMask = $mask >> 1; # TODO: not needed
 				#}
 				
-				#fwrite(STDOUT, str_repeat("\t", $level).'level: '.$level."\n");
-				#fwrite(STDOUT, str_repeat("\t", $level).'node: '.$node->getIdHexStr()."\n");
-				#fwrite(STDOUT, str_repeat("\t", $level).'dist: '.intToBin($distance[15])."\n");
-				#fwrite(STDOUT, str_repeat("\t", $level).'mask: '.intToBin($mask)."\n");
+				fwrite(STDOUT, str_repeat("\t", $level).'level: '.$level."\n");
+				fwrite(STDOUT, str_repeat("\t", $level).'node: '.$node->getIdHexStr()."\n");
+				fwrite(STDOUT, str_repeat("\t", $level).'dist: '.intToBin($distance[15])."\n");
+				fwrite(STDOUT, str_repeat("\t", $level).'mask: '.intToBin($mask)."\n");
 				
 				if($this->childBucketUpper){
-					#fwrite(STDOUT, str_repeat("\t", $level).'upper: '.intToBin($this->childBucketUpper->getMask())."\n");
+					fwrite(STDOUT, str_repeat("\t", $level).'upper: '.intToBin($this->childBucketUpper->getMask())."\n");
 				}
 				else{
-					#fwrite(STDOUT, str_repeat("\t", $level).'upper: N/A'."\n");
+					fwrite(STDOUT, str_repeat("\t", $level).'upper: N/A'."\n");
 				}
 				if($this->childBucketLower){
-					#fwrite(STDOUT, str_repeat("\t", $level).'lower: '.intToBin($this->childBucketLower->getMask())."\n");
+					fwrite(STDOUT, str_repeat("\t", $level).'lower: '.intToBin($this->childBucketLower->getMask())."\n");
 				}
 				else{
-					#fwrite(STDOUT, str_repeat("\t", $level).'lower: N/A'."\n");
+					fwrite(STDOUT, str_repeat("\t", $level).'lower: N/A'."\n");
 				}
 				
 				$onode = $this->nodeFind($node);
 				if(!$onode){
 					
 					if($this->getNodesNum() < static::$SIZE_MAX && !$this->getIsFull()){
-						#fwrite(STDOUT, str_repeat("\t", $level).'add node'."\n");
+						fwrite(STDOUT, str_repeat("\t", $level).'add node'."\n");
 						
 						$this->nodeAdd($node, $sortNodes);
 						$nodeEncloseReturnValue = $node;
 						
 						if($this->isFull()){
-							#fwrite(STDOUT, str_repeat("\t", $level).'FULL end'."\n");
+							fwrite(STDOUT, str_repeat("\t", $level).'FULL end'."\n");
 							$this->nodesReEnclose($sortNodes, $level + 1);
 						}
 					}
 					else{
-						#fwrite(STDOUT, str_repeat("\t", $level).'FULL new'."\n");
+						fwrite(STDOUT, str_repeat("\t", $level).'FULL new'."\n");
 						
 						$bucket = null;
 						if($distance[15] & $mask){ # TODO
-							#fwrite(STDOUT, str_repeat("\t", $level).'match: upper'."\n");
+							fwrite(STDOUT, str_repeat("\t", $level).'match: upper'."\n");
 							$this->setChildBucketUpper($distance[15]); # TODO
 							$bucket = $this->childBucketUpper;
 						}
 						else{
-							#fwrite(STDOUT, str_repeat("\t", $level).'match: lower'."\n");
+							fwrite(STDOUT, str_repeat("\t", $level).'match: lower'."\n");
 							$this->setChildBucketLower($distance[15]); # TODO
 							$bucket = $this->childBucketLower;
 						}
@@ -475,7 +477,7 @@ class Bucket extends YamlStorage{
 							# TODO: what happens when a bucket is not found?
 						}
 						else{
-							#fwrite(STDOUT, str_repeat("\t", $level).'child bucket: '.intToBin($bucket->getMask()).' d='.intToBin($bucket->getDistance()).''."\n");
+							fwrite(STDOUT, str_repeat("\t", $level).'child bucket: '.intToBin($bucket->getMask()).' d='.intToBin($bucket->getDistance()).''."\n");
 							
 							$bucket->nodeEnclose($node, $sortNodes, $level + 1);
 						}
@@ -489,7 +491,7 @@ class Bucket extends YamlStorage{
 		}
 		else{
 			# TODO
-			#fwrite(STDOUT, str_repeat("\t", $level).'ERROR: level '.$level.' is too deep'."\n");
+			fwrite(STDOUT, str_repeat("\t", $level).'ERROR: level '.$level.' is too deep'."\n");
 			throw new RuntimeException('enclose level too deep: '.$level);
 		}
 		

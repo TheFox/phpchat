@@ -317,9 +317,6 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		Bucket::$SIZE_MAX = 4;
 		$this->assertEquals(4, Bucket::$SIZE_MAX);
 		
-		#Bucket::$SIZE_MAX = 1;
-		#Bucket::$SIZE_MAX = 2;
-		
 		$localNode = new Node();
 		$localNode->setIdHexStr('11000001-2002-4004-8008-100000000006');
 		
@@ -357,24 +354,24 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		#$this->assertEquals($baseBitStr.'110', $localNode->distanceBitStr($node0));
 		#$this->assertEquals($baseBitStr.'111', $localNode->distanceBitStr($node1));
 		#$this->assertEquals($baseBitStr.'100', $localNode->distanceBitStr($node2));
+		##$this->assertEquals($baseBitStr.'101', $localNode->distanceBitStr($node3));
 		#$this->assertEquals($baseBitStr.'010', $localNode->distanceBitStr($node4));
 		#$this->assertEquals($baseBitStr.'011', $localNode->distanceBitStr($node5));
 		#$this->assertEquals($baseBitStr.'001', $localNode->distanceBitStr($node7));
 		
 		
-		#$table->nodeEnclose($node0);
-		#$table->nodeEnclose($node1);
-		#$table->nodeEnclose($node2);
-		#$table->nodeEnclose($node4);
-		#$table->nodeEnclose($node5);
-		#$table->nodeEnclose($node7);
+		$table->nodeEnclose($node0);
+		$table->nodeEnclose($node1);
+		$table->nodeEnclose($node2);
+		$table->nodeEnclose($node4);
+		$table->nodeEnclose($node5);
+		$table->nodeEnclose($node7);
 		#$table->nodeEnclose($node20);
 		
 		$table->save();
 		
-		#ve($table);
 		
-		$this->clean();
+		#$this->clean();
 	}
 	
 	/**

@@ -71,7 +71,20 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		$this->assertEquals('tcp://192.168.241.21:25001', (string)$node->getUri());
 	}
 	
-	public function testId(){
+	public function testIdInt(){
+		$this->assertEquals(Node::ID_LEN_BIT, Node::ID_LEN_BYTE * 8);
+		$this->assertEquals(Node::ID_LEN_BYTE, Node::ID_LEN_BIT / 8);
+		
+		// Array index.
+		$this->assertEquals(Node::ID_LEN_BYTE - 1, Node::ID_LEN_BIT / 8 - 1);
+		
+		$this->assertEquals(1, 0 / 8 - 1);
+		
+		
+		
+	}
+	
+	public function testIdHexStr(){
 		$id = (string)Uuid::uuid4();
 		
 		$node = new Node();
