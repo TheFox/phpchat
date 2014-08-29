@@ -673,7 +673,7 @@ class Client{
 								$msgHandleReturnValue .= $this->sendNodeFound($rid);
 							}
 							elseif( !$node->isEqual($this->getNode()) && $onode = $this->getTable()->nodeFind($node) ){
-								$this->log('debug', 'node find: find in buckets');
+								$this->log('debug', 'node find: find in table');
 								
 								$msgHandleReturnValue .= $this->sendNodeFound($rid, array($onode));
 							}

@@ -337,7 +337,7 @@ class Server{
 			'clientsId' => 0,
 		);
 		foreach($this->clients as $clientId => $client){
-			$this->log->debug('client: '.$client->getUri());
+			#$this->log->debug('client: '.$client->getUri());
 			
 			$rv['clients'][$clientId] = array(
 				'hasId' => $client->getStatus('hasId'),
