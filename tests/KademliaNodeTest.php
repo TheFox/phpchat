@@ -9,7 +9,7 @@ use TheFox\Dht\Kademlia\Node;
 use TheFox\PhpChat\TcpUri;
 use TheFox\PhpChat\HttpUri;
 
-class NodeTest extends PHPUnit_Framework_TestCase{
+class KademliaNodeTest extends PHPUnit_Framework_TestCase{
 	
 	const SSL_KEY_PUB1 = '-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA2+wZQQSxQXaxUmL/bg7O
@@ -71,7 +71,23 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		$this->assertEquals('tcp://192.168.241.21:25001', (string)$node->getUri());
 	}
 	
-	public function testId(){
+	public function testIdInt(){
+		$this->assertEquals(Node::ID_LEN_BIT, Node::ID_LEN_BYTE * 8);
+		$this->assertEquals(Node::ID_LEN_BYTE, Node::ID_LEN_BIT / 8);
+		
+		// Array index.
+		$this->assertEquals(0, floor(0 / 8));
+		$this->assertEquals(0, floor(1 / 8));
+		$this->assertEquals(0, floor(7 / 8));
+		$this->assertEquals(1, floor(8 / 8));
+		$this->assertEquals(1, floor(9 / 8));
+		$this->assertEquals(1, floor(15 / 8));
+		$this->assertEquals(2, floor(16 / 8));
+		$this->assertEquals(15, floor(126 / 8));
+		$this->assertEquals(15, floor(127 / 8));
+	}
+	
+	public function testIdHexStr(){
 		$id = (string)Uuid::uuid4();
 		
 		$node = new Node();

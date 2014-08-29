@@ -14,8 +14,8 @@ use TheFox\Utilities\Base58;
 
 class Node extends YamlStorage{
 	
-	const ID_LEN = 16;
-	const ID_LEN_BITS = 128;
+	const ID_LEN_BYTE = 16;
+	const ID_LEN_BIT = 128;
 	const SSL_KEY_LEN_MIN = 4096;
 	
 	private $id = array();
@@ -33,6 +33,7 @@ class Node extends YamlStorage{
 		$this->data['uri'] = '';
 		$this->data['sslKeyPubFingerprint'] = '';
 		$this->data['sslKeyPubStatus'] = 'U';
+		$this->data['distance'] = null;
 		$this->data['timeCreated'] = time();
 		$this->data['timeLastSeen'] = 0;
 		
@@ -91,18 +92,20 @@ class Node extends YamlStorage{
 	public function setIdHexStr($id){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		$id = strtolower($id);
-		$this->id = array_fill(0, static::ID_LEN, 0);
+		$this->id = array_fill(0, static::ID_LEN_BYTE, 0);
 		
 		if(Uuid::isValid($id)){
 			#print __CLASS__.'->'.__FUNCTION__.': check valid UUID'."\n";
 			$this->data['id'] = $id;
 			
 			$id = str_replace('-', '', $id);
-			for($idPos = 0; $idPos < static::ID_LEN; $idPos++){
+			for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
 				$this->id[$idPos] = hexdec(substr($id, 0, 2));
 				$id = substr($id, 2);
 			}
 		}
+		
+		#ve($this->id);
 		#else{ print __CLASS__.'->'.__FUNCTION__.': check valid UUID FAILED: '.$id."\n"; }
 	}
 	
@@ -112,7 +115,7 @@ class Node extends YamlStorage{
 	
 	public function getIdBitStr(){
 		$rv = '';
-		for($idPos = 0; $idPos < static::ID_LEN; $idPos++){
+		for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
 			for($bits = 7; $bits >= 0; $bits--){
 				$rv .= $this->id[$idPos] & (1 << $bits) ? '1' : '0';
 			}
@@ -238,6 +241,16 @@ class Node extends YamlStorage{
 		}
 	}
 	
+	public function setDistance($distance){
+		$this->data['distance'] = $distance;
+		#$this->distance = $distance;
+	}
+	
+	public function getDistance(){
+		return $this->data['distance'];
+		#return $this->distance;
+	}
+	
 	public function setTimeCreated($timeCreated){
 		$this->data['timeCreated'] = $timeCreated;
 	}
@@ -263,14 +276,20 @@ class Node extends YamlStorage{
 	}
 	
 	public function distance(Node $node){
-		$rv = array_fill(0, static::ID_LEN, 0);
+		#fwrite(STDOUT, __FUNCTION__.''."\n");
+		$rv = array_fill(0, static::ID_LEN_BYTE, 0);
+		#ve($rv);
 		
 		if($node && $this !== $node){
-			$nodeId = $node->getId();
 			$thisId = $this->getId();
+			$nodeId = $node->getId();
 			
-			for($idPos = 0; $idPos < static::ID_LEN; $idPos++){
+			#ve($thisId);
+			#ve($nodeId);
+			
+			for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
 				$rv[$idPos] = $thisId[$idPos] ^ $nodeId[$idPos];
+				#fwrite(STDOUT, __FUNCTION__.'     pos: '.$idPos.' -> '.$rv[$idPos]."\n");
 			}
 		}
 		
@@ -281,8 +300,10 @@ class Node extends YamlStorage{
 		$distance = $this->distance($node);
 		
 		$rv = '';
-		for($idPos = 0; $idPos < static::ID_LEN; $idPos++){
+		for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
+			#fwrite(STDOUT, __FUNCTION__.' pos: '.$idPos."\n");
 			for($bits = 7; $bits >= 0; $bits--){
+				#fwrite(STDOUT, __FUNCTION__.'     bit: '.$bits.' -> '.(1 << $bits)."\n");
 				$rv .= $distance[$idPos] & (1 << $bits) ? '1' : '0';
 			}
 			#$rv .= ' ';
@@ -304,10 +325,6 @@ class Node extends YamlStorage{
 		return $this->getIdHexStr() == $node->getIdHexStr();
 	}
 	
-	public function isInTable(){
-		return $this->getBucket() !== null;
-	}
-	
 	public static function idMinHexStr($hex_a, $hex_b){
 		if($hex_a == $hex_b){
 			return $hex_a;
@@ -319,6 +336,14 @@ class Node extends YamlStorage{
 		sort($ar, SORT_STRING);
 		
 		return array_shift($ar);
+	}
+	
+	public function update(Node $node){
+		if($node->getTimeLastSeen() > $this->getTimeLastSeen()){
+			$this->setUri($node->getUri());
+			$this->setTimeLastSeen($node->getTimeLastSeen());
+			$this->setDataChanged(true);
+		}
 	}
 	
 }

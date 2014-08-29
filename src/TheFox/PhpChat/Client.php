@@ -486,6 +486,8 @@ class Client{
 						
 						$node = $this->getTable()->nodeEnclose($node);
 						
+						#$this->log('debug', 'node ok: '.(int)is_object($node));
+						
 						// Check if not Local Node
 						if(! $this->getLocalNode()->isEqual($node)){
 							
@@ -653,7 +655,7 @@ class Client{
 								
 								$msgHandleReturnValue .= $this->sendNodeFound($rid);
 							}
-							elseif( !$node->isEqual($this->getNode()) && $onode = $this->getTable()->nodeFindInBuckets($node) ){
+							elseif( !$node->isEqual($this->getNode()) && $onode = $this->getTable()->nodeFind($node) ){
 								$this->log('debug', 'node find: find in buckets');
 								
 								$msgHandleReturnValue .= $this->sendNodeFound($rid, array($onode));

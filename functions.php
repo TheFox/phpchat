@@ -7,7 +7,7 @@ function ve($v = null){
 		fwrite(STDOUT, $rv."\n");
 	}
 	catch(Exception $e){
-		print "ERROR: ".$e->getMessage()."\n";
+		print 'ERROR: '.$e->getMessage()."\n";
 	}
 }
 
@@ -16,7 +16,7 @@ function vej($v = null){
 		ve(json_encode($v));
 	}
 	catch(Exception $e){
-		print "ERROR: ".$e->getMessage()."\n";
+		print 'ERROR: '.$e->getMessage()."\n";
 	}
 }
 
@@ -27,7 +27,7 @@ function vew($v = null){
 		print '</pre>';
 	}
 	catch(Exception $e){
-		print "ERROR: ".$e->getMessage()."\n";
+		print 'ERROR: '.$e->getMessage()."\n";
 	}
 }
 
@@ -45,4 +45,27 @@ function sslKeyPubClean($key){
 	$key = str_replace('-----END PUBLIC KEY-----', '', $key);
 	
 	return $key;
+}
+
+function intToBin($i){
+	$rv = '';
+	$rv .= $i & (1 << 7) ? '1' : '0';
+	$rv .= $i & (1 << 6) ? '1' : '0';
+	$rv .= $i & (1 << 5) ? '1' : '0';
+	$rv .= $i & (1 << 4) ? '1' : '0';
+	$rv .= $i & (1 << 3) ? '1' : '0';
+	$rv .= $i & (1 << 2) ? '1' : '0';
+	$rv .= $i & (1 << 1) ? '1' : '0';
+	$rv .= $i & (1 << 0) ? '1' : '0';
+	return $rv;
+}
+
+$timeStopStart = 0;
+function timeStop($name = ''){
+	global $timeStopStart;
+	$time = microtime(true);
+	$diff = $time - $timeStopStart;
+	$timeStopStart = $time;
+	#fwrite(STDOUT, '[time] '.$name.' '.sprintf('%d', ($diff * 1000)).PHP_EOL);
+	fwrite(STDOUT, '[time] '.$name.' '.sprintf('%f', $diff).PHP_EOL);
 }

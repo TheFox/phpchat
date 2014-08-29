@@ -4,7 +4,7 @@ use TheFox\PhpChat\Cronjob;
 use TheFox\PhpChat\MsgDb;
 use TheFox\PhpChat\Msg;
 use TheFox\PhpChat\Settings;
-use TheFox\Dht\Kademlia\Table;
+use TheFox\Dht\Simple\Table;
 use TheFox\Dht\Kademlia\Node;
 
 class CronjobTest extends PHPUnit_Framework_TestCase{
@@ -172,6 +172,8 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 ';
 	
 	public function testMsgDbDefault(){
+		@unlink('tests/bucket_root.yml');
+		
 		file_put_contents('tests/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
 		file_put_contents('tests/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
 		

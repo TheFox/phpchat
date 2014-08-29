@@ -33,10 +33,11 @@ test_phpcs: $(PHPCS) vendor/thefox/phpcsrs/Standards/TheFox
 
 test_phpunit: $(PHPUNIT) phpunit.xml
 	$(PHPUNIT)
+	make test_clean
 
 test_clean:
 	$(RM) tests/testdir_*
-	$(RM) tests/testfile_*
+	$(RM) tests/*.yml
 
 release:
 	./release.sh

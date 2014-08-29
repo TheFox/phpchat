@@ -1,9 +1,13 @@
 <?php
 
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
+
 use TheFox\Dht\Kademlia\Table;
+use TheFox\Dht\Kademlia\Bucket;
 use TheFox\Dht\Kademlia\Node;
 
-class TableTest extends PHPUnit_Framework_TestCase{
+class KademliaTableTest extends PHPUnit_Framework_TestCase{
 	
 	const NODE_PUB1 = '-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAvAyZWe+VL1AfzK8ciwBQ
@@ -124,8 +128,11 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$node_e->setIdHexStr('10000001-2002-4004-8008-020000000008');
 		$node_e->setTimeCreated(1408371221);
 		
+		
 		$this->assertEquals($localNode, $table->getLocalNode());
-		$this->assertEquals(array($node_a, $node_b, $node_c, $node_d, $node_e), $table->getNodes());
+		
+		$nodes = $table->getNodes();
+		$this->assertEquals(5, count($nodes));
 	}
 	
 	public function testNodeFindInBuckets1(){
@@ -218,7 +225,11 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		
 		$nodes = $table->nodeFindClosest($node_e);
 		
+		$this->assertEquals(4, count($nodes));
 		$this->assertEquals(array($node_c, $node_a, $node_b, $node_d), $nodes);
+		/*foreach($nodes as $nodeId => $node){
+			fwrite(STDOUT, 'node: /'.$nodeId.'/ '.$node->getIdHexStr()."\n");
+		}*/
 	}
 	
 	public function testNodeFindByKeyPubFingerprint(){
@@ -266,6 +277,7 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		
 		$node = new Node();
 		$node->setIdHexStr('10000001-2002-4004-8008-100000000002');
+		
 		$onode = $table->nodeEnclose($node);
 		
 		$this->assertEquals($node, $onode);
@@ -292,6 +304,140 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$this->assertTrue($node_a === $onode);
 		
 		$this->assertEquals('192.168.241.1', $onode->getUri()->getHost());
+	}
+	
+	public function testNodeEnclose3(){
+		fwrite(STDOUT, 'testNodeEnclose3'.PHP_EOL);
+		
+		#@unlink('tests/testfile_table_table.yml');
+		#@unlink('tests/bucket_root.yml');
+		
+		$this->assertEquals(20, Bucket::$SIZE_MAX);
+		
+		#Bucket::$SIZE_MAX = 4;
+		#$this->assertEquals(4, Bucket::$SIZE_MAX);
+		
+		$localNode = new Node();
+		$localNode->setIdHexStr('11000001-2002-4004-8008-100000000006');
+		
+		$table = new Table('tests/testfile_table_table.yml');
+		$table->setDatadirBasePath('tests');
+		$table->setLocalNode($localNode);
+		
+		timeStop('table load start');
+		$table->load();
+		timeStop('table load end');
+		
+		$node0 = new Node();
+		$node0->setIdHexStr('11000001-2002-4004-8008-100000000000');
+		
+		$node1 = new Node();
+		$node1->setIdHexStr('11000001-2002-4004-8008-100000000001');
+		
+		$node2 = new Node();
+		$node2->setIdHexStr('11000001-2002-4004-8008-100000000002');
+		
+		$node3 = new Node();
+		$node3->setIdHexStr('11000001-2002-4004-8008-100000000003');
+		
+		$node4 = new Node();
+		$node4->setIdHexStr('11000001-2002-4004-8008-100000000004');
+		
+		$node5 = new Node();
+		$node5->setIdHexStr('11000001-2002-4004-8008-100000000005');
+		
+		$node7 = new Node();
+		$node7->setIdHexStr('11000001-2002-4004-8008-100000000007');
+		
+		$node20 = new Node();
+		$node20->setIdHexStr('11000001-2002-4004-8008-100000000020');
+		
+		
+		$baseBitStr = str_repeat('0', 125);
+		#$this->assertEquals($baseBitStr.'110', $localNode->distanceBitStr($node0));
+		#$this->assertEquals($baseBitStr.'111', $localNode->distanceBitStr($node1));
+		#$this->assertEquals($baseBitStr.'100', $localNode->distanceBitStr($node2));
+		##$this->assertEquals($baseBitStr.'101', $localNode->distanceBitStr($node3));
+		#$this->assertEquals($baseBitStr.'010', $localNode->distanceBitStr($node4));
+		#$this->assertEquals($baseBitStr.'011', $localNode->distanceBitStr($node5));
+		#$this->assertEquals($baseBitStr.'001', $localNode->distanceBitStr($node7));
+		
+		
+		$table->nodeEnclose($node0);
+		$table->nodeEnclose($node1);
+		$table->nodeEnclose($node2);
+		$table->nodeEnclose($node4);
+		$table->nodeEnclose($node5);
+		$table->nodeEnclose($node7);
+		#$table->nodeEnclose($node20);
+		
+		$table->save();
+		
+		
+		$this->clean();
+	}
+	
+	/**
+	 * @group large
+	 */
+	public function testNodeEnclose4(){
+		fwrite(STDOUT, 'testNodeEnclose4'.PHP_EOL);
+		
+		$NODES = 100;
+		Bucket::$SIZE_MAX = 20;
+		
+		$localNode = new Node();
+		$localNode->setIdHexStr('12000001-2002-4004-8008-100000000001');
+		$table = new Table('tests/testfile_table_table.yml');
+		$table->setDatadirBasePath('tests');
+		$table->setLocalNode($localNode);
+		$table->load();
+		
+		$nodeNoBegin = 100000000002;
+		$nodeNoEnd = $nodeNoBegin + $NODES;
+		for($nodeNo = $nodeNoBegin; $nodeNo < $nodeNoEnd; $nodeNo++){
+			#fwrite(STDOUT, __METHOD__.' node setup: '.$nodeNo.''.PHP_EOL);
+			timeStop('node setup '.$nodeNo);
+			
+			$node = new Node();
+			$node->setIdHexStr('12000001-2002-4004-8008-'.$nodeNo);
+			
+			$table->nodeEnclose($node);
+		}
+		
+		fwrite(STDOUT, 'save'.PHP_EOL);
+		$table->save();
+		
+		$nodeNum = $table->getNodesNum();
+		fwrite(STDOUT, 'nodes: '.$nodeNum.''.PHP_EOL);
+		#$this->assertEquals(160, $nodeNum);
+		
+		$this->assertTrue(true);
+		
+		$finder = new Finder();
+		$files = $finder->in('tests')->name('node_*.yml');
+		#$this->assertEquals(160, count($files));
+		
+		$this->clean();
+	}
+	
+	private function clean(){
+		@unlink('tests/testfile_table_table.yml');
+		@unlink('tests/bucket_root.yml');
+		
+		$finder = new Finder();
+		$files = $finder->in('tests')->name('bucket_*.yml');
+		$filesystem = new Filesystem();
+		foreach($files as $fileId => $file){
+			$filesystem->remove($file->getRealPath());
+		}
+		
+		$finder = new Finder();
+		$files = $finder->in('tests')->name('node_*.yml');
+		$filesystem = new Filesystem();
+		foreach($files as $fileId => $file){
+			$filesystem->remove($file->getRealPath());
+		}
 	}
 	
 }

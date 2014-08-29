@@ -4,7 +4,7 @@ namespace TheFox\PhpChat;
 
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler as LoggerStreamHandler;
-use TheFox\Dht\Kademlia\Table;
+use TheFox\Dht\Simple\Table;
 use TheFox\Dht\Kademlia\Node;
 use TheFox\Ipc\ConnectionServer;
 use TheFox\Ipc\StreamHandler as IpcStreamHandler;
@@ -161,7 +161,7 @@ class Kernel extends Thread{
 		$this->ipcCronjobConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20001));
 		foreach(array(
 			'getSettings', 'getLocalNode',
-			'getTable', 'tableNodeEnclose',
+			'getTable', 'tableNodeEnclose', 'tableNodesClean', 'tableNodesSort',
 			'getMsgDb', 'msgDbMsgUpdate', 'msgDbMsgIncForwardCyclesById', 'msgDbMsgSetStatusById',
 			'getNodesNewDb', 'nodesNewDbNodeAddUri', 'nodesNewDbNodeAddId', 'nodesNewDbNodeIncConnectAttempt',
 				'nodesNewDbNodeIncFindAttempt', 'nodesNewDbNodeRemove',
@@ -352,6 +352,14 @@ class Kernel extends Thread{
 	public function tableNodeEnclose(Node $node){
 		#ve($node->getIdHexStr());
 		return $this->getTable()->nodeEnclose($node);
+	}
+	
+	public function tableNodesClean(){
+		return $this->getTable()->nodesClean();
+	}
+	
+	public function tableNodesSort(){
+		return $this->getTable()->nodesSort();
 	}
 	
 	public function getAddressbook(){
