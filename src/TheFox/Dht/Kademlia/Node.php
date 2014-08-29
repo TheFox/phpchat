@@ -33,6 +33,7 @@ class Node extends YamlStorage{
 		$this->data['uri'] = '';
 		$this->data['sslKeyPubFingerprint'] = '';
 		$this->data['sslKeyPubStatus'] = 'U';
+		$this->data['distance'] = null;
 		$this->data['timeCreated'] = time();
 		$this->data['timeLastSeen'] = 0;
 		
@@ -240,6 +241,16 @@ class Node extends YamlStorage{
 		}
 	}
 	
+	public function setDistance($distance){
+		$this->data['distance'] = $distance;
+		#$this->distance = $distance;
+	}
+	
+	public function getDistance(){
+		return $this->data['distance'];
+		#return $this->distance;
+	}
+	
 	public function setTimeCreated($timeCreated){
 		$this->data['timeCreated'] = $timeCreated;
 	}
@@ -312,10 +323,6 @@ class Node extends YamlStorage{
 	
 	public function isEqual(Node $node){
 		return $this->getIdHexStr() == $node->getIdHexStr();
-	}
-	
-	public function isInTable(){
-		return $this->getBucket() !== null;
 	}
 	
 	public static function idMinHexStr($hex_a, $hex_b){

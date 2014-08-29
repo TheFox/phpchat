@@ -199,7 +199,7 @@ class SmtpCommand extends BasicCommand{
 			$dstNode->setIdHexStr($dstNodeId);
 			
 			$msg->setDstNodeId($dstNode->getIdHexStr());
-			if($oDstNode = $table->nodeFindInBuckets($dstNode)){
+			if($oDstNode = $table->nodeFind($dstNode)){
 				#print 'found node in table'.PHP_EOL;
 				$msg->setDstSslPubKey($oDstNode->getSslKeyPub());
 			}

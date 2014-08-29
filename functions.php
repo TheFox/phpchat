@@ -59,3 +59,13 @@ function intToBin($i){
 	$rv .= $i & (1 << 0) ? '1' : '0';
 	return $rv;
 }
+
+$timeStopStart = 0;
+function timeStop($name = ''){
+	global $timeStopStart;
+	$time = microtime(true);
+	$diff = $time - $timeStopStart;
+	$timeStopStart = $time;
+	#fwrite(STDOUT, '[time] '.$name.' '.sprintf('%d', ($diff * 1000)).PHP_EOL);
+	fwrite(STDOUT, '[time] '.$name.' '.sprintf('%f', $diff).PHP_EOL);
+}

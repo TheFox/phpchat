@@ -2,7 +2,7 @@
 
 use TheFox\Dht\Kademlia\Bucket;
 
-class BucketTest extends PHPUnit_Framework_TestCase{
+class KademliaBucketTest extends PHPUnit_Framework_TestCase{
 	
 	public function testSave(){
 		$bucket = new Bucket('tests/testfile_bucket_bucket1.yml');

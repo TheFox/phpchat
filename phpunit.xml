@@ -22,15 +22,16 @@
 	<testsuites>
 		<testsuite name="My Test Suite">
 			<file>tests/BasicTest.php</file>
-			<file>tests/BucketTest.php</file>
 			<file>tests/ClientTest.php</file>
 			<file>tests/ConsoleTest.php</file>
 			<file>tests/CronjobTest.php</file>
+			<file>tests/KademliaBucketTest.php</file>
+			<file>tests/KademliaNodeTest.php</file>
+			<!--<file>tests/KademliaTableTest.php</file>//-->
 			<file>tests/LogTest.php</file>
 			<file>tests/MsgTest.php</file>
-			<file>tests/NodeTest.php</file>
+			<file>tests/SimpleTableTest.php</file>
 			<file>tests/SslTest.php</file>
-			<file>tests/TableTest.php</file>
 			<file>tests/TcpClientTest.php</file>
 			<file>tests/UuidTest.php</file>
 		</testsuite>

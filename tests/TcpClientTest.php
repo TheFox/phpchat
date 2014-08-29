@@ -12,8 +12,8 @@ use TheFox\PhpChat\Client;
 use TheFox\PhpChat\TcpClient;
 use TheFox\PhpChat\ClientAction;
 use TheFox\PhpChat\Msg;
-use TheFox\Dht\Kademlia\Table;
-use TheFox\Dht\Kademlia\Bucket;
+use TheFox\Dht\Simple\Table;
+#use TheFox\Dht\Kademlia\Bucket;
 use TheFox\Dht\Kademlia\Node;
 
 class TcpClientTest extends PHPUnit_Framework_TestCase{

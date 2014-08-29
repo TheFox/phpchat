@@ -9,7 +9,7 @@ use TheFox\Dht\Kademlia\Node;
 use TheFox\PhpChat\TcpUri;
 use TheFox\PhpChat\HttpUri;
 
-class NodeTest extends PHPUnit_Framework_TestCase{
+class KademliaNodeTest extends PHPUnit_Framework_TestCase{
 	
 	const SSL_KEY_PUB1 = '-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA2+wZQQSxQXaxUmL/bg7O

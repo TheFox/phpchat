@@ -10,7 +10,7 @@ class Bucket extends YamlStorage{
 	
 	static $SIZE_MAX = 20;
 	
-	private $nodesId = 0;
+	#private $nodesId = 0;
 	private $nodes = array();
 	private $localNode = null;
 	private $childBucketUpper = null;
@@ -81,7 +81,6 @@ class Bucket extends YamlStorage{
 	public function load(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		#fwrite(STDOUT, __FUNCTION__.': '.$this->getFilePath().''."\n");
-		#usleep(50000);
 		
 		if(parent::load()){
 			
@@ -89,13 +88,14 @@ class Bucket extends YamlStorage{
 				if(array_key_exists('nodes', $this->data) && $this->data['nodes']){
 					foreach($this->data['nodes'] as $nodeId => $nodeAr){
 						if(file_exists($nodeAr['path'])){
-							$this->nodesId = $nodeId;
+							#$this->nodesId = $nodeId;
 							
 							$node = new Node($nodeAr['path']);
 							$node->setDatadirBasePath($this->getDatadirBasePath());
 							$node->setBucket($this);
 							if($node->load()){
-								$this->nodes[$this->nodesId] = $node;
+								#$this->nodes[$this->nodesId] = $node;
+								$this->nodes[$nodeId] = $node;
 							}
 						}
 					}
@@ -222,10 +222,13 @@ class Bucket extends YamlStorage{
 	
 	public function nodeFindByIdHexStr($id){
 		$id = strtolower($id);
-		foreach($this->nodes as $nodeId => $node){
+		/*foreach($this->nodes as $nodeId => $node){
 			if($node->getIdHexStr() == $id){
 				return $node;
 			}
+		}*/
+		if(isset($this->nodes[$id])){
+			return $this->nodes[$id];
 		}
 		if($this->childBucketUpper){
 			return $this->childBucketUpper->nodeFindByIdHexStr($id);
@@ -255,13 +258,15 @@ class Bucket extends YamlStorage{
 	}
 	
 	private function nodeAdd(Node $node, $sortNodes = true){
+		$nodeId = $node->getIdHexStr();
+		
 		$filePath = null;
 		if($this->getDatadirBasePath()){
 			#$filePath = $this->getDatadirBasePath().'/node_'.$node->getIdHexStr().'.yml';
 			#$filePath = $this->getDatadirBasePath().'/node_'.$node->getIdHexStr().'_'.mt_rand(1000, 9999).'.yml';
-			#$filePath = $this->getDatadirBasePath().'/node_'.substr($node->getIdHexStr(), -5).'_'.time().'.yml';
-			$filePath = $this->getDatadirBasePath().'/node_'.substr($node->getIdHexStr(), -5).'.yml';
-			#$filePath = $this->getDatadirBasePath().'/node_'.$node->getIdHexStr().'.yml';
+			#$filePath = $this->getDatadirBasePath().'/node_'.substr($nodeId, -5).'_'.time().'.yml';
+			$filePath = $this->getDatadirBasePath().'/node_'.substr($nodeId, -5).'.yml';
+			#$filePath = $this->getDatadirBasePath().'/node_'.$nodeId.'.yml'; # TODO
 		}
 		if(!$node->getFilePath()){
 			$node->setFilePath($filePath);
@@ -270,14 +275,15 @@ class Bucket extends YamlStorage{
 		$node->setBucket($this);
 		$node->setDataChanged(true);
 		
-		$this->nodesId++;
-		$this->nodes[$this->nodesId] = $node;
+		#$this->nodesId++;
+		#$this->nodes[$this->nodesId] = $node;
+		$this->nodes[$nodeId] = $node;
 		$this->isFull();
 		$this->setDataChanged(true);
 		
-		if($sortNodes){
+		/*if($sortNodes){
 			$this->nodesSort();
-		}
+		}*/
 	}
 	
 	private function maskDecr(){
@@ -298,10 +304,6 @@ class Bucket extends YamlStorage{
 	}
 	
 	private function setChildBucketUpper($distance){
-		if(!$this->getLocalNode()){
-			throw new RuntimeException('localNode not set.');
-		}
-		
 		if(!$this->childBucketUpper){
 			list($newMaskByte, $newMaskBit, $newMaskBitValue) = $this->maskDecr();
 			
@@ -347,10 +349,6 @@ class Bucket extends YamlStorage{
 	}
 	
 	private function setChildBucketLower($distance){
-		if(!$this->getLocalNode()){
-			throw new RuntimeException('localNode not set.');
-		}
-		
 		if(!$this->childBucketLower){
 			list($newMaskByte, $newMaskBit, $newMaskBitValue) = $this->maskDecr();
 			
@@ -415,7 +413,8 @@ class Bucket extends YamlStorage{
 			foreach($this->nodes as $nodeId => $node){
 				#fwrite(STDOUT, str_repeat("\t", $printLevel).'reenclose node: '.$nodeId."\n");
 				
-				$distance = $this->getLocalNode()->distance($node);
+				#$distance = $this->getLocalNode()->distance($node);
+				$distance = $node->getDistance();
 				
 				$bucket = null;
 				if($distance[$maskByte] & $maskBitValue){
@@ -441,6 +440,7 @@ class Bucket extends YamlStorage{
 			}
 			
 			$this->nodes = array();
+			$this->setDataChanged(true);
 		}
 		else{
 			#fwrite(STDOUT, str_repeat("\t", $printLevel).'reenclose failed: '.intToBin($maskBitValue).' ('.$maskBitValue.')'."\n");
@@ -451,9 +451,12 @@ class Bucket extends YamlStorage{
 	}
 	
 	public function nodeEnclose(Node $node, $sortNodes = true, $level = 1){
+		if(!$this->getLocalNode()){
+			throw new RuntimeException('localNode not set.');
+		}
+		
 		$nodeEncloseReturnValue = $node;
 		
-		#usleep(50000);
 		
 		/*if($level >= 260){
 			fwrite(STDOUT, str_repeat("\t", $level).'ERROR: level '.$level.' is too deep'."\n");
@@ -466,7 +469,11 @@ class Bucket extends YamlStorage{
 		}
 		
 		if($node->getIdHexStr() != '00000000-0000-4000-8000-000000000000'){
-			$distance = $this->getLocalNode()->distance($node);
+			$distance = $node->getDistance();
+			if(!$distance){
+				$distance = $this->getLocalNode()->distance($node);
+				$node->setDistance($distance);
+			}
 			
 			$maskByte = 0;
 			$maskBit = 7; // Root MaskBit
@@ -505,8 +512,11 @@ class Bucket extends YamlStorage{
 				#fwrite(STDOUT, str_repeat("\t", $printLevel).'lower: N/A'."\n");
 			}
 			
+			#timeStop('onode find start');
 			$onode = $this->nodeFind($node);
+			#timeStop('onode find end');
 			if(!$onode){
+				#fwrite(STDOUT, str_repeat("\t", $printLevel).'old node not found'."\n");
 				
 				if($this->getNodesNum() < static::$SIZE_MAX && !$this->getIsFull()){
 					#fwrite(STDOUT, str_repeat("\t", $printLevel).'add node'."\n");
@@ -516,7 +526,9 @@ class Bucket extends YamlStorage{
 					
 					if($this->isFull()){
 						#fwrite(STDOUT, str_repeat("\t", $printLevel).'FULL end'."\n");
+						#timeStop('nodesReEnclose start');
 						$this->nodesReEnclose($sortNodes, $level + 1);
+						#timeStop('nodesReEnclose end');
 					}
 				}
 				else{
@@ -549,7 +561,11 @@ class Bucket extends YamlStorage{
 				}
 			}
 			else{
+				#fwrite(STDOUT, str_repeat("\t", $printLevel).'update existing node'."\n");
+				#usleep(1000000);
+				#timeStop('onode update start');
 				$onode->update($node);
+				#timeStop('onode update end');
 				$nodeEncloseReturnValue = $onode;
 			}
 		}

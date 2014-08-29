@@ -4,7 +4,7 @@ use TheFox\PhpChat\Cronjob;
 use TheFox\PhpChat\MsgDb;
 use TheFox\PhpChat\Msg;
 use TheFox\PhpChat\Settings;
-use TheFox\Dht\Kademlia\Table;
+use TheFox\Dht\Simple\Table;
 use TheFox\Dht\Kademlia\Node;
 
 class CronjobTest extends PHPUnit_Framework_TestCase{

@@ -37,9 +37,7 @@ test_phpunit: $(PHPUNIT) phpunit.xml
 
 test_clean:
 	$(RM) tests/testdir_*
-	$(RM) tests/testfile_*
-	$(RM) tests/bucket_*.yml
-	$(RM) tests/node_*.yml
+	$(RM) tests/*.yml
 
 release:
 	./release.sh

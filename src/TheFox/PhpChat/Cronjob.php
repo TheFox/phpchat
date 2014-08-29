@@ -169,12 +169,16 @@ class Cronjob extends Thread{
 		if($this->minutes % 5 == 0 && $this->seconds == 0){
 			#print 'save'."\n";
 			$this->log->debug('save');
+			$this->tableNodesSort();
 			$this->getIpcKernelConnection()->execAsync('save');
 		}
 		if($this->minutes % 15 == 0 && $this->seconds == 0){
 			#print 'ping'."\n";
 			$this->pingClosestNodes();
 			$this->bootstrapNodesEnclose();
+		}
+		if($this->minutes % 30 == 0 && $this->seconds == 0){
+			$this->tableNodesClean();
 		}
 		
 		$this->getIpcKernelConnection()->run();
@@ -204,6 +208,14 @@ class Cronjob extends Thread{
 		$this->log->debug('loop end');
 		
 		$this->shutdown();
+	}
+	
+	private function tableNodesClean(){
+		$this->getIpcKernelConnection()->execAsync('tableNodesClean');
+	}
+	
+	private function tableNodesSort(){
+		$this->getIpcKernelConnection()->execAsync('tableNodesSort');
 	}
 	
 	private function pingClosestNodes(){
@@ -274,7 +286,7 @@ class Cronjob extends Thread{
 				
 				$node = new Node();
 				$node->setIdHexStr($msg->getDstNodeId());
-				$onode = $this->table->nodeFindInBuckets($node);
+				$onode = $this->table->nodeFind($node);
 				if($onode && $onode->getSslKeyPub()){
 					#fwrite(STDOUT, 'msg db, init nodes:     found node: '.$onode->getIdHexStr()."\n");
 					
@@ -436,7 +448,7 @@ class Cronjob extends Thread{
 			}
 			
 			// Send it direct.
-			$onode = $this->table->nodeFindInBuckets($dstNode);
+			$onode = $this->table->nodeFind($dstNode);
 			#$this->log->debug(__FUNCTION__.'      onode: '.(int)(is_object($onode)).' ('.(is_object($onode) ? $onode->getUri() : 'N/A').')');
 			if($onode && $onode->getUri()->getHost() && $onode->getUri()->getPort()){
 				#$this->log->debug(__FUNCTION__.'      dst node found in table');
@@ -680,7 +692,7 @@ class Cronjob extends Thread{
 				$nodeObj = new Node();
 				$nodeObj->setIdHexStr($node['id']);
 				
-				if($this->table->nodeFindInBuckets($nodeObj)){
+				if($this->table->nodeFind($nodeObj)){
 					$this->log->debug('node remove: '.$nodeId);
 					$this->getIpcKernelConnection()->execAsync('nodesNewDbNodeRemove', array($nodeId));
 				}

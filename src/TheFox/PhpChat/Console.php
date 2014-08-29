@@ -810,7 +810,7 @@ class Console extends Thread{
 				$node = new Node();
 				$node->setIdHexStr($uuid);
 				
-				if($onode = $this->ipcKernelConnection->execSync('getTable')->nodeFindInBuckets($node)){
+				if($onode = $this->ipcKernelConnection->execSync('getTable')->nodeFind($node)){
 					$this->connect($onode->getUri());
 				}
 				else{
@@ -998,7 +998,7 @@ class Console extends Thread{
 								$dstNode->setIdHexStr($dstNodeId);
 								
 								$msg->setDstNodeId($dstNode->getIdHexStr());
-								if($oDstNode = $table->nodeFindInBuckets($dstNode)){
+								if($oDstNode = $table->nodeFind($dstNode)){
 									#print 'found node in table'.PHP_EOL;
 									$msg->setDstSslPubKey($oDstNode->getSslKeyPub());
 								}
