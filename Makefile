@@ -37,6 +37,7 @@ test_phpunit: $(PHPUNIT) phpunit.xml
 
 test_clean:
 	$(RM) tests/testdir_*
+	$(RM) tests/testfile_*
 	$(RM) tests/*.yml
 
 release:
