@@ -39,6 +39,7 @@ class Client{
 	private $sslPasswordPeerCurrent = '';
 	private $sslPasswordPeerNew = '';
 	private $sslPasswordTime = 0;
+	private $sslMsgCount = 0;
 	
 	private $requestsId = 0;
 	private $requests = array();
@@ -46,7 +47,6 @@ class Client{
 	private $actions = array();
 	protected $pingTime = 0;
 	protected $pongTime = 0;
-	private $sslMsgCount = 0;
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
