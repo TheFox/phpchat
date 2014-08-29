@@ -359,6 +359,10 @@ class Server{
 	public function connect($uri, $clientActions = array()){
 		$this->log->debug('connect: '.$uri);
 		
+		foreach($clientActions as $clientActionId => $clientAction){
+			$this->log->debug('connect action: '.join(', ', $clientAction->getCriteria()));
+		}
+		
 		try{
 			if(is_object($uri)){
 				if($uri->getScheme() == 'tcp'){

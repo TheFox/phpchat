@@ -240,7 +240,7 @@ class Client{
 			#$hashcash->setMintAttemptsMax(10);
 			
 			try{
-				$this->log('debug', 'hashcash: mint '.$bits.' bits');
+				#$this->log('debug', 'hashcash: mint '.$bits.' bits');
 				$stamp = $hashcash->mint();
 				#$this->log('debug', 'hashcash minted: '.$stamp);
 				return $stamp;
@@ -271,7 +271,7 @@ class Client{
 					&& $hashcash->getBits() >= $bits
 					&& $hashcash->getResource() == $resource
 					&& $added = $this->getHashcashDb()->addHashcash($hashcash)){
-					$this->log('debug', 'hashcash: OK');
+					#$this->log('debug', 'hashcash: OK');
 					return true;
 				}
 				else{
@@ -659,7 +659,7 @@ class Client{
 					$hashcash = $msgData['hashcash'];
 				}
 				
-				$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.$nodeId.', '.(int)($this->getNode() != null));
+				$this->log('debug', $this->getUri().' recv '.$msgName.': '.$nodeId);
 				
 				if($rid){
 					if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MIN)){

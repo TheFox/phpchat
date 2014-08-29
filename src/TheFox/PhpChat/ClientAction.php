@@ -44,6 +44,14 @@ class ClientAction{
 		return $this->id;
 	}
 	
+	public function setCriteria($criteria){
+		$this->criteria = $criteria;
+	}
+	
+	public function getCriteria(){
+		return $this->criteria;
+	}
+	
 	public function getVar($name = null){
 		if($name === null){
 			#print __CLASS__.'->'.__FUNCTION__.': name is null'."\n";
