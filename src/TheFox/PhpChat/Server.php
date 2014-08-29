@@ -230,11 +230,14 @@ class Server{
 	private function clientNewTcp($socket){
 		$this->clientsId++;
 		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.$this->clientsId."\n");
-		$this->log->debug('new tcp client: '.$this->clientsId);
+		#$this->log->debug('new tcp client: '.$this->clientsId);
 		
 		$client = new TcpClient();
 		$client->setSocket($socket);
+		
+		#$this->log->debug('server ssl setup');
 		$client->setSslPrv($this->sslKeyPrvPath, $this->sslKeyPrvPass);
+		#$this->log->debug('new tcp client ssl: '.($client->getSsl() ? 'ok' : 'N/A'));
 		
 		return $this->clientAdd($client);
 	}

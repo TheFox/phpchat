@@ -25,7 +25,6 @@ class Client{
 	const SSL_PASSWORD_TTL = 300;
 	const SSL_PASSWORD_MSG_MAX = 100;
 	
-	private $debug = false;
 	protected $id = 0;
 	private $status = array();
 	
@@ -151,7 +150,21 @@ class Client{
 	}
 	
 	public function setSslPrv($sslKeyPrvPath, $sslKeyPrvPass){
-		$this->setSsl(openssl_pkey_get_private(file_get_contents($sslKeyPrvPath), $sslKeyPrvPass));
+		$this->log('debug', 'SSL setup');
+		
+		$content = file_get_contents($sslKeyPrvPath);
+		$sslHandle = openssl_pkey_get_private($content, $sslKeyPrvPass);
+		if($sslHandle !== false){
+			$this->log('debug', 'SSL setup ok');
+			$this->setSsl($sslHandle);
+		}
+		else{
+			$this->log('debug', 'SSL failed');
+			while($openSslErrorStr = openssl_error_string()){
+				$this->log('error', 'SSL: '.$openSslErrorStr);
+			}
+		}
+		
 	}
 	
 	public function getLocalNode(){
@@ -173,6 +186,7 @@ class Client{
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		if($this->getServer()){
+			#print __CLASS__.'->'.__FUNCTION__.': get server, ok'."\n";
 			return $this->getServer()->getLog();
 		}
 		
@@ -187,6 +201,9 @@ class Client{
 				$this->getLog()->$level($msg);
 			}
 		}
+		/*else{
+			print __CLASS__.'->'.__FUNCTION__.': '.$level.', '.$msg."\n";
+		}*/
 	}
 	
 	public function getTable(){
@@ -486,7 +503,7 @@ class Client{
 						
 						$node = $this->getTable()->nodeEnclose($node);
 						
-						#$this->log('debug', 'node ok: '.(int)is_object($node));
+						$this->log('debug', 'node ok: '.(int)is_object($node).' /'.$node->getIdHexStr().'/');
 						
 						// Check if not Local Node
 						if(! $this->getLocalNode()->isEqual($node)){
@@ -1184,7 +1201,7 @@ class Client{
 						
 						$this->setStatus('hasSslPasswortPut', true);
 						$this->sslPasswordPeerCurrent = $password;
-						$this->log('debug', 'SSL: peer password: '.substr($this->sslPasswordPeerCurrent, 0, 20));
+						#$this->log('debug', 'SSL: peer password: '.substr($this->sslPasswordPeerCurrent, 0, 20));
 						
 						$msgHandleReturnValue .= $this->sendSslPasswordTest();
 					}
@@ -1695,6 +1712,9 @@ class Client{
 	public function msgCreateId(){
 		if(!$this->getLocalNode()){
 			throw new RuntimeException('localNode not set.');
+		}
+		if(!$this->getSsl()){
+			throw new RuntimeException('SSL not set.');
 		}
 		
 		$sslKeyPub = $this->getLocalNode()->getSslKeyPub();
