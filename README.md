@@ -37,6 +37,10 @@ I also like the [Bitmessage](https://bitmessage.org) project. But building think
 	To run PHPChat with an [MUA](https://github.com/TheFox/phpchat/wiki/GUI) interface run
 	
 		./start-mua.sh
+	
+	To run PHPChat only in daemon mode:
+	
+		./start-daemon.sh
 
 ## Contribute
 You're welcome to contribute to this project. Fork this project at <https://github.com/TheFox/phpchat>. You should read GitHub's [How to Fork a Repo](https://help.github.com/articles/fork-a-repo).
