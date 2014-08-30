@@ -1497,7 +1497,8 @@ class Client{
 						$userNickname = $msgData['userNickname'];
 					}
 					
-					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.(int)$status.', '.$userNickname);
+					#$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.(int)$status.', '.$userNickname);
+					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.(int)$status);
 					
 					$request = $this->requestGetByRid($rid);
 					if($request){
@@ -1567,8 +1568,10 @@ class Client{
 						$ignore = $msgData['ignore'];
 					}
 					
-					$debugText = '/'.$rid.'/ /'.$userNickname.'/ '.(int)$ignore.' /'.$text.'/';
-					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$debugText);
+					#$debugText = '/'.$rid.'/ /'.$userNickname.'/ '.(int)$ignore.' /'.$text.'/';
+					#$this->log('debug', $this->getUri().' recv '.$msgName.': '.$debugText);
+					$this->log('debug', $this->getUri().' recv '.$msgName);
+					
 					if(!$ignore){
 						$this->consoleTalkMsgAdd($rid, $userNickname, $text);
 					}
@@ -1605,7 +1608,7 @@ class Client{
 					}
 					
 					if($userNicknameNew){
-						$this->log('debug', $this->getUri().' recv '.$msgName.': '.$userNicknameOld.', '.$userNicknameNew);
+						#$this->log('debug', $this->getUri().' recv '.$msgName.': '.$userNicknameOld.', '.$userNicknameNew);
 						$this->consoleMsgAdd('User "'.$userNicknameOld.'" is now known as "'.$userNicknameNew.'".',
 							true, true, true);
 					}
