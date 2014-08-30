@@ -46,7 +46,7 @@ class Client{
 	private $requests = array();
 	private $actionsId = 0;
 	private $actions = array();
-	private $actionsTime = 0;
+	#private $actionsTime = 0;
 	protected $pingTime = 0;
 	protected $pongTime = 0;
 	
@@ -389,13 +389,13 @@ class Client{
 			}
 		}
 		
-		if(!$this->actionsTime){
+		/*if(!$this->actionsTime){
 			$this->actionsTime = time();
 		}
 		if($this->actionsTime <= time() - static::ACTIONS_INTERVAL){
 			$this->actionsTime = time();
 			$this->log('debug', 'actions left: '.count($this->actions));
-		}
+		}*/
 	}
 	
 	public function checkSslPasswordTimeout(){
