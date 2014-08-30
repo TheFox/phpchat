@@ -376,22 +376,24 @@ class Client{
 	}
 	
 	public function checkSslPasswordTimeout(){
-		if(!$this->sslPasswordTime){
-			$this->sslPasswordTime = time();
-		}
-		if($this->sslPasswordTime < time() - static::SSL_PASSWORD_TTL || $this->sslMsgCount >= static::SSL_PASSWORD_MSG_MAX){
-			#$this->log('debug', 'SSL: password timed out: '.date('H:i:s', $this->sslPasswordTime));
-			#$this->log('debug', 'SSL: msgs count: '.$this->sslMsgCount);
-			
-			$this->sslMsgCount = 0;
-			$this->sslPasswordToken = '';
-			$this->sslPasswordLocalNew = '';
-			$this->sslPasswordPeerNew = '';
-			$this->setStatus('hasReSslPasswortPutInit', true);
-			$this->setStatus('hasReSslPasswortPut', false);
-			$this->setStatus('hasReSslPasswortTest', false);
-			
-			$this->sendSslPasswordReput();
+		if($this->getStatus('hasSsl')){
+			if(!$this->sslPasswordTime){
+				$this->sslPasswordTime = time();
+			}
+			if($this->sslPasswordTime < time() - static::SSL_PASSWORD_TTL || $this->sslMsgCount >= static::SSL_PASSWORD_MSG_MAX){
+				#$this->log('debug', 'SSL: password timed out: '.date('H:i:s', $this->sslPasswordTime));
+				#$this->log('debug', 'SSL: msgs count: '.$this->sslMsgCount);
+				
+				$this->sslMsgCount = 0;
+				$this->sslPasswordToken = '';
+				$this->sslPasswordLocalNew = '';
+				$this->sslPasswordPeerNew = '';
+				$this->setStatus('hasReSslPasswortPutInit', true);
+				$this->setStatus('hasReSslPasswortPut', false);
+				$this->setStatus('hasReSslPasswortTest', false);
+				
+				$this->sendSslPasswordReput();
+			}
 		}
 	}
 	
