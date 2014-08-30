@@ -8,4 +8,5 @@ cd $SCRIPT_BASEDIR
 php bootstrap.php
 ./application.php kernel -d
 ./application.php cronjob -d
-./application.php console
+./application.php imap -a 127.0.0.1 -p 21143 -d
+./application.php smtp -a 127.0.0.1 -p 21025 -d
