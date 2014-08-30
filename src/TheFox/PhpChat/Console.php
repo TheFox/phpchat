@@ -1254,7 +1254,9 @@ class Console extends Thread{
 	public function ipcKernelShutdown(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
-		$this->log->info('Connection to kernel process closed.');
+		#$this->log->info('Connection to kernel process closed.');
+		$this->msgAdd('Connection to kernel process closed.', true, true);
+		
 		$this->setExit(1);
 		$this->ipcKernelShutdown = true;
 		
