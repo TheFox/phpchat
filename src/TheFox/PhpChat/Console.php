@@ -1223,7 +1223,9 @@ class Console extends Thread{
 	
 	public function shutdown(){
 		#print __CLASS__.'->'.__FUNCTION__.': '.(int)$this->ipcKernelShutdown."\n";
+		print PHP_EOL;
 		$this->getLog()->info('shutdown');
+		#$this->msgAdd('Shutting down...', true, true);
 		
 		if($this->getModeChannel()){
 			$this->talkCloseSend();
@@ -1255,7 +1257,7 @@ class Console extends Thread{
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		#$this->log->info('Connection to kernel process closed.');
-		$this->msgAdd('Connection to kernel process closed.', true, true);
+		#$this->msgAdd('Connection to kernel process closed.', true, true);
 		
 		$this->setExit(1);
 		$this->ipcKernelShutdown = true;
