@@ -22,8 +22,8 @@ foreach(array(
 	new InfoCommand(),
 	new ImapCommand(),
 	new SmtpCommand(),
-) as $obj){
-	$obj->setSettings($settings);
-	$application->add($obj);
+) as $command){
+	$command->setSettings($settings);
+	$application->add($command);
 }
 $application->run();
