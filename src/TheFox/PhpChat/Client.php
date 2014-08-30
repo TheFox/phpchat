@@ -24,6 +24,7 @@ class Client{
 	const HASHCASH_EXPIRATION = 172800; // 2 days
 	const SSL_PASSWORD_TTL = 300;
 	const SSL_PASSWORD_MSG_MAX = 100;
+	const ACTIONS_INTERVAL = 30;
 	
 	protected $id = 0;
 	private $status = array();
@@ -45,6 +46,7 @@ class Client{
 	private $requests = array();
 	private $actionsId = 0;
 	private $actions = array();
+	private $actionsTime = 0;
 	protected $pingTime = 0;
 	protected $pongTime = 0;
 	
@@ -324,6 +326,15 @@ class Client{
 		}
 	}
 	
+	public function actionsExecute($criterion){
+		$actions = $this->actionsGetByCriterion($criterion);
+		foreach($actions as $actionId => $action){
+			$this->log('debug', 'action execute: '.$criterion);
+			$this->actionRemove($action);
+			$action->functionExec($this);
+		}
+	}
+	
 	public function actionAdd(ClientAction $action){
 		$this->actionsId++;
 		
@@ -352,15 +363,6 @@ class Client{
 		return null;
 	}
 	
-	public function actionExecute($criterion){
-		$action = $this->actionGetByCriterion($criterion);
-		if($action){
-			$this->log('debug', 'action execute: '.$criterion);
-			$this->actionRemove($action);
-			$action->functionExec($this);
-		}
-	}
-	
 	public function actionRemove(ClientAction $action){
 		#print __CLASS__.'->'.__FUNCTION__.': '.$action->getId()."\n";
 		unset($this->actions[$action->getId()]);
@@ -381,6 +383,14 @@ class Client{
 				$this->actionRemove($action);
 				$action->functionExec($this);
 			}
+		}
+		
+		if(!$this->actionsTime){
+			$this->actionsTime = time();
+		}
+		if($this->actionsTime <= time() - static::ACTIONS_INTERVAL){
+			$this->actionsTime = time();
+			$this->log('debug', 'actions left: '.count($this->actions));
 		}
 	}
 	
@@ -459,7 +469,7 @@ class Client{
 			}
 			
 			$this->log('debug', 'action execute: CRITERION_AFTER_HELLO');
-			$this->actionExecute(ClientAction::CRITERION_AFTER_HELLO);
+			$this->actionsExecute(ClientAction::CRITERION_AFTER_HELLO);
 			
 			$msgHandleReturnValue .= $this->sendId();
 		}
@@ -620,7 +630,7 @@ class Client{
 			$this->log('debug', $this->getUri().' recv '.$msgName);
 			
 			$this->log('debug', 'action execute: CRITERION_AFTER_ID_SUCCESSFULL');
-			$this->actionExecute(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
+			$this->actionsExecute(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
 			
 			if($this->getStatus('isChannelPeer')){
 				$this->consoleMsgAdd('New incoming channel connection from '.$this->getUri().'.', true, true, true);
@@ -1038,7 +1048,7 @@ class Client{
 					}
 					
 					$this->log('debug', 'action execute: CRITERION_AFTER_MSG_RESPONSE_SUCCESSFULL');
-					$this->actionExecute(ClientAction::CRITERION_AFTER_MSG_RESPONSE_SUCCESSFULL);
+					$this->actionsExecute(ClientAction::CRITERION_AFTER_MSG_RESPONSE_SUCCESSFULL);
 				}
 				else{
 					$msgHandleReturnValue .= $this->sendError(9000, $msgName);
@@ -1049,7 +1059,7 @@ class Client{
 			}
 			
 			$this->log('debug', 'action execute: CRITERION_AFTER_MSG_RESPONSE');
-			$this->actionExecute(ClientAction::CRITERION_AFTER_MSG_RESPONSE);
+			$this->actionsExecute(ClientAction::CRITERION_AFTER_MSG_RESPONSE);
 		}
 		
 		elseif($msgName == 'ssl_init'){
@@ -1343,7 +1353,7 @@ class Client{
 							$this->setStatus('hasSsl', true);
 							
 							$this->log('debug', 'action execute: CRITERION_AFTER_HAS_SSL');
-							$this->actionExecute(ClientAction::CRITERION_AFTER_HAS_SSL);
+							$this->actionsExecute(ClientAction::CRITERION_AFTER_HAS_SSL);
 						}
 						else{
 							$msgHandleReturnValue .= $this->sendError(2090, $msgName);
@@ -1390,7 +1400,7 @@ class Client{
 							$this->sslPasswordPeerCurrent = $this->sslPasswordPeerNew;
 							
 							$this->log('debug', 'action execute: CRITERION_AFTER_HAS_RESSL');
-							$this->actionExecute(ClientAction::CRITERION_AFTER_HAS_RESSL);
+							$this->actionsExecute(ClientAction::CRITERION_AFTER_HAS_RESSL);
 						}
 						else{
 							$msgHandleReturnValue .= $this->sendError(2090, $msgName);
