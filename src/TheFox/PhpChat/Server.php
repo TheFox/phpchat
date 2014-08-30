@@ -257,21 +257,10 @@ class Server{
 		$client->setId($this->clientsId);
 		$client->setServer($this);
 		
-		// Network Bootstrap
-		if($this->getSettings()->data['firstRun'] && !$this->getHasDhtNetworkBootstrapped()){
-			$this->setHasDhtNetworkBootstrapped(true);
-			
-			$this->log->debug('dht network bootstrap');
-			
-			$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
-			$action->functionSet(function($action, $client){
-				$client->sendNodeFind($client->getLocalNode()->getIdHexStr());
-			});
-			$client->actionAdd($action);
-		}
-		
 		$this->clients[$this->clientsId] = $client;
 		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.count($this->clients)."\n");
+		
+		$this->networkBootstrap($client);
 		
 		return $client;
 	}
@@ -473,6 +462,21 @@ class Server{
 				
 				$this->connect($node->getUri(), $clientActions);
 			}
+		}
+	}
+	
+	public function networkBootstrap($client){
+		// Network Bootstrap
+		if($this->getSettings()->data['firstRun'] && !$this->getHasDhtNetworkBootstrapped()){
+			$this->setHasDhtNetworkBootstrapped(true);
+			
+			$this->log->debug('dht network bootstrap');
+			
+			$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
+			$action->functionSet(function($action, $client){
+				$client->sendNodeFind($client->getLocalNode()->getIdHexStr());
+			});
+			$client->actionAdd($action);
 		}
 	}
 	
