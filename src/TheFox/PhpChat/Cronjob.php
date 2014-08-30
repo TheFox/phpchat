@@ -7,7 +7,7 @@ use RuntimeException;
 
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler as LoggerStreamHandler;
-use TheFox\Ipc\ConnectionClient;
+use TheFox\Ipc\ClientConnection;
 use TheFox\Ipc\StreamHandler as IpcStreamHandler;
 use TheFox\Dht\Kademlia\Node;
 
@@ -68,7 +68,7 @@ class Cronjob extends Thread{
 		$this->log->info('init');
 		
 		usleep(100000); // Let the kernel start up.
-		$this->ipcKernelConnection = new ConnectionClient();
+		$this->ipcKernelConnection = new ClientConnection();
 		$this->ipcKernelConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20001));
 		$this->ipcKernelConnection->functionAdd('shutdown', $this, 'ipcKernelShutdown');
 		$this->ipcKernelConnection->functionAdd('msgDbInit', $this, 'msgDbInit');

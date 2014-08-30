@@ -2,12 +2,12 @@
 
 namespace TheFox\Ipc;
 
-class ConnectionClient extends Connection{
+class ServerConnection extends Connection{
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
-		$this->isServer(false);
+		$this->isServer(true);
 	}
 	
 }

@@ -6,7 +6,7 @@ use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler as LoggerStreamHandler;
 use TheFox\Dht\Simple\Table;
 use TheFox\Dht\Kademlia\Node;
-use TheFox\Ipc\ConnectionServer;
+use TheFox\Ipc\ServerConnection;
 use TheFox\Ipc\StreamHandler as IpcStreamHandler;
 use TheFox\Pow\HashcashDb;
 
@@ -140,7 +140,7 @@ class Kernel extends Thread{
 		
 		// Console Connection
 		$this->getLog()->info('setup console connection');
-		$this->ipcConsoleConnection = new ConnectionServer();
+		$this->ipcConsoleConnection = new ServerConnection();
 		$this->ipcConsoleConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20000));
 		$this->ipcConsoleConnection->functionAdd('shutdown', $this, 'ipcConsoleShutdown');
 		foreach(array(
@@ -157,7 +157,7 @@ class Kernel extends Thread{
 		
 		// Cronjob Connection
 		$this->getLog()->info('setup cronjob connection');
-		$this->ipcCronjobConnection = new ConnectionServer();
+		$this->ipcCronjobConnection = new ServerConnection();
 		$this->ipcCronjobConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20001));
 		foreach(array(
 			'getSettings', 'getLocalNode',
@@ -174,7 +174,7 @@ class Kernel extends Thread{
 		
 		// IMAP Server Connection
 		$this->getLog()->info('setup IPC IMAP server connection');
-		$this->ipcImapServerConnection = new ConnectionServer();
+		$this->ipcImapServerConnection = new ServerConnection();
 		$this->ipcImapServerConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20002));
 		foreach(array(
 			'getSettings'
@@ -185,7 +185,7 @@ class Kernel extends Thread{
 		
 		// SMTP Server Connection
 		$this->getLog()->info('setup IPC SMTP server connection');
-		$this->ipcSmtpServerConnection = new ConnectionServer();
+		$this->ipcSmtpServerConnection = new ServerConnection();
 		$this->ipcSmtpServerConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20003));
 		foreach(array(
 			'getSettings', 'getTable', 'msgDbMsgAdd'
@@ -196,7 +196,7 @@ class Kernel extends Thread{
 		
 		// Info Connection
 		$this->getLog()->info('setup info connection');
-		$this->ipcInfoConnection = new ConnectionServer();
+		$this->ipcInfoConnection = new ServerConnection();
 		$this->ipcInfoConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20004));
 		foreach(array(
 			'serverClientsInfo'

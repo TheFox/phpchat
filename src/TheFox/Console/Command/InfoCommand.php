@@ -12,7 +12,7 @@ use Colors\Color;
 use TheFox\PhpChat\PhpChat;
 use TheFox\PhpChat\Console;
 use TheFox\Dht\Kademlia\Node;
-use TheFox\Ipc\ConnectionClient;
+use TheFox\Ipc\ClientConnection;
 use TheFox\Ipc\StreamHandler as IpcStreamHandler;
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler;
@@ -44,7 +44,7 @@ class InfoCommand extends BasicCommand{
 	private function initIpcKernelConnection(){
 		usleep(100000); // Let the kernel start up.
 		
-		$this->ipcKernelConnection = new ConnectionClient();
+		$this->ipcKernelConnection = new ClientConnection();
 		$this->ipcKernelConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20004));
 		$this->ipcKernelConnection->functionAdd('shutdown', $this, 'ipcKernelShutdown');
 		foreach(array(

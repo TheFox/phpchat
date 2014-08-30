@@ -13,7 +13,7 @@ use Zend\Uri\UriFactory;
 
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler as LoggerStreamHandler;
-use TheFox\Ipc\ConnectionClient;
+use TheFox\Ipc\ClientConnection;
 use TheFox\Ipc\StreamHandler as IpcStreamHandler;
 use TheFox\Dht\Kademlia\Node;
 use TheFox\Storage\YamlStorage;
@@ -220,7 +220,7 @@ class Console extends Thread{
 	}
 	
 	private function initIpcKernelConnection(){
-		$this->ipcKernelConnection = new ConnectionClient();
+		$this->ipcKernelConnection = new ClientConnection();
 		$this->ipcKernelConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20000));
 		$this->ipcKernelConnection->functionAdd('shutdown', $this, 'ipcKernelShutdown');
 		foreach(array(

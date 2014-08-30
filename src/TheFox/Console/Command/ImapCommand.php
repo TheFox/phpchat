@@ -12,7 +12,7 @@ use Zend\Mail\Headers;
 
 use TheFox\Imap\Server;
 use TheFox\Imap\Event;
-use TheFox\Ipc\ConnectionClient;
+use TheFox\Ipc\ClientConnection;
 use TheFox\Ipc\StreamHandler as IpcStreamHandler;
 
 class ImapCommand extends BasicCommand{
@@ -46,7 +46,7 @@ class ImapCommand extends BasicCommand{
 	private function initIpcKernelConnection(){
 		usleep(100000); // Let the kernel start up.
 		
-		$this->ipcKernelConnection = new ConnectionClient();
+		$this->ipcKernelConnection = new ClientConnection();
 		$this->ipcKernelConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20002));
 		$this->ipcKernelConnection->functionAdd('shutdown', $this, 'ipcKernelShutdown');
 		foreach(array(

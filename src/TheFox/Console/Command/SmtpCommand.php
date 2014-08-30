@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use TheFox\Smtp\Server;
 use TheFox\Smtp\Event;
-use TheFox\Ipc\ConnectionClient;
+use TheFox\Ipc\ClientConnection;
 use TheFox\Ipc\StreamHandler as IpcStreamHandler;
 use TheFox\PhpChat\Msg;
 use TheFox\Dht\Kademlia\Node;
@@ -48,7 +48,7 @@ class SmtpCommand extends BasicCommand{
 	private function initIpcKernelConnection(){
 		usleep(100000); // Let the kernel start up.
 		
-		$this->ipcKernelConnection = new ConnectionClient();
+		$this->ipcKernelConnection = new ClientConnection();
 		$this->ipcKernelConnection->setHandler(new IpcStreamHandler('127.0.0.1', 20003));
 		$this->ipcKernelConnection->functionAdd('shutdown', $this, 'ipcKernelShutdown');
 		foreach(array(
