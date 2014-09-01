@@ -1223,7 +1223,7 @@ class Console extends Thread{
 	
 	public function shutdown(){
 		#print __CLASS__.'->'.__FUNCTION__.': '.(int)$this->ipcKernelShutdown."\n";
-		print PHP_EOL;
+		fwrite(STDOUT, PHP_EOL);
 		$this->getLog()->info('shutdown');
 		#$this->msgAdd('Shutting down...', true, true);
 		
