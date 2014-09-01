@@ -331,7 +331,8 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$cronjobMsgs = $cronjob->getMsgDb()->getMsgs();
 		
 		#foreach($cronjobMsgs as $msgId => $msg){
-		#	fwrite(STDOUT, __METHOD__.' cronjobMsgs: '.$msg->getId().', '.$msg->getStatus().', '.$msg->getEncryptionMode().PHP_EOL);
+		#	$logOut = $msg->getId().', '.$msg->getStatus().', '.$msg->getEncryptionMode();
+		#	fwrite(STDOUT, __METHOD__.' cronjobMsgs: '.$logOut.PHP_EOL);
 		#}
 		
 		$this->assertEquals(12, count($cronjobMsgs));
@@ -366,8 +367,10 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$updateMsgs = $cronjob->msgDbSendAll();
 		
 		/*foreach($updateMsgs as $msgId => $msg){
-			#fwrite(STDOUT, __METHOD__.': '.$msgId.', '.$msg->getStatus().', '.$msg->getEncryptionMode().PHP_EOL);
-			fwrite(STDOUT, __METHOD__.' update msg: /'.$msg['obj']->getId().'/ /'.$msg['obj']->getStatus().'/ /'.$msg['obj']->getEncryptionMode().'/'.' '.count($msg['nodes']).PHP_EOL);
+			$logOut = '/'.$msg['obj']->getId().'/';
+			$logOut .= ' /'.$msg['obj']->getStatus().'/';
+			$logOut .= ' /'.$msg['obj']->getEncryptionMode().'/'.' '.count($msg['nodes']);
+			fwrite(STDOUT, __METHOD__.' update msg: '.$logOut.PHP_EOL);
 			#ve($msg['nodes']);
 		}*/
 		

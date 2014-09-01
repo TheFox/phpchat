@@ -333,7 +333,7 @@ class Client{
 		
 		$this->log('debug', 'actions execute: '.count($actions));
 		foreach($actions as $actionId => $action){
-			$this->log('debug', 'action execute: '.$criterion);
+			#$this->log('debug', 'action execute: '.$criterion);
 			$this->actionRemove($action);
 			$action->functionExec($this);
 		}
@@ -474,7 +474,7 @@ class Client{
 				}
 			}
 			
-			$this->log('debug', 'action execute: CRITERION_AFTER_HELLO');
+			#$this->log('debug', 'action execute: CRITERION_AFTER_HELLO');
 			$this->actionsExecute(ClientAction::CRITERION_AFTER_HELLO);
 			
 			$msgHandleReturnValue .= $this->sendId();
@@ -642,7 +642,7 @@ class Client{
 		elseif($msgName == 'id_ok'){
 			$this->log('debug', $this->getUri().' recv '.$msgName);
 			
-			$this->log('debug', 'action execute: CRITERION_AFTER_ID_SUCCESSFULL');
+			#$this->log('debug', 'action execute: CRITERION_AFTER_ID_SUCCESSFULL');
 			$this->actionsExecute(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
 			
 			if($this->getStatus('isChannelPeer')){
@@ -1060,7 +1060,7 @@ class Client{
 						$msg->setStatus('D');
 					}
 					
-					$this->log('debug', 'action execute: CRITERION_AFTER_MSG_RESPONSE_SUCCESSFULL');
+					#$this->log('debug', 'action execute: CRITERION_AFTER_MSG_RESPONSE_SUCCESSFULL');
 					$this->actionsExecute(ClientAction::CRITERION_AFTER_MSG_RESPONSE_SUCCESSFULL);
 				}
 				else{
@@ -1071,7 +1071,7 @@ class Client{
 				$msgHandleReturnValue .= $this->sendError(1000, $msgName);
 			}
 			
-			$this->log('debug', 'action execute: CRITERION_AFTER_MSG_RESPONSE');
+			#$this->log('debug', 'action execute: CRITERION_AFTER_MSG_RESPONSE');
 			$this->actionsExecute(ClientAction::CRITERION_AFTER_MSG_RESPONSE);
 		}
 		
@@ -1365,7 +1365,7 @@ class Client{
 							
 							$this->setStatus('hasSsl', true);
 							
-							$this->log('debug', 'action execute: CRITERION_AFTER_HAS_SSL');
+							#$this->log('debug', 'action execute: CRITERION_AFTER_HAS_SSL');
 							$this->actionsExecute(ClientAction::CRITERION_AFTER_HAS_SSL);
 						}
 						else{
@@ -1412,7 +1412,7 @@ class Client{
 							$this->sslPasswordLocalCurrent = $this->sslPasswordLocalNew;
 							$this->sslPasswordPeerCurrent = $this->sslPasswordPeerNew;
 							
-							$this->log('debug', 'action execute: CRITERION_AFTER_HAS_RESSL');
+							#$this->log('debug', 'action execute: CRITERION_AFTER_HAS_RESSL');
 							$this->actionsExecute(ClientAction::CRITERION_AFTER_HAS_RESSL);
 						}
 						else{
