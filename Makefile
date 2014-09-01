@@ -56,9 +56,10 @@ clean_nodes:
 	$(RM) data/addressbook.yml
 
 clean_data:
+	$(RM) data/*
 	$(RM) data
 
-clean_all: clean clean_nodes clean_data
+clean_all: clean clean_data
 	$(CHMOD) 600 id_rsa.prv id_rsa.pub
 	$(RM) id_rsa.prv id_rsa.pub
 	$(RM) settings.yml
