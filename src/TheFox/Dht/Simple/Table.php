@@ -115,9 +115,12 @@ class Table extends YamlStorage{
 	}
 	
 	public function nodeFindByUri($uri){
-		foreach($this->nodes as $nodeId => $node){
-			if((string)$node->getUri() == (string)$uri){
-				return $node;
+		$uri = (string)$uri;
+		if($uri){
+			foreach($this->nodes as $nodeId => $node){
+				if((string)$node->getUri() == $uri){
+					return $node;
+				}
 			}
 		}
 		
@@ -148,7 +151,7 @@ class Table extends YamlStorage{
 	}
 	
 	public function nodeEnclose(Node $node){
-		#fwrite(STDOUT, __FUNCTION__.''."\n");
+		#fwrite(STDOUT, __FUNCTION__.': '.$node."\n");
 		
 		if(!$this->getLocalNode()){
 			throw new RuntimeException('localNode not set.');
@@ -157,8 +160,19 @@ class Table extends YamlStorage{
 		$returnNode = $node;
 		
 		if(! $this->getLocalNode()->isEqual($node)){
+			$found = false;
 			$onode = $this->nodeFind($node);
 			if($onode){
+				$found = true;
+			}
+			if(!$found){
+				$onode = $this->nodeFindByUri($node->getUri());
+				if($onode){
+					$found = true;
+				}
+			}
+			
+			if($found){
 				$onode->update($node);
 				$returnNode = $onode;
 			}

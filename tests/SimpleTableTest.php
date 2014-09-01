@@ -566,6 +566,41 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$this->clean();
 	}
 	
+	public function testNodeEnclose5(){
+		$localNode = new Node();
+		$localNode->setIdHexStr('11000001-2002-4004-8008-100000000006');
+		
+		$table = new Table('tests/testfile_table.yml');
+		$table->setDatadirBasePath('tests');
+		$table->setLocalNode($localNode);
+		
+		$node0 = new Node();
+		$node0->setIdHexStr('11000001-2002-4004-8008-100000000000');
+		$node0->setUri('tcp://192.168.241.1:25000');
+		
+		$node1 = new Node();
+		$node1->setIdHexStr('11000001-2002-4004-8008-100000000001');
+		$node1->setUri('tcp://192.168.241.2:25000');
+		
+		$node10 = new Node();
+		$node10->setUri('tcp://192.168.241.1:25000');
+		
+		$node20 = new Node();
+		$node20->setIdHexStr('11000001-2002-4004-8008-100000000000');
+		
+		
+		$table->nodeEnclose($node0);
+		$table->nodeEnclose($node1);
+		
+		$node = $table->nodeEnclose($node10);
+		$this->assertEquals('11000001-2002-4004-8008-100000000000', $node->getIdHexStr());
+		$this->assertEquals('tcp://192.168.241.1:25000', (string)$node->getUri());
+		
+		$node = $table->nodeEnclose($node20);
+		$this->assertEquals('11000001-2002-4004-8008-100000000000', $node->getIdHexStr());
+		$this->assertEquals('tcp://192.168.241.1:25000', (string)$node->getUri());
+	}
+	
 	private function clean(){
 		@unlink('tests/testfile_table.yml');
 		@unlink('tests/bucket_root.yml');

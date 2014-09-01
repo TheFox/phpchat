@@ -49,7 +49,12 @@ class Node extends YamlStorage{
 	}
 	
 	public function __toString(){
-		return __CLASS__.'->{'.$this->getIdHexStr().'}';
+		if($this->getIdHexStr() != '00000000-0000-4000-8000-000000000000'){
+			return __CLASS__.'->{ID:'.$this->getIdHexStr().'}';
+		}
+		if((string)$this->getUri()){
+			return __CLASS__.'->{URI:'.$this->getUri().'}';
+		}
 	}
 	
 	public function save(){
@@ -94,21 +99,25 @@ class Node extends YamlStorage{
 	}
 	
 	public function setIdHexStr($id){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		$id = strtolower($id);
-		$this->id = array_fill(0, static::ID_LEN_BYTE, 0);
+		#fwrite(STDOUT, __FUNCTION__.''."\n");
+		#fwrite(STDOUT, __FUNCTION__.': '.$id."\n");
+		#ve(isset($id) ? $id : null);
 		
-		if(Uuid::isValid($id)){
-			#print __CLASS__.'->'.__FUNCTION__.': check valid UUID'."\n";
-			$this->data['id'] = $id;
+		if($id){
+			$id = strtolower($id);
+			$this->id = array_fill(0, static::ID_LEN_BYTE, 0);
 			
-			$id = str_replace('-', '', $id);
-			for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
-				$this->id[$idPos] = hexdec(substr($id, 0, 2));
-				$id = substr($id, 2);
+			if(Uuid::isValid($id)){
+				#print __CLASS__.'->'.__FUNCTION__.': check valid UUID'."\n";
+				$this->data['id'] = $id;
+				
+				$id = str_replace('-', '', $id);
+				for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
+					$this->id[$idPos] = hexdec(substr($id, 0, 2));
+					$id = substr($id, 2);
+				}
 			}
 		}
-		
 		#ve($this->id);
 		#else{ print __CLASS__.'->'.__FUNCTION__.': check valid UUID FAILED: '.$id."\n"; }
 	}
