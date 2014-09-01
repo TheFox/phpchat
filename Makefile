@@ -4,11 +4,12 @@ MKDIR = mkdir -p
 GZIP = gzip
 MV = mv -i
 CP = cp -rp
+CHMOD = chmod
 PHPCS = vendor/bin/phpcs
 PHPUNIT = vendor/bin/phpunit
 
 
-.PHONY: all install tests test_phpcs test_phpunit test_clean release clean
+.PHONY: all install tests test_phpcs test_phpunit test_clean release clean clean_nodes clean_data clean_all
 
 all: install tests
 
@@ -47,3 +48,17 @@ clean: test_clean
 	$(RM) composer.lock composer.phar
 	$(RM) vendor/*
 	$(RM) vendor
+
+clean_nodes:
+	$(RM) data/table.yml
+	$(RM) data/node_*.yml
+	$(RM) data/nodesnewdb.yml
+	$(RM) data/addressbook.yml
+
+clean_data:
+	$(RM) data
+
+clean_all: clean clean_nodes clean_data
+	$(CHMOD) 600 id_rsa.prv id_rsa.pub
+	$(RM) id_rsa.prv id_rsa.pub
+	$(RM) settings.yml
