@@ -527,7 +527,7 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$files = $finder->in('tests')->depth(0)->name('node_*.yml');
 		$this->assertEquals(9, count($files));
 		
-		#$this->clean();
+		$this->clean();
 	}
 	
 	public function testNodeEnclose4(){

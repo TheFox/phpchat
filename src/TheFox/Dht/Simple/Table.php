@@ -189,11 +189,6 @@ class Table extends YamlStorage{
 	public function nodesClean(){
 		$this->nodesSort();
 		
-		#fwrite(STDOUT, 'nodes clean'.PHP_EOL);
-		
-		# TODO: remove nodes which are not connectable.
-		#       or which are not connected for a longer time
-		
 		foreach($this->nodes as $nodeId => $node){
 			#fwrite(STDOUT, 'node delete: '.(time() - $node->getTimeCreated()).' '.(time() - $node->getTimeLastSeen()).' '.PHP_EOL);
 			if(
@@ -214,7 +209,6 @@ class Table extends YamlStorage{
 				$this->nodeRemove($node);
 			}
 		}
-		
 	}
 	
 	private function nodeRemove(Node $node){
