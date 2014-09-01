@@ -195,7 +195,7 @@ class Server{
 					$socket = $this->socket->accept();
 					if($socket){
 						$client = $this->clientNewTcp($socket);
-						
+						$client->setStatus('isInbound', true);
 						$client->sendHello();
 						
 						$this->log->debug('new client: '.$client->getUri());
@@ -337,6 +337,8 @@ class Server{
 				
 				'isChannelPeer' => $client->getStatus('isChannelPeer'),
 				'isChannelLocal' => $client->getStatus('isChannelLocal'),
+				'isOutbound' => $client->getStatus('isOutbound'),
+				'isInbound' => $client->getStatus('isInbound'),
 			);
 		}
 		
@@ -348,8 +350,14 @@ class Server{
 	public function connect($uri, $clientActions = array()){
 		$this->log->debug('connect: '.$uri);
 		
-		foreach($clientActions as $clientActionId => $clientAction){
+		/*foreach($clientActions as $clientActionId => $clientAction){
 			$this->log->debug('connect action: '.join(', ', $clientAction->getCriteria()));
+		}*/
+		
+		$onode = $this->getTable()->nodeFindByUri($uri);
+		if($onode){
+			$this->log->debug('connect '.$uri.': '.$onode->getIdHexStr());
+			$onode->incConnectionsOutboundAttempts();
 		}
 		
 		try{
@@ -360,6 +368,7 @@ class Server{
 						$socket = new Socket();
 						$connected = $socket->connect($uri->getHost(), $uri->getPort());
 						$client = $this->clientNewTcp($socket);
+						$client->setStatus('isOutbound', true);
 					}
 					if($connected){
 						$client->actionsAdd($clientActions);

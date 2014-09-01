@@ -430,6 +430,106 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$this->clean();
 	}
 	
+	public function testNodeEnclose3c(){
+		Table::$NODE_CONNECTIONS_OUTBOUND_ATTEMPTS_MAX = 4;
+		
+		$localNode = new Node();
+		$localNode->setIdHexStr('11000001-2002-4004-8008-100000000006');
+		
+		$table = new Table('tests/testfile_table.yml');
+		$table->setDatadirBasePath('tests');
+		$table->setLocalNode($localNode);
+		#$table->load();
+		
+		$node = new Node();
+		$node->setIdHexStr('11000001-2002-4004-8008-100000000000');
+		$node->setConnectionsOutboundAttempts(0);
+		$node->setConnectionsOutboundSucceed(0);
+		$node->setConnectionsInboundSucceed(0);
+		$table->nodeEnclose($node);
+		
+		$node = new Node();
+		$node->setIdHexStr('11000001-2002-4004-8008-100000000001');
+		$node->setConnectionsOutboundAttempts(1);
+		$node->setConnectionsOutboundSucceed(0);
+		$node->setConnectionsInboundSucceed(0);
+		$table->nodeEnclose($node);
+		
+		$node = new Node();
+		$node->setIdHexStr('11000001-2002-4004-8008-100000000002');
+		$node->setConnectionsOutboundAttempts(2);
+		$node->setConnectionsOutboundSucceed(1);
+		$node->setConnectionsInboundSucceed(0);
+		$table->nodeEnclose($node);
+		
+		$node = new Node();
+		$node->setIdHexStr('11000001-2002-4004-8008-100000000003');
+		$node->setConnectionsOutboundAttempts(3);
+		$node->setConnectionsOutboundSucceed(1);
+		$node->setConnectionsInboundSucceed(1);
+		$table->nodeEnclose($node);
+		
+		$node = new Node();
+		$node->setIdHexStr('11000001-2002-4004-8008-100000000004');
+		$node->setConnectionsOutboundAttempts(7);
+		$node->setConnectionsOutboundSucceed(0);
+		$node->setConnectionsInboundSucceed(0);
+		$table->nodeEnclose($node);
+		
+		$node = new Node();
+		$node->setIdHexStr('11000001-2002-4004-8008-100000000005');
+		$node->setConnectionsOutboundAttempts(7);
+		$node->setConnectionsOutboundSucceed(2);
+		$node->setConnectionsInboundSucceed(0);
+		$table->nodeEnclose($node);
+		
+		$node = new Node();
+		$node->setIdHexStr('11000001-2002-4004-8008-100000000006');
+		$node->setConnectionsOutboundAttempts(1);
+		$node->setConnectionsOutboundSucceed(0);
+		$node->setConnectionsInboundSucceed(7);
+		$table->nodeEnclose($node);
+		
+		$node = new Node();
+		$node->setIdHexStr('11000001-2002-4004-8008-100000000007');
+		$node->setConnectionsOutboundAttempts(7);
+		$node->setConnectionsOutboundSucceed(0);
+		$node->setConnectionsInboundSucceed(7);
+		$table->nodeEnclose($node);
+		
+		$node = new Node();
+		$node->setIdHexStr('11000001-2002-4004-8008-100000000008');
+		$node->setConnectionsOutboundAttempts(7);
+		$node->setConnectionsOutboundSucceed(7);
+		$node->setConnectionsInboundSucceed(7);
+		$table->nodeEnclose($node);
+		
+		$node = new Node();
+		$node->setIdHexStr('11000001-2002-4004-8008-100000000009');
+		$node->setConnectionsOutboundAttempts(0);
+		$node->setConnectionsOutboundSucceed(0);
+		$node->setConnectionsInboundSucceed(1);
+		$table->nodeEnclose($node);
+		
+		$node = new Node();
+		$node->setIdHexStr('11000001-2002-4004-8008-100000000010');
+		$node->setConnectionsOutboundAttempts(0);
+		$node->setConnectionsOutboundSucceed(0);
+		$node->setConnectionsInboundSucceed(7);
+		$table->nodeEnclose($node);
+		
+		
+		
+		$table->nodesClean();
+		$table->save();
+		
+		$finder = new Finder();
+		$files = $finder->in('tests')->depth(0)->name('node_*.yml');
+		$this->assertEquals(9, count($files));
+		
+		#$this->clean();
+	}
+	
 	public function testNodeEnclose4(){
 		$NODES = 100;
 		Table::$NODES_MAX = 50;

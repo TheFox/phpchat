@@ -63,6 +63,8 @@ class Client{
 		
 		$this->status['isChannelLocal'] = false;
 		$this->status['isChannelPeer'] = false;
+		$this->status['isOutbound'] = false;
+		$this->status['isInbound'] = false;
 		
 		$this->resetStatusSsl();
 	}
@@ -610,6 +612,13 @@ class Client{
 					if($idOk){
 						$this->setStatus('hasId', true);
 						$this->setNode($node);
+						
+						if($this->getStatus('isOutbound')){
+							$this->getNode()->incConnectionsOutboundSucceed();
+						}
+						if($this->getStatus('isInbound')){
+							$this->getNode()->incConnectionsInboundSucceed();
+						}
 						
 						$msgHandleReturnValue .= $this->sendIdOk();
 						

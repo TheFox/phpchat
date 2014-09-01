@@ -14,6 +14,7 @@ class Table extends YamlStorage{
 	
 	static $NODES_MAX = 5000;
 	static $NODE_TTL = 1209600; // 14 days
+	static $NODE_CONNECTIONS_OUTBOUND_ATTEMPTS_MAX = 100;
 	
 	private $localNode = null;
 	private $nodes = array();
@@ -198,6 +199,9 @@ class Table extends YamlStorage{
 			if(
 				$node->getTimeCreated() <= time() - static::$NODE_TTL && !$node->getTimeLastSeen()
 				|| $node->getTimeLastSeen() && $node->getTimeLastSeen() <= time() - static::$NODE_TTL
+				|| $node->getConnectionsOutboundAttempts() >= static::$NODE_CONNECTIONS_OUTBOUND_ATTEMPTS_MAX
+					&& $node->getConnectionsOutboundSucceed() == 0
+					&& $node->getConnectionsInboundSucceed() == 0
 			){
 				$this->nodeRemove($node);
 			}

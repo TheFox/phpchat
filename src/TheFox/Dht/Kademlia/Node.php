@@ -34,6 +34,10 @@ class Node extends YamlStorage{
 		$this->data['sslKeyPubFingerprint'] = '';
 		$this->data['sslKeyPubStatus'] = 'U';
 		$this->data['distance'] = null;
+		$this->data['connectionsOutboundSucceed'] = 0;
+		$this->data['connectionsOutboundAttempts'] = 0;
+		$this->data['connectionsInboundSucceed'] = 0;
+		#$this->data['connectionsInboundAttempts'] = 0;
 		$this->data['timeCreated'] = time();
 		$this->data['timeLastSeen'] = 0;
 		
@@ -251,6 +255,58 @@ class Node extends YamlStorage{
 		#return $this->distance;
 	}
 	
+	public function setConnectionsOutboundSucceed($connectionsOutboundSucceed){
+		$this->data['connectionsOutboundSucceed'] = $connectionsOutboundSucceed;
+	}
+	
+	public function getConnectionsOutboundSucceed(){
+		return $this->data['connectionsOutboundSucceed'];
+	}
+	
+	public function incConnectionsOutboundSucceed($inc = 1){
+		$this->data['connectionsOutboundSucceed'] += $inc;
+		$this->setDataChanged(true);
+	}
+	
+	public function setConnectionsOutboundAttempts($connectionsOutboundAttempts){
+		$this->data['connectionsOutboundAttempts'] = $connectionsOutboundAttempts;
+	}
+	
+	public function getConnectionsOutboundAttempts(){
+		return $this->data['connectionsOutboundAttempts'];
+	}
+	
+	public function incConnectionsOutboundAttempts($inc = 1){
+		$this->data['connectionsOutboundAttempts'] += $inc;
+		$this->setDataChanged(true);
+	}
+	
+	public function setConnectionsInboundSucceed($connectionsInboundSucceed){
+		$this->data['connectionsInboundSucceed'] = $connectionsInboundSucceed;
+	}
+	
+	public function getConnectionsInboundSucceed(){
+		return $this->data['connectionsInboundSucceed'];
+	}
+	
+	public function incConnectionsInboundSucceed($inc = 1){
+		$this->data['connectionsInboundSucceed'] += $inc;
+		$this->setDataChanged(true);
+	}
+	
+	/*public function setConnectionsInboundAttempts($connectionsInboundAttempts){
+		$this->data['connectionsInboundAttempts'] = $connectionsInboundAttempts;
+	}
+	
+	public function getConnectionsInboundAttempts(){
+		return $this->data['connectionsInboundAttempts'];
+	}
+	
+	public function incConnectionsInboundAttempts($inc = 1){
+		$this->data['connectionsInboundAttempts'] += $inc;
+		$this->setDataChanged(true);
+	}*/
+	
 	public function setTimeCreated($timeCreated){
 		$this->data['timeCreated'] = $timeCreated;
 	}
@@ -341,6 +397,10 @@ class Node extends YamlStorage{
 	public function update(Node $node){
 		if($node->getTimeLastSeen() > $this->getTimeLastSeen()){
 			$this->setUri($node->getUri());
+			#$this->setConnectionsOutboundSucceed($node->getConnectionsOutboundSucceed());
+			#$this->setConnectionsOutboundAttempts($node->getConnectionsOutboundAttempts());
+			#$this->setConnectionsInboundSucceed($node->getConnectionsInboundSucceed());
+			#$this->setConnectionsInboundAttempts($node->getConnectionsInboundAttempts());
 			$this->setTimeLastSeen($node->getTimeLastSeen());
 			$this->setDataChanged(true);
 		}
