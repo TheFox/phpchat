@@ -191,7 +191,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings->data['user']['nickname'] = 'user_'.substr(md5(time()), 0, 4);
 		
 		$log = new Logger('test_application');
-		$log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
+		#$log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
 		
 		$kernel = new Kernel();
 		$kernel->setLog($log);
@@ -251,7 +251,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings->data['user']['nickname'] = 'user_'.substr(md5(time()), 0, 4);
 		
 		$log = new Logger('test_application');
-		$log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
+		#$log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
 		
 		$kernel = new Kernel();
 		$kernel->setLog($log);
@@ -300,7 +300,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings->data['user']['nickname'] = 'user_'.substr(md5(time()), 0, 4);
 		
 		$log = new Logger('test_application');
-		$log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
+		#$log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
 		
 		$kernel = new Kernel();
 		$kernel->setLog($log);
@@ -348,7 +348,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings->data['user']['nickname'] = 'user_'.substr(md5(time()), 0, 4);
 		
 		$log = new Logger('test_application');
-		$log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
+		#$log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
 		
 		$kernel = new Kernel();
 		$kernel->setLog($log);

@@ -392,8 +392,8 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$node2 = new Node();
 		$node2->setIdHexStr('11000001-2002-4004-8008-100000000002');
 		
-		$node3 = new Node();
-		$node3->setIdHexStr('11000001-2002-4004-8008-100000000003');
+		#$node3 = new Node();
+		#$node3->setIdHexStr('11000001-2002-4004-8008-100000000003');
 		
 		$node4 = new Node();
 		$node4->setIdHexStr('11000001-2002-4004-8008-100000000004');

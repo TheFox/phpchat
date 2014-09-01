@@ -365,11 +365,11 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		
 		$updateMsgs = $cronjob->msgDbSendAll();
 		
-		foreach($updateMsgs as $msgId => $msg){
+		/*foreach($updateMsgs as $msgId => $msg){
 			#fwrite(STDOUT, __METHOD__.': '.$msgId.', '.$msg->getStatus().', '.$msg->getEncryptionMode().PHP_EOL);
 			fwrite(STDOUT, __METHOD__.' update msg: /'.$msg['obj']->getId().'/ /'.$msg['obj']->getStatus().'/ /'.$msg['obj']->getEncryptionMode().'/'.' '.count($msg['nodes']).PHP_EOL);
 			#ve($msg['nodes']);
-		}
+		}*/
 		
 		$this->assertEquals(6, count($updateMsgs));
 		

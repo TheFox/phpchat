@@ -293,10 +293,10 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		
 		
 		$log1 = new Logger('client_1');
-		$log1->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
+		#$log1->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
 		
 		$log2 = new Logger('client_2');
-		$log2->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
+		#$log2->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
 		
 		$kernel1 = new Kernel();
 		$kernel1->setLog($log1);
