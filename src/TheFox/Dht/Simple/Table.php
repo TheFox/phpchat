@@ -155,29 +155,31 @@ class Table extends YamlStorage{
 		
 		$returnNode = $node;
 		
-		$onode = $this->nodeFind($node);
-		if($onode){
-			$onode->update($node);
-			$returnNode = $onode;
-		}
-		else{
-			$nodeId = $node->getIdHexStr();
-			
-			$filePath = null;
-			if($this->getDatadirBasePath()){
-				#$filePath = $this->getDatadirBasePath().'/node_'.substr($nodeId, -5).'.yml';
-				$filePath = $this->getDatadirBasePath().'/node_'.$nodeId.'.yml';
+		if(! $this->getLocalNode()->isEqual($node)){
+			$onode = $this->nodeFind($node);
+			if($onode){
+				$onode->update($node);
+				$returnNode = $onode;
 			}
-			if(!$node->getFilePath()){
-				$node->setFilePath($filePath);
+			else{
+				$nodeId = $node->getIdHexStr();
+				
+				$filePath = null;
+				if($this->getDatadirBasePath()){
+					#$filePath = $this->getDatadirBasePath().'/node_'.substr($nodeId, -5).'.yml';
+					$filePath = $this->getDatadirBasePath().'/node_'.$nodeId.'.yml';
+				}
+				if(!$node->getFilePath()){
+					$node->setFilePath($filePath);
+				}
+				$node->setDatadirBasePath($this->getDatadirBasePath());
+				$node->setDataChanged(true);
+				
+				$this->nodes[$nodeId] = $node;
+				$this->setDataChanged(true);
+				
+				$this->nodesSort();
 			}
-			$node->setDatadirBasePath($this->getDatadirBasePath());
-			$node->setDataChanged(true);
-			
-			$this->nodes[$nodeId] = $node;
-			$this->setDataChanged(true);
-			
-			$this->nodesSort();
 		}
 		
 		return $returnNode;
