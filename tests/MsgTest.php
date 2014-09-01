@@ -304,7 +304,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$this->assertTrue( (bool)$msg->save() );
 		
 		$finder = new Finder();
-		$files = $finder->in('tests')->name('testfile_msg.yml');
+		$files = $finder->in('tests')->depth(0)->name('testfile_msg.yml');
 		$this->assertEquals(1, count($files));
 	}
 	

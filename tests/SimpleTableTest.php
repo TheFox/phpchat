@@ -424,7 +424,7 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$table->save();
 		
 		$finder = new Finder();
-		$files = $finder->in('tests')->name('node_*.yml');
+		$files = $finder->in('tests')->depth(0)->name('node_*.yml');
 		$this->assertEquals(1, count($files));
 		
 		$this->clean();
@@ -560,7 +560,7 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$this->assertEquals(50, $nodeNum);
 		
 		$finder = new Finder();
-		$files = $finder->in('tests')->name('node_*.yml');
+		$files = $finder->in('tests')->depth(0)->name('node_*.yml');
 		$this->assertEquals(50, count($files));
 		
 		$this->clean();
@@ -571,14 +571,14 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		@unlink('tests/bucket_root.yml');
 		
 		$finder = new Finder();
-		$files = $finder->in('tests')->name('bucket_*.yml');
+		$files = $finder->in('tests')->depth(0)->name('bucket_*.yml');
 		$filesystem = new Filesystem();
 		foreach($files as $fileId => $file){
 			$filesystem->remove($file->getRealPath());
 		}
 		
 		$finder = new Finder();
-		$files = $finder->in('tests')->name('node_*.yml');
+		$files = $finder->in('tests')->depth(0)->name('node_*.yml');
 		$filesystem = new Filesystem();
 		foreach($files as $fileId => $file){
 			$filesystem->remove($file->getRealPath());
