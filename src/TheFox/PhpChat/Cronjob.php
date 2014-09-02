@@ -538,7 +538,7 @@ class Cronjob extends Thread{
 			}
 			
 			#$this->log->debug(__FUNCTION__.'      msgs sending: '.count($msgIds));
-			if($msgs && $this->ipcKernelConnection){
+			if($msgIds && $this->ipcKernelConnection){
 				$serverConnectArgs = array($node->getUri(), false, false, $msgIds);
 				$this->ipcKernelConnection->execSync('serverConnect', $serverConnectArgs);
 			}
