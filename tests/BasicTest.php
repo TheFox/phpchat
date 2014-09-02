@@ -1,8 +1,5 @@
 <?php
 
-use Rhumsaa\Uuid\Uuid;
-use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
-
 class BasicTest extends PHPUnit_Framework_TestCase{
 	
 	public function testFunctions(){
