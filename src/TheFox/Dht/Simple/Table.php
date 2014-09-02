@@ -127,7 +127,7 @@ class Table extends YamlStorage{
 		return null;
 	}
 	
-	/*public function nodesFindByUri($uri){
+	public function nodesFindByUri($uri){
 		$rv = array();
 		$uri = (string)$uri;
 		if($uri){
@@ -139,7 +139,7 @@ class Table extends YamlStorage{
 		}
 		
 		return $rv;
-	}*/
+	}
 	
 	public function nodeFindByKeyPubFingerprint($fingerprint){
 		foreach($this->nodes as $nodeId => $node){
@@ -184,8 +184,13 @@ class Table extends YamlStorage{
 			else{
 				$nodeId = $node->getIdHexStr();
 				if($nodeId != '00000000-0000-4000-8000-000000000000'){
-					$onode = $this->nodeFindByUri($node->getUri());
+					/*$onode = $this->nodeFindByUri($node->getUri());
 					if($onode){
+						$onode->setUri('');
+						$onode->setDataChanged(true);
+					}*/
+					
+					foreach($this->nodesFindByUri($node->getUri()) as $onodeId => $onode){
 						$onode->setUri('');
 						$onode->setDataChanged(true);
 					}
