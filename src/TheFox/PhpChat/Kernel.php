@@ -102,7 +102,7 @@ class Kernel extends Thread{
 		$this->getLog()->info('setup local node');
 		$this->localNode = new Node();
 		$this->localNode->setIdHexStr($this->settings->data['node']['id']);
-		$this->localNode->setUri('tcp://'.$this->settings->data['node']['ip'].':'.$this->settings->data['node']['port']);
+		$this->localNode->setUri($this->settings->data['node']['uriLocal']);
 		$this->localNode->setSslKeyPub(file_get_contents($this->settings->data['node']['sslKeyPubPath']));
 		$this->getLog()->info('setup local node: done');
 		
@@ -140,8 +140,8 @@ class Kernel extends Thread{
 		$this->getLog()->info('setup server');
 		$this->server = new Server();
 		$this->server->setKernel($this);
-		$this->server->setIp($this->settings->data['node']['ip']);
-		$this->server->setPort($this->settings->data['node']['port']);
+		$this->server->setIp($this->localNode->getUri()->getHost());
+		$this->server->setPort($this->localNode->getUri()->getPort());
 		$this->server->setSslPrv($this->settings->data['node']['sslKeyPrvPath'],
 			$this->settings->data['node']['sslKeyPrvPass']);
 		$init = $this->server->init();

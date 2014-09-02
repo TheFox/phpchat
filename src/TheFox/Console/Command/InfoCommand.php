@@ -356,7 +356,7 @@ class InfoCommand extends BasicCommand{
 			
 			$localNode = new Node();
 			$localNode->setIdHexStr($settings->data['node']['id']);
-			$localNode->setUri('tcp://'.$settings->data['node']['ip'].':'.$settings->data['node']['port']);
+			$localNode->setUri($settings->data['node']['uriLocal']);
 			$localNode->setSslKeyPub(file_get_contents($settings->data['node']['sslKeyPubPath']));
 			
 			print '--------'.PHP_EOL;
@@ -364,17 +364,14 @@ class InfoCommand extends BasicCommand{
 			print '   Version: '.PhpChat::NAME.'/'.PhpChat::VERSION.' ('.PhpChat::RELEASE.')'.PHP_EOL;
 			print '   ID: '.$localNode->getIdHexStr().PHP_EOL;
 			print '   Public key fingerprint: '.$localNode->getSslKeyPubFingerprint().PHP_EOL;
-			print '   Last public IP: '.$settings->data['node']['ipPub'].PHP_EOL;
-			print '   Listen IP:Port: '.$settings->data['node']['ip'].':'.$settings->data['node']['port'].PHP_EOL;
+			print '   Last public IP: '.$settings->data['node']['uriPub'].PHP_EOL;
+			print '   Listen IP:Port: '.$settings->data['node']['uriLocal'].PHP_EOL;
 			print '   Nickname: '.$settings->data['user']['nickname'].PHP_EOL;
 			print '   SSL version: '.OPENSSL_VERSION_TEXT.PHP_EOL;
 			print '--------'.PHP_EOL;
 			print '   Pub Key Base64:'.PHP_EOL.base64_encode($localNode->getSslKeyPub()).PHP_EOL;
 			print '--------'.PHP_EOL;
 		}
-		
-		
-		
 		#$this->executePost();
 	}
 	

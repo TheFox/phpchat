@@ -191,7 +191,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		
 		$localNode = new Node();
 		$localNode->setIdHexStr($settings->data['node']['id']);
-		$localNode->setUri('tcp://'.$settings->data['node']['ip'].':'.$settings->data['node']['port']);
+		$localNode->setUri($settings->data['node']['uriLocal']);
 		$localNode->setSslKeyPub(file_get_contents($settings->data['node']['sslKeyPubPath']));
 		
 		$this->assertEquals(static::NODE_LOCAL_SSL_KEY_PUB, $localNode->getSslKeyPub());
@@ -448,7 +448,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		
 		$localNode = new Node();
 		$localNode->setIdHexStr($settings->data['node']['id']);
-		$localNode->setUri('tcp://'.$settings->data['node']['ip'].':'.$settings->data['node']['port']);
+		$localNode->setUri($settings->data['node']['uriLocal']);
 		$localNode->setSslKeyPub(file_get_contents($settings->data['node']['sslKeyPubPath']));
 		
 		

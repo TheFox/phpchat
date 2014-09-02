@@ -182,8 +182,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings->data['datadir'] = 'tests';
 		$settings->data['firstRun'] = false;
 		$settings->data['timeCreated'] = time();
-		$settings->data['node']['ip'] = '';
-		$settings->data['node']['port'] = 0;
+		$settings->data['node']['uriLocal'] = '';
 		$settings->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
 		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_client_id_rsa1.prv';
@@ -242,8 +241,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings->data['datadir'] = 'tests';
 		$settings->data['firstRun'] = false;
 		$settings->data['timeCreated'] = time();
-		$settings->data['node']['ip'] = '';
-		$settings->data['node']['port'] = 0;
+		$settings->data['node']['uriLocal'] = '';
 		$settings->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
 		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_client_id_rsa1.prv';
@@ -291,8 +289,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings->data['datadir'] = 'tests';
 		$settings->data['firstRun'] = false;
 		$settings->data['timeCreated'] = time();
-		$settings->data['node']['ip'] = '';
-		$settings->data['node']['port'] = 0;
+		$settings->data['node']['uriLocal'] = '';
 		$settings->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
 		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_client_id_rsa1.prv';
@@ -339,8 +336,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings->data['datadir'] = 'tests';
 		$settings->data['firstRun'] = false;
 		$settings->data['timeCreated'] = time();
-		$settings->data['node']['ip'] = '';
-		$settings->data['node']['port'] = 0;
+		$settings->data['node']['uriLocal'] = '';
 		$settings->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
 		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_client_id_rsa1.prv';

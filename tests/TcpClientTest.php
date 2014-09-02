@@ -271,8 +271,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings1->data['datadir'] = 'tests/testdir_tcpclient1';
 		$settings1->data['firstRun'] = false;
 		$settings1->data['timeCreated'] = time();
-		$settings1->data['node']['ip'] = '127.0.0.1';
-		$settings1->data['node']['port'] = 0;
+		$settings1->data['node']['uriLocal'] = 'tcp://127.0.0.1';
 		$settings1->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB1);
 		$settings1->data['node']['sslKeyPrvPass'] = 'my_password';
 		$settings1->data['node']['sslKeyPrvPath'] = 'tests/testdir_tcpclient1/id_rsa.prv';
@@ -283,8 +282,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings2->data['datadir'] = 'tests/testdir_tcpclient2';
 		$settings2->data['firstRun'] = false;
 		$settings2->data['timeCreated'] = time();
-		$settings2->data['node']['ip'] = '127.0.0.2';
-		$settings2->data['node']['port'] = 0;
+		$settings2->data['node']['uriLocal'] = 'tcp://127.0.0.2';
 		$settings2->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB2);
 		$settings2->data['node']['sslKeyPrvPass'] = 'my_password';
 		$settings2->data['node']['sslKeyPrvPath'] = 'tests/testdir_tcpclient2/id_rsa.prv';
@@ -316,17 +314,17 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$client1 = new TcpClient();
 		$client1->setSslPrv($settings1->data['node']['sslKeyPrvPath'], $settings1->data['node']['sslKeyPrvPass']);
 		$client1->setId(1);
-		$client1->setUri('tcp://'.$settings1->data['node']['ip']);
+		$client1->setUri($settings1->data['node']['uriLocal']);
 		$client1->setServer($server1);
-		$this->assertEquals($settings1->data['node']['ip'], $client1->getUri()->getHost());
+		$this->assertEquals($settings1->data['node']['uriLocal'], 'tcp://'.$client1->getUri()->getHost());
 		#fwrite(STDOUT, 'ip1: /'.$client1->getUri()->getHost().'/'."\n");
 		
 		$client2 = new TcpClient();
 		$client2->setSslPrv($settings2->data['node']['sslKeyPrvPath'], $settings2->data['node']['sslKeyPrvPass']);
 		$client2->setId(2);
-		$client2->setUri('tcp://'.$settings2->data['node']['ip']);
+		$client2->setUri($settings2->data['node']['uriLocal']);
 		$client2->setServer($server2);
-		$this->assertEquals($settings2->data['node']['ip'], $client2->getUri()->getHost());
+		$this->assertEquals($settings2->data['node']['uriLocal'], 'tcp://'.$client2->getUri()->getHost());
 		#fwrite(STDOUT, 'ip2: /'.$client2->getUri()->getHost().'/'."\n");
 		
 		return array($client1, $client2);

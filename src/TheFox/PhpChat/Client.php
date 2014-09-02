@@ -491,8 +491,8 @@ class Client{
 		elseif($msgName == 'hello'){
 			if(array_key_exists('ip', $msgData)){
 				$ip = $msgData['ip'];
-				if($ip != '127.0.0.1' && strIsIp($ip) && $this->getSettings()){
-					$this->getSettings()->data['node']['ipPub'] = $ip;
+				if($ip != '127.0.0.1' && strIsIp($ip)){
+					$this->getSettings()->data['node']['uriLocal'] = 'tcp://'.$ip;
 					$this->getSettings()->setDataChanged(true);
 				}
 			}
@@ -815,39 +815,31 @@ class Client{
 											if(Node::genIdHexStr($nodeArSslPubKey) == $nodeArId){
 												if($node->setSslKeyPub($nodeArSslPubKey)){
 													if(!$this->getLocalNode()->isEqual($node)){
-														if(
-															$this->getSettings()->data['node']['ipPub'] != $node->getUri()->getHost()
-															|| $this->getLocalNode()->getUri()->getPort() != $node->getUri()->getPort()
-														){
-															if(!in_array($node->getIdHexStr(), $nodesFoundIds)){
-																
-																$nodesFoundIds[] = $nodeAr['id'];
-																if(count($nodesFoundIds) > static::NODE_FIND_MAX_NODE_IDS){
-																	array_shift($nodesFoundIds);
-																}
-																
-																if($nodeAr['id'] == $nodeId){
-																	$this->log('debug', 'node found: find completed');
-																	$uri = '';
-																}
-																else{
-																	if($distanceOld != $distanceNew){
-																		$distanceMin = Node::idMinHexStr($distanceOld, $distanceNew);
-																		if($distanceMin == $distanceNew){ // Is smaller then $distanceOld.
-																			$distanceOld = $distanceNew;
-																			$uri = $node->getUri();
-																		}
-																	}
-																}
-																
-																$this->getTable()->nodeEnclose($node);
+														if(!in_array($node->getIdHexStr(), $nodesFoundIds)){
+															
+															$nodesFoundIds[] = $nodeAr['id'];
+															if(count($nodesFoundIds) > static::NODE_FIND_MAX_NODE_IDS){
+																array_shift($nodesFoundIds);
+															}
+															
+															if($nodeAr['id'] == $nodeId){
+																$this->log('debug', 'node found: find completed');
+																$uri = '';
 															}
 															else{
-																$this->log('debug', 'node found: already known');
+																if($distanceOld != $distanceNew){
+																	$distanceMin = Node::idMinHexStr($distanceOld, $distanceNew);
+																	if($distanceMin == $distanceNew){ // Is smaller then $distanceOld.
+																		$distanceOld = $distanceNew;
+																		$uri = $node->getUri();
+																	}
+																}
 															}
+															
+															$this->getTable()->nodeEnclose($node);
 														}
 														else{
-															$this->log('debug', 'node found: myself, uri equal ('.$node->getUri().')');
+															$this->log('debug', 'node found: already known');
 														}
 													}
 													else{

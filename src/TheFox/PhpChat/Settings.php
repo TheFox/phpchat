@@ -18,9 +18,8 @@ class Settings extends YamlStorage{
 		$this->data['timeCreated'] = time();
 		
 		$this->data['node'] = array();
-		$this->data['node']['ip'] = '0.0.0.0';
-		$this->data['node']['ipPub'] = null;
-		$this->data['node']['port'] = 25000;
+		$this->data['node']['uriLocal'] = 'tcp://0.0.0.0:25000';
+		$this->data['node']['uriPub'] = '';
 		$this->data['node']['id'] = '';
 		
 		$this->data['node']['sslKeyPrvPass'] = '';
