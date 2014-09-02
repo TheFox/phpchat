@@ -221,9 +221,15 @@ class Server{
 	
 	public function shutdown(){
 		$this->log->info('shutdown');
+		$this->log->info('shutdown clients: '.count($this->clients));
 		
 		if($this->socket){
 			$this->socket->close();
+		}
+		
+		foreach($this->clients as $clientId => $client){
+			$this->log->info('shutdown client: '.$clientId);
+			$this->clientRemove($client);
 		}
 	}
 	
