@@ -583,6 +583,7 @@ class Cronjob extends Thread{
 					),
 					'connect_timeout' => 3,
 					'timeout' => 5,
+					'verify' => false,
 				));
 			}
 			catch(Exception $e){
