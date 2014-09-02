@@ -492,7 +492,7 @@ class Client{
 			if(array_key_exists('ip', $msgData)){
 				$ip = $msgData['ip'];
 				if($ip != '127.0.0.1' && strIsIp($ip)){
-					$this->getSettings()->data['node']['uriLocal'] = 'tcp://'.$ip;
+					$this->getSettings()->data['node']['uriPub'] = 'tcp://'.$ip;
 					$this->getSettings()->setDataChanged(true);
 				}
 			}
