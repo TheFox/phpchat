@@ -63,6 +63,10 @@ class InfoCommand extends BasicCommand{
 	protected function execute(InputInterface $input, OutputInterface $output){
 		#$this->executePre($input, $output);
 		
+		#$bytesizeFormatter = new Binary();
+		#$bytesize = new ByteSize($bytesizeFormatter);
+		$bytesize = new ByteSize();
+		
 		if($input->hasOption('name') && $input->getOption('name')){
 			print PhpChat::NAME;
 		}
@@ -85,9 +89,6 @@ class InfoCommand extends BasicCommand{
 			
 			
 			$color = new Color();
-			#$bytesizeFormatter = new Binary();
-			#$bytesize = new ByteSize($bytesizeFormatter);
-			$bytesize = new ByteSize();
 			
 			$startTime = time();
 			$time = time();
@@ -360,12 +361,14 @@ class InfoCommand extends BasicCommand{
 			$localNode->setSslKeyPub(file_get_contents($settings->data['node']['sslKeyPubPath']));
 			
 			print '--------'.PHP_EOL;
-			print 'Informations about your node:'.PHP_EOL;
+			print 'Informations about local node:'.PHP_EOL;
 			print '   Version: '.PhpChat::NAME.'/'.PhpChat::VERSION.' ('.PhpChat::RELEASE.')'.PHP_EOL;
 			print '   ID: '.$localNode->getIdHexStr().PHP_EOL;
 			print '   Public key fingerprint: '.$localNode->getSslKeyPubFingerprint().PHP_EOL;
 			print '   Last public IP: '.$settings->data['node']['uriPub'].PHP_EOL;
 			print '   Listen IP:Port: '.$settings->data['node']['uriLocal'].PHP_EOL;
+			print '   Traffic IN:  '.$bytesize->format($settings->data['node']['traffic']['in']).' ('.$settings->data['node']['traffic']['in'].' byte)'.PHP_EOL;
+			print '   Traffic OUT: '.$bytesize->format($settings->data['node']['traffic']['out']).' ('.$settings->data['node']['traffic']['out'].' byte)'.PHP_EOL;
 			print '   Nickname: '.$settings->data['user']['nickname'].PHP_EOL;
 			print '   SSL version: '.OPENSSL_VERSION_TEXT.PHP_EOL;
 			print '--------'.PHP_EOL;
