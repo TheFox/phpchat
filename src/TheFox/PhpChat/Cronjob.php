@@ -428,7 +428,8 @@ class Cronjob extends Thread{
 		$nodes = array();
 		$nodeIds = array();
 		foreach($processedMsgs as $msgId => $msg){
-			#$this->log->debug(__FUNCTION__.' msg: /'.$msg->getId().'/ /'.$msg->getStatus().'/ /'.$msg->getEncryptionMode().'/');
+			#$msgOut = '/'.$msg->getId().'/ /'.$msg->getStatus().'/ /'.$msg->getEncryptionMode().'/';
+			#$this->log->debug(__FUNCTION__.' msg: '.$msgOut);
 			#$this->log->debug(__FUNCTION__.'      dst:   /'.$msg->getDstNodeId().'/');
 			#$this->log->debug(__FUNCTION__.'      relay: /'.$msg->getRelayNodeId().'/');
 			
@@ -441,7 +442,8 @@ class Cronjob extends Thread{
 			
 			// Send it direct.
 			$onode = $this->table->nodeFind($dstNode);
-			#$this->log->debug(__FUNCTION__.'      onode: '.(int)(is_object($onode)).' ('.(is_object($onode) ? $onode->getUri() : 'N/A').')');
+			#$msgOut = (int)(is_object($onode)).' ('.(is_object($onode) ? $onode->getUri() : 'N/A').')';
+			#$this->log->debug(__FUNCTION__.'      onode: '.$msgOut);
 			if($onode && $onode->getUri()->getHost() && $onode->getUri()->getPort()){
 				#$this->log->debug(__FUNCTION__.'      dst node found in table');
 				

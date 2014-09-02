@@ -42,6 +42,10 @@ I also like the [Bitmessage](https://bitmessage.org) project. But building think
 	
 		./start-daemon.sh
 
+## TODO
+- Some tasks are commented with `NOT_IMPLEMENTED`.
+- `TODO` are to be complete the PHP Code Sniffer tests before releasing a new version.
+
 ## Contribute
 You're welcome to contribute to this project. Fork this project at <https://github.com/TheFox/phpchat>. You should read GitHub's [How to Fork a Repo](https://help.github.com/articles/fork-a-repo).
 

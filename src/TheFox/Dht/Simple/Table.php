@@ -12,9 +12,9 @@ use TheFox\Dht\Kademlia\Node;
 
 class Table extends YamlStorage{
 	
-	static $NODES_MAX = 5000;
-	static $NODE_TTL = 1209600; // 14 days
-	static $NODE_CONNECTIONS_OUTBOUND_ATTEMPTS_MAX = 100;
+	public static $NODES_MAX = 5000;
+	public static $NODE_TTL = 1209600; // 14 days
+	public static $NODE_CONNECTIONS_OUTBOUND_ATTEMPTS_MAX = 100;
 	
 	private $localNode = null;
 	private $nodes = array();
@@ -221,7 +221,8 @@ class Table extends YamlStorage{
 		$this->nodesSort();
 		
 		foreach($this->nodes as $nodeId => $node){
-			#fwrite(STDOUT, 'node delete: '.(time() - $node->getTimeCreated()).' '.(time() - $node->getTimeLastSeen()).' '.PHP_EOL);
+			#$msgOut = (time() - $node->getTimeCreated()).' '.(time() - $node->getTimeLastSeen()).' ';
+			#fwrite(STDOUT, 'node delete: '.$msgOut.PHP_EOL);
 			if(
 				$node->getTimeCreated() <= time() - static::$NODE_TTL && !$node->getTimeLastSeen()
 				|| $node->getTimeLastSeen() && $node->getTimeLastSeen() <= time() - static::$NODE_TTL
