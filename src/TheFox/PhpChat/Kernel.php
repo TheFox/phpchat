@@ -64,6 +64,19 @@ class Kernel extends Thread{
 		$this->getSettings()->setDataChanged(true);
 	}
 	
+	public function incSettingsTrafficIn($inc){
+		#fwrite(STDOUT, 'traffic in: '.$inc.PHP_EOL);
+		$this->settings->data['node']['traffic']['in'] = bcadd($this->settings->data['node']['traffic']['in'], $inc);
+		$this->settings->setDataChanged(true);
+	}
+	
+	public function incSettingsTrafficOut($inc){
+		#fwrite(STDOUT, 'traffic out: '.$inc.PHP_EOL);
+		#$this->settings->data['node']['traffic']['out'] += $inc;
+		$this->settings->data['node']['traffic']['out'] = bcadd($this->settings->data['node']['traffic']['out'], $inc);
+		$this->settings->setDataChanged(true);
+	}
+	
 	public function getLocalNode(){
 		return $this->localNode;
 	}

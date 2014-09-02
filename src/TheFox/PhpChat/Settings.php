@@ -27,6 +27,10 @@ class Settings extends YamlStorage{
 		$this->data['node']['sslKeyPrvPath'] = 'id_rsa.prv';
 		$this->data['node']['sslKeyPubPath'] = 'id_rsa.pub';
 		
+		$this->data['node']['traffic'] = array();
+		$this->data['node']['traffic']['in'] = '0';
+		$this->data['node']['traffic']['out'] = '0';
+		
 		$this->data['user'] = array();
 		$this->data['user']['nickname'] = '';
 		
@@ -38,7 +42,6 @@ class Settings extends YamlStorage{
 		
 		$this->data['message'] = array();
 		$this->data['message']['directDelivery'] = true;
-		
 		
 		$this->load();
 		

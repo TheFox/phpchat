@@ -8,6 +8,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Colors\Color;
+#use Rych\ByteSize\Formatter\Binary;
+use Rych\ByteSize\ByteSize;
 
 use TheFox\PhpChat\PhpChat;
 use TheFox\PhpChat\Console;
@@ -83,6 +85,9 @@ class InfoCommand extends BasicCommand{
 			
 			
 			$color = new Color();
+			#$bytesizeFormatter = new Binary();
+			#$bytesize = new ByteSize($bytesizeFormatter);
+			$bytesize = new ByteSize();
 			
 			$startTime = time();
 			$time = time();
@@ -95,7 +100,23 @@ class InfoCommand extends BasicCommand{
 			#print 'cols: '.$tcols.PHP_EOL;
 			#print 'lines: '.$tlines.PHP_EOL;
 			
-			print ' Clients: N/A'."\r";
+			$baseLines = 5;
+			
+			print ' Traffic IN:  N/A'.PHP_EOL;
+			print ' Traffic OUT: N/A'.PHP_EOL;
+			#print ' Traffic AVG: N/A'.PHP_EOL;
+			print ' Clients: N/A'.PHP_EOL;
+			#sleep(1);
+			#print '---A'.PHP_EOL;
+			print ''.PHP_EOL;
+			#sleep(1);
+			#print '---B'.PHP_EOL;
+			print ' '.PHP_EOL;
+			#sleep(1);
+			Console::cursorJumpToColumn(1);
+			#sleep(1);
+			Console::cursorUp($baseLines);
+			#sleep(1);
 			
 			while(!$this->getExit()){
 				#$this->log->debug('run');
@@ -120,9 +141,6 @@ class InfoCommand extends BasicCommand{
 				
 				if($update){
 					$clientsInfo = $this->ipcKernelConnection->execSync('serverClientsInfo');
-					#ve($clientsInfo);
-					
-					#$clientsIdMax = max($clientsIdMax, $clientsInfo['clientsId']);
 					$clientsId = $clientsInfo['clientsId'];
 					
 					$clientsChanged = 0;
@@ -240,15 +258,50 @@ class InfoCommand extends BasicCommand{
 					}
 					
 					$oldClientsLen = count($oldClients);
-					#$oldClientsLen = mt_rand(1, 100000000);
 					
-					Console::cursorJumpToColumn(11);
+					Console::cursorJumpToColumn(15);
 					#sleep(1);
-					print $oldClientsLen.'/'.$clientsId;
+					print $bytesize->format($clientsInfo['traffic']['in']);
 					#sleep(1);
 					Console::lineClearRight();
 					#sleep(1);
-					print PHP_EOL.' ';
+					print Console::cursorDown();
+					#sleep(1);
+					
+					Console::cursorJumpToColumn(15);
+					#sleep(1);
+					print $bytesize->format($clientsInfo['traffic']['out']);
+					#sleep(1);
+					Console::lineClearRight();
+					#sleep(1);
+					print Console::cursorDown();
+					#sleep(1);
+					
+					Console::cursorJumpToColumn(11);
+					#sleep(1);
+					print $oldClientsLen.' / '.$clientsId;
+					#sleep(1);
+					Console::lineClearRight();
+					#sleep(1);
+					print Console::cursorDown();
+					#sleep(1);
+					
+					/*Console::cursorJumpToColumn(15);
+					#sleep(1);
+					$trafficTotal = bcadd($clientsInfo['traffic']['in'], $clientsInfo['traffic']['out']);
+					print $bytesize->format(bcdiv($trafficTotal, time() - $clientsInfo['timeCreated'])).'/s';
+					#print time() - $clientsInfo['timeCreated'];
+					#sleep(1);
+					Console::lineClearRight();
+					#sleep(1);
+					print Console::cursorDown();
+					#sleep(1);*/
+					
+					print Console::cursorDown();
+					#sleep(1);
+					Console::cursorJumpToColumn(2);
+					#sleep(1);
+					#print PHP_EOL.' ';
 					#sleep(1);
 					
 					$line = 0;
@@ -280,20 +333,20 @@ class InfoCommand extends BasicCommand{
 					#sleep(1);
 					print PHP_EOL;
 					#sleep(1);
-					Console::cursorUp($line + 2);
-					#sleep(1);
 					Console::cursorJumpToColumn(1);
 					#sleep(1);
-					
-					#print 'run /'.$time.'/ /'.$seconds.'/ /'.$clientLines.'/ /'.$tcols.'/ /'.$tlines.'/'."\r";
+					Console::cursorUp($line + $baseLines);
+					#sleep(1);
 				}
 				
 				usleep(static::LOOP_USLEEP);
 			}
 			
-			#print "\n\n\n\n";
-			
+			#sleep(1);
+			Console::cursorUp();
+			#sleep(1);
 			Console::screenClearToBottom();
+			#sleep(1);
 			
 			$this->executePost();
 			$this->log->info('exit');

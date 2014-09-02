@@ -130,6 +130,10 @@ class Console extends Thread{
 		print static::CHAR_ESCAPE.'['.$lines.'A';
 	}
 	
+	public static function cursorDown($lines = 1){
+		print static::CHAR_ESCAPE.'['.$lines.'B';
+	}
+	
 	public static function cursorJumpToTop(){
 		print static::CHAR_ESCAPE.'[1;1f';
 	}

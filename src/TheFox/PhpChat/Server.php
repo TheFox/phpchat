@@ -181,6 +181,8 @@ class Server{
 				// Run client.
 				#print __CLASS__.'->'.__FUNCTION__.': client run'."\n";
 				$client->run();
+				$this->getKernel()->incSettingsTrafficIn($client->resetTrafficIn());
+				$this->getKernel()->incSettingsTrafficOut($client->resetTrafficOut());
 			}
 		}
 		$readHandlesNum = count($readHandles);
@@ -322,6 +324,9 @@ class Server{
 		
 		$client->shutdown();
 		
+		$this->getKernel()->incSettingsTrafficIn($client->resetTrafficIn());
+		$this->getKernel()->incSettingsTrafficOut($client->resetTrafficOut());
+		
 		$clientsId = $client->getId();
 		unset($this->clients[$clientsId]);
 	}
@@ -330,6 +335,11 @@ class Server{
 		$rv = array(
 			'clients' => array(),
 			'clientsId' => 0,
+			'traffic' => array(
+				'in' => $this->getSettings()->data['node']['traffic']['in'],
+				'out' => $this->getSettings()->data['node']['traffic']['out'],
+			),
+			'timeCreated' => $this->getSettings()->data['timeCreated'],
 		);
 		foreach($this->clients as $clientId => $client){
 			#$this->log->debug('client: '.$client->getUri());

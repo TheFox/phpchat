@@ -39,6 +39,10 @@ if(!extension_loaded('curl')){
 	print 'FATAL ERROR: you must first install "curl" extension.'."\n";
 	exit(1);
 }
+if(!extension_loaded('bcmath')){
+	print 'FATAL ERROR: you must first install "bcmath" extension.'."\n";
+	exit(1);
+}
 if(!function_exists('gzcompress')){
 	print 'FATAL ERROR: you need the PHP gzip functions.'."\n";
 	exit(1);

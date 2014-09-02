@@ -68,7 +68,9 @@ class TcpClient extends Client{
 			$data = $this->getSocket()->read();
 		}
 		
+		$this->incTrafficIn(strlen($data));
 		#fwrite(STDOUT, $this->getId().' dataRecv data: /'.$data.'/'."\n");
+		#fwrite(STDOUT, $this->getId().'  > len: '.strlen($data).''."\n");
 		
 		do{
 			$separatorPos = strpos($data, static::MSG_SEPARATOR);
@@ -105,13 +107,15 @@ class TcpClient extends Client{
 	}
 	
 	public function dataSend($data){
-		#fwrite(STDOUT, 'dataSend'."\n");
-		#fwrite(STDOUT, 'dataSend: /'.$data.'/'."\n");
+		#fwrite(STDOUT, $this->getId().' dataSend'."\n");
+		#fwrite(STDOUT, $this->getId().' dataSend data: /'.$data.'/'."\n");
+		#fwrite(STDOUT, $this->getId().' <  len: '.strlen($data).''."\n");
 		
 		$msg = '';
 		
 		if($data){
 			$data = base64_encode($data);
+			$this->incTrafficOut(strlen($data) + static::MSG_SEPARATOR_LEN);
 			$msg = $data.static::MSG_SEPARATOR;
 			if($this->getSocket()){
 				$this->getSocket()->write($msg);

@@ -49,6 +49,8 @@ class Client{
 	#private $actionsTime = 0;
 	protected $pingTime = 0;
 	protected $pongTime = 0;
+	private $trafficIn = 0;
+	private $trafficOut = 0;
 	
 	public function __construct(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
@@ -373,6 +375,26 @@ class Client{
 	public function actionRemove(ClientAction $action){
 		#print __CLASS__.'->'.__FUNCTION__.': '.$action->getId()."\n";
 		unset($this->actions[$action->getId()]);
+	}
+	
+	public function incTrafficIn($inc){
+		$this->trafficIn += $inc;
+	}
+	
+	public function resetTrafficIn(){
+		$rv = $this->trafficIn;
+		$this->trafficIn = 0;
+		return $rv;
+	}
+	
+	public function incTrafficOut($inc){
+		$this->trafficOut += $inc;
+	}
+	
+	public function resetTrafficOut(){
+		$rv = $this->trafficOut;
+		$this->trafficOut = 0;
+		return $rv;
 	}
 	
 	public function run(){
