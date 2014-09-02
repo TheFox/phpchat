@@ -28,15 +28,15 @@ if(version_compare(PHP_VERSION, '5.3.0', '<')){
 
 // Check modules installed.
 if(!extension_loaded('openssl')){
-	print 'FATAL ERROR: you must first install openssl.'."\n";
+	print 'FATAL ERROR: you must first install "openssl" extension.'."\n";
 	exit(1);
 }
 if(!extension_loaded('sockets')){
-	print 'FATAL ERROR: you must first install sockets.'."\n";
+	print 'FATAL ERROR: you must first install "sockets" extension.'."\n";
 	exit(1);
 }
 if(!extension_loaded('curl')){
-	print 'FATAL ERROR: you must first install curl.'."\n";
+	print 'FATAL ERROR: you must first install "curl" extension.'."\n";
 	exit(1);
 }
 if(!function_exists('gzcompress')){
