@@ -138,6 +138,8 @@ class Kernel extends Thread{
 		$this->getLog()->info('setup nodesNewDb: done ('.(int)$load.')');
 		
 		$this->getLog()->info('setup server');
+		$this->getLog()->info('server IP: /'.$this->localNode->getUri()->getHost().'/');
+		$this->getLog()->info('server port: /'.$this->localNode->getUri()->getPort().'/');
 		$this->server = new Server();
 		$this->server->setKernel($this);
 		$this->server->setIp($this->localNode->getUri()->getHost());
@@ -145,9 +147,12 @@ class Kernel extends Thread{
 		$this->server->setSslPrv($this->settings->data['node']['sslKeyPrvPath'],
 			$this->settings->data['node']['sslKeyPrvPass']);
 		$init = $this->server->init();
-		$this->getLog()->info('setup server: done');
-		if(!$init){
+		if($init){
+			$this->getLog()->info('setup server: done');
+		}
+		else{
 			#print __CLASS__.'->'.__FUNCTION__.': failed'."\n";
+			$this->getLog()->emergency('setup server: failed');
 			$this->setExit(1);
 		}
 		
