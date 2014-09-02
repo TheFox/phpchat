@@ -574,31 +574,35 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$table->setDatadirBasePath('tests');
 		$table->setLocalNode($localNode);
 		
-		$node0 = new Node();
-		$node0->setIdHexStr('11000001-2002-4004-8008-100000000000');
-		$node0->setUri('tcp://192.168.241.1:25000');
-		
 		$node1 = new Node();
 		$node1->setIdHexStr('11000001-2002-4004-8008-100000000001');
-		$node1->setUri('tcp://192.168.241.2:25000');
+		$node1->setUri('tcp://192.168.241.1:25000');
 		
-		$node10 = new Node();
-		$node10->setUri('tcp://192.168.241.1:25000');
+		$node2 = new Node();
+		$node2->setIdHexStr('11000001-2002-4004-8008-100000000002');
+		$node2->setUri('tcp://192.168.241.2:25000');
 		
-		$node20 = new Node();
-		$node20->setIdHexStr('11000001-2002-4004-8008-100000000000');
+		$node3 = new Node();
+		$node3->setUri('tcp://192.168.241.1:25000');
+		
+		$node4 = new Node();
+		$node4->setIdHexStr('11000001-2002-4004-8008-100000000003');
+		$node4->setUri('tcp://192.168.241.2:25000');
 		
 		
-		$table->nodeEnclose($node0);
 		$table->nodeEnclose($node1);
+		$table->nodeEnclose($node2);
 		
-		$node = $table->nodeEnclose($node10);
-		$this->assertEquals('11000001-2002-4004-8008-100000000000', $node->getIdHexStr());
+		$node = $table->nodeEnclose($node3);
+		$this->assertEquals('00000000-0000-4000-8000-000000000000', $node->getIdHexStr());
 		$this->assertEquals('tcp://192.168.241.1:25000', (string)$node->getUri());
 		
-		$node = $table->nodeEnclose($node20);
-		$this->assertEquals('11000001-2002-4004-8008-100000000000', $node->getIdHexStr());
-		$this->assertEquals('tcp://192.168.241.1:25000', (string)$node->getUri());
+		$node = $table->nodeEnclose($node4);
+		$this->assertEquals('11000001-2002-4004-8008-100000000003', $node->getIdHexStr());
+		$this->assertEquals('tcp://192.168.241.2:25000', (string)$node->getUri());
+		$this->assertEquals('', (string)$node2->getUri());
+		
+		$table->save();
 	}
 	
 	private function clean(){

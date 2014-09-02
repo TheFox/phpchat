@@ -127,6 +127,20 @@ class Table extends YamlStorage{
 		return null;
 	}
 	
+	/*public function nodesFindByUri($uri){
+		$rv = array();
+		$uri = (string)$uri;
+		if($uri){
+			foreach($this->nodes as $nodeId => $node){
+				if((string)$node->getUri() == $uri){
+					$rv[] = $node;
+				}
+			}
+		}
+		
+		return $rv;
+	}*/
+	
 	public function nodeFindByKeyPubFingerprint($fingerprint){
 		foreach($this->nodes as $nodeId => $node){
 			if($node->getSslKeyPubFingerprint() == $fingerprint){
@@ -160,40 +174,38 @@ class Table extends YamlStorage{
 		$returnNode = $node;
 		
 		if(! $this->getLocalNode()->isEqual($node)){
-			$found = false;
+			#$found = false;
+			
 			$onode = $this->nodeFind($node);
 			if($onode){
-				$found = true;
-			}
-			if(!$found){
-				$onode = $this->nodeFindByUri($node->getUri());
-				if($onode){
-					$found = true;
-				}
-			}
-			
-			if($found){
 				$onode->update($node);
 				$returnNode = $onode;
 			}
 			else{
 				$nodeId = $node->getIdHexStr();
-				
-				$filePath = null;
-				if($this->getDatadirBasePath()){
-					#$filePath = $this->getDatadirBasePath().'/node_'.substr($nodeId, -5).'.yml';
-					$filePath = $this->getDatadirBasePath().'/node_'.$nodeId.'.yml';
+				if($nodeId != '00000000-0000-4000-8000-000000000000'){
+					$onode = $this->nodeFindByUri($node->getUri());
+					if($onode){
+						$onode->setUri('');
+						$onode->setDataChanged(true);
+					}
+					
+					$filePath = null;
+					if($this->getDatadirBasePath()){
+						#$filePath = $this->getDatadirBasePath().'/node_'.substr($nodeId, -5).'.yml';
+						$filePath = $this->getDatadirBasePath().'/node_'.$nodeId.'.yml';
+					}
+					if(!$node->getFilePath()){
+						$node->setFilePath($filePath);
+					}
+					$node->setDatadirBasePath($this->getDatadirBasePath());
+					$node->setDataChanged(true);
+					
+					$this->nodes[$nodeId] = $node;
+					$this->setDataChanged(true);
+					
+					$this->nodesSort();
 				}
-				if(!$node->getFilePath()){
-					$node->setFilePath($filePath);
-				}
-				$node->setDatadirBasePath($this->getDatadirBasePath());
-				$node->setDataChanged(true);
-				
-				$this->nodes[$nodeId] = $node;
-				$this->setDataChanged(true);
-				
-				$this->nodesSort();
 			}
 		}
 		

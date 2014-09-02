@@ -279,10 +279,11 @@ class Client{
 					return true;
 				}
 				else{
-					$this->log('debug', 'hashcash version: '.$hashcash->getVersion());
-					$this->log('debug', 'hashcash bit: '.$hashcash->getBits().' (min: '.$bits.')');
-					$this->log('debug', 'hashcash resource: '.$hashcash->getResource().' ('.$resource.')');
-					$this->log('debug', 'hashcash added: '.($added ? 'yes' : 'no'));
+					$this->log('error', 'hashcash verification failed');
+					$this->log('error', 'hashcash version: '.$hashcash->getVersion());
+					$this->log('error', 'hashcash bit: '.$hashcash->getBits().' (min: '.$bits.')');
+					$this->log('error', 'hashcash resource: '.$hashcash->getResource().' ('.$resource.')');
+					$this->log('error', 'hashcash added: '.($added ? 'yes' : 'no'));
 				}
 			}
 		}
@@ -527,7 +528,7 @@ class Client{
 						
 						$node = $this->getTable()->nodeEnclose($node);
 						
-						$this->log('debug', 'node ok: '.(int)is_object($node).' /'.$node->getIdHexStr().'/');
+						#$this->log('debug', 'node ok: '.(int)is_object($node).' /'.$node->getIdHexStr().'/');
 						
 						// Check if not Local Node
 						if(! $this->getLocalNode()->isEqual($node)){
