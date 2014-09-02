@@ -334,14 +334,14 @@ class Client{
 	public function actionsExecute($criterion){
 		$actions = $this->actionsGetByCriterion($criterion);
 		
-		$this->log('debug', 'actions execute: '.count($actions));
+		#$this->log('debug', 'actions execute: '.count($actions));
 		foreach($actions as $actionId => $action){
 			#$this->log('debug', 'action execute: '.$criterion);
 			$this->actionRemove($action);
 			$action->functionExec($this);
 		}
 		
-		$this->log('debug', 'actions left: '.count($this->actions));
+		#$this->log('debug', 'actions left: '.count($this->actions));
 	}
 	
 	public function actionAdd(ClientAction $action){
