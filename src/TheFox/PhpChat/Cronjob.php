@@ -217,11 +217,9 @@ class Cronjob extends Thread{
 		$table = $this->ipcKernelConnection->execSync('getTable');
 		#ve($table);
 		
-		$nodes = $table->getNodesClosest(20);
-		#ve($nodes);
 		
-		foreach($nodes as $nodeId => $node){
-			#ve($node->getUri());
+		foreach($table->getNodesClosest(20) as $nodeId => $node){
+			$this->log->debug('ping B: '.$node->getUri());
 			$this->ipcKernelConnection->execAsync('serverConnect', array($node->getUri(), false, true));
 		}
 	}

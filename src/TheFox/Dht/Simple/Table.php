@@ -102,8 +102,8 @@ class Table extends YamlStorage{
 		$nodes = array_slice($nodes, 0, $num);
 		ksort($nodes, SORT_STRING);
 		
-		$rv = array_values($nodes);
-		return $rv;
+		#return array_values($nodes);
+		return $nodes;
 	}
 	
 	public function nodeFind(Node $node){
