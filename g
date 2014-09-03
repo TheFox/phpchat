@@ -1,4 +1,3 @@
 #!/bin/sh
 
-grep -nR --color=always $* *.php src tests
-
+grep -nR --color=always $* *.php src tests/*.php
