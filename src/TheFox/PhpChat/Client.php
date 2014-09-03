@@ -496,7 +496,7 @@ class Client{
 				}
 			}
 			
-			$this->log('debug', 'action execute: CRITERION_AFTER_HELLO');
+			$this->log('debug', 'actions execute: CRITERION_AFTER_HELLO');
 			$this->actionsExecute(ClientAction::CRITERION_AFTER_HELLO);
 			
 			$msgHandleReturnValue .= $this->sendId();
@@ -689,7 +689,7 @@ class Client{
 		elseif($msgName == 'id_ok'){
 			$this->log('debug', $this->getUri().' recv '.$msgName);
 			
-			$this->log('debug', 'action execute: CRITERION_AFTER_ID_SUCCESSFULL');
+			$this->log('debug', 'actions execute: CRITERION_AFTER_ID_SUCCESSFULL');
 			$this->actionsExecute(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
 			
 			if($this->getStatus('isChannelPeer')){
@@ -1115,7 +1115,7 @@ class Client{
 						$msg->setStatus('D');
 					}
 					
-					$this->log('debug', 'action execute: CRITERION_AFTER_MSG_RESPONSE_SUCCESSFULL');
+					$this->log('debug', 'actions execute: CRITERION_AFTER_MSG_RESPONSE_SUCCESSFULL');
 					$this->actionsExecute(ClientAction::CRITERION_AFTER_MSG_RESPONSE_SUCCESSFULL);
 				}
 				else{
@@ -1126,7 +1126,7 @@ class Client{
 				$msgHandleReturnValue .= $this->sendError(1000, $msgName);
 			}
 			
-			$this->log('debug', 'action execute: CRITERION_AFTER_MSG_RESPONSE');
+			$this->log('debug', 'actions execute: CRITERION_AFTER_MSG_RESPONSE');
 			$this->actionsExecute(ClientAction::CRITERION_AFTER_MSG_RESPONSE);
 		}
 		
@@ -1420,7 +1420,7 @@ class Client{
 							
 							$this->setStatus('hasSsl', true);
 							
-							$this->log('debug', 'action execute: CRITERION_AFTER_HAS_SSL');
+							$this->log('debug', 'actions execute: CRITERION_AFTER_HAS_SSL');
 							$this->actionsExecute(ClientAction::CRITERION_AFTER_HAS_SSL);
 						}
 						else{
@@ -1467,7 +1467,7 @@ class Client{
 							$this->sslPasswordLocalCurrent = $this->sslPasswordLocalNew;
 							$this->sslPasswordPeerCurrent = $this->sslPasswordPeerNew;
 							
-							$this->log('debug', 'action execute: CRITERION_AFTER_HAS_RESSL');
+							$this->log('debug', 'actions execute: CRITERION_AFTER_HAS_RESSL');
 							$this->actionsExecute(ClientAction::CRITERION_AFTER_HAS_RESSL);
 						}
 						else{
@@ -1985,18 +1985,18 @@ class Client{
 			throw new RuntimeException('ssl not set.');
 		}
 		
-		$this->log('debug', 'send SSL init');
+		#$this->log('debug', 'send SSL init');
 		
 		if($this->getStatus('hasSendSslInit')){
 			$this->setStatus('hasSslInit', true);
 			
-			$this->log('debug', 'send SSL init: set has send');
+			#$this->log('debug', 'send SSL init: set has send');
 			return '';
 		}
 		else{
 			$this->setStatus('hasSendSslInit', true);
 			
-			$this->log('debug', 'send SSL init: create data');
+			#$this->log('debug', 'send SSL init: create data');
 			
 			$data = array('hashcash' => '');
 			if($useHashcash){
