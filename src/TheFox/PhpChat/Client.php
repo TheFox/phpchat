@@ -663,8 +663,8 @@ class Client{
 							$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
 							$action->setName('bridge_server_send_subscribe');
 							$action->functionSet(function($action, $client){
-								$this->log('debug', 'bridge subscribe ('.(int)$client->getLocalNode()->getBridgeClient().') because of bridge server');
-								$client->sendBridgeSubscribe($client->getLocalNode()->getBridgeClient());
+								$this->log('debug', 'bridge subscribe ('.(int)$client->getSettings()->data['node']['bridge']['client']['enabled'].') because of bridge server');
+								$client->sendBridgeSubscribe($client->getSettings()->data['node']['bridge']['client']['enabled']);
 							});
 							$actions[] = $action;
 							
