@@ -183,7 +183,7 @@ class Kernel extends Thread{
 			'getSettings', 'getLocalNode',
 			'getTable', 'tableNodeEnclose', 'tableNodesClean', 'tableNodesSort',
 			'getMsgDb', 'msgDbMsgUpdate', 'msgDbMsgIncForwardCyclesById', 'msgDbMsgSetStatusById',
-			'getNodesNewDb', 'nodesNewDbNodeAddUri', 'nodesNewDbNodeAddId', 'nodesNewDbNodeIncConnectAttempt',
+			'getNodesNewDb', 'nodesNewDbNodeAddConnect', 'nodesNewDbNodeAddFind', 'nodesNewDbNodeIncConnectAttempt',
 				'nodesNewDbNodeIncFindAttempt', 'nodesNewDbNodeRemove',
 			'serverConnect', 'serverNodeFind',
 			'save', 
@@ -446,12 +446,12 @@ class Kernel extends Thread{
 		return $this->nodesNewDb;
 	}
 	
-	public function nodesNewDbNodeAddUri($uri){
-		return $this->getNodesNewDb()->nodeAddUri($uri);
+	public function nodesNewDbNodeAddConnect($uri){
+		return $this->getNodesNewDb()->nodeAddConnect($uri);
 	}
 	
-	public function nodesNewDbNodeAddId($id){
-		return $this->getNodesNewDb()->nodeAddId($id);
+	public function nodesNewDbNodeAddFind($id){
+		return $this->getNodesNewDb()->nodeAddFind($id);
 	}
 	
 	public function nodesNewDbNodeIncConnectAttempt($id){

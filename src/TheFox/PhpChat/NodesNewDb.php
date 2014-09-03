@@ -20,7 +20,7 @@ class NodesNewDb extends YamlStorage{
 		return array('data');
 	}
 	
-	public function nodeAddUri($uri){
+	public function nodeAddConnect($uri){
 		#print __CLASS__.'->'.__FUNCTION__.': '.$uri."\n";
 		
 		$oldId = 0;
@@ -45,7 +45,7 @@ class NodesNewDb extends YamlStorage{
 		$this->setDataChanged(true);
 	}
 	
-	public function nodeAddId($id){
+	public function nodeAddFind($id){
 		#print __CLASS__.'->'.__FUNCTION__.': '.$uri."\n";
 		
 		$oldId = false;

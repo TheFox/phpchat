@@ -335,7 +335,7 @@ class Cronjob extends Thread{
 				else{
 					#fwrite(STDOUT, 'msg db, init nodes:     unknown node: '.$node->getIdHexStr()."\n");
 					if($this->ipcKernelConnection){
-						$this->ipcKernelConnection->execAsync('nodesNewDbNodeAddId', array($node->getIdHexStr()));
+						$this->ipcKernelConnection->execAsync('nodesNewDbNodeAddFind', array($node->getIdHexStr()));
 					}
 				}
 			}
@@ -668,7 +668,7 @@ class Cronjob extends Thread{
 										}
 										else{
 											$this->log->debug('node: /'.$nodeObj->getUri().'/');
-											$this->ipcKernelConnection->execAsync('nodesNewDbNodeAddUri', array((string)$nodeObj->getUri()));
+											$this->ipcKernelConnection->execAsync('nodesNewDbNodeAddConnect', array((string)$nodeObj->getUri()));
 										}
 									}
 									
