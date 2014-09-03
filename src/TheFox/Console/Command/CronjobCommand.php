@@ -23,8 +23,8 @@ class CronjobCommand extends BasicCommand{
 		$this->addOption('cycle', 'c', InputOption::VALUE_NONE, 'Run only one cycle.');
 		$this->addOption('ping', 'p', InputOption::VALUE_NONE, 'Run only one ping nodes cycle.');
 		$this->addOption('msg', 'm', InputOption::VALUE_NONE, 'Run only one cycle with Msgs.');
-		$this->addOption('nodes', null, InputOption::VALUE_NONE, 'Run only one cycle with Nodes New DB.');
-		$this->addOption('bootstrap', null, InputOption::VALUE_NONE, 'Run only one cycle with Boostrap Nodes.');
+		$this->addOption('nodes', 'o', InputOption::VALUE_NONE, 'Run only one cycle with Nodes New DB.');
+		$this->addOption('bootstrap', 'b', InputOption::VALUE_NONE, 'Run only one cycle with Boostrap Nodes.');
 		$this->addOption('shutdown', 's', InputOption::VALUE_NONE, 'Shutdown.');
 	}
 	

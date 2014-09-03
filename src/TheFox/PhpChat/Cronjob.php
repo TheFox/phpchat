@@ -331,11 +331,9 @@ class Cronjob extends Thread{
 					if($this->ipcKernelConnection){
 						$this->ipcKernelConnection->execAsync('msgDbMsgUpdate', array($msg));
 					}
-					
 				}
 				else{
 					#fwrite(STDOUT, 'msg db, init nodes:     unknown node: '.$node->getIdHexStr()."\n");
-					
 					if($this->ipcKernelConnection){
 						$this->ipcKernelConnection->execAsync('nodesNewDbNodeAddId', array($node->getIdHexStr()));
 					}
