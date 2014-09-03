@@ -339,7 +339,12 @@ class Node extends YamlStorage{
 	}
 	
 	public function addBridgeDst($bridgeDst){
-		$this->data['bridgeDst'][] = $bridgeDst;
+		if(is_array($bridgeDst)){
+			$this->data['bridgeDst'] = array_merge($this->data['bridgeDst'], $bridgeDst);
+		}
+		else{
+			$this->data['bridgeDst'][] = $bridgeDst;
+		}
 		$this->data['bridgeDst'] = array_unique($this->data['bridgeDst']);
 		$this->setDataChanged(true);
 	}
@@ -451,6 +456,12 @@ class Node extends YamlStorage{
 			#$this->setConnectionsOutboundAttempts($node->getConnectionsOutboundAttempts());
 			#$this->setConnectionsInboundSucceed($node->getConnectionsInboundSucceed());
 			#$this->setConnectionsInboundAttempts($node->getConnectionsInboundAttempts());
+			
+			$this->setBridgeServer($node->getBridgeServer());
+			$this->setBridgeClient($node->getBridgeClient());
+			#$this->addBridgeDst($node->getBridgeDst()); # TODO
+			$this->setBridgeSubscribed($node->getBridgeSubscribed());
+			
 			$this->setTimeLastSeen($node->getTimeLastSeen());
 			$this->setDataChanged(true);
 		}
