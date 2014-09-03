@@ -41,6 +41,7 @@ class Node extends YamlStorage{
 		$this->data['bridgeServer'] = false;
 		$this->data['bridgeClient'] = false;
 		$this->data['bridgeDst'] = array();
+		$this->data['bridgeSubscribed'] = false;
 		$this->data['timeCreated'] = time();
 		$this->data['timeLastSeen'] = 0;
 		
@@ -345,6 +346,15 @@ class Node extends YamlStorage{
 	
 	public function getBridgeDst(){
 		return $this->data['bridgeDst'];
+	}
+	
+	public function setBridgeSubscribed($bridgeSubscribed){
+		$this->data['bridgeSubscribed'] = (bool)$bridgeSubscribed;
+		$this->setDataChanged(true);
+	}
+	
+	public function getBridgeSubscribed(){
+		return (bool)$this->data['bridgeSubscribed'];
 	}
 	
 	public function setTimeCreated($timeCreated){

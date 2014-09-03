@@ -1721,9 +1721,11 @@ class Client{
 						if($rid){
 							if($subscribe){
 								$this->getNode()->setBridgeClient(true);
+								$this->getNode()->setBridgeSubscribed(true);
 							}
 							else{
 								$this->getNode()->setBridgeClient(false);
+								$this->getNode()->setBridgeSubscribed(false);
 							}
 						}
 						else{
