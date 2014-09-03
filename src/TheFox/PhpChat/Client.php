@@ -325,12 +325,6 @@ class Client{
 		unset($this->requests[$request['id']]);
 	}
 	
-	public function actionsAdd($actions){
-		foreach($actions as $action){
-			$this->actionAdd($action);
-		}
-	}
-	
 	public function actionsExecute($criterion){
 		$actions = $this->actionsGetByCriterion($criterion);
 		
@@ -341,6 +335,12 @@ class Client{
 			$action->functionExec($this);
 		}
 		$this->log('debug', 'actions left: '.count($this->actions));
+	}
+	
+	public function actionsAdd($actions){
+		foreach($actions as $action){
+			$this->actionAdd($action);
+		}
 	}
 	
 	public function actionAdd(ClientAction $action){
