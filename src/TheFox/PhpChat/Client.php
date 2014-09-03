@@ -542,7 +542,7 @@ class Client{
 						$this->setStatus('isChannelPeer', true);
 					}
 					
-					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$id.', '.$port);
+					$this->log('debug', $this->getUri().' recv '.$msgName.': /'.$id.'/ /'.$port.'/ bs='.(int)$bridgeServer.'');
 					
 					$idOk = false;
 					$node = new Node();
@@ -1825,10 +1825,10 @@ class Client{
 	
 	public function msgCreateId(){
 		if(!$this->getLocalNode()){
-			throw new RuntimeException('localNode not set.');
+			throw new RuntimeException('msgCreateId: localNode not set.');
 		}
 		if(!$this->getSsl()){
-			throw new RuntimeException('SSL not set.');
+			throw new RuntimeException('msgCreateId: SSL not set.');
 		}
 		
 		$sslKeyPub = $this->getLocalNode()->getSslKeyPub();
