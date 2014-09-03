@@ -38,6 +38,8 @@ class Node extends YamlStorage{
 		$this->data['connectionsOutboundAttempts'] = 0;
 		$this->data['connectionsInboundSucceed'] = 0;
 		#$this->data['connectionsInboundAttempts'] = 0;
+		$this->data['bridgeServer'] = false;
+		$this->data['bridgeClient'] = false;
 		$this->data['timeCreated'] = time();
 		$this->data['timeLastSeen'] = 0;
 		
@@ -315,6 +317,24 @@ class Node extends YamlStorage{
 		$this->data['connectionsInboundAttempts'] += $inc;
 		$this->setDataChanged(true);
 	}*/
+	
+	public function setBridgeServer($bridgeServer){
+		$this->data['bridgeServer'] = (bool)$bridgeServer;
+		$this->setDataChanged(true);
+	}
+	
+	public function getBridgeServer(){
+		return (bool)$this->data['bridgeServer'];
+	}
+	
+	public function setBridgeClient($bridgeClient){
+		$this->data['bridgeClient'] = (bool)$bridgeClient;
+		$this->setDataChanged(true);
+	}
+	
+	public function getBridgeClient(){
+		return (bool)$this->data['bridgeClient'];
+	}
 	
 	public function setTimeCreated($timeCreated){
 		$this->data['timeCreated'] = $timeCreated;

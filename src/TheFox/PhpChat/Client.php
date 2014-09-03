@@ -513,6 +513,7 @@ class Client{
 					$strKeyPub = '';
 					$strKeyPubSign = '';
 					$strKeyPubFingerprint = '';
+					$bridgeServer = false;
 					$isChannelPeer = false;
 					$hashcash = '';
 					if(array_key_exists('release', $msgData)){
@@ -530,6 +531,9 @@ class Client{
 					if(array_key_exists('sslKeyPubSign', $msgData)){
 						$strKeyPubSign = base64_decode($msgData['sslKeyPubSign']);
 					}
+					if(array_key_exists('bridgeServer', $msgData)){
+						$bridgeServer = (bool)$msgData['bridgeServer'];
+					}
 					if(array_key_exists('isChannel', $msgData)){ // isChannelPeer
 						$isChannelPeer = (bool)$msgData['isChannel'];
 					}
@@ -546,6 +550,7 @@ class Client{
 					if(Uuid::isValid($id) && $id != Uuid::NIL){
 						$node->setIdHexStr($id);
 						$node->setUri('tcp://'.$this->getUri()->getHost().':'.$port);
+						$node->setBridgeServer($bridgeServer);
 						$node->setTimeLastSeen(time());
 						
 						$node = $this->getTable()->nodeEnclose($node);
@@ -790,6 +795,9 @@ class Client{
 									
 									$nodeArId = '';
 									$nodeArSslPubKey = '';
+									$nodeArBridgeServer = false;
+									$nodeArBridgeClient = false;
+									$nodeArBridgeDst = array();
 									
 									$node = new Node();
 									if(isset($nodeAr['id'])){
@@ -801,6 +809,19 @@ class Client{
 									if(isset($nodeAr['sslKeyPub']) && $nodeAr['sslKeyPub']){
 										$nodeArSslPubKey = base64_decode($nodeAr['sslKeyPub']);
 									}
+									if(isset($nodeAr['bridgeServer'])){
+										$nodeArBridgeServer = $nodeAr['bridgeServer'];
+									}
+									if(isset($nodeAr['bridgeClient'])){
+										$nodeArBridgeClient = $nodeAr['bridgeClient'];
+									}
+									if(isset($nodeAr['bridgeDst'])){
+										# TODO
+										$nodeArBridgeDst = $nodeAr['bridgeDst'];
+									}
+									
+									$node->setBridgeServer($nodeArBridgeServer);
+									$node->setBridgeServer($nodeArBridgeClient);
 									$node->setTimeLastSeen(time());
 									
 									$distanceNew = $this->getLocalNode()->distanceHexStr($node);
@@ -1774,6 +1795,8 @@ class Client{
 				'port'      => $this->getLocalNode()->getUri()->getPort(),
 				'sslKeyPub' => $sslKeyPubBase64,
 				'sslKeyPubSign' => $sslKeyPubSign,
+				'bridgeServer' => $this->getLocalNode()->getBridgeServer(),
+				
 				'isChannel' => $this->getStatus('isChannelLocal'),
 			);
 			return $this->msgCreate('id', $data);
@@ -1829,11 +1852,24 @@ class Client{
 		
 		$nodesOut = array();
 		foreach($nodes as $nodeId => $node){
-			$nodesOut[] = array(
+			$nodeOut = array(
 				'id' => $node->getIdHexStr(),
-				'uri' => (string)$node->getUri(),
+				'uri' => '',
 				'sslKeyPub' => base64_encode($node->getSslKeyPub()),
+				'bridgeServer' => $node->getBridgeServer(),
+				'bridgeClient' => $node->getBridgeClient(),
+				'bridgeDst' => array(),
 			);
+			
+			if(!$this->getLocalNode()->getBridgeServer() && !$nodes->getBridgeClient()){
+				$nodeOut['uri'] = (string)$node->getUri();
+			}
+			if($nodes->getBridgeClient()){
+				# TODO: alle exit bridges ins array eintragen
+				#$nodeOut['bridgeDst'] = 
+			}
+			
+			$nodesOut[] = $nodeOut;
 		}
 		
 		$data = array(

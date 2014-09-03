@@ -605,6 +605,9 @@ class Cronjob extends Thread{
 									$active = (bool)$node['active'];
 								}
 								if($active){
+									if(isset($node['bridge'])){
+										$nodeObj->setBridgeServer($node['bridge']);
+									}
 									if(isset($node['uri'])){
 										$nodeObj->setUri($node['uri']);
 										
