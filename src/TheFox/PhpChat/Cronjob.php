@@ -325,21 +325,21 @@ class Cronjob extends Thread{
 		if(!$this->msgDb){
 			throw new RuntimeException('msgDb not set', 1);
 		}
-		/*if(!$this->settings){
+		if(!$this->settings){
 			throw new RuntimeException('settings not set', 2);
-		}*/
+		}
 		if(!$this->table){
 			throw new RuntimeException('table not set', 3);
 		}
-		/*if(!$this->localNode){
+		if(!$this->localNode){
 			throw new RuntimeException('localNode not set', 4);
-		}*/
+		}
 		
 		$processedMsgIds = array();
 		$processedMsgs = array();
 		
 		// Send own unsent msgs.
-		#$this->log->debug(__FUNCTION__.' unsent own');
+		#$this->log->debug('unsent own');
 		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
 			if(
 				!in_array($msg->getId(), $processedMsgIds)
@@ -348,7 +348,7 @@ class Cronjob extends Thread{
 				&& $msg->getStatus() == 'O'
 				&& $msg->getSrcNodeId() == $this->localNode->getIdHexStr()
 			){
-				#$this->log->debug(__FUNCTION__.'       unsent own: '.$msg->getId());
+				#$this->log->debug('      unsent own: '.$msg->getId());
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
@@ -356,7 +356,7 @@ class Cronjob extends Thread{
 		}
 		
 		// Send foreign unsent msgs.
-		#$this->log->debug(__FUNCTION__.' unsent foreign');
+		#$this->log->debug('unsent foreign');
 		foreach($this->msgDb->getUnsentMsgs() as $msgId => $msg){
 			if(
 				!in_array($msg->getId(), $processedMsgIds)
@@ -365,7 +365,7 @@ class Cronjob extends Thread{
 				&& $msg->getStatus() == 'U'
 				&& $msg->getDstNodeId() != $this->localNode->getIdHexStr()
 			){
-				#$this->log->debug(__FUNCTION__.'       unsent foreign: '.$msg->getId());
+				#$this->log->debug('      unsent foreign: '.$msg->getId());
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
@@ -373,7 +373,7 @@ class Cronjob extends Thread{
 		}
 		
 		// Relay all other msgs.
-		#$this->log->debug(__FUNCTION__.' other');
+		#$this->log->debug('other');
 		foreach($this->msgDb->getMsgs() as $msgId => $msg){
 			if(
 				!in_array($msg->getId(), $processedMsgIds)
@@ -381,7 +381,7 @@ class Cronjob extends Thread{
 				&& $msg->getEncryptionMode() == 'D'
 				&& $msg->getStatus() == 'S'
 			){
-				#$this->log->debug(__FUNCTION__.'      other: '.$msg->getId());
+				#$this->log->debug('     other: '.$msg->getId());
 				
 				$processedMsgIds[] = $msg->getId();
 				$processedMsgs[] = $msg;
@@ -389,11 +389,11 @@ class Cronjob extends Thread{
 		}
 		
 		$processedMsgs = array_unique($processedMsgs);
-		#$this->log->debug(__FUNCTION__.' processedMsgs: '.count($processedMsgs));
+		#$this->log->debug('processedMsgs: '.count($processedMsgs));
 		
 		// Don't use messages which reached MSG_FORWARD_TO_NODES_MIN or MSG_FORWARD_TO_NODES_MAX.
 		foreach($processedMsgs as $msgId => $msg){
-			#$this->log->debug(__FUNCTION__.' search for unset: '.$msg->getId());
+			#$this->log->debug('search for unset: '.$msg->getId());
 			
 			$sentNodesC = count($msg->getSentNodes());
 			$forwardCycles = $msg->getForwardCycles();
@@ -404,7 +404,7 @@ class Cronjob extends Thread{
 				
 				|| $sentNodesC >= static::MSG_FORWARD_TO_NODES_MAX
 			){
-				#$this->log->debug(__FUNCTION__.'      set X: '.$msg->getId());
+				#$this->log->debug('     set X: '.$msg->getId());
 				
 				$msg->setStatus('X');
 				
@@ -416,7 +416,7 @@ class Cronjob extends Thread{
 			}
 			
 			elseif( in_array($msg->getDstNodeId(), $msg->getSentNodes()) ){
-				#$this->log->debug(__FUNCTION__.'      set D: '.$msg->getId());
+				#$this->log->debug('     set D: '.$msg->getId());
 				
 				$msg->setStatus('D');
 				
@@ -428,54 +428,79 @@ class Cronjob extends Thread{
 			}
 		}
 		
-		// Process valid messages.
+		// Collect Nodes.
 		$nodes = array();
 		$nodeIds = array();
-		foreach($processedMsgs as $msgId => $msg){
-			#$msgOut = '/'.$msg->getId().'/ /'.$msg->getStatus().'/ /'.$msg->getEncryptionMode().'/';
-			#$this->log->debug(__FUNCTION__.' msg: '.$msgOut);
-			#$this->log->debug(__FUNCTION__.'      dst:   /'.$msg->getDstNodeId().'/');
-			#$this->log->debug(__FUNCTION__.'      relay: /'.$msg->getRelayNodeId().'/');
+		if($this->settings->data['node']['bridge']['client']['enabled']){
+			$this->log->debug('bridge delivery');
 			
-			$dstNode = new Node();
-			$dstNode->setIdHexStr($msg->getDstNodeId());
-			
-			if(!isset($nodes[$dstNode->getIdHexStr()])){
-				$nodes[$dstNode->getIdHexStr()] = $dstNode;
-			}
-			
-			// Send it direct.
-			$onode = $this->table->nodeFind($dstNode);
-			#$msgOut = (int)(is_object($onode)).' ('.(is_object($onode) ? $onode->getUri() : 'N/A').')';
-			#$this->log->debug(__FUNCTION__.'      onode: '.$msgOut);
-			if($onode && $onode->getUri()->getHost() && $onode->getUri()->getPort()){
-				#$this->log->debug(__FUNCTION__.'      dst node found in table');
-				
-				$nodes[$onode->getIdHexStr()] = $onode;
-				
-				if(!isset($nodeIds[$onode->getIdHexStr()])){
-					$nodeIds[$onode->getIdHexStr()] = array();
-				}
-				$nodeIds[$onode->getIdHexStr()][$msg->getId()] = $msg;
-			}
-			
-			// Send it to close nodes.
-			#$this->log->debug(__FUNCTION__.'      close nodes');
-			$closestNodes = $this->table->nodeFindClosest($dstNode, static::MSG_FORWARD_TO_NODES_MAX);
-			foreach($closestNodes as $nodeId => $node){
-				if(
-					$msg->getRelayNodeId() != $node->getIdHexStr()
-					&& !in_array($node->getIdHexStr(), $msg->getSentNodes())
-					&& $node->getUri()->getHost() && $node->getUri()->getPort()
-				){
-					#$this->log->debug(__FUNCTION__.'             node: '.$node->getIdHexStr());
-					
+			$nodesBridgeServer = $this->table->getNodesClosestBridgeServer();
+			foreach($nodesBridgeServer as $nodeId => $node){
+				if((string)$node->getUri()){
 					$nodes[$node->getIdHexStr()] = $node;
-					
-					if(!isset($nodeIds[$node->getIdHexStr()])){
-						$nodeIds[$node->getIdHexStr()] = array();
+					$nodeIds[$node->getIdHexStr()] = array();
+				}
+			}
+			foreach($processedMsgs as $msgId => $msg){
+				#$msgOut = '/'.$msg->getId().'/ /'.$msg->getStatus().'/ /'.$msg->getEncryptionMode().'/';
+				#$this->log->debug('msg: '.$msgOut);
+				
+				foreach($nodeIds as $nodeId => $msgs){
+					if($msg->getRelayNodeId() != $nodeId && !in_array($nodeId, $msg->getSentNodes())){
+						$nodeIds[$nodeId][$msg->getId()] = $msg;
 					}
-					$nodeIds[$node->getIdHexStr()][$msg->getId()] = $msg;
+				}
+			}
+		}
+		else{
+			$this->log->debug('normal delivery');
+			foreach($processedMsgs as $msgId => $msg){
+				#$msgOut = '/'.$msg->getId().'/ /'.$msg->getStatus().'/ /'.$msg->getEncryptionMode().'/';
+				#$this->log->debug('msg: '.$msgOut);
+				#$this->log->debug('     dst:   /'.$msg->getDstNodeId().'/');
+				#$this->log->debug('     relay: /'.$msg->getRelayNodeId().'/');
+				
+				$dstNode = new Node();
+				$dstNode->setIdHexStr($msg->getDstNodeId());
+				
+				if(!isset($nodes[$dstNode->getIdHexStr()])){
+					$nodes[$dstNode->getIdHexStr()] = $dstNode;
+				}
+				
+				// Send it direct.
+				$onode = $this->table->nodeFind($dstNode);
+				#$msgOut = (int)(is_object($onode)).' ('.(is_object($onode) ? $onode->getUri() : 'N/A').')';
+				#$this->log->debug('     onode: '.$msgOut);
+				#if($onode && $onode->getUri()->getHost() && $onode->getUri()->getPort()){
+				if($onode && (string)$onode->getUri()){
+					#$this->log->debug('     dst node found in table');
+					
+					$nodes[$onode->getIdHexStr()] = $onode;
+					
+					if(!isset($nodeIds[$onode->getIdHexStr()])){
+						$nodeIds[$onode->getIdHexStr()] = array();
+					}
+					$nodeIds[$onode->getIdHexStr()][$msg->getId()] = $msg;
+				}
+				
+				// Send it to close nodes.
+				#$this->log->debug('     close nodes');
+				$closestNodes = $this->table->nodeFindClosest($dstNode, static::MSG_FORWARD_TO_NODES_MAX);
+				foreach($closestNodes as $nodeId => $node){
+					if(
+						$msg->getRelayNodeId() != $node->getIdHexStr()
+						&& !in_array($node->getIdHexStr(), $msg->getSentNodes())
+						&& (string)$node->getUri()
+					){
+						#$this->log->debug('            node: '.$node->getIdHexStr());
+						
+						$nodes[$node->getIdHexStr()] = $node;
+						
+						if(!isset($nodeIds[$node->getIdHexStr()])){
+							$nodeIds[$node->getIdHexStr()] = array();
+						}
+						$nodeIds[$node->getIdHexStr()][$msg->getId()] = $msg;
+					}
 				}
 			}
 		}
@@ -484,7 +509,7 @@ class Cronjob extends Thread{
 		$updateMsgs = array();
 		foreach($nodeIds as $nodeId => $msgs){
 			$node = $nodes[$nodeId];
-			#$this->log->debug(__FUNCTION__.' node: /'.$node->getIdHexStr().'/ /'.$node->getUri().'/');
+			#$this->log->debug('node: /'.$node->getIdHexStr().'/ /'.$node->getUri().'/');
 			
 			$msgs = array_unique($msgs);
 			$msgIds = array();
@@ -495,42 +520,30 @@ class Cronjob extends Thread{
 					$msg->getDstNodeId() == $node->getIdHexStr()
 					&& $node->getUri()->getHost() && $node->getUri()->getPort()
 				);
-				$deliver = true;
 				
-				$logMsg = '/'.$msg->getId().'/ /'.$msg->getStatus().'/ /'.$msg->getEncryptionMode().'/';
-				$logMsg .= ' /'.$msg->getDstNodeId().'/';
-				$logMsg .= ' direct='.$direct.'';
-				$logMsg .= ' source='.(int)($msg->getSrcNodeId() == $this->localNode->getIdHexStr());
-				$logMsg .= ' deliver='.(int)$deliver;
-				#$this->log->debug(__FUNCTION__.'      msg: '.$logMsg);
+				#$logMsg = '/'.$msg->getId().'/ /'.$msg->getStatus().'/ /'.$msg->getEncryptionMode().'/';
+				#$logMsg .= ' /'.$msg->getDstNodeId().'/';
+				#$logMsg .= ' direct='.$direct.'';
+				#$logMsg .= ' source='.(int)($msg->getSrcNodeId() == $this->localNode->getIdHexStr());
+				#$this->log->debug('     msg: '.$logMsg);
 				
-				if($deliver){
-					#$updateMsgs[$msg->getId()] = $msg;
-					if(!isset($updateMsgs[$msg->getId()])){
-						$updateMsgs[$msg->getId()] = array(
-							'obj' => $msg,
-							'nodes' => array(
-								$node->getIdHexStr() => 1,
-							),
-						);
-					}
-					else{
-						if(!isset($updateMsgs[$msg->getId()]['nodes'][$node->getIdHexStr()])){
-							$updateMsgs[$msg->getId()]['nodes'][$node->getIdHexStr()] = 1;
-						}
-						else{
-							$updateMsgs[$msg->getId()]['nodes'][$node->getIdHexStr()]++;
-						}
-						#$updateMsgs[$msg->getId()]['nodes'][$node->getIdHexStr()] = 1;
-						#$updateMsgs[$msg->getId()]['nodes'][$node->getIdHexStr()]++;
-						#ve($updateMsgs[$msg->getId()]['nodes']);
-						#$this->log->debug(__FUNCTION__.'      id: '.$msg->getId());
-					}
-					$msgIds[] = $msg->getId();
+				if(!isset($updateMsgs[$msg->getId()])){
+					$updateMsgs[$msg->getId()] = array(
+						'obj' => $msg,
+						'nodes' => array(
+							$node->getIdHexStr() => $node,
+						),
+					);
 				}
+				else{
+					if(!isset($updateMsgs[$msg->getId()]['nodes'][$node->getIdHexStr()])){
+						$updateMsgs[$msg->getId()]['nodes'][$node->getIdHexStr()] = $node;
+					}
+				}
+				$msgIds[] = $msg->getId();
 			}
 			
-			#$this->log->debug(__FUNCTION__.'      msgs sending: '.count($msgIds));
+			#$this->log->debug('     msgs sending: '.count($msgIds));
 			if($msgIds && $this->ipcKernelConnection){
 				$serverConnectArgs = array($node->getUri(), false, false, $msgIds);
 				$this->ipcKernelConnection->execSync('serverConnect', $serverConnectArgs);
@@ -538,8 +551,8 @@ class Cronjob extends Thread{
 		}
 		
 		foreach($updateMsgs as $msgId => $msg){
-			#$this->log->debug(__FUNCTION__.' update msg: '.$msg['obj']->getId());
-			#$this->log->debug(__FUNCTION__.' update msg: '.(int)is_object($msg['obj']));
+			#$this->log->debug('update msg: '.$msg['obj']->getId());
+			#$this->log->debug('update msg: '.(int)is_object($msg['obj']));
 			if($this->ipcKernelConnection){
 				$this->ipcKernelConnection->execAsync('msgDbMsgIncForwardCyclesById', array($msg['obj']->getId()));
 			}

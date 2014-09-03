@@ -93,16 +93,29 @@ class Table extends YamlStorage{
 		return count($this->getNodes());
 	}
 	
-	public function getNodesClosest($num = 20){
-		if(!$this->getLocalNode()){
-			throw new RuntimeException('localNode not set.');
+	public function getNodesBridgeServer(){
+		$rv = array();
+		foreach($this->nodes as $nodeId => $node){
+			if($node->getBridgeServer()){
+				$rv[] = $node;
+			}
 		}
-		
+		return $rv;
+	}
+	
+	public function getNodesClosest($num = 20){
 		$nodes = $this->nodes;
 		$nodes = array_slice($nodes, 0, $num);
 		ksort($nodes, SORT_STRING);
 		
-		#return array_values($nodes);
+		return $nodes;
+	}
+	
+	public function getNodesClosestBridgeServer($num = 20){
+		$nodes = $this->getNodesBridgeServer();
+		$nodes = array_slice($nodes, 0, $num);
+		ksort($nodes, SORT_STRING);
+		
 		return $nodes;
 	}
 	
@@ -155,6 +168,19 @@ class Table extends YamlStorage{
 		$nodes = array();
 		foreach($this->nodes as $onodeId => $onode){
 			if(!$onode->isEqual($node)){
+				$nodes[$onode->distanceHexStr($node)] = $onode;
+				ksort($nodes, SORT_STRING);
+				$nodes = array_slice($nodes, 0, $num);
+			}
+		}
+		$rv = array_values($nodes);
+		return $rv;
+	}
+	
+	public function nodeFindClosestBridgeServer(Node $node, $num = 8){
+		$nodes = array();
+		foreach($this->nodes as $onodeId => $onode){
+			if($onode->getBridgeServer() && !$onode->isEqual($node)){
 				$nodes[$onode->distanceHexStr($node)] = $onode;
 				ksort($nodes, SORT_STRING);
 				$nodes = array_slice($nodes, 0, $num);

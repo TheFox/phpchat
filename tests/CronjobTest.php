@@ -172,8 +172,8 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 ';
 	
 	public function testMsgDbDefault(){
-		$nodeIdBase1 = '10000000-1000-4001-8001-1000000000';
-		$nodeIdBase2 = '20000000-2000-4002-8002-20000000';
+		$uuid1 = '10000000-1000-4001-8001-1000000000';
+		$uuid2 = '20000000-2000-4002-8002-20000000';
 		
 		@unlink('tests/bucket_root.yml');
 		
@@ -199,30 +199,30 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		
 		$nodes = array();
 		$nodes[0] = new Node();
-		$nodes[0]->setIdHexStr($nodeIdBase1.'00');
+		$nodes[0]->setIdHexStr($uuid1.'00');
 		$nodes[0]->setUri('tcp://127.0.0.0:25000');
 		$nodes[0]->setSslKeyPub(static::NODE0_SSL_KEY_PUB);
 		
 		$nodes[1] = new Node();
-		$nodes[1]->setIdHexStr($nodeIdBase1.'01');
+		$nodes[1]->setIdHexStr($uuid1.'01');
 		$nodes[1]->setUri('tcp://127.0.0.1:25000');
 		
 		$nodes[2] = new Node();
-		$nodes[2]->setIdHexStr($nodeIdBase1.'02');
+		$nodes[2]->setIdHexStr($uuid1.'02');
 		$nodes[2]->setUri('tcp://127.0.0.2:25000');
 		$nodes[2]->setSslKeyPub(static::NODE2_SSL_KEY_PUB);
 		
 		$nodes[3] = new Node();
-		$nodes[3]->setIdHexStr($nodeIdBase1.'03');
+		$nodes[3]->setIdHexStr($uuid1.'03');
 		$nodes[3]->setUri('tcp://127.0.0.3:25000');
 		
 		$nodes[4] = new Node();
-		$nodes[4]->setIdHexStr($nodeIdBase1.'04');
+		$nodes[4]->setIdHexStr($uuid1.'04');
 		$nodes[4]->setUri('tcp://127.0.0.4:25000');
 		$nodes[4]->setSslKeyPub(static::NODE4_SSL_KEY_PUB);
 		
 		$nodes[5] = new Node();
-		$nodes[5]->setIdHexStr($nodeIdBase1.'05');
+		$nodes[5]->setIdHexStr($uuid1.'05');
 		$nodes[5]->setUri('tcp://127.0.0.5:25000');
 		$nodes[5]->setSslKeyPub(static::NODE5_SSL_KEY_PUB);
 		
@@ -240,8 +240,8 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		for($nodeNo = 1000; $nodeNo <= 1011; $nodeNo++){
 			$msg = new Msg();
 			
-			$msg->setId($nodeIdBase2.$nodeNo);
-			$this->assertEquals($nodeIdBase2.$nodeNo, $msg->getId());
+			$msg->setId($uuid2.$nodeNo);
+			$this->assertEquals($uuid2.$nodeNo, $msg->getId());
 			
 			$msg->setSrcNodeId($settings->data['node']['id']);
 			$msg->setSrcSslKeyPub($table->getLocalNode()->getSslKeyPub());
@@ -292,9 +292,9 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$msgs[1008]->setSentNodes(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
 		
 		$msgs[1009]->setStatus('S');
-		$msgs[1009]->setSentNodes(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, $nodeIdBase1.'00'));
+		$msgs[1009]->setSentNodes(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, $uuid1.'00'));
 		
-		$msgs[1010]->setRelayNodeId($nodeIdBase1.'01');
+		$msgs[1010]->setRelayNodeId($uuid1.'01');
 		
 		$msgs[1011]->setSrcNodeId( $nodes[4]->getIdHexStr() );
 		$msgs[1011]->setDstNodeId( $nodes[5]->getIdHexStr() );
@@ -340,31 +340,31 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		
 		$this->assertEquals(12, count($cronjobMsgs));
 		
-		$this->assertEquals($msgs[1000], $cronjobMsgs[$nodeIdBase2.'1000']);
-		$this->assertEquals($msgs[1001], $cronjobMsgs[$nodeIdBase2.'1001']);
-		$this->assertEquals($msgs[1002], $cronjobMsgs[$nodeIdBase2.'1002']);
-		$this->assertEquals($msgs[1003], $cronjobMsgs[$nodeIdBase2.'1003']);
-		$this->assertEquals($msgs[1004], $cronjobMsgs[$nodeIdBase2.'1004']);
-		$this->assertEquals($msgs[1005], $cronjobMsgs[$nodeIdBase2.'1005']);
-		$this->assertEquals($msgs[1006], $cronjobMsgs[$nodeIdBase2.'1006']);
-		$this->assertEquals($msgs[1007], $cronjobMsgs[$nodeIdBase2.'1007']);
-		$this->assertEquals($msgs[1008], $cronjobMsgs[$nodeIdBase2.'1008']);
-		$this->assertEquals($msgs[1009], $cronjobMsgs[$nodeIdBase2.'1009']);
-		$this->assertEquals($msgs[1010], $cronjobMsgs[$nodeIdBase2.'1010']);
-		$this->assertEquals($msgs[1011], $cronjobMsgs[$nodeIdBase2.'1011']);
+		$this->assertEquals($msgs[1000], $cronjobMsgs[$uuid2.'1000']);
+		$this->assertEquals($msgs[1001], $cronjobMsgs[$uuid2.'1001']);
+		$this->assertEquals($msgs[1002], $cronjobMsgs[$uuid2.'1002']);
+		$this->assertEquals($msgs[1003], $cronjobMsgs[$uuid2.'1003']);
+		$this->assertEquals($msgs[1004], $cronjobMsgs[$uuid2.'1004']);
+		$this->assertEquals($msgs[1005], $cronjobMsgs[$uuid2.'1005']);
+		$this->assertEquals($msgs[1006], $cronjobMsgs[$uuid2.'1006']);
+		$this->assertEquals($msgs[1007], $cronjobMsgs[$uuid2.'1007']);
+		$this->assertEquals($msgs[1008], $cronjobMsgs[$uuid2.'1008']);
+		$this->assertEquals($msgs[1009], $cronjobMsgs[$uuid2.'1009']);
+		$this->assertEquals($msgs[1010], $cronjobMsgs[$uuid2.'1010']);
+		$this->assertEquals($msgs[1011], $cronjobMsgs[$uuid2.'1011']);
 		
-		$this->assertEquals('D', $cronjobMsgs[$nodeIdBase2.'1000']->getEncryptionMode());
-		$this->assertEquals('S', $cronjobMsgs[$nodeIdBase2.'1001']->getEncryptionMode());
-		$this->assertEquals('D', $cronjobMsgs[$nodeIdBase2.'1002']->getEncryptionMode());
-		$this->assertEquals('S', $cronjobMsgs[$nodeIdBase2.'1003']->getEncryptionMode());
-		$this->assertEquals('D', $cronjobMsgs[$nodeIdBase2.'1004']->getEncryptionMode());
-		$this->assertEquals('D', $cronjobMsgs[$nodeIdBase2.'1005']->getEncryptionMode());
-		$this->assertEquals('D', $cronjobMsgs[$nodeIdBase2.'1006']->getEncryptionMode());
-		$this->assertEquals('D', $cronjobMsgs[$nodeIdBase2.'1007']->getEncryptionMode());
-		$this->assertEquals('D', $cronjobMsgs[$nodeIdBase2.'1008']->getEncryptionMode());
-		$this->assertEquals('D', $cronjobMsgs[$nodeIdBase2.'1009']->getEncryptionMode());
-		$this->assertEquals('D', $cronjobMsgs[$nodeIdBase2.'1010']->getEncryptionMode());
-		$this->assertEquals('D', $cronjobMsgs[$nodeIdBase2.'1011']->getEncryptionMode());
+		$this->assertEquals('D', $cronjobMsgs[$uuid2.'1000']->getEncryptionMode());
+		$this->assertEquals('S', $cronjobMsgs[$uuid2.'1001']->getEncryptionMode());
+		$this->assertEquals('D', $cronjobMsgs[$uuid2.'1002']->getEncryptionMode());
+		$this->assertEquals('S', $cronjobMsgs[$uuid2.'1003']->getEncryptionMode());
+		$this->assertEquals('D', $cronjobMsgs[$uuid2.'1004']->getEncryptionMode());
+		$this->assertEquals('D', $cronjobMsgs[$uuid2.'1005']->getEncryptionMode());
+		$this->assertEquals('D', $cronjobMsgs[$uuid2.'1006']->getEncryptionMode());
+		$this->assertEquals('D', $cronjobMsgs[$uuid2.'1007']->getEncryptionMode());
+		$this->assertEquals('D', $cronjobMsgs[$uuid2.'1008']->getEncryptionMode());
+		$this->assertEquals('D', $cronjobMsgs[$uuid2.'1009']->getEncryptionMode());
+		$this->assertEquals('D', $cronjobMsgs[$uuid2.'1010']->getEncryptionMode());
+		$this->assertEquals('D', $cronjobMsgs[$uuid2.'1011']->getEncryptionMode());
 		
 		
 		$updateMsgs = $cronjob->msgDbSendAll();
@@ -393,47 +393,47 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$this->assertEquals('D', $msgs[1010]->getEncryptionMode());
 		$this->assertEquals('D', $msgs[1011]->getEncryptionMode());
 		
-		$this->assertTrue(array_key_exists($nodeIdBase2.'1000', $updateMsgs));
-		$this->assertTrue(array_key_exists($nodeIdBase2.'1002', $updateMsgs));
-		$this->assertTrue(array_key_exists($nodeIdBase2.'1005', $updateMsgs));
-		$this->assertTrue(array_key_exists($nodeIdBase2.'1006', $updateMsgs));
-		$this->assertTrue(array_key_exists($nodeIdBase2.'1010', $updateMsgs));
-		$this->assertTrue(array_key_exists($nodeIdBase2.'1011', $updateMsgs));
+		$this->assertTrue(array_key_exists($uuid2.'1000', $updateMsgs));
+		$this->assertTrue(array_key_exists($uuid2.'1002', $updateMsgs));
+		$this->assertTrue(array_key_exists($uuid2.'1005', $updateMsgs));
+		$this->assertTrue(array_key_exists($uuid2.'1006', $updateMsgs));
+		$this->assertTrue(array_key_exists($uuid2.'1010', $updateMsgs));
+		$this->assertTrue(array_key_exists($uuid2.'1011', $updateMsgs));
 		
-		$this->assertEquals(3, count($updateMsgs[$nodeIdBase2.'1000']['nodes']));
-		$this->assertEquals(3, count($updateMsgs[$nodeIdBase2.'1002']['nodes']));
-		$this->assertEquals(3, count($updateMsgs[$nodeIdBase2.'1005']['nodes']));
-		$this->assertEquals(3, count($updateMsgs[$nodeIdBase2.'1006']['nodes']));
-		$this->assertEquals(2, count($updateMsgs[$nodeIdBase2.'1010']['nodes']));
-		$this->assertEquals(3, count($updateMsgs[$nodeIdBase2.'1011']['nodes']));
+		$this->assertEquals(3, count($updateMsgs[$uuid2.'1000']['nodes']));
+		$this->assertEquals(3, count($updateMsgs[$uuid2.'1002']['nodes']));
+		$this->assertEquals(3, count($updateMsgs[$uuid2.'1005']['nodes']));
+		$this->assertEquals(3, count($updateMsgs[$uuid2.'1006']['nodes']));
+		$this->assertEquals(2, count($updateMsgs[$uuid2.'1010']['nodes']));
+		$this->assertEquals(3, count($updateMsgs[$uuid2.'1011']['nodes']));
 		
-		$this->assertTrue(array_key_exists($nodeIdBase1.'00', $updateMsgs[$nodeIdBase2.'1000']['nodes']));
-		$this->assertTrue(array_key_exists($nodeIdBase1.'01', $updateMsgs[$nodeIdBase2.'1000']['nodes']));
-		$this->assertTrue(array_key_exists($nodeIdBase1.'02', $updateMsgs[$nodeIdBase2.'1000']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'00', $updateMsgs[$uuid2.'1000']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'01', $updateMsgs[$uuid2.'1000']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'02', $updateMsgs[$uuid2.'1000']['nodes']));
 		
-		$this->assertTrue(array_key_exists($nodeIdBase1.'00', $updateMsgs[$nodeIdBase2.'1002']['nodes']));
-		$this->assertTrue(array_key_exists($nodeIdBase1.'01', $updateMsgs[$nodeIdBase2.'1002']['nodes']));
-		$this->assertTrue(array_key_exists($nodeIdBase1.'02', $updateMsgs[$nodeIdBase2.'1002']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'00', $updateMsgs[$uuid2.'1002']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'01', $updateMsgs[$uuid2.'1002']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'02', $updateMsgs[$uuid2.'1002']['nodes']));
 		
-		$this->assertTrue(array_key_exists($nodeIdBase1.'00', $updateMsgs[$nodeIdBase2.'1005']['nodes']));
-		$this->assertTrue(array_key_exists($nodeIdBase1.'01', $updateMsgs[$nodeIdBase2.'1005']['nodes']));
-		$this->assertTrue(array_key_exists($nodeIdBase1.'02', $updateMsgs[$nodeIdBase2.'1005']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'00', $updateMsgs[$uuid2.'1005']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'01', $updateMsgs[$uuid2.'1005']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'02', $updateMsgs[$uuid2.'1005']['nodes']));
 		
-		$this->assertTrue(array_key_exists($nodeIdBase1.'00', $updateMsgs[$nodeIdBase2.'1006']['nodes']));
-		$this->assertTrue(array_key_exists($nodeIdBase1.'01', $updateMsgs[$nodeIdBase2.'1006']['nodes']));
-		$this->assertTrue(array_key_exists($nodeIdBase1.'02', $updateMsgs[$nodeIdBase2.'1006']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'00', $updateMsgs[$uuid2.'1006']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'01', $updateMsgs[$uuid2.'1006']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'02', $updateMsgs[$uuid2.'1006']['nodes']));
 		
-		$this->assertTrue(array_key_exists($nodeIdBase1.'00', $updateMsgs[$nodeIdBase2.'1010']['nodes']));
-		$this->assertTrue(array_key_exists($nodeIdBase1.'02', $updateMsgs[$nodeIdBase2.'1010']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'00', $updateMsgs[$uuid2.'1010']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'02', $updateMsgs[$uuid2.'1010']['nodes']));
 		
-		$this->assertTrue(array_key_exists($nodeIdBase1.'00', $updateMsgs[$nodeIdBase2.'1011']['nodes']));
-		$this->assertTrue(array_key_exists($nodeIdBase1.'01', $updateMsgs[$nodeIdBase2.'1011']['nodes']));
-		$this->assertTrue(array_key_exists($nodeIdBase1.'02', $updateMsgs[$nodeIdBase2.'1011']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'00', $updateMsgs[$uuid2.'1011']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'01', $updateMsgs[$uuid2.'1011']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'02', $updateMsgs[$uuid2.'1011']['nodes']));
 	}
 	
-	public function testMsgDbBridgeDelivery(){
-		$nodeIdBase1 = '11000000-1000-4001-8001-1000000000';
-		$nodeIdBase2 = '21000000-2000-4002-8002-20000000';
+	public function testMsgDbBridge(){
+		$uuid1 = '11000000-1000-4001-8001-1000000000';
+		$uuid2 = '21000000-2000-4002-8002-20000000';
 		
 		file_put_contents('tests/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
 		file_put_contents('tests/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
@@ -444,7 +444,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
 		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_cronjob_id_rsa.prv';
 		$settings->data['node']['sslKeyPubPath'] = 'tests/testfile_cronjob_id_rsa.pub';
-		#$settings->data['message']['directDelivery'] = false;
+		$settings->data['node']['bridge']['client']['enabled'] = true;
 		
 		$localNode = new Node();
 		$localNode->setIdHexStr($settings->data['node']['id']);
@@ -453,44 +453,44 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		
 		
 		$nodes = array();
-		$nodes[0] = new Node();
-		$nodes[0]->setIdHexStr($nodeIdBase1.'00');
-		$nodes[0]->setUri('tcp://127.0.0.0:25000');
-		$nodes[0]->setSslKeyPub(static::NODE0_SSL_KEY_PUB);
 		
 		$nodes[1] = new Node();
-		$nodes[1]->setIdHexStr($nodeIdBase1.'01');
+		$nodes[1]->setIdHexStr($uuid1.'01');
 		$nodes[1]->setUri('tcp://127.0.0.1:25000');
 		$nodes[1]->setSslKeyPub(static::NODE1_SSL_KEY_PUB);
 		
 		$nodes[2] = new Node();
-		$nodes[2]->setIdHexStr($nodeIdBase1.'02');
+		$nodes[2]->setIdHexStr($uuid1.'02');
 		$nodes[2]->setUri('tcp://127.0.0.2:25000');
 		$nodes[2]->setSslKeyPub(static::NODE2_SSL_KEY_PUB);
 		
+		// Bridge Server
 		$nodes[3] = new Node();
-		$nodes[3]->setIdHexStr($nodeIdBase1.'03');
+		$nodes[3]->setIdHexStr($uuid1.'03');
 		$nodes[3]->setUri('tcp://127.0.0.3:25000');
 		$nodes[3]->setSslKeyPub(static::NODE3_SSL_KEY_PUB);
+		$nodes[3]->setBridgeServer(true);
 		
+		// Bridge Server
 		$nodes[4] = new Node();
-		$nodes[4]->setIdHexStr($nodeIdBase1.'04');
+		$nodes[4]->setIdHexStr($uuid1.'04');
 		$nodes[4]->setUri('tcp://127.0.0.4:25000');
 		$nodes[4]->setSslKeyPub(static::NODE4_SSL_KEY_PUB);
+		$nodes[4]->setBridgeServer(true);
 		
 		$nodes[5] = new Node();
-		$nodes[5]->setIdHexStr($nodeIdBase1.'05');
+		$nodes[5]->setIdHexStr($uuid1.'05');
 		$nodes[5]->setUri('tcp://127.0.0.5:25000');
 		$nodes[5]->setSslKeyPub(static::NODE5_SSL_KEY_PUB);
 		
 		$table = new Table();
 		$table->setDatadirBasePath($settings->data['datadir']);
 		$table->setLocalNode($localNode);
-		#$table->nodeEnclose($nodes[0]);
+		
 		$table->nodeEnclose($nodes[1]);
 		$table->nodeEnclose($nodes[2]);
-		#$table->nodeEnclose($nodes[3]);
-		#$table->nodeEnclose($nodes[4]);
+		$table->nodeEnclose($nodes[3]);
+		$table->nodeEnclose($nodes[4]);
 		$table->nodeEnclose($nodes[5]);
 		
 		
@@ -498,10 +498,10 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		for($nodeNo = 2001; $nodeNo <= 2004; $nodeNo++){
 			$msg = new Msg();
 			
-			$msg->setId($nodeIdBase2.$nodeNo);
+			$msg->setId($uuid2.$nodeNo);
 			$msg->setSrcNodeId($settings->data['node']['id']);
 			$msg->setSrcSslKeyPub($table->getLocalNode()->getSslKeyPub());
-			$msg->setSrcUserNickname($settings->data['user']['nickname']);
+			#$msg->setSrcUserNickname($settings->data['user']['nickname']);
 			$msg->setText('this is  a test. '.date('Y/m/d H:i:s'));
 			$msg->setSslKeyPrvPath($settings->data['node']['sslKeyPrvPath'], $settings->data['node']['sslKeyPrvPass']);
 			$msg->setStatus('O');
@@ -523,6 +523,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$msgs[2003]->setDstNodeId($nodes[3]->getIdHexStr());
 		$msgs[2003]->setDstSslPubKey($nodes[3]->getSslKeyPub());
 		
+		// Foreign msg.
 		$msgs[2004]->setSrcNodeId($nodes[4]->getIdHexStr());
 		$msgs[2004]->setDstNodeId($nodes[5]->getIdHexStr());
 		$msgs[2004]->setDstSslPubKey($nodes[5]->getSslKeyPub());
@@ -539,18 +540,14 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		
 		// Encrypt
 		foreach($msgs as $msgId => $msg){
-			#fwrite(STDOUT, __METHOD__.' encrypt: '.$msgId.PHP_EOL);
-			
 			try{
 				$msg->encrypt();
 			}
 			catch(Exception $e){
 				fwrite(STDOUT, 'ERROR: '.$e->getMessage().PHP_EOL);
 			}
-			
 			$cronjob->getMsgDb()->msgAdd($msg);
 		}
-		
 		
 		// Init Nodes
 		#fwrite(STDOUT, __METHOD__.' init nodes'.PHP_EOL);
@@ -565,13 +562,18 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		
 		$updateMsgs = $cronjob->msgDbSendAll();
 		
-		#foreach($updateMsgs as $msgId => $msg){
-		#	$outMsg = '/'.$msg['obj']->getId().'/';
-		#	$outMsg .= ' /'.$msg['obj']->getStatus().'/';
-		#	$outMsg .= ' /'.$msg['obj']->getEncryptionMode().'/ '.count($msg['nodes']);
-		#	fwrite(STDOUT, __METHOD__.' update msg: '.$outMsg.PHP_EOL);
-		#	ve($msg['nodes']);
-		#}
+		/*foreach($updateMsgs as $msgId => $msg){
+			$outMsg = '/'.$msg['obj']->getId().'/';
+			$outMsg .= ' /'.$msg['obj']->getStatus().'/';
+			$outMsg .= ' /'.$msg['obj']->getEncryptionMode().'/ '.count($msg['nodes']);
+			fwrite(STDOUT, __METHOD__.' msg: '.$outMsg.PHP_EOL);
+			
+			foreach($msg['nodes'] as $nodeId => $node){
+				$outMsg = $nodeId.' /'.(int)$node->getBridgeServer().'/';
+				$outMsg = '/'.(int)is_object($node).'/ /'.$node.'/';
+				fwrite(STDOUT, __METHOD__.'     node: '.$outMsg.PHP_EOL);
+			}
+		}*/
 		
 		$this->assertEquals('O', $msgs[2001]->getStatus());
 		$this->assertEquals('O', $msgs[2002]->getStatus());
@@ -583,24 +585,22 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$this->assertEquals('D', $msgs[2003]->getEncryptionMode());
 		$this->assertEquals('D', $msgs[2004]->getEncryptionMode());
 		
-		$this->assertEquals(2, count($updateMsgs[$nodeIdBase2.'2001']['nodes']));
-		$this->assertEquals(2, count($updateMsgs[$nodeIdBase2.'2002']['nodes']));
-		$this->assertEquals(3, count($updateMsgs[$nodeIdBase2.'2003']['nodes']));
-		$this->assertEquals(3, count($updateMsgs[$nodeIdBase2.'2004']['nodes']));
+		$this->assertEquals(2, count($updateMsgs[$uuid2.'2001']['nodes']));
+		$this->assertEquals(2, count($updateMsgs[$uuid2.'2002']['nodes']));
+		$this->assertEquals(2, count($updateMsgs[$uuid2.'2003']['nodes']));
+		$this->assertEquals(2, count($updateMsgs[$uuid2.'2004']['nodes']));
 		
-		$this->assertTrue(array_key_exists($nodeIdBase1.'02', $updateMsgs[$nodeIdBase2.'2001']['nodes']));
-		$this->assertTrue(array_key_exists($nodeIdBase1.'05', $updateMsgs[$nodeIdBase2.'2001']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'03', $updateMsgs[$uuid2.'2001']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'04', $updateMsgs[$uuid2.'2001']['nodes']));
 		
-		$this->assertTrue(array_key_exists($nodeIdBase1.'01', $updateMsgs[$nodeIdBase2.'2002']['nodes']));
-		$this->assertTrue(array_key_exists($nodeIdBase1.'05', $updateMsgs[$nodeIdBase2.'2002']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'03', $updateMsgs[$uuid2.'2002']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'04', $updateMsgs[$uuid2.'2002']['nodes']));
 		
-		$this->assertTrue(array_key_exists($nodeIdBase1.'01', $updateMsgs[$nodeIdBase2.'2003']['nodes']));
-		$this->assertTrue(array_key_exists($nodeIdBase1.'02', $updateMsgs[$nodeIdBase2.'2003']['nodes']));
-		$this->assertTrue(array_key_exists($nodeIdBase1.'05', $updateMsgs[$nodeIdBase2.'2003']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'03', $updateMsgs[$uuid2.'2003']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'04', $updateMsgs[$uuid2.'2003']['nodes']));
 		
-		$this->assertTrue(array_key_exists($nodeIdBase1.'01', $updateMsgs[$nodeIdBase2.'2004']['nodes']));
-		$this->assertTrue(array_key_exists($nodeIdBase1.'02', $updateMsgs[$nodeIdBase2.'2004']['nodes']));
-		$this->assertTrue(array_key_exists($nodeIdBase1.'05', $updateMsgs[$nodeIdBase2.'2004']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'03', $updateMsgs[$uuid2.'2004']['nodes']));
+		$this->assertTrue(array_key_exists($uuid1.'04', $updateMsgs[$uuid2.'2004']['nodes']));
 	}
 	
 }
