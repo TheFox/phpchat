@@ -337,14 +337,14 @@ class Node extends YamlStorage{
 		return (bool)$this->data['bridgeClient'];
 	}
 	
-	public function addBridgeClient($bridgeDst){
+	public function addBridgeDst($bridgeDst){
 		$this->data['bridgeDst'][] = $bridgeDst;
 		$this->data['bridgeDst'] = array_unique($this->data['bridgeDst']);
 		$this->setDataChanged(true);
 	}
 	
-	public function getBridgeClient(){
-		return (bool)$this->data['bridgeClient'];
+	public function getBridgeDst(){
+		return $this->data['bridgeDst'];
 	}
 	
 	public function setTimeCreated($timeCreated){
