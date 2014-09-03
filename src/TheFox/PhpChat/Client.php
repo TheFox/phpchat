@@ -648,6 +648,22 @@ class Client{
 							$this->getNode()->incConnectionsInboundSucceed();
 						}
 						
+						if($node->getBridgeServer()){
+							$this->log('debug', 'subscribe to bridge server');
+							
+							$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
+							$action->functionSet(function($action, $client){
+								$client->sendSslInit();
+							});
+							$this->actionsAdd($action);
+							
+							$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
+							$action->functionSet(function($action, $client){
+								$client->sendBridgeSubscribe($client->getLocalNode()->getBridgeClient());
+							});
+							$this->actionsAdd($action);
+						}
+						
 						$msgHandleReturnValue .= $this->sendIdOk();
 						
 						$this->log('debug', $this->getUri().' recv '.$msgName.': ID OK');
@@ -1686,6 +1702,49 @@ class Client{
 			}
 		}
 		
+		elseif($msgName == 'bridge_subscribe'){
+			if($this->getLocalNode()->getBridgeServer()){
+				if($this->getStatus('hasSsl')){
+					$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
+					if($msgData){
+						$rid = '';
+						$subscribe = true;
+						if(array_key_exists('rid', $msgData)){
+							$rid = $msgData['rid'];
+						}
+						if(array_key_exists('subscribe', $msgData)){
+							$subscribe = $msgData['subscribe'];
+						}
+						
+						$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.(int)$subscribe);
+						
+						if($rid){
+							if($subscribe){
+								$this->getNode()->setBridgeClient(true);
+							}
+							else{
+								$this->getNode()->setBridgeClient(false);
+							}
+						}
+						else{
+							$msgHandleReturnValue .= $this->sendError(9000, $msgName);
+						}
+					}
+					else{
+						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
+					}
+				}
+				else{
+					$msgHandleReturnValue .= $this->sendError(2060, $msgName);
+					$this->log('warning', static::getErrorMsg(2060));
+				}
+			}
+			else{
+				$msgHandleReturnValue .= $this->sendError(5000, $msgName);
+				$this->log('warning', static::getErrorMsg(5000));
+			}
+		}
+		
 		elseif($msgName == 'ping'){
 			$rid = '';
 			if(array_key_exists('rid', $msgData)){
@@ -2130,6 +2189,19 @@ class Client{
 		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('talk_close', $data));
 	}
 	
+	public function sendBridgeSubscribe($subscribe = true){
+		$rid = (string)Uuid::uuid4();
+		
+		$data = array(
+			'rid' => $rid,
+			'subscribe' => $subscribe,
+		);
+		
+		$this->log('debug', 'send bridge_subscribe: '.$rid.', '.(int)$subscribe);
+		
+		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('bridge_subscribe', $data));
+	}
+	
 	public function sendPing($rid = ''){
 		$this->pingTime = time();
 		
@@ -2172,6 +2244,9 @@ class Client{
 			
 			// 4000-4999: Hashcash
 			4000 => 'Hashcash: verification failed',
+			
+			// 5000-5999: Bridge
+			5000 => 'Bridge: No Server',
 			
 			// 9000-9999: Misc
 			9000 => 'Invalid data',
