@@ -229,20 +229,37 @@ class Cronjob extends Thread{
 		$this->log->debug('ping');
 		#print __FUNCTION__.''."\n";
 		#$this->log->debug(__FUNCTION__);
-		$table = $this->ipcKernelConnection->execSync('getTable');
-		#ve($table);
+		$this->settings = $this->ipcKernelConnection->execSync('getSettings');
+		#$table = $this->ipcKernelConnection->execSync('getTable');
+		$this->setTable($this->ipcKernelConnection->execSync('getTable'));
+		#ve($this->table);
 		
-		foreach($table->getNodes() as $nodeId => $node){
-			if($node->getSslKeyPubStatus() == 'U'){
-				$this->log->debug('ping A: '.$node->getUri().' /'.$node->getSslKeyPubStatus().'/');
+		if($this->settings->data['node']['bridge']['client']['enabled']){
+			// Ping closest bridge server nodes.
+			$this->log->debug('ping closest bridge server nodes');
+			foreach($this->table->getNodesClosestBridgeServer(20) as $nodeId => $node){
+				$this->log->debug('ping: '.$node->getUri());
+				$this->ipcKernelConnection->execAsync('serverConnect', array($node->getUri(), false, true));
+			}
+		}
+		else{
+			// Ping nodes with unconfirmed SSL Public Key.
+			$this->log->debug('ping unconfirmed nodes');
+			foreach($this->table->getNodes() as $nodeId => $node){
+				if($node->getSslKeyPubStatus() == 'U'){
+					$this->log->debug('ping: /'.$node->getUri().'/ /'.$node->getSslKeyPubStatus().'/');
+					$this->ipcKernelConnection->execAsync('serverConnect', array($node->getUri(), false, true));
+				}
+			}
+			
+			// Ping closest nodes.
+			$this->log->debug('ping closest nodes');
+			foreach($this->table->getNodesClosest(20) as $nodeId => $node){
+				$this->log->debug('ping: '.$node->getUri());
 				$this->ipcKernelConnection->execAsync('serverConnect', array($node->getUri(), false, true));
 			}
 		}
 		
-		foreach($table->getNodesClosest(20) as $nodeId => $node){
-			$this->log->debug('ping B: '.$node->getUri());
-			$this->ipcKernelConnection->execAsync('serverConnect', array($node->getUri(), false, true));
-		}
 	}
 	
 	public function msgDbInit(){
