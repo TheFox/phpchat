@@ -104,6 +104,8 @@ class Kernel extends Thread{
 		$this->localNode->setIdHexStr($this->settings->data['node']['id']);
 		$this->localNode->setUri($this->settings->data['node']['uriLocal']);
 		$this->localNode->setSslKeyPub(file_get_contents($this->settings->data['node']['sslKeyPubPath']));
+		$this->localNode->setBridgeServer($this->settings->data['node']['bridge']['server']['enabled']);
+		$this->localNode->setBridgeClient($this->settings->data['node']['bridge']['client']['enabled']);
 		$this->getLog()->info('setup local node: done');
 		
 		$this->getLog()->info('setup table');

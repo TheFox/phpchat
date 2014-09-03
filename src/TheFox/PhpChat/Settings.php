@@ -30,6 +30,12 @@ class Settings extends YamlStorage{
 		$this->data['node']['traffic']['in'] = '0';
 		$this->data['node']['traffic']['out'] = '0';
 		
+		$this->data['node']['bridge'] = array();
+		$this->data['node']['bridge']['server'] = array();
+		$this->data['node']['bridge']['server']['enabled'] = false;
+		$this->data['node']['bridge']['client'] = array();
+		$this->data['node']['bridge']['client']['enabled'] = false;
+		
 		$this->data['user'] = array();
 		$this->data['user']['nickname'] = '';
 		
@@ -39,10 +45,9 @@ class Settings extends YamlStorage{
 		$this->data['console']['history']['entriesMax'] = 1000;
 		$this->data['console']['history']['saveToFile'] = true;
 		
-		$this->data['message'] = array();
-		$this->data['message']['directDelivery'] = true;
-		
 		$this->load();
+		
+		
 		
 		if($this->isLoaded()){
 			$this->data['version'] = PhpChat::VERSION;

@@ -431,7 +431,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$this->assertTrue(array_key_exists($nodeIdBase1.'02', $updateMsgs[$nodeIdBase2.'1011']['nodes']));
 	}
 	
-	public function testMsgDbIndirectDelivery(){
+	public function testMsgDbBridgeDelivery(){
 		$nodeIdBase1 = '11000000-1000-4001-8001-1000000000';
 		$nodeIdBase2 = '21000000-2000-4002-8002-20000000';
 		
@@ -444,7 +444,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
 		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_cronjob_id_rsa.prv';
 		$settings->data['node']['sslKeyPubPath'] = 'tests/testfile_cronjob_id_rsa.pub';
-		$settings->data['message']['directDelivery'] = false;
+		#$settings->data['message']['directDelivery'] = false;
 		
 		$localNode = new Node();
 		$localNode->setIdHexStr($settings->data['node']['id']);

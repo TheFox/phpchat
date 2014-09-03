@@ -494,23 +494,12 @@ class Cronjob extends Thread{
 				$direct = (int)(
 					$msg->getDstNodeId() == $node->getIdHexStr()
 					&& $node->getUri()->getHost() && $node->getUri()->getPort()
-					#&& $this->settings->data['message']['directDelivery']
 				);
-				$deliver = false;
-				if(
-					#$direct && $this->settings->data['message']['directDelivery']
-					$direct && $this->settings->data['message']['directDelivery']
-					#|| $direct && $this->settings->data['message']['directDelivery']
-					|| !$direct
-					|| $msg->getSrcNodeId() != $this->localNode->getIdHexStr()
-				){
-					$deliver = true;
-				}
-				#$deliver = true;
+				$deliver = true;
 				
 				$logMsg = '/'.$msg->getId().'/ /'.$msg->getStatus().'/ /'.$msg->getEncryptionMode().'/';
 				$logMsg .= ' /'.$msg->getDstNodeId().'/';
-				$logMsg .= ' direct='.$direct.' ('.(int)$this->settings->data['message']['directDelivery'].')';
+				$logMsg .= ' direct='.$direct.'';
 				$logMsg .= ' source='.(int)($msg->getSrcNodeId() == $this->localNode->getIdHexStr());
 				$logMsg .= ' deliver='.(int)$deliver;
 				#$this->log->debug(__FUNCTION__.'      msg: '.$logMsg);
