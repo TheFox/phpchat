@@ -235,18 +235,21 @@ class Kernel extends Thread{
 			$clientActions = array();
 			if($isTalkRequest){
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_HELLO);
+				$action->setName('talk_request_set_status_is_channel_local');
 				$action->functionSet(function($action, $client){
 					$client->setStatus('isChannelLocal', true);
 				});
 				$clientActions[] = $action;
 				
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
+				$action->setName('talk_request_ssl_init');
 				$action->functionSet(function($action, $client){
 					$client->sendSslInit();
 				});
 				$clientActions[] = $action;
 				
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
+				$action->setName('talk_request_after_has_ssl_send_talk_request');
 				$action->functionSet(function($action, $client){
 					$this->ipcConsoleMsgSend('Sening talk request to '.$client->getUri().' ...', true, false);
 					$client->sendTalkRequest($this->getSettingsUserNickname());
@@ -257,12 +260,14 @@ class Kernel extends Thread{
 			
 			if($isPingOnly){
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
+				$action->setName('ping_only_send_quit');
 				$action->functionSet(function($action, $client){
 					$client->sendQuit();
 				});
 				$clientActions[] = $action;
 				
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
+				$action->setName('ping_only_after_previous_actions_shutdown');
 				$action->functionSet(function($action, $client){
 					$client->shutdown();
 				});
@@ -282,6 +287,7 @@ class Kernel extends Thread{
 				}
 				
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
+				$action->setName('msgs_send_msgs');
 				$action->functionSet(function($action, $client){
 					#print __CLASS__.'->'.__FUNCTION__.': send msgs'."\n";
 					
@@ -296,6 +302,7 @@ class Kernel extends Thread{
 				// Wait to get response. Don't disconnect instantly after sending.
 				foreach($msgs as $msgId => $msg){
 					$action = new ClientAction(ClientAction::CRITERION_AFTER_MSG_RESPONSE);
+					$action->setName('msgs_response_for_msg'.$msgId);
 					$action->functionSet(function($action, $client){
 						#print __CLASS__.'->'.__FUNCTION__.': CRITERION_AFTER_MSG_RESPONSE'."\n";
 					});
@@ -303,6 +310,7 @@ class Kernel extends Thread{
 				}
 				
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
+				$action->setName('msgs_after_previous_actions_send_quit');
 				$action->functionSet(function($action, $client){
 					#print __CLASS__.'->'.__FUNCTION__.': shutdown'."\n";
 					

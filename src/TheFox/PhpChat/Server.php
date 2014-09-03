@@ -479,6 +479,7 @@ class Server{
 				
 				$clientActions = array();
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
+				$action->setName('node_find_after_id');
 				$action->functionSet(function($action, $client) use($nodeIdToFind) {
 					#fwrite(STDOUT, 'action function: '.$nodeIdToFind.''."\n");
 					$client->sendNodeFind($nodeIdToFind);
@@ -498,6 +499,7 @@ class Server{
 			$this->log->debug('dht network bootstrap');
 			
 			$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
+			$action->setName('network_bootstrap_node_find');
 			$action->functionSet(function($action, $client){
 				$client->sendNodeFind($client->getLocalNode()->getIdHexStr());
 			});

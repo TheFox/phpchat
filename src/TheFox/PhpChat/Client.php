@@ -334,14 +334,13 @@ class Client{
 	public function actionsExecute($criterion){
 		$actions = $this->actionsGetByCriterion($criterion);
 		
-		#$this->log('debug', 'actions execute: '.count($actions));
+		$this->log('debug', 'actions execute: '.count($actions));
 		foreach($actions as $actionId => $action){
-			#$this->log('debug', 'action execute: '.$criterion);
+			$this->log('debug', 'action execute: /'.$action->getName().'/ /'.$criterion.'/');
 			$this->actionRemove($action);
 			$action->functionExec($this);
 		}
-		
-		#$this->log('debug', 'actions left: '.count($this->actions));
+		$this->log('debug', 'actions left: '.count($this->actions));
 	}
 	
 	public function actionAdd(ClientAction $action){
@@ -497,7 +496,7 @@ class Client{
 				}
 			}
 			
-			#$this->log('debug', 'action execute: CRITERION_AFTER_HELLO');
+			$this->log('debug', 'action execute: CRITERION_AFTER_HELLO');
 			$this->actionsExecute(ClientAction::CRITERION_AFTER_HELLO);
 			
 			$msgHandleReturnValue .= $this->sendId();
@@ -652,6 +651,7 @@ class Client{
 							$this->log('debug', 'subscribe to bridge server');
 							
 							$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
+							$action->setName('bridge_server_init_ssl');
 							$action->functionSet(function($action, $client){
 								$this->log('debug', 'init ssl because of bridge server');
 								$client->sendSslInit();
@@ -659,6 +659,7 @@ class Client{
 							$this->actionsAdd($action);
 							
 							$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
+							$action->setName('bridge_server_send_subscribe');
 							$action->functionSet(function($action, $client){
 								$this->log('debug', 'bridge subscribe ('.(int)$client->getLocalNode()->getBridgeClient().') because of bridge server');
 								$client->sendBridgeSubscribe($client->getLocalNode()->getBridgeClient());
@@ -688,7 +689,7 @@ class Client{
 		elseif($msgName == 'id_ok'){
 			$this->log('debug', $this->getUri().' recv '.$msgName);
 			
-			#$this->log('debug', 'action execute: CRITERION_AFTER_ID_SUCCESSFULL');
+			$this->log('debug', 'action execute: CRITERION_AFTER_ID_SUCCESSFULL');
 			$this->actionsExecute(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
 			
 			if($this->getStatus('isChannelPeer')){
@@ -1114,7 +1115,7 @@ class Client{
 						$msg->setStatus('D');
 					}
 					
-					#$this->log('debug', 'action execute: CRITERION_AFTER_MSG_RESPONSE_SUCCESSFULL');
+					$this->log('debug', 'action execute: CRITERION_AFTER_MSG_RESPONSE_SUCCESSFULL');
 					$this->actionsExecute(ClientAction::CRITERION_AFTER_MSG_RESPONSE_SUCCESSFULL);
 				}
 				else{
@@ -1125,7 +1126,7 @@ class Client{
 				$msgHandleReturnValue .= $this->sendError(1000, $msgName);
 			}
 			
-			#$this->log('debug', 'action execute: CRITERION_AFTER_MSG_RESPONSE');
+			$this->log('debug', 'action execute: CRITERION_AFTER_MSG_RESPONSE');
 			$this->actionsExecute(ClientAction::CRITERION_AFTER_MSG_RESPONSE);
 		}
 		
@@ -1419,7 +1420,7 @@ class Client{
 							
 							$this->setStatus('hasSsl', true);
 							
-							#$this->log('debug', 'action execute: CRITERION_AFTER_HAS_SSL');
+							$this->log('debug', 'action execute: CRITERION_AFTER_HAS_SSL');
 							$this->actionsExecute(ClientAction::CRITERION_AFTER_HAS_SSL);
 						}
 						else{
@@ -1466,7 +1467,7 @@ class Client{
 							$this->sslPasswordLocalCurrent = $this->sslPasswordLocalNew;
 							$this->sslPasswordPeerCurrent = $this->sslPasswordPeerNew;
 							
-							#$this->log('debug', 'action execute: CRITERION_AFTER_HAS_RESSL');
+							$this->log('debug', 'action execute: CRITERION_AFTER_HAS_RESSL');
 							$this->actionsExecute(ClientAction::CRITERION_AFTER_HAS_RESSL);
 						}
 						else{

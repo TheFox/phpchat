@@ -31,6 +31,7 @@ class ClientAction{
 	//const CRITERION_AFTER_LAST_ACTION = 9050;
 	
 	private $id = 0;
+	private $name = ''; // Optional, only for debugging.
 	private $criteria = array();
 	private $objc = null;
 	private $func = null;
@@ -46,6 +47,14 @@ class ClientAction{
 	
 	public function getId(){
 		return $this->id;
+	}
+	
+	public function setName($name){
+		$this->name = $name;
+	}
+	
+	public function getName(){
+		return $this->name;
 	}
 	
 	public function setCriteria($criteria){
