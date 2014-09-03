@@ -83,10 +83,25 @@ class Cronjob extends Thread{
 			throw new RuntimeException('You must first run init().');
 		}
 		
-		$this->pingClosestNodes();
+		$this->pingNodes();
 		$this->msgDbInit();
 		$this->bootstrapNodesEnclose();
 		$this->nodesNewEnclose();
+		
+		$this->log->debug('save');
+		$this->ipcKernelConnection->execAsync('save');
+		
+		$this->ipcKernelConnection->run();
+		
+		$this->shutdown();
+	}
+	
+	public function cyclePingNodes(){
+		if(!$this->ipcKernelConnection){
+			throw new RuntimeException('You must first run init().');
+		}
+		
+		$this->pingNodes();
 		
 		$this->log->debug('save');
 		$this->ipcKernelConnection->execAsync('save');
@@ -148,7 +163,7 @@ class Cronjob extends Thread{
 		
 		if($this->hours == 0 && $this->minutes == 1 && $this->seconds == 0){
 			#print 'ping'."\n";
-			$this->pingClosestNodes();
+			$this->pingNodes();
 			$this->bootstrapNodesEnclose();
 			$this->nodesNewEnclose();
 		}
@@ -166,7 +181,7 @@ class Cronjob extends Thread{
 		}
 		if($this->minutes % 15 == 0 && $this->seconds == 0){
 			#print 'ping'."\n";
-			$this->pingClosestNodes();
+			$this->pingNodes();
 			$this->bootstrapNodesEnclose();
 		}
 		if($this->minutes % 30 == 0 && $this->seconds == 0){
@@ -210,7 +225,7 @@ class Cronjob extends Thread{
 		$this->ipcKernelConnection->execAsync('tableNodesSort');
 	}
 	
-	private function pingClosestNodes(){
+	private function pingNodes(){
 		$this->log->debug('ping');
 		#print __FUNCTION__.''."\n";
 		#$this->log->debug(__FUNCTION__);

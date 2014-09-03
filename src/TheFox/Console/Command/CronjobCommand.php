@@ -21,6 +21,7 @@ class CronjobCommand extends BasicCommand{
 		$this->setDescription('Run the Cronjob.');
 		$this->addOption('daemon', 'd', InputOption::VALUE_NONE, 'Run in daemon mode.');
 		$this->addOption('cycle', 'c', InputOption::VALUE_NONE, 'Run only one cycle.');
+		$this->addOption('ping', 'p', InputOption::VALUE_NONE, 'Run only one ping nodes cycle.');
 		$this->addOption('msg', 'm', InputOption::VALUE_NONE, 'Run only one cycle with Msgs.');
 		$this->addOption('nodes', null, InputOption::VALUE_NONE, 'Run only one cycle with Nodes New DB.');
 		$this->addOption('bootstrap', null, InputOption::VALUE_NONE, 'Run only one cycle with Boostrap Nodes.');
@@ -46,6 +47,9 @@ class CronjobCommand extends BasicCommand{
 		}
 		elseif($input->hasOption('msg') && $input->getOption('msg')){
 			$this->cronjob->cycleMsg();
+		}
+		elseif($input->hasOption('ping') && $input->getOption('ping')){
+			$this->cronjob->cyclePingNodes();
 		}
 		elseif($input->hasOption('nodes') && $input->getOption('nodes')){
 			$this->cronjob->cycleNodesNew();
