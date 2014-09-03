@@ -653,12 +653,14 @@ class Client{
 							
 							$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
 							$action->functionSet(function($action, $client){
+								$this->log('debug', 'init ssl because of bridge server');
 								$client->sendSslInit();
 							});
 							$this->actionsAdd($action);
 							
 							$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
 							$action->functionSet(function($action, $client){
+								$this->log('debug', 'bridge subscribe ('.(int)$client->getLocalNode()->getBridgeClient().') because of bridge server');
 								$client->sendBridgeSubscribe($client->getLocalNode()->getBridgeClient());
 							});
 							$this->actionsAdd($action);
