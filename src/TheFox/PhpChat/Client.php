@@ -1929,10 +1929,11 @@ class Client{
 				'bridgeDst' => array(),
 			);
 			
-			if(!$this->getLocalNode()->getBridgeServer() && !$nodes->getBridgeClient()){
+			if(!$this->getSettings()->data['node']['bridge']['server']['enabled']
+				&& !$node->getBridgeClient()){
 				$nodeOut['uri'] = (string)$node->getUri();
 			}
-			if($nodes->getBridgeClient()){
+			if($node->getBridgeClient()){
 				# TODO: alle exit bridges ins array eintragen
 				#$nodeOut['bridgeDst'] = 
 			}
