@@ -330,7 +330,7 @@ class Client{
 		
 		$this->log('debug', 'actions execute: '.count($actions));
 		foreach($actions as $actionId => $action){
-			$this->log('debug', 'action execute: /'.$action->getName().'/ /'.$criterion.'/');
+			$this->log('debug', 'action execute: /'.$action->getName().'/ /'.join(',', $action->getCriteria()).'/');
 			$this->actionRemove($action);
 			$action->functionExec($this);
 		}
@@ -408,8 +408,13 @@ class Client{
 			$actions = $this->actions;
 			$caction = array_shift($actions);
 			if($caction->getId() == $action->getId()){
+				$this->log('debug', 'actions execute: 1');
+				$this->log('debug', 'action execute: /'.$action->getName().'/ /'.join(',', $action->getCriteria()).'/');
+				
 				$this->actionRemove($action);
 				$action->functionExec($this);
+				
+				$this->log('debug', 'actions left: '.count($this->actions));
 			}
 		}
 		
@@ -907,6 +912,9 @@ class Client{
 									}
 								}
 							}
+							
+							$this->log('debug', 'actions execute: CRITERION_AFTER_NODE_FOUND');
+							$this->actionsExecute(ClientAction::CRITERION_AFTER_NODE_FOUND);
 							
 							if($uri){
 								// Further search at the nearest node.

@@ -486,6 +486,24 @@ class Server{
 				});
 				$clientActions[] = $action;
 				
+				// Wait to get response. Don't disconnect instantly after sending.
+				$action = new ClientAction(ClientAction::CRITERION_AFTER_NODE_FOUND);
+				$action->setName('node_find_node_found');
+				$action->functionSet(function($action, $client){
+					#fwrite(STDOUT, 'action function: CRITERION_AFTER_NODE_FOUND'."\n");
+				});
+				$clientActions[] = $action;
+				
+				$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
+				$action->setName('node_find_after_previous_actions_send_quit');
+				$action->functionSet(function($action, $client){
+					#fwrite(STDOUT, 'action function: CRITERION_AFTER_PREVIOUS_ACTIONS'."\n");
+					
+					$client->sendQuit();
+					$client->shutdown();
+				});
+				$clientActions[] = $action;
+				
 				$this->connect($node->getUri(), $clientActions);
 			}
 		}
