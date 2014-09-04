@@ -648,14 +648,14 @@ class Client{
 						}
 						
 						if($node->getBridgeServer()){
-							$this->log('debug', 'subscribe to bridge server');
+							#$this->log('debug', 'subscribe to bridge server');
 							
 							$actions = array();
 							
 							$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
 							$action->setName('bridge_server_init_ssl');
 							$action->functionSet(function($action, $client){
-								$this->log('debug', 'init ssl because of bridge server');
+								#$this->log('debug', 'init ssl because of bridge server');
 								$client->sendSslInit();
 							});
 							$actions[] = $action;
@@ -663,7 +663,7 @@ class Client{
 							$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
 							$action->setName('bridge_server_send_subscribe');
 							$action->functionSet(function($action, $client){
-								$this->log('debug', 'bridge subscribe ('.(int)$client->getSettings()->data['node']['bridge']['client']['enabled'].') because of bridge server');
+								#$this->log('debug', 'bridge subscribe ('.(int)$client->getSettings()->data['node']['bridge']['client']['enabled'].') because of bridge server');
 								$client->sendBridgeSubscribe($client->getSettings()->data['node']['bridge']['client']['enabled']);
 							});
 							$actions[] = $action;

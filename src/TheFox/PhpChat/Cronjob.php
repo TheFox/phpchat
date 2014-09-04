@@ -259,7 +259,6 @@ class Cronjob extends Thread{
 				$this->ipcKernelConnection->execAsync('serverConnect', array($node->getUri(), false, true));
 			}
 		}
-		
 	}
 	
 	public function msgDbInit(){
