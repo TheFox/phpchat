@@ -22,6 +22,7 @@ class Cronjob extends Thread{
 	private $msgDb;
 	private $settings;
 	private $table;
+	private $nodesNewDb;
 	private $localNode;
 	private $hours = 0;
 	private $minutes = 0;
@@ -62,6 +63,14 @@ class Cronjob extends Thread{
 	
 	public function getTable(){
 		return $this->table;
+	}
+	
+	public function setNodesNewDb($nodesNewDb){
+		$this->nodesNewDb = $nodesNewDb;
+	}
+	
+	public function getNodesNewDb(){
+		return $this->nodesNewDb;
 	}
 	
 	public function init(){
@@ -756,58 +765,125 @@ class Cronjob extends Thread{
 		return $nodes; // Return only for tests.
 	}
 	
-	private function nodesNewEnclose(){
+	public function nodesNewEnclose(){
 		$this->log->debug('nodes new enclose');
 		
-		if(!$this->table){
+		if($this->ipcKernelConnection){
 			$this->setTable($this->ipcKernelConnection->execSync('getTable'));
 		}
+		if($this->ipcKernelConnection){
+			$this->nodesNewDb = $this->ipcKernelConnection->execSync('getNodesNewDb', array(), 10);
+		}
 		
-		$this->log->debug('nodes new enclose, table');
+		$settingsBridgeClient = $this->settings->data['node']['bridge']['client']['enabled'];
 		
-		$nodesNewDb = $this->ipcKernelConnection->execSync('getNodesNewDb', array(), 10);
-		#ve($nodesNewDb);
+		$nodes = array();
 		
-		foreach($nodesNewDb->getNodes() as $nodeId => $node){
+		foreach($this->nodesNewDb->getNodes() as $nodeId => $node){
+			#$this->log->debug('node: '.$nodeId.' '.(int)$node['bridgeServer']);
+			
 			if($node['type'] == 'connect'){
 				if($node['connectAttempts'] >= 10){
 					$this->log->debug('node remove: '.$nodeId);
-					$this->ipcKernelConnection->execAsync('nodesNewDbNodeRemove', array($nodeId));
+					#$nodes[] = array('type' => 'remove', 'node' => null);
+					if($this->ipcKernelConnection){
+						$this->ipcKernelConnection->execAsync('nodesNewDbNodeRemove', array($nodeId));
+					}
+					else{
+						$this->nodesNewDb->nodeRemove($nodeId);
+					}
 				}
 				else{
 					$nodeObj = new Node();
 					$nodeObj->setUri($node['uri']);
+					$nodeObj->setBridgeServer($node['bridgeServer']);
 					
-					$this->log->debug('node connect: '.(string)$nodeObj->getUri());
-					$connected = $this->ipcKernelConnection->execSync('serverConnect', array($nodeObj->getUri(), false, true));
-					if($connected){
-						$this->log->debug('node remove: '.$nodeId);
-						$this->ipcKernelConnection->execAsync('nodesNewDbNodeRemove', array($nodeId));
+					if($settingsBridgeClient){
+						if($nodeObj->getBridgeServer()){
+							$nodes[] = array('type' => 'connect', 'node' => $nodeObj);
+							$this->nodesNewEncloseServerConnect($nodeObj, $nodeId);
+						}
+						else{
+							$this->log->debug('node remove: '.$nodeId);
+							$nodes[] = array('type' => 'remove', 'node' => $nodeObj);
+							
+							if($this->ipcKernelConnection){
+								$this->ipcKernelConnection->execAsync('nodesNewDbNodeRemove', array($nodeId));
+							}
+							else{
+								$this->nodesNewDb->nodeRemove($nodeId);
+							}
+						}
 					}
 					else{
-						$this->log->debug('node inc connect attempt: '.$nodeId);
-						$this->ipcKernelConnection->execAsync('nodesNewDbNodeIncConnectAttempt', array($nodeId));
+						$nodes[] = array('type' => 'connect', 'node' => $nodeObj);
+						$this->nodesNewEncloseServerConnect($nodeObj, $nodeId);
 					}
 				}
 			}
 			elseif($node['type'] == 'find'){
 				$nodeObj = new Node();
 				$nodeObj->setIdHexStr($node['id']);
+				$nodeObj->setBridgeServer($node['bridgeServer']);
 				
 				if($this->table->nodeFind($nodeObj)){
 					$this->log->debug('node remove: '.$nodeId);
-					$this->ipcKernelConnection->execAsync('nodesNewDbNodeRemove', array($nodeId));
+					#$nodes[] = array('type' => 'remove', 'node' => $nodeObj);
+					if($this->ipcKernelConnection){
+						$this->ipcKernelConnection->execAsync('nodesNewDbNodeRemove', array($nodeId));
+					}
+					else{
+						$this->nodesNewDb->nodeRemove($nodeId);
+					}
 				}
 				elseif($node['findAttempts'] >= 5){
 					$this->log->debug('node remove: '.$nodeId);
-					$this->ipcKernelConnection->execAsync('nodesNewDbNodeRemove', array($nodeId));
+					#$nodes[] = array('type' => 'remove', 'node' => $nodeObj);
+					if($this->ipcKernelConnection){
+						$this->ipcKernelConnection->execAsync('nodesNewDbNodeRemove', array($nodeId));
+					}
+					else{
+						$this->nodesNewDb->nodeRemove($nodeId);
+					}
 				}
 				else{
-					$this->log->debug('node find: '.$node['id']);
-					$this->ipcKernelConnection->execAsync('serverNodeFind', array($node['id']));
-					$this->ipcKernelConnection->execAsync('nodesNewDbNodeIncFindAttempt', array($nodeId));
+					#$this->log->debug('node find: '.$node['id']);
+					$nodes[] = array('type' => 'find', 'node' => $nodeObj);
+					if($this->ipcKernelConnection){
+						$this->ipcKernelConnection->execAsync('serverNodeFind', array($node['id']));
+						$this->ipcKernelConnection->execAsync('nodesNewDbNodeIncFindAttempt', array($nodeId));
+					}
+					else{
+						$this->nodesNewDb->nodeIncFindAttempt($nodeId);
+					}
 				}
 			}
+		}
+		
+		foreach($nodes as $nodeId => $node){
+			fwrite(STDOUT, 'node: '.$node['type'].' /'.(int)is_object($node['node']).'/ /'.(int)$node['node']->getBridgeServer().'/'.PHP_EOL);
+			
+		}
+		
+		return $nodes; // Return only for tests.
+	}
+	
+	private function nodesNewEncloseServerConnect($node, $nodeId){
+		$this->log->debug('node connect: '.(string)$node->getUri().' /'.(int)$node->getBridgeServer().'/');
+		
+		if($this->ipcKernelConnection){
+			$connected = $this->ipcKernelConnection->execSync('serverConnect', array($node->getUri(), false, true));
+			if($connected){
+				$this->log->debug('node remove: '.$nodeId);
+				$this->ipcKernelConnection->execAsync('nodesNewDbNodeRemove', array($nodeId));
+			}
+			else{
+				$this->log->debug('node inc connect attempt: '.$nodeId);
+				$this->ipcKernelConnection->execAsync('nodesNewDbNodeIncConnectAttempt', array($nodeId));
+			}
+		}
+		else{
+			$this->nodesNewDb->nodeIncConnectAttempt($nodeId);
 		}
 	}
 	

@@ -6,6 +6,7 @@ use TheFox\PhpChat\Msg;
 use TheFox\PhpChat\Settings;
 use TheFox\Dht\Simple\Table;
 use TheFox\Dht\Kademlia\Node;
+use TheFox\PhpChat\NodesNewDb;
 
 class CronjobTest extends PHPUnit_Framework_TestCase{
 	
@@ -742,6 +743,121 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$this->assertTrue($nodes[2]['node']->getBridgeServer());
 		$this->assertTrue($nodes[3]['node']->getBridgeServer());
 		$this->assertTrue($nodes[4]['node']->getBridgeServer());
+	}
+	
+	public function testNodesNewEncloseDefault(){
+		file_put_contents('tests/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('tests/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+		
+		$settings = new Settings('tests/testfile_cronjob_settings.yml');
+		$settings->data['datadir'] = 'tests';
+		$settings->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB);
+		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
+		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_cronjob_id_rsa.prv';
+		$settings->data['node']['sslKeyPubPath'] = 'tests/testfile_cronjob_id_rsa.pub';
+		$settings->data['node']['bridge']['client']['enabled'] = false;
+		
+		$localNode = new Node();
+		$localNode->setIdHexStr($settings->data['node']['id']);
+		$localNode->setUri($settings->data['node']['uriLocal']);
+		$localNode->setSslKeyPub(file_get_contents($settings->data['node']['sslKeyPubPath']));
+		
+		$table = new Table();
+		$table->setDatadirBasePath($settings->data['datadir']);
+		$table->setLocalNode($localNode);
+		
+		$nodesNewDb = new NodesNewDb('tests/testfile_cronjob_nodesnewdb1.yml');
+		$nodesNewDb->nodeAddConnect('tcp://192.168.241.21', false);
+		$nodesNewDb->nodeAddConnect('tcp://192.168.241.22', true);
+		$nodesNewDb->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1742', false);
+		$nodesNewDb->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1743', true);
+		$nodesNewDb->setDataChanged(true);
+		$nodesNewDb->save();
+		
+		$cronjob = new Cronjob();
+		$cronjob->setSettings($settings);
+		$cronjob->setTable($table);
+		$cronjob->setNodesNewDb($nodesNewDb);
+		
+		$nodes = $cronjob->nodesNewEnclose();
+		
+		$this->assertEquals(4, count($nodes));
+		
+		$this->assertEquals('connect', $nodes[0]['type']);
+		$this->assertEquals('connect', $nodes[1]['type']);
+		$this->assertEquals('find', $nodes[2]['type']);
+		$this->assertEquals('find', $nodes[3]['type']);
+		
+		$this->assertTrue(is_object($nodes[0]['node']));
+		$this->assertTrue(is_object($nodes[1]['node']));
+		$this->assertTrue(is_object($nodes[2]['node']));
+		$this->assertTrue(is_object($nodes[3]['node']));
+		
+		$this->assertFalse($nodes[0]['node']->getBridgeServer());
+		$this->assertTrue($nodes[1]['node']->getBridgeServer());
+		$this->assertFalse($nodes[2]['node']->getBridgeServer());
+		$this->assertTrue($nodes[3]['node']->getBridgeServer());
+		
+		$nodesNewDb->setDataChanged(true);
+		$nodesNewDb->save();
+	}
+	
+	public function testNodesNewEncloseBridge(){
+		file_put_contents('tests/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('tests/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+		
+		$settings = new Settings('tests/testfile_cronjob_settings.yml');
+		$settings->data['datadir'] = 'tests';
+		$settings->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB);
+		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
+		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_cronjob_id_rsa.prv';
+		$settings->data['node']['sslKeyPubPath'] = 'tests/testfile_cronjob_id_rsa.pub';
+		$settings->data['node']['bridge']['client']['enabled'] = true;
+		
+		$localNode = new Node();
+		$localNode->setIdHexStr($settings->data['node']['id']);
+		$localNode->setUri($settings->data['node']['uriLocal']);
+		$localNode->setSslKeyPub(file_get_contents($settings->data['node']['sslKeyPubPath']));
+		
+		$table = new Table();
+		$table->setDatadirBasePath($settings->data['datadir']);
+		$table->setLocalNode($localNode);
+		
+		$nodesNewDb = new NodesNewDb('tests/testfile_cronjob_nodesnewdb2.yml');
+		$nodesNewDb->nodeAddConnect('tcp://192.168.241.21', false);
+		$nodesNewDb->nodeAddConnect('tcp://192.168.241.22', true);
+		$nodesNewDb->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1742', false);
+		$nodesNewDb->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1743', true);
+		$nodesNewDb->setDataChanged(true);
+		$nodesNewDb->save();
+		
+		$cronjob = new Cronjob();
+		$cronjob->setSettings($settings);
+		$cronjob->setTable($table);
+		$cronjob->setNodesNewDb($nodesNewDb);
+		
+		$nodes = $cronjob->nodesNewEnclose();
+		
+		
+		$this->assertEquals(4, count($nodes));
+		
+		$this->assertEquals('remove', $nodes[0]['type']);
+		$this->assertEquals('connect', $nodes[1]['type']);
+		$this->assertEquals('find', $nodes[2]['type']);
+		$this->assertEquals('find', $nodes[3]['type']);
+		
+		$this->assertTrue(is_object($nodes[0]['node']));
+		$this->assertTrue(is_object($nodes[1]['node']));
+		$this->assertTrue(is_object($nodes[2]['node']));
+		$this->assertTrue(is_object($nodes[3]['node']));
+		
+		$this->assertFalse($nodes[0]['node']->getBridgeServer());
+		$this->assertTrue($nodes[1]['node']->getBridgeServer());
+		$this->assertFalse($nodes[2]['node']->getBridgeServer());
+		$this->assertTrue($nodes[3]['node']->getBridgeServer());
+		
+		$nodesNewDb->setDataChanged(true);
+		$nodesNewDb->save();
 	}
 	
 }
