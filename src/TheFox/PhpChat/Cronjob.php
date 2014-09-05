@@ -700,9 +700,7 @@ class Cronjob extends Thread{
 							}*/
 							
 							if((string)$nodeObj->getUri()){
-								$this->log->debug('    NO ID, URI ('.(int)$nodeObj->getBridgeServer().','.(int)$this->settings->data['node']['bridge']['client']['enabled'].')');
-								
-								#$nodes[] = array('type' => 'connect', 'node' => $nodeObj);
+								#$this->log->debug('    NO ID, URI ('.(int)$nodeObj->getBridgeServer().','.(int)$this->settings->data['node']['bridge']['client']['enabled'].')');
 								
 								if(
 									  !$nodeObj->getBridgeServer() && !$settingsBridgeClient
@@ -710,35 +708,35 @@ class Cronjob extends Thread{
 									|| $nodeObj->getBridgeServer() &&  $settingsBridgeClient
 								){
 									$nodes[] = array('type' => 'connect', 'node' => $nodeObj);
-									$this->log->debug('    add connect');
+									#$this->log->debug('    add connect');
 								}
 							}
 							else{
-								$this->log->debug('    NO ID, NO URI');
+								#$this->log->debug('    NO ID, NO URI');
 							}
 						}
 						else{
 							if((string)$nodeObj->getUri()){
-								$this->log->debug('    ID, URI');
+								#$this->log->debug('    ID, URI');
 								$nodes[] = array('type' => 'enclose', 'node' => $nodeObj);
 							}
 							else{
-								$this->log->debug('    ID, NO URI');
+								#$this->log->debug('    ID, NO URI');
 								$nodes[] = array('type' => 'find', 'node' => $nodeObj);
 							}
 						}
 					}
 					else{
-						$this->log->debug('    ignore local node');
+						#$this->log->debug('    ignore local node');
 					}
 				}
 			}
 		}
 		
 		foreach($nodes as $nodeId => $node){
-			$msgOut = $nodeId.' '.$node['type'];
-			$msgOut .= ' /'.$node['node']->getIdHexStr().'/ /'.$node['node']->getUri().'/';
-			$this->log->debug('node: '.$msgOut);
+			#$msgOut = $nodeId.' '.$node['type'];
+			#$msgOut .= ' /'.$node['node']->getIdHexStr().'/ /'.$node['node']->getUri().'/';
+			#$this->log->debug('node: '.$msgOut);
 			
 			$functionName = '';
 			$functionArgs = array();
@@ -847,7 +845,7 @@ class Cronjob extends Thread{
 					}
 				}
 				else{
-					#$this->log->debug('node find: '.$node['id']);
+					$this->log->debug('node find: '.$node['id']);
 					$nodes[] = array('type' => 'find', 'node' => $nodeObj);
 					if($this->ipcKernelConnection){
 						$this->ipcKernelConnection->execAsync('serverNodeFind', array($node['id']));
@@ -860,10 +858,9 @@ class Cronjob extends Thread{
 			}
 		}
 		
-		foreach($nodes as $nodeId => $node){
+		/*foreach($nodes as $nodeId => $node){
 			fwrite(STDOUT, 'node: '.$node['type'].' /'.(int)is_object($node['node']).'/ /'.(int)$node['node']->getBridgeServer().'/'.PHP_EOL);
-			
-		}
+		}*/
 		
 		return $nodes; // Return only for tests.
 	}

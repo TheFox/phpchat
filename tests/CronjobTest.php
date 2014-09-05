@@ -771,8 +771,8 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$nodesNewDb->nodeAddConnect('tcp://192.168.241.22', true);
 		$nodesNewDb->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1742', false);
 		$nodesNewDb->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1743', true);
-		$nodesNewDb->setDataChanged(true);
-		$nodesNewDb->save();
+		#$nodesNewDb->setDataChanged(true);
+		#$nodesNewDb->save();
 		
 		$cronjob = new Cronjob();
 		$cronjob->setSettings($settings);
@@ -798,8 +798,8 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$this->assertFalse($nodes[2]['node']->getBridgeServer());
 		$this->assertTrue($nodes[3]['node']->getBridgeServer());
 		
-		$nodesNewDb->setDataChanged(true);
-		$nodesNewDb->save();
+		#$nodesNewDb->setDataChanged(true);
+		#$nodesNewDb->save();
 	}
 	
 	public function testNodesNewEncloseBridge(){
@@ -828,8 +828,8 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$nodesNewDb->nodeAddConnect('tcp://192.168.241.22', true);
 		$nodesNewDb->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1742', false);
 		$nodesNewDb->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1743', true);
-		$nodesNewDb->setDataChanged(true);
-		$nodesNewDb->save();
+		#$nodesNewDb->setDataChanged(true);
+		#$nodesNewDb->save();
 		
 		$cronjob = new Cronjob();
 		$cronjob->setSettings($settings);
@@ -856,8 +856,8 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$this->assertFalse($nodes[2]['node']->getBridgeServer());
 		$this->assertTrue($nodes[3]['node']->getBridgeServer());
 		
-		$nodesNewDb->setDataChanged(true);
-		$nodesNewDb->save();
+		#$nodesNewDb->setDataChanged(true);
+		#$nodesNewDb->save();
 	}
 	
 }
