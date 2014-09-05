@@ -182,9 +182,9 @@ class Cronjob extends Thread{
 		if($this->minutes % 15 == 0 && $this->seconds == 0){
 			#print 'ping'."\n";
 			$this->pingNodes();
-			$this->bootstrapNodesEnclose();
 		}
 		if($this->minutes % 30 == 0 && $this->seconds == 0){
+			$this->bootstrapNodesEnclose();
 			$this->tableNodesClean();
 		}
 		
