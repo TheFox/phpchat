@@ -20,7 +20,7 @@ class NodesNewDb extends YamlStorage{
 		return array('data');
 	}
 	
-	public function nodeAddConnect($uri){
+	public function nodeAddConnect($uri, $bridgeServer = false){
 		#print __CLASS__.'->'.__FUNCTION__.': '.$uri."\n";
 		
 		if((string)$uri){
@@ -40,6 +40,7 @@ class NodesNewDb extends YamlStorage{
 					'type' => 'connect',
 					'id' => null,
 					'uri' => $uri,
+					'bridgeServer' => $bridgeServer,
 					'connectAttempts' => 0,
 					'findAttempts' => 0,
 					'insertAttempts' => 0,
@@ -49,7 +50,7 @@ class NodesNewDb extends YamlStorage{
 		}
 	}
 	
-	public function nodeAddFind($id){
+	public function nodeAddFind($id, $bridgeServer = false){
 		#print __CLASS__.'->'.__FUNCTION__.': '.$id."\n";
 		
 		if($id != '00000000-0000-4000-8000-000000000000'){
@@ -69,6 +70,7 @@ class NodesNewDb extends YamlStorage{
 					'type' => 'find',
 					'id' => $id,
 					'uri' => null,
+					'bridgeServer' => $bridgeServer,
 					'connectAttempts' => 0,
 					'findAttempts' => 0,
 					'insertAttempts' => 0,

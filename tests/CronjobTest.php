@@ -186,6 +186,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
 		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_cronjob_id_rsa.prv';
 		$settings->data['node']['sslKeyPubPath'] = 'tests/testfile_cronjob_id_rsa.pub';
+		$settings->data['node']['bridge']['client']['enabled'] = false;
 		#$settings->setDataChanged(true);
 		#$settings->save();
 		
@@ -601,6 +602,146 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		
 		$this->assertTrue(array_key_exists($uuid1.'03', $updateMsgs[$uuid2.'2004']['nodes']));
 		$this->assertTrue(array_key_exists($uuid1.'04', $updateMsgs[$uuid2.'2004']['nodes']));
+	}
+	
+	public function testBootstrapNodesEncloseDefault(){
+		file_put_contents('tests/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('tests/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+		
+		$settings = new Settings('tests/testfile_cronjob_settings.yml');
+		$settings->data['datadir'] = 'tests';
+		$settings->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB);
+		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
+		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_cronjob_id_rsa.prv';
+		$settings->data['node']['sslKeyPubPath'] = 'tests/testfile_cronjob_id_rsa.pub';
+		$settings->data['node']['bridge']['client']['enabled'] = false;
+		
+		$localNode = new Node();
+		$localNode->setIdHexStr($settings->data['node']['id']);
+		$localNode->setUri($settings->data['node']['uriLocal']);
+		$localNode->setSslKeyPub(file_get_contents($settings->data['node']['sslKeyPubPath']));
+		
+		$table = new Table();
+		$table->setDatadirBasePath($settings->data['datadir']);
+		$table->setLocalNode($localNode);
+		
+		$cronjob = new Cronjob();
+		$cronjob->setSettings($settings);
+		$cronjob->setTable($table);
+		
+		
+		$jsonSource = json_encode(array(
+			'nodes' => array(
+				array('uri' => 'tcp://10.0.0.11:25000'),
+				array('active' => false, 'id' => 'cafed00d-2131-4159-8e11-0b4dbadb1738'),
+				
+				array('active' => true),
+				array('active' => true, 'id' => $localNode->getIdHexStr()),
+				
+				array('active' => true, 'id' => 'cafed00d-2131-4159-8e11-0b4dbadb1739'),
+				array('active' => true, 'uri' => 'tcp://192.168.241.24'),
+				array('active' => true, 'id' => 'cafed00d-2131-4159-8e11-0b4dbadb1740', 'uri' => 'tcp://192.168.241.25'),
+				
+				array('active' => true, 'id' => 'cafed00d-2131-4159-8e11-0b4dbadb1741', 'bridgeServer' => true),
+				array('active' => true, 'uri' => 'tcp://192.168.241.26', 'bridgeServer' => true),
+			),
+		));
+		
+		$nodes = $cronjob->bootstrapNodesEncloseJson(json_decode($jsonSource, true));
+		#ve($nodes);
+		
+		$this->assertEquals(5, count($nodes));
+		
+		$this->assertEquals('find', $nodes[0]['type']);
+		$this->assertEquals('connect', $nodes[1]['type']);
+		$this->assertEquals('enclose', $nodes[2]['type']);
+		$this->assertEquals('find', $nodes[3]['type']);
+		$this->assertEquals('connect', $nodes[4]['type']);
+		
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1739', $nodes[0]['node']->getIdHexStr());
+		$this->assertEquals('00000000-0000-4000-8000-000000000000', $nodes[1]['node']->getIdHexStr());
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1740', $nodes[2]['node']->getIdHexStr());
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1741', $nodes[3]['node']->getIdHexStr());
+		$this->assertEquals('00000000-0000-4000-8000-000000000000', $nodes[4]['node']->getIdHexStr());
+		
+		$this->assertEquals('', (string)$nodes[0]['node']->getUri());
+		$this->assertEquals('tcp://192.168.241.24', (string)$nodes[1]['node']->getUri());
+		$this->assertEquals('tcp://192.168.241.25', (string)$nodes[2]['node']->getUri());
+		$this->assertEquals('', (string)$nodes[3]['node']->getUri());
+		$this->assertEquals('tcp://192.168.241.26', (string)$nodes[4]['node']->getUri());
+		
+		$this->assertFalse($nodes[0]['node']->getBridgeServer());
+		$this->assertFalse($nodes[1]['node']->getBridgeServer());
+		$this->assertFalse($nodes[2]['node']->getBridgeServer());
+		$this->assertTrue($nodes[3]['node']->getBridgeServer());
+		$this->assertTrue($nodes[4]['node']->getBridgeServer());
+	}
+	
+	public function testBootstrapNodesEncloseBridge(){
+		file_put_contents('tests/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('tests/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+		
+		$settings = new Settings('tests/testfile_cronjob_settings.yml');
+		$settings->data['datadir'] = 'tests';
+		$settings->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB);
+		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
+		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_cronjob_id_rsa.prv';
+		$settings->data['node']['sslKeyPubPath'] = 'tests/testfile_cronjob_id_rsa.pub';
+		$settings->data['node']['bridge']['client']['enabled'] = true;
+		
+		$localNode = new Node();
+		$localNode->setIdHexStr($settings->data['node']['id']);
+		$localNode->setUri($settings->data['node']['uriLocal']);
+		$localNode->setSslKeyPub(file_get_contents($settings->data['node']['sslKeyPubPath']));
+		
+		$table = new Table();
+		$table->setDatadirBasePath($settings->data['datadir']);
+		$table->setLocalNode($localNode);
+		
+		$cronjob = new Cronjob();
+		$cronjob->setSettings($settings);
+		$cronjob->setTable($table);
+		
+		$jsonSource = json_encode(array(
+			'nodes' => array(
+				array('active' => true, 'id' => 'cafed00d-2131-4159-8e11-0b4dbadb1742'),
+				array('active' => true, 'uri' => 'tcp://192.168.241.27'),
+				array('active' => true, 'id' => 'cafed00d-2131-4159-8e11-0b4dbadb1743', 'uri' => 'tcp://192.168.241.28'),
+				
+				array('active' => true, 'id' => 'cafed00d-2131-4159-8e11-0b4dbadb1744', 'bridgeServer' => true),
+				array('active' => true, 'uri' => 'tcp://192.168.241.29', 'bridgeServer' => true),
+				array('active' => true, 'id' => 'cafed00d-2131-4159-8e11-0b4dbadb1745', 'uri' => 'tcp://192.168.241.30', 'bridgeServer' => true),
+			),
+		));
+		
+		$nodes = $cronjob->bootstrapNodesEncloseJson(json_decode($jsonSource, true));
+		#ve($nodes);
+		
+		$this->assertEquals(5, count($nodes));
+		
+		$this->assertEquals('find', $nodes[0]['type']);
+		$this->assertEquals('enclose', $nodes[1]['type']);
+		$this->assertEquals('find', $nodes[2]['type']);
+		$this->assertEquals('connect', $nodes[3]['type']);
+		$this->assertEquals('enclose', $nodes[4]['type']);
+		
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1742', $nodes[0]['node']->getIdHexStr());
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1743', $nodes[1]['node']->getIdHexStr());
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1744', $nodes[2]['node']->getIdHexStr());
+		$this->assertEquals('00000000-0000-4000-8000-000000000000', $nodes[3]['node']->getIdHexStr());
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1745', $nodes[4]['node']->getIdHexStr());
+		
+		$this->assertEquals('', (string)$nodes[0]['node']->getUri());
+		$this->assertEquals('tcp://192.168.241.28', (string)$nodes[1]['node']->getUri());
+		$this->assertEquals('', (string)$nodes[2]['node']->getUri());
+		$this->assertEquals('tcp://192.168.241.29', (string)$nodes[3]['node']->getUri());
+		$this->assertEquals('tcp://192.168.241.30', (string)$nodes[4]['node']->getUri());
+		
+		$this->assertFalse($nodes[0]['node']->getBridgeServer());
+		$this->assertFalse($nodes[1]['node']->getBridgeServer());
+		$this->assertTrue($nodes[2]['node']->getBridgeServer());
+		$this->assertTrue($nodes[3]['node']->getBridgeServer());
+		$this->assertTrue($nodes[4]['node']->getBridgeServer());
 	}
 	
 }

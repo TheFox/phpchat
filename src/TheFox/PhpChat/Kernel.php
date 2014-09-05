@@ -446,12 +446,12 @@ class Kernel extends Thread{
 		return $this->nodesNewDb;
 	}
 	
-	public function nodesNewDbNodeAddConnect($uri){
-		return $this->getNodesNewDb()->nodeAddConnect($uri);
+	public function nodesNewDbNodeAddConnect($uri, $bridgeServer = false){
+		return $this->getNodesNewDb()->nodeAddConnect($uri, $bridgeServer);
 	}
 	
-	public function nodesNewDbNodeAddFind($id){
-		return $this->getNodesNewDb()->nodeAddFind($id);
+	public function nodesNewDbNodeAddFind($id, $bridgeServer = false){
+		return $this->getNodesNewDb()->nodeAddFind($id, $bridgeServer);
 	}
 	
 	public function nodesNewDbNodeIncConnectAttempt($id){

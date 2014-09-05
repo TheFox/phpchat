@@ -590,8 +590,13 @@ class Cronjob extends Thread{
 		return $updateMsgs;
 	}
 	
-	private function bootstrapNodesEnclose(){
+	public function bootstrapNodesEnclose(){
 		$this->log->debug('bootstrap nodes enclose');
+		
+		if(!$this->settings){
+			$this->log->debug('get settings');
+			$this->settings = $this->ipcKernelConnection->execSync('getSettings');
+		}
 		
 		$urls = array(
 			'http://phpchat.fox21.at/nodes.json',
@@ -628,53 +633,15 @@ class Cronjob extends Thread{
 			if($response){
 				if($response->getStatusCode() == 200){
 					if($response->getHeader('content-type') == 'application/json'){
-						$data = array();
+						$json = array();
 						try{
-							$data = $response->json();
+							$json = $response->json();
 						}
 						catch(Exception $e){
 							$this->log->error('JSON: '.$e->getMessage());
 						}
 						
-						if(isset($data['nodes']) && is_array($data['nodes'])){
-							foreach($data['nodes'] as $node){
-								#ve($node);
-								
-								$nodeObj = new Node();
-								
-								$active = true;
-								if(isset($node['active'])){
-									$active = (bool)$node['active'];
-								}
-								if($active){
-									if(isset($node['bridgeServer'])){
-										$nodeObj->setBridgeServer($node['bridgeServer']);
-									}
-									if(isset($node['uri'])){
-										$nodeObj->setUri($node['uri']);
-										
-										if(isset($node['id'])){
-											$nodeObj->setIdHexStr($node['id']);
-											
-											$this->log->debug('node: /'.$nodeObj->getUri().'/ /'.$nodeObj->getIdHexStr().'/');
-											
-											if(!$nodeObj->isEqual($this->table->getLocalNode())){
-												$this->ipcKernelConnection->execAsync('tableNodeEnclose', array($nodeObj));
-											}
-											else{
-												$this->log->debug('ignore local node');
-											}
-										}
-										else{
-											$this->log->debug('node: /'.$nodeObj->getUri().'/');
-											$this->ipcKernelConnection->execAsync('nodesNewDbNodeAddConnect', array((string)$nodeObj->getUri()));
-										}
-									}
-									
-									
-								}
-							}
-						}
+						$this->bootstrapNodesEncloseJson($json);
 					}
 					else{
 						$this->log->warning('response type for "'.$url.'": '.$response->getHeader('content-type'));
@@ -685,6 +652,108 @@ class Cronjob extends Thread{
 				}
 			}
 		}
+	}
+	
+	public function bootstrapNodesEncloseJson($json){
+		#fwrite(STDOUT, 'json: '.(int)$this->ipcKernelConnection.PHP_EOL);
+		
+		$settingsBridgeClient = $this->settings->data['node']['bridge']['client']['enabled'];
+		
+		$nodes = array();
+		
+		if(isset($json['nodes']) && is_array($json['nodes'])){
+			foreach($json['nodes'] as $node){
+				#$this->log->debug('node');
+				
+				$nodeObj = new Node();
+				
+				$active = false;
+				if(isset($node['active'])){
+					$active = (bool)$node['active'];
+				}
+				if($active){
+					if(isset($node['id'])){
+						$nodeObj->setIdHexStr($node['id']);
+					}
+					if(isset($node['uri'])){
+						$nodeObj->setUri($node['uri']);
+					}
+					if(isset($node['bridgeServer'])){
+						$nodeObj->setBridgeServer($node['bridgeServer']);
+					}
+					
+					$this->log->debug('node: /'.$nodeObj->getIdHexStr().'/ /'.$nodeObj->getUri().'/');
+					
+					if(!$nodeObj->isEqual($this->table->getLocalNode())){
+						if($nodeObj->getIdHexStr() == '00000000-0000-4000-8000-000000000000'){
+							/*if(!$nodeObj->getBridgeServer() && !$this->settings->data['node']['bridge']['client']['enabled']){
+								$this->log->debug('no bridge server');
+							}*/
+							
+							if((string)$nodeObj->getUri()){
+								$this->log->debug('    NO ID, URI ('.(int)$nodeObj->getBridgeServer().','.(int)$this->settings->data['node']['bridge']['client']['enabled'].')');
+								
+								#$nodes[] = array('type' => 'connect', 'node' => $nodeObj);
+								
+								if(
+									  !$nodeObj->getBridgeServer() && !$settingsBridgeClient
+									|| $nodeObj->getBridgeServer() && !$settingsBridgeClient
+									|| $nodeObj->getBridgeServer() &&  $settingsBridgeClient
+								){
+									$nodes[] = array('type' => 'connect', 'node' => $nodeObj);
+									$this->log->debug('    add connect');
+								}
+							}
+							else{
+								$this->log->debug('    NO ID, NO URI');
+							}
+						}
+						else{
+							if((string)$nodeObj->getUri()){
+								$this->log->debug('    ID, URI');
+								$nodes[] = array('type' => 'enclose', 'node' => $nodeObj);
+							}
+							else{
+								$this->log->debug('    ID, NO URI');
+								$nodes[] = array('type' => 'find', 'node' => $nodeObj);
+							}
+						}
+					}
+					else{
+						$this->log->debug('    ignore local node');
+					}
+				}
+			}
+		}
+		
+		foreach($nodes as $nodeId => $node){
+			$msgOut = $nodeId.' '.$node['type'];
+			$msgOut .= ' /'.$node['node']->getIdHexStr().'/ /'.$node['node']->getUri().'/';
+			$this->log->debug('node: '.$msgOut);
+			
+			$functionName = '';
+			$functionArgs = array();
+			if($node['type'] == 'enclose'){
+				$functionName = 'tableNodeEnclose';
+				$functionArgs = array($node['node']);
+			}
+			elseif($node['type'] == 'connect'){
+				$functionName = 'nodesNewDbNodeAddConnect';
+				$functionArgs = array((string)$node['node']->getUri());
+			}
+			elseif($node['type'] == 'find'){
+				$functionName = 'nodesNewDbNodeAddFind';
+				$functionArgs = array($node['node']->getIdHexStr());
+			}
+			
+			$functionArgs[] = $node['node']->getBridgeServer();
+			
+			if($this->ipcKernelConnection && $functionName){
+				$this->ipcKernelConnection->execAsync($functionName, $functionArgs);
+			}
+		}
+		
+		return $nodes; // Return only for tests.
 	}
 	
 	private function nodesNewEnclose(){
