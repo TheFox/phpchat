@@ -23,51 +23,59 @@ class NodesNewDb extends YamlStorage{
 	public function nodeAddConnect($uri){
 		#print __CLASS__.'->'.__FUNCTION__.': '.$uri."\n";
 		
-		$oldId = 0;
-		foreach($this->data['nodes'] as $nodeId => $node){
-			if($node['uri'] == $uri){
-				$oldId = $nodeId;
-				break;
+		if((string)$uri){
+			$oldId = 0;
+			foreach($this->data['nodes'] as $nodeId => $node){
+				if($node['uri'] == $uri){
+					$oldId = $nodeId;
+					break;
+				}
 			}
+			if($oldId){
+				$this->data['nodes'][$oldId]['insertAttempts']++;
+			}
+			else{
+				$this->data['nodesId']++;
+				$this->data['nodes'][$this->data['nodesId']] = array(
+					'type' => 'connect',
+					'id' => null,
+					'uri' => $uri,
+					'connectAttempts' => 0,
+					'findAttempts' => 0,
+					'insertAttempts' => 0,
+				);
+			}
+			$this->setDataChanged(true);
 		}
-		if($oldId){
-			$this->data['nodes'][$oldId]['insertAttempts']++;
-		}
-		else{
-			$this->data['nodesId']++;
-			$this->data['nodes'][$this->data['nodesId']] = array(
-				'type' => 'connect',
-				'uri' => $uri,
-				'connectAttempts' => 0,
-				'insertAttempts' => 0,
-			);
-		}
-		$this->setDataChanged(true);
 	}
 	
 	public function nodeAddFind($id){
-		#print __CLASS__.'->'.__FUNCTION__.': '.$uri."\n";
+		#print __CLASS__.'->'.__FUNCTION__.': '.$id."\n";
 		
-		$oldId = false;
-		foreach($this->data['nodes'] as $nodeId => $node){
-			if($node['id'] == $id){
-				$oldId = $nodeId;
-				break;
+		if($id != '00000000-0000-4000-8000-000000000000'){
+			$oldId = false;
+			foreach($this->data['nodes'] as $nodeId => $node){
+				if($node['id'] == $id){
+					$oldId = $nodeId;
+					break;
+				}
 			}
+			if($oldId){
+				$this->data['nodes'][$oldId]['insertAttempts']++;
+			}
+			else{
+				$this->data['nodesId']++;
+				$this->data['nodes'][$this->data['nodesId']] = array(
+					'type' => 'find',
+					'id' => $id,
+					'uri' => null,
+					'connectAttempts' => 0,
+					'findAttempts' => 0,
+					'insertAttempts' => 0,
+				);
+			}
+			$this->setDataChanged(true);
 		}
-		if($oldId){
-			$this->data['nodes'][$oldId]['insertAttempts']++;
-		}
-		else{
-			$this->data['nodesId']++;
-			$this->data['nodes'][$this->data['nodesId']] = array(
-				'type' => 'find',
-				'id' => $id,
-				'findAttempts' => 0,
-				'insertAttempts' => 0,
-			);
-		}
-		$this->setDataChanged(true);
 	}
 	
 	public function nodeIncConnectAttempt($id){
