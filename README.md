@@ -10,7 +10,7 @@ I also like the [Bitmessage](https://bitmessage.org) project. But building think
 - [Peer-to-peer](http://en.wikipedia.org/wiki/Peer-to-peer) instant messaging.
 - Peer-to-peer offline messaging. *Offline* means when the recipient is offline.
 - Decentralized: See [DHT](http://en.wikipedia.org/wiki/Distributed_hash_table).
-- Encryption: [SSL](https://www.openssl.org/)
+- Point-to-point encryption using [SSL](https://www.openssl.org/)
 - Addressbook: manage all conversation partners.
 - [IMAP](https://github.com/TheFox/imapd) interface for fetching new messages.
 - [SMTP](https://github.com/TheFox/smtpd) interface for sending messages.
