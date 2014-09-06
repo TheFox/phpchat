@@ -471,40 +471,46 @@ class Server{
 	}
 	
 	public function nodeFind($nodeIdToFind){
-		#fwrite(STDOUT, 'nodeFind: '.$nodeIdToFind.''."\n");
+		$settingsBridgeClient = $this->getSettings()->data['node']['bridge']['client']['enabled'];
+		
+		#fwrite(STDOUT, 'nodeFind: '.$nodeIdToFind.' /'.(int)$settingsBridgeClient.'/'."\n");
 		
 		if($this->getTable()){
 			foreach($this->getTable()->getNodesClosest() as $nodeId => $node){
-				#fwrite(STDOUT, 'send nodeFind to '.$node->getIdHexStr().''."\n");
+				$connect = $node->getBridgeServer() && $settingsBridgeClient
+					|| !$settingsBridgeClient;
+				#fwrite(STDOUT, 'send node find to '.$node->getIdHexStr().': /'.(int)$node->getBridgeServer().'/ /'.(int)$connect.'/'."\n");
 				
-				$clientActions = array();
-				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
-				$action->setName('node_find_after_id');
-				$action->functionSet(function($action, $client) use($nodeIdToFind) {
-					#fwrite(STDOUT, 'action function: '.$nodeIdToFind.''."\n");
-					$client->sendNodeFind($nodeIdToFind);
-				});
-				$clientActions[] = $action;
-				
-				// Wait to get response. Don't disconnect instantly after sending.
-				$action = new ClientAction(ClientAction::CRITERION_AFTER_NODE_FOUND);
-				$action->setName('node_find_node_found');
-				$action->functionSet(function($action, $client){
-					#fwrite(STDOUT, 'action function: CRITERION_AFTER_NODE_FOUND'."\n");
-				});
-				$clientActions[] = $action;
-				
-				$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
-				$action->setName('node_find_after_previous_actions_send_quit');
-				$action->functionSet(function($action, $client){
-					#fwrite(STDOUT, 'action function: CRITERION_AFTER_PREVIOUS_ACTIONS'."\n");
+				if($connect){
+					$clientActions = array();
+					$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
+					$action->setName('node_find_after_id');
+					$action->functionSet(function($action, $client) use($nodeIdToFind) {
+						#fwrite(STDOUT, 'action function: CRITERION_AFTER_ID_SUCCESSFULL, '.$nodeIdToFind.''."\n");
+						$client->sendNodeFind($nodeIdToFind);
+					});
+					$clientActions[] = $action;
 					
-					$client->sendQuit();
-					$client->shutdown();
-				});
-				$clientActions[] = $action;
-				
-				$this->connect($node->getUri(), $clientActions);
+					// Wait to get response. Don't disconnect instantly after sending.
+					$action = new ClientAction(ClientAction::CRITERION_AFTER_NODE_FOUND);
+					$action->setName('node_find_node_found');
+					$action->functionSet(function($action, $client){
+						#fwrite(STDOUT, 'action function: CRITERION_AFTER_NODE_FOUND'."\n");
+					});
+					$clientActions[] = $action;
+					
+					$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
+					$action->setName('node_find_after_previous_actions_send_quit');
+					$action->functionSet(function($action, $client){
+						#fwrite(STDOUT, 'action function: CRITERION_AFTER_PREVIOUS_ACTIONS'."\n");
+						
+						$client->sendQuit();
+						$client->shutdown();
+					});
+					$clientActions[] = $action;
+					
+					$this->connect($node->getUri(), $clientActions);
+				}
 			}
 		}
 	}
