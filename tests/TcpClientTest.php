@@ -214,7 +214,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		return $rv;
 	}
 	
-	private function sendGenTestData(){
+	private function sendGenTestDataDefault(){
 		@unlink('tests/testdir_tcpclient1/bucket_root.yml');
 		@unlink('tests/testdir_tcpclient2/bucket_root.yml');
 		
@@ -349,7 +349,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 	}
 	
 	public function testSendBasic(){
-		list($client1, $client2) = $this->sendGenTestData();
+		list($client1, $client2) = $this->sendGenTestDataDefault();
 		
 		// Hello Client1
 		$raw = $client1->sendHello();
@@ -425,7 +425,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 	}
 	
 	public function testSendNodeFind(){
-		list($client1, $client2) = $this->sendGenTestData();
+		list($client1, $client2) = $this->sendGenTestDataDefault();
 		
 		// Node Find before ID should cause an error.
 		$raw = $client1->sendNodeFind($client1->getSettings()->data['node']['id']);
@@ -510,7 +510,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 	}
 	
 	public function testSendMsg(){
-		list($client1, $client2) = $this->sendGenTestData();
+		list($client1, $client2) = $this->sendGenTestDataDefault();
 		
 		// Send Msg before ID should cause an error.
 		$msg = new Msg();
@@ -583,7 +583,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 	}
 	
 	public function testSendSsl(){
-		list($client1, $client2) = $this->sendGenTestData();
+		list($client1, $client2) = $this->sendGenTestDataDefault();
 		
 		// SSL before ID should cause an error.
 		$raw = $client1->sendSslInit();
@@ -682,7 +682,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 	}
 	
 	public function testSendTalk(){
-		list($client1, $client2) = $this->sendGenTestData();
+		list($client1, $client2) = $this->sendGenTestDataDefault();
 		
 		
 		// Talk Request before ID should cause an error.
@@ -794,7 +794,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 	}
 	
 	public function testSendPingPong(){
-		list($client1, $client2) = $this->sendGenTestData();
+		list($client1, $client2) = $this->sendGenTestDataDefault();
 		
 		// Ping - Pong
 		$raw = $client1->sendPing();
@@ -826,7 +826,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 	}
 	
 	public function testSendNoop(){
-		list($client1, $client2) = $this->sendGenTestData();
+		list($client1, $client2) = $this->sendGenTestDataDefault();
 		
 		// NoOp
 		$raw = $client1->sendNoop();
@@ -839,7 +839,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 	}
 	
 	public function testSendError(){
-		list($client1, $client2) = $this->sendGenTestData();
+		list($client1, $client2) = $this->sendGenTestDataDefault();
 		
 		// Error
 		$raw = $client1->sendError();
@@ -861,7 +861,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 	}
 	
 	public function testSendUnknownCommand(){
-		list($client1, $client2) = $this->sendGenTestData();
+		list($client1, $client2) = $this->sendGenTestDataDefault();
 		
 		// Unknown Command
 		$raw = $client2->msgHandle('{"name":"blaaaaa"}');
