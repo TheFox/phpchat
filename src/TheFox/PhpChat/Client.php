@@ -26,6 +26,7 @@ class Client{
 	const SSL_PASSWORD_MSG_MAX = 100;
 	const ACTIONS_INTERVAL = 30;
 	
+	public $debug = false;
 	protected $id = 0;
 	private $status = array();
 	
@@ -652,7 +653,7 @@ class Client{
 							$this->getNode()->incConnectionsInboundSucceed();
 						}
 						
-						if($node->getBridgeServer()){
+						if(!$this->debug && $node->getBridgeServer()){
 							#$this->log('debug', 'subscribe to bridge server');
 							
 							$actions = array();
@@ -660,7 +661,7 @@ class Client{
 							$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
 							$action->setName('bridge_server_init_ssl');
 							$action->functionSet(function($action, $client){
-								#$this->log('debug', 'init ssl because of bridge server');
+								$this->log('debug', 'init ssl because of bridge server');
 								$client->sendSslInit();
 							});
 							$actions[] = $action;
@@ -668,7 +669,7 @@ class Client{
 							$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
 							$action->setName('bridge_server_send_subscribe');
 							$action->functionSet(function($action, $client){
-								#$this->log('debug', 'bridge subscribe ('.(int)$client->getSettings()->data['node']['bridge']['client']['enabled'].') because of bridge server');
+								$this->log('debug', 'bridge subscribe ('.(int)$client->getSettings()->data['node']['bridge']['client']['enabled'].') because of bridge server');
 								$client->sendBridgeSubscribe($client->getSettings()->data['node']['bridge']['client']['enabled']);
 							});
 							$actions[] = $action;
@@ -1998,7 +1999,7 @@ class Client{
 			throw new RuntimeException('ssl not set.');
 		}
 		
-		#$this->log('debug', 'send SSL init');
+		$this->log('debug', 'send SSL init');
 		
 		if($this->getStatus('hasSendSslInit')){
 			$this->setStatus('hasSslInit', true);
@@ -2024,6 +2025,8 @@ class Client{
 			throw new RuntimeException('ssl not set.');
 		}
 		
+		$this->log('debug', 'send SSL init response');
+		
 		$data = array('status' => $status);
 		
 		return $this->dataSend($this->msgCreate('ssl_init_response', $data));
@@ -2040,7 +2043,7 @@ class Client{
 			'token' => $this->sslTestToken,
 		);
 		
-		#$this->log('debug', 'send SSL Test: '.$this->sslTestToken);
+		$this->log('debug', 'send SSL Test: '.$this->sslTestToken);
 		
 		return $this->dataSend($this->sslMsgCreatePublicEncrypt('ssl_test', $data));
 	}
@@ -2049,6 +2052,8 @@ class Client{
 		if(!$this->getSsl()){
 			throw new RuntimeException('ssl not set.');
 		}
+		
+		$this->log('debug', 'send SSL verify');
 		
 		$data = array(
 			'token' => $token,
@@ -2069,6 +2074,7 @@ class Client{
 		$this->sslPasswordLocalCurrent = $this->genSslPassword();
 		$this->sslPasswordTime = time();
 		#$this->log('debug', 'SSL: local password: '.substr($this->sslPasswordLocalCurrent, 0, 20));
+		$this->log('debug', 'send SSL password put');
 		
 		$data = array(
 			'password' => $this->sslPasswordLocalCurrent,
@@ -2087,6 +2093,7 @@ class Client{
 		#$this->log('debug', 're-SSL: local password new: '.substr($this->sslPasswordLocalNew, 0, 20));
 		#$this->log('debug', 're-SSL: peer password:      '.substr($this->sslPasswordPeerCurrent, 0, 20));
 		#$this->log('debug', 're-SSL: peer password new:  '.substr($this->sslPasswordPeerNew, 0, 20));
+		$this->log('debug', 'send SSL password reput');
 		
 		$data = array(
 			'password' => $this->sslPasswordLocalNew,
@@ -2098,6 +2105,8 @@ class Client{
 		if(!$this->getSsl()){
 			throw new RuntimeException('ssl not set.');
 		}
+		
+		$this->log('debug', 'send SSL password test');
 		
 		$this->sslPasswordToken = (string)Uuid::uuid4();
 		
@@ -2114,6 +2123,7 @@ class Client{
 		
 		$this->sslPasswordToken = (string)Uuid::uuid4();
 		#$this->log('debug', 're-SSL token: '.substr($this->sslPasswordToken, 0, 20));
+		$this->log('debug', 'send SSL password retest');
 		
 		$data = array(
 			'token' => $this->sslPasswordToken,
@@ -2126,6 +2136,8 @@ class Client{
 		if(!$this->getSsl()){
 			throw new RuntimeException('ssl not set.');
 		}
+		
+		$this->log('debug', 'send SSL password verify');
 		
 		$token = hash('sha512', $token.'_'.$this->getLocalNode()->getIdHexStr());
 		
@@ -2143,6 +2155,7 @@ class Client{
 		#$this->log('debug', 're-SSL peer token: '.substr($token, 0, 20));
 		$token = hash('sha512', $token.'_'.$this->getLocalNode()->getSslKeyPubFingerprint());
 		#$this->log('debug', 're-SSL local token: '.substr($token, 0, 20));
+		$this->log('debug', 'send SSL password reverify');
 		
 		$data = array(
 			'token' => $token,
@@ -2445,7 +2458,7 @@ class Client{
 	}
 	
 	private function sslPasswordEncrypt($data, $sslPasswordLocalCurrent = null, $sslPasswordPeerCurrent = null){
-		#$this->log('debug', 'SSL password encrypt: /'.$sslPasswordLocalCurrent.'/ /'.$sslPasswordPeerCurrent.'/');
+		#$this->log('debug', 'SSL password encrypt A: /'.$sslPasswordLocalCurrent.'/ /'.$sslPasswordPeerCurrent.'/');
 		
 		if($sslPasswordLocalCurrent === null){
 			#$this->log('debug', 'SSL password encrypt: no local password set');
@@ -2455,6 +2468,9 @@ class Client{
 			#$this->log('debug', 'SSL password encrypt: no peer password set');
 			$sslPasswordPeerCurrent = $this->sslPasswordPeerCurrent;
 		}
+		
+		#$this->log('debug', 'SSL password encrypt B: /'.$sslPasswordLocalCurrent.'/ /'.$sslPasswordPeerCurrent.'/');
+		#$this->log('debug', 'SSL password encrypt');
 		
 		if($sslPasswordLocalCurrent && $sslPasswordPeerCurrent){
 			$password = $sslPasswordLocalCurrent.'_'.$sslPasswordPeerCurrent;

@@ -312,6 +312,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$server2->setLog($log2);
 		
 		$client1 = new TcpClient();
+		$client1->debug = true;
 		$client1->setSslPrv($settings1->data['node']['sslKeyPrvPath'], $settings1->data['node']['sslKeyPrvPass']);
 		$client1->setId(1);
 		$client1->setUri($settings1->data['node']['uriLocal']);
@@ -320,6 +321,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		#fwrite(STDOUT, 'ip1: /'.$client1->getUri()->getHost().'/'."\n");
 		
 		$client2 = new TcpClient();
+		$client2->debug = true;
 		$client2->setSslPrv($settings2->data['node']['sslKeyPrvPath'], $settings2->data['node']['sslKeyPrvPass']);
 		$client2->setId(2);
 		$client2->setUri($settings2->data['node']['uriLocal']);
