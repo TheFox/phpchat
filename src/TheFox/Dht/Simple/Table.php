@@ -103,17 +103,17 @@ class Table extends YamlStorage{
 		return $rv;
 	}
 	
-	public function getNodesClosest($num = 20){
+	public function getNodesClosest($max = 20){
 		$nodes = $this->nodes;
-		$nodes = array_slice($nodes, 0, $num);
+		$nodes = array_slice($nodes, 0, $max);
 		ksort($nodes, SORT_STRING);
 		
 		return $nodes;
 	}
 	
-	public function getNodesClosestBridgeServer($num = 20){
+	public function getNodesClosestBridgeServer($max = 20){
 		$nodes = $this->getNodesBridgeServer();
-		$nodes = array_slice($nodes, 0, $num);
+		$nodes = array_slice($nodes, 0, $max);
 		ksort($nodes, SORT_STRING);
 		
 		return $nodes;
@@ -164,26 +164,26 @@ class Table extends YamlStorage{
 		return null;
 	}
 	
-	public function nodeFindClosest(Node $node, $num = 8){
+	public function nodeFindClosest(Node $node, $max = 8){
 		$nodes = array();
 		foreach($this->nodes as $onodeId => $onode){
 			if(!$onode->isEqual($node)){
 				$nodes[$onode->distanceHexStr($node)] = $onode;
 				ksort($nodes, SORT_STRING);
-				$nodes = array_slice($nodes, 0, $num);
+				$nodes = array_slice($nodes, 0, $max);
 			}
 		}
 		$rv = array_values($nodes);
 		return $rv;
 	}
 	
-	public function nodeFindClosestBridgeServer(Node $node, $num = 8){
+	public function nodeFindClosestBridgeServer(Node $node, $max = 8){
 		$nodes = array();
 		foreach($this->nodes as $onodeId => $onode){
 			if($onode->getBridgeServer() && !$onode->isEqual($node)){
 				$nodes[$onode->distanceHexStr($node)] = $onode;
 				ksort($nodes, SORT_STRING);
-				$nodes = array_slice($nodes, 0, $num);
+				$nodes = array_slice($nodes, 0, $max);
 			}
 		}
 		$rv = array_values($nodes);
