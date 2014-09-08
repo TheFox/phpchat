@@ -2057,7 +2057,7 @@ class Client{
 			throw new RuntimeException('ssl not set.');
 		}
 		
-		$this->log('debug', 'send SSL init response');
+		$this->log('debug', 'send SSL init response: '.$status);
 		
 		$data = array('status' => $status);
 		
