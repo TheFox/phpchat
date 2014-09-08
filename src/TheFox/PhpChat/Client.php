@@ -744,7 +744,7 @@ class Client{
 					$hashcash = $msgData['hashcash'];
 				}
 				
-				$this->log('debug', $this->getUri().' recv '.$msgName.': '.$nodeId);
+				$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid);
 				
 				if($rid){
 					if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MIN)){
@@ -938,6 +938,8 @@ class Client{
 					else{
 						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
 					}
+					
+					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.' end');
 				}
 				else{
 					$msgHandleReturnValue .= $this->sendError(9000, $msgName);
@@ -1936,6 +1938,8 @@ class Client{
 		
 		$rid = (string)Uuid::uuid4();
 		
+		$this->log('debug', 'send node find: '.$rid);
+		
 		$this->requestAdd('node_find', $rid, array(
 			'nodeId' => $nodeId,
 			'distance' => $distance,
@@ -1958,6 +1962,8 @@ class Client{
 		if(!$this->getTable()){
 			throw new RuntimeException('table not set.');
 		}
+		
+		$this->log('debug', 'send node found: '.$rid);
 		
 		$nodesOut = array();
 		foreach($nodes as $nodeId => $node){
