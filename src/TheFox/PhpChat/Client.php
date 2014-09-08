@@ -923,7 +923,7 @@ class Client{
 								
 								$clientActions = array();
 								$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
-								$action->functionSet(function($action, $client){
+								$action->functionSet(function($action, $client) use($nodeId) {
 									$client->sendNodeFind($nodeId, $distanceOld, $nodesFoundIds);
 								});
 								$clientActions[] = $action;
