@@ -250,7 +250,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		
 		
 		$localNode2 = new Node();
-		$localNode1->setUri('tcp://127.0.0.2:25000');
+		$localNode2->setUri('tcp://127.0.0.2:25000');
 		$localNode2->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1739');
 		
 		$table2 = new Table('tests/testdir_tcpclient2/table.yml');
