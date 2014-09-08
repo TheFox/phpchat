@@ -818,6 +818,8 @@ class Client{
 							$distanceOld = $request['data']['distance'];
 							$uri = '';
 							
+							$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.' nodes: '.count($nodes));
+							
 							if($nodes){
 								// Find the smallest distance.
 								foreach($nodes as $nodeArId => $nodeAr){
@@ -1150,19 +1152,23 @@ class Client{
 			if($this->getSsl()){
 				if($this->getStatus('hasId')){
 					if(!$this->getStatus('hasSslInit')){
+						$rid = '';
 						$hashcash = '';
+						if(array_key_exists('rid', $msgData)){
+							$rid = $msgData['rid'];
+						}
 						if(array_key_exists('hashcash', $msgData)){
 							$hashcash = $msgData['hashcash'];
 						}
 						
-						$this->log('debug', 'SSL: init A');
+						$this->log('debug', 'SSL: init A: '.$rid);
 						
 						if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MIN)){
 							$this->log('debug', 'SSL: init B');
 							
 							$this->setStatus('hasSslInit', true);
 							$msgHandleReturnValue .= $this->sendSslInit();
-							$msgHandleReturnValue .= $this->sendSslInitResponse(1);
+							$msgHandleReturnValue .= $this->sendSslInitResponse($rid, 1);
 							
 							#fwrite(STDOUT, 'ssl init: /'.$msgHandleReturnValue.'/'."\n");
 							#ve($msgHandleReturnValue);
@@ -1170,29 +1176,33 @@ class Client{
 						else{
 							$this->resetStatusSsl();
 							#$msgHandleReturnValue .= $this->sendError(4000, $msgName);
-							$msgHandleReturnValue .= $this->sendSslInitResponse(4000);
+							$msgHandleReturnValue .= $this->sendSslInitResponse($rid, 4000);
 						}
 					}
 				}
 				else{
 					$this->resetStatusSsl();
 					#$msgHandleReturnValue .= $this->sendError(1000, $msgName);
-					$msgHandleReturnValue .= $this->sendSslInitResponse(1000);
+					$msgHandleReturnValue .= $this->sendSslInitResponse(null, 1000);
 				}
 			}
 			else{
 				$this->resetStatusSsl();
 				#$msgHandleReturnValue .= $this->sendError(3090, $msgName);
-				$msgHandleReturnValue .= $this->sendSslInitResponse(3090);
+				$msgHandleReturnValue .= $this->sendSslInitResponse(null, 3090);
 			}
 		}
 		elseif($msgName == 'ssl_init_response'){
+			$rid = '';
 			$status = 0;
+			if(array_key_exists('rid', $msgData)){
+				$rid = $msgData['rid'];
+			}
 			if(array_key_exists('status', $msgData)){
 				$status = $msgData['status'];
 			}
 			
-			$this->log('debug', 'SSL: init response: '.$status);
+			$this->log('debug', 'SSL: init response: '.$rid.' '.$status);
 			
 			if($status){
 				if($status == 1){
@@ -2037,20 +2047,25 @@ class Client{
 			throw new RuntimeException('ssl not set.');
 		}
 		
-		$this->log('debug', 'send SSL init');
+		$this->log('debug', 'send SSL init A');
 		
 		if($this->getStatus('hasSendSslInit')){
 			$this->setStatus('hasSslInit', true);
 			
-			#$this->log('debug', 'send SSL init: set has send');
+			$this->log('debug', 'send SSL init BB');
 			return '';
 		}
 		else{
 			$this->setStatus('hasSendSslInit', true);
 			
-			#$this->log('debug', 'send SSL init: create data');
+			$rid = (string)Uuid::uuid4();
 			
-			$data = array('hashcash' => '');
+			$this->log('debug', 'send SSL init BA: '.$rid);
+			
+			$data = array(
+				'rid' => $rid,
+				'hashcash' => '',
+			);
 			if($useHashcash){
 				$data['hashcash'] = $this->hashcashMint(static::HASHCASH_BITS_MIN);
 			}
@@ -2058,14 +2073,17 @@ class Client{
 		}
 	}
 	
-	private function sendSslInitResponse($status){
+	private function sendSslInitResponse($rid, $status){
 		if(!$this->getSsl()){
 			throw new RuntimeException('ssl not set.');
 		}
 		
-		$this->log('debug', 'send SSL init response: '.$status);
+		$this->log('debug', 'send SSL init response: '.$rid.' '.$status);
 		
-		$data = array('status' => $status);
+		$data = array(
+			'rid' => $rid,
+			'status' => $status,
+		);
 		
 		return $this->dataSend($this->msgCreate('ssl_init_response', $data));
 	}
