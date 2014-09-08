@@ -1718,7 +1718,7 @@ class Client{
 		}
 		
 		elseif($msgName == 'bridge_subscribe'){
-			if($this->getLocalNode()->getBridgeServer()){
+			if($this->getSettings()->data['node']['bridge']['server']['enabled']){
 				if($this->getStatus('hasSsl')){
 					$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
 					if($msgData){
@@ -1871,7 +1871,7 @@ class Client{
 				'port'      => $this->getLocalNode()->getUri()->getPort(),
 				'sslKeyPub' => $sslKeyPubBase64,
 				'sslKeyPubSign' => $sslKeyPubSign,
-				'bridgeServer' => $this->getLocalNode()->getBridgeServer(),
+				'bridgeServer' => $this->getSettings()->data['node']['bridge']['server']['enabled'],
 				
 				'isChannel' => $this->getStatus('isChannelLocal'),
 			);
