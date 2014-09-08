@@ -917,9 +917,9 @@ class Client{
 							$this->log('debug', 'actions execute: CRITERION_AFTER_NODE_FOUND');
 							$this->actionsExecute(ClientAction::CRITERION_AFTER_NODE_FOUND);
 							
-							if($uri){
+							if((string)$uri){
 								// Further search at the nearest node.
-								$this->log('debug', 'node found: uri ('.$uri.') ok');
+								$this->log('debug', 'node found: uri ('.(string)$uri.') ok');
 								
 								$clientActions = array();
 								$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
