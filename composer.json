@@ -26,7 +26,8 @@
 		"guzzlehttp/guzzle": "~4.1",
 		"kevinlebrun/colors.php": "~0.3",
 		"rych/bytesize": "1.0.0",
-		"thefox/utilities": "~1.1",
+		"stephenhill/base58": "~1.1",
+		"thefox/utilities": "~1.2",
 		"thefox/hashcash": "~1.5",
 		"thefox/imapd": "~0.1",
 		"thefox/smtpd": "~0.1"
