@@ -8,6 +8,7 @@ use RuntimeException;
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
 use Zend\Uri\UriFactory;
+use Colors\Color;
 
 use TheFox\Utilities\Hex;
 use TheFox\Dht\Kademlia\Node;
@@ -157,21 +158,20 @@ class Client{
 	}
 	
 	public function setSslPrv($sslKeyPrvPath, $sslKeyPrvPass){
-		$this->log('debug', 'SSL setup');
+		$this->logColor('debug', 'SSL setup', 'green');
 		
 		$content = file_get_contents($sslKeyPrvPath);
 		$sslHandle = openssl_pkey_get_private($content, $sslKeyPrvPass);
 		if($sslHandle !== false){
-			$this->log('debug', 'SSL setup ok');
+			$this->logColor('debug', 'SSL setup ok', 'green');
 			$this->setSsl($sslHandle);
 		}
 		else{
-			$this->log('debug', 'SSL failed');
+			$this->logColor('debug', 'SSL failed', 'green');
 			while($openSslErrorStr = openssl_error_string()){
 				$this->log('error', 'SSL: '.$openSslErrorStr);
 			}
 		}
-		
 	}
 	
 	public function getLocalNode(){
@@ -211,6 +211,11 @@ class Client{
 		/*else{
 			print __CLASS__.'->'.__FUNCTION__.': '.$level.', '.$msg."\n";
 		}*/
+	}
+	
+	public function logColor($level, $msg, $colorBg = 'green', $colorFg = 'black'){
+		$color = new Color();
+		$this->log($level, $color($msg)->bg($colorBg)->fg($colorFg));
 	}
 	
 	public function getTable(){
@@ -434,8 +439,8 @@ class Client{
 				$this->sslPasswordTime = time();
 			}
 			if($this->sslPasswordTime < time() - static::SSL_PASSWORD_TTL || $this->sslMsgCount >= static::SSL_PASSWORD_MSG_MAX){
-				#$this->log('debug', 'SSL: password timed out: '.date('H:i:s', $this->sslPasswordTime));
-				#$this->log('debug', 'SSL: msgs count: '.$this->sslMsgCount);
+				#$this->logColor('debug', 'SSL: password timed out: '.date('H:i:s', $this->sslPasswordTime), 'green');
+				#$this->logColor('debug', 'SSL: msgs count: '.$this->sslMsgCount, 'green');
 				
 				$this->sslMsgCount = 0;
 				$this->sslPasswordToken = '';
@@ -572,11 +577,11 @@ class Client{
 											
 											// Check if a public key already exists.
 											if($node->getSslKeyPub()){
-												$this->log('debug', 'SSL public key ok [Aa]');
+												#$this->logColor('debug', 'SSL public key ok [Aa]', 'green');
 												$idOk = true;
 												
 												if($node->getSslKeyPub() == $strKeyPub){
-													$this->log('debug', 'SSL public key ok [Ab]');
+													#$this->logColor('debug', 'SSL public key ok [Ab]', 'green');
 													$node->setSslKeyPubStatus('C');
 													$node->setDataChanged(true);
 												}
@@ -588,7 +593,7 @@ class Client{
 													$sslPubKeyDetails = openssl_pkey_get_details($sslPubKey);
 													
 													if($sslPubKeyDetails['bits'] >= Node::SSL_KEY_LEN_MIN){
-														$this->log('debug', 'SSL public key ok [B]');
+														#$this->logColor('debug', 'SSL public key ok [B]', 'green');
 														$idOk = true;
 														
 														$node->setSslKeyPub($strKeyPub);
@@ -661,7 +666,7 @@ class Client{
 							$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
 							$action->setName('bridge_server_init_ssl');
 							$action->functionSet(function($action, $client){
-								$this->log('debug', 'init ssl because of bridge server');
+								$this->logColor('debug', 'init ssl because of bridge server', 'green');
 								$client->sendSslInit();
 							});
 							$actions[] = $action;
@@ -669,7 +674,7 @@ class Client{
 							$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
 							$action->setName('bridge_server_send_subscribe');
 							$action->functionSet(function($action, $client){
-								$this->log('debug', 'bridge subscribe ('.(int)$client->getSettings()->data['node']['bridge']['client']['enabled'].') because of bridge server');
+								$this->logColor('debug', 'bridge subscribe ('.(int)$client->getSettings()->data['node']['bridge']['client']['enabled'].') because of bridge server', 'yellow');
 								$client->sendBridgeSubscribe($client->getSettings()->data['node']['bridge']['client']['enabled']);
 							});
 							$actions[] = $action;
@@ -1161,10 +1166,10 @@ class Client{
 							$hashcash = $msgData['hashcash'];
 						}
 						
-						$this->log('debug', 'SSL: init A: '.$rid);
+						$this->logColor('debug', 'SSL: init A: '.$rid, 'green');
 						
 						if($hashcash && $this->hashcashVerify($hashcash, $this->getNode()->getIdHexStr(), static::HASHCASH_BITS_MIN)){
-							$this->log('debug', 'SSL: init B');
+							$this->logColor('debug', 'SSL: init B', 'green');
 							
 							$this->setStatus('hasSslInit', true);
 							$msgHandleReturnValue .= $this->sendSslInit();
@@ -1202,30 +1207,30 @@ class Client{
 				$status = $msgData['status'];
 			}
 			
-			$this->log('debug', 'SSL: init response: '.$rid.' '.$status);
+			$this->logColor('debug', 'SSL: init response: '.$rid.' '.$status, 'green');
 			
 			if($status){
 				if($status == 1){
 					// Ok
 					if($this->getStatus('hasSslInit') && !$this->getStatus('hasSslInitOk')){
-						$this->log('debug', 'SSL: init ok');
+						$this->logColor('debug', 'SSL: init ok', 'green');
 						
 						$this->setStatus('hasSslInitOk', true);
 						$msgHandleReturnValue .= $this->sendSslTest();
 					}
 					else{
-						$this->log('warning', $msgName.' SSL: you already initialized ssl');
+						$this->logColor('warning', $msgName.' SSL: you already initialized ssl', 'green');
 						$msgHandleReturnValue .= $this->sendError(2050, $msgName);
 					}
 				}
 				else{
-					$this->log('warning', $msgName.' SSL: failed. status = '.$status);
+					$this->logColor('warning', $msgName.' SSL: failed. status = '.$status, 'green');
 					$this->resetStatusSsl();
 					$msgHandleReturnValue .= $this->sendError(3100, $msgName);
 				}
 			}
 			else{
-				$this->log('warning', $msgName.' SSL: failed, invalid data');
+				$this->logColor('warning', $msgName.' SSL: failed, invalid data', 'green');
 				$this->resetStatusSsl();
 				$msgHandleReturnValue .= $this->sendError(3100, $msgName);
 			}
@@ -1240,7 +1245,7 @@ class Client{
 					}
 					
 					if($token){
-						$this->log('debug', 'SSL: test');
+						$this->logColor('debug', 'SSL: test', 'green');
 						
 						$this->setStatus('hasSslTest', true);
 						$msgHandleReturnValue .= $this->sendSslVerify($token);
@@ -1251,12 +1256,12 @@ class Client{
 				}
 				else{
 					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
-					$this->log('warning', $msgName.' SSL: decryption failed');
+					$this->logColor('warning', $msgName.' SSL: decryption failed', 'green');
 				}
 			}
 			else{
 				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
-				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
+				$this->logColor('warning', $msgName.' SSL: you need to initialize ssl', 'green');
 			}
 		}
 		elseif($msgName == 'ssl_verify'){
@@ -1269,7 +1274,7 @@ class Client{
 					}
 					
 					if($token && $this->sslTestToken && $token == $this->sslTestToken){
-						$this->log('debug', 'SSL: verified');
+						$this->logColor('debug', 'SSL: verified', 'green');
 						#print __CLASS__.'->'.__FUNCTION__.': '.$msgName.' SSL: verified'."\n";
 						
 						$this->setStatus('hasSslVerify', true);
@@ -1281,12 +1286,12 @@ class Client{
 				}
 				else{
 					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
-					$this->log('warning', $msgName.' SSL: decryption failed');
+					$this->logColor('warning', $msgName.' SSL: decryption failed', 'green');
 				}
 			}
 			else{
 				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
-				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
+				$this->logColor('warning', $msgName.' SSL: you need to initialize ssl', 'green');
 			}
 		}
 		elseif($msgName == 'ssl_password_put'){
@@ -1299,11 +1304,11 @@ class Client{
 					}
 					
 					if($password){
-						$this->log('debug', 'SSL: password put');
+						$this->logColor('debug', 'SSL: password put', 'green');
 						
 						$this->setStatus('hasSslPasswortPut', true);
 						$this->sslPasswordPeerCurrent = $password;
-						#$this->log('debug', 'SSL: peer password: '.substr($this->sslPasswordPeerCurrent, 0, 20));
+						#$this->logColor('debug', 'SSL: peer password: '.substr($this->sslPasswordPeerCurrent, 0, 20), 'green');
 						
 						$msgHandleReturnValue .= $this->sendSslPasswordTest();
 					}
@@ -1313,12 +1318,12 @@ class Client{
 				}
 				else{
 					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
-					$this->log('warning', $msgName.' SSL: decryption failed');
+					$this->logColor('warning', $msgName.' SSL: decryption failed', 'green');
 				}
 			}
 			else{
 				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
-				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
+				$this->logColor('warning', $msgName.' SSL: you need to initialize ssl', 'green');
 			}
 		}
 		elseif($msgName == 'ssl_password_reput'){
@@ -1335,8 +1340,8 @@ class Client{
 						
 						$this->sslPasswordPeerNew = $password;
 						
-						#$this->log('debug', 'SSL: peer password: '.substr($this->sslPasswordPeerCurrent, 0, 20));
-						#$this->log('debug', 'SSL: peer password new: '.substr($this->sslPasswordPeerNew, 0, 20));
+						#$this->logColor('debug', 'SSL: peer password: '.substr($this->sslPasswordPeerCurrent, 0, 20), 'green');
+						#$this->logColor('debug', 'SSL: peer password new: '.substr($this->sslPasswordPeerNew, 0, 20), 'green');
 						
 						if(!$this->getStatus('hasReSslPasswortPutInit')){
 							$this->sslMsgCount = 0;
@@ -1355,7 +1360,7 @@ class Client{
 				}
 				else{
 					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
-					$this->log('warning', $msgName.' re-SSL: decryption failed');
+					$this->logColor('warning', $msgName.' re-SSL: decryption failed', 'green');
 				}
 			}
 			else{
@@ -1363,7 +1368,7 @@ class Client{
 				$logMsg = $msgName.' re-SSL: you need to initialize ssl, ';
 				$logMsg .= 'hasSsl=/'.(int)$this->getStatus('hasSsl').'/ ';
 				$logMsg .= 'hasReSslPasswortPut=/'.(int)$this->getStatus('hasReSslPasswortPut').'/';
-				$this->log('warning', $logMsg);
+				$this->logColor('warning', $logMsg, 'green');
 			}
 		}
 		elseif($msgName == 'ssl_password_test'){
@@ -1385,12 +1390,12 @@ class Client{
 				}
 				else{
 					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
-					$this->log('warning', $msgName.' SSL: decryption failed');
+					$this->logColor('warning', $msgName.' SSL: decryption failed', 'green');
 				}
 			}
 			else{
 				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
-				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
+				$this->logColor('warning', $msgName.' SSL: you need to initialize ssl', 'green');
 			}
 		}
 		elseif($msgName == 'ssl_password_retest'){
@@ -1403,7 +1408,7 @@ class Client{
 					}
 					
 					if($token){
-						$this->log('debug', 're-SSL: password retest');
+						$this->logColor('debug', 're-SSL: password retest', 'green');
 						
 						$this->setStatus('hasReSslPasswortTest', true);
 						$msgHandleReturnValue .= $this->sendSslPasswordReverify($token);
@@ -1414,7 +1419,7 @@ class Client{
 				}
 				else{
 					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
-					$this->log('warning', $msgName.' re-SSL: decryption failed');
+					$this->logColor('warning', $msgName.' re-SSL: decryption failed', 'green');
 				}
 			}
 			else{
@@ -1422,7 +1427,7 @@ class Client{
 				$logMsg = $msgName.' re-SSL: you need to initialize ssl, ';
 				$logMsg .= 'hasSsl=/'.(int)$this->getStatus('hasSsl').'/ ';
 				$logMsg .= 'hasReSslPasswortTest=/'.(int)$this->getStatus('hasReSslPasswortTest').'/';
-				$this->log('warning', $logMsg);
+				$this->logColor('warning', $logMsg, 'green');
 			}
 		}
 		elseif($msgName == 'ssl_password_verify'){
@@ -1440,8 +1445,8 @@ class Client{
 						$testToken = hash('sha512',
 							$this->sslPasswordToken.'_'.$this->getNode()->getIdHexStr());
 						if($this->sslPasswordToken && $token == $testToken){
-							$this->log('debug', 'SSL: password verified');
-							$this->log('debug', 'SSL: OK');
+							$this->logColor('debug', 'SSL: password verified', 'green');
+							$this->logColor('debug', 'SSL: OK', 'green');
 							
 							$this->setStatus('hasSsl', true);
 							
@@ -1458,12 +1463,12 @@ class Client{
 				}
 				else{
 					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
-					$this->log('warning', $msgName.' SSL: decryption failed');
+					$this->logColor('warning', $msgName.' SSL: decryption failed', 'green');
 				}
 			}
 			else{
 				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
-				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
+				$this->logColor('warning', $msgName.' SSL: you need to initialize ssl', 'green');
 			}
 			
 			$this->sslTestToken = '';
@@ -1484,15 +1489,15 @@ class Client{
 						$testToken = hash('sha512',
 							$this->sslPasswordToken.'_'.$this->getNode()->getSslKeyPubFingerprint());
 						if($this->sslPasswordToken && $token == $testToken){
-							$this->log('debug', 're-SSL: password verified');
-							$this->log('debug', 're-SSL: OK');
+							$this->logColor('debug', 're-SSL: password verified', 'green');
+							$this->logColor('debug', 're-SSL: OK', 'green');
 							
 							$this->setStatus('hasReSslPasswortPutInit', false);
 							
 							$this->sslPasswordLocalCurrent = $this->sslPasswordLocalNew;
 							$this->sslPasswordPeerCurrent = $this->sslPasswordPeerNew;
 							
-							$this->log('debug', 'actions execute: CRITERION_AFTER_HAS_RESSL');
+							$this->logColor('debug', 'actions execute: CRITERION_AFTER_HAS_RESSL', 'green');
 							$this->actionsExecute(ClientAction::CRITERION_AFTER_HAS_RESSL);
 						}
 						else{
@@ -1505,7 +1510,7 @@ class Client{
 				}
 				else{
 					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
-					$this->log('warning', $msgName.' re-SSL: decryption failed');
+					$this->logColor('warning', $msgName.' re-SSL: decryption failed', 'green');
 				}
 			}
 			else{
@@ -1513,7 +1518,7 @@ class Client{
 				$logMsg = $msgName.' re-SSL: you need to initialize ssl, ';
 				$logMsg .= 'hasSsl=/'.(int)$this->getStatus('hasSsl').'/ ';
 				$logMsg .= 'hasReSslPasswortTest=/'.(int)$this->getStatus('hasReSslPasswortTest').'/';
-				$this->log('warning', $logMsg);
+				$this->logColor('warning', $logMsg, 'green');
 			}
 			
 			$this->sslPasswordToken = '';
@@ -1566,7 +1571,7 @@ class Client{
 			}
 			else{
 				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
-				$this->log('warning', $msgName.' SSL: you need to initialize ssl');
+				$this->logColor('warning', $msgName.' SSL: you need to initialize ssl', 'green');
 			}
 		}
 		elseif($msgName == 'talk_response'){
@@ -1835,7 +1840,13 @@ class Client{
 				$name = $msgData['name'];
 			}
 			
-			$this->log('debug', $this->getUri().' recv '.$msgName.': '.$code.', '.$msg.', '.$name);
+			if($code >= 2000 && $code <= 3999){
+				// SSL
+				$this->logColor('debug', $this->getUri().' recv '.$msgName.': '.$code.', '.$msg.', '.$name, 'green');
+			}
+			else{
+				$this->log('debug', $this->getUri().' recv '.$msgName.': '.$code.', '.$msg.', '.$name);
+			}
 		}
 		elseif($msgName == 'quit'){
 			$this->shutdown();
@@ -2047,12 +2058,12 @@ class Client{
 			throw new RuntimeException('ssl not set.');
 		}
 		
-		$this->log('debug', 'send SSL init A');
+		$this->logColor('debug', 'send SSL init A', 'green');
 		
 		if($this->getStatus('hasSendSslInit')){
 			$this->setStatus('hasSslInit', true);
 			
-			$this->log('debug', 'send SSL init BB');
+			$this->logColor('debug', 'send SSL init BB', 'green');
 			return '';
 		}
 		else{
@@ -2060,7 +2071,7 @@ class Client{
 			
 			$rid = (string)Uuid::uuid4();
 			
-			$this->log('debug', 'send SSL init BA: '.$rid);
+			$this->logColor('debug', 'send SSL init BA: '.$rid, 'green');
 			
 			$data = array(
 				'rid' => $rid,
@@ -2078,7 +2089,7 @@ class Client{
 			throw new RuntimeException('ssl not set.');
 		}
 		
-		$this->log('debug', 'send SSL init response: '.$rid.' '.$status);
+		$this->logColor('debug', 'send SSL init response: '.$rid.' '.$status, 'green');
 		
 		$data = array(
 			'rid' => $rid,
@@ -2099,7 +2110,7 @@ class Client{
 			'token' => $this->sslTestToken,
 		);
 		
-		$this->log('debug', 'send SSL Test: '.$this->sslTestToken);
+		$this->logColor('debug', 'send SSL Test: '.$this->sslTestToken, 'green');
 		
 		return $this->dataSend($this->sslMsgCreatePublicEncrypt('ssl_test', $data));
 	}
@@ -2109,7 +2120,7 @@ class Client{
 			throw new RuntimeException('ssl not set.');
 		}
 		
-		$this->log('debug', 'send SSL verify');
+		$this->logColor('debug', 'send SSL verify', 'green');
 		
 		$data = array(
 			'token' => $token,
@@ -2129,8 +2140,8 @@ class Client{
 		
 		$this->sslPasswordLocalCurrent = $this->genSslPassword();
 		$this->sslPasswordTime = time();
-		#$this->log('debug', 'SSL: local password: '.substr($this->sslPasswordLocalCurrent, 0, 20));
-		$this->log('debug', 'send SSL password put');
+		#$this->logColor('debug', 'SSL: local password: '.substr($this->sslPasswordLocalCurrent, 0, 20), 'green');
+		$this->logColor('debug', 'send SSL password put', 'green');
 		
 		$data = array(
 			'password' => $this->sslPasswordLocalCurrent,
@@ -2149,7 +2160,7 @@ class Client{
 		#$this->log('debug', 're-SSL: local password new: '.substr($this->sslPasswordLocalNew, 0, 20));
 		#$this->log('debug', 're-SSL: peer password:      '.substr($this->sslPasswordPeerCurrent, 0, 20));
 		#$this->log('debug', 're-SSL: peer password new:  '.substr($this->sslPasswordPeerNew, 0, 20));
-		$this->log('debug', 'send SSL password reput');
+		$this->logColor('debug', 'send SSL password reput', 'green');
 		
 		$data = array(
 			'password' => $this->sslPasswordLocalNew,
@@ -2162,7 +2173,7 @@ class Client{
 			throw new RuntimeException('ssl not set.');
 		}
 		
-		$this->log('debug', 'send SSL password test');
+		$this->logColor('debug', 'send SSL password test', 'green');
 		
 		$this->sslPasswordToken = (string)Uuid::uuid4();
 		
@@ -2179,7 +2190,7 @@ class Client{
 		
 		$this->sslPasswordToken = (string)Uuid::uuid4();
 		#$this->log('debug', 're-SSL token: '.substr($this->sslPasswordToken, 0, 20));
-		$this->log('debug', 'send SSL password retest');
+		$this->logColor('debug', 'send SSL password retest', 'green');
 		
 		$data = array(
 			'token' => $this->sslPasswordToken,
@@ -2193,7 +2204,7 @@ class Client{
 			throw new RuntimeException('ssl not set.');
 		}
 		
-		$this->log('debug', 'send SSL password verify');
+		$this->logColor('debug', 'send SSL password verify', 'green');
 		
 		$token = hash('sha512', $token.'_'.$this->getLocalNode()->getIdHexStr());
 		
@@ -2211,7 +2222,7 @@ class Client{
 		#$this->log('debug', 're-SSL peer token: '.substr($token, 0, 20));
 		$token = hash('sha512', $token.'_'.$this->getLocalNode()->getSslKeyPubFingerprint());
 		#$this->log('debug', 're-SSL local token: '.substr($token, 0, 20));
-		$this->log('debug', 'send SSL password reverify');
+		$this->logColor('debug', 'send SSL password reverify', 'green');
 		
 		$data = array(
 			'token' => $token,
@@ -2284,7 +2295,7 @@ class Client{
 			'subscribe' => $subscribe,
 		);
 		
-		$this->log('debug', 'send bridge_subscribe: '.$rid.', '.(int)$subscribe);
+		$this->logColor('debug', 'send bridge_subscribe: '.$rid.', '.(int)$subscribe, 'yellow');
 		
 		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('bridge_subscribe', $data));
 	}
@@ -2295,7 +2306,7 @@ class Client{
 			'status' => (int)$status,
 		);
 		
-		$this->log('debug', 'send bridge_subscribe_response: '.$rid.', '.$status);
+		$this->logColor('debug', 'send bridge_subscribe_response: '.$rid.', '.$status, 'yellow');
 		
 		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('bridge_subscribe_response', $data));
 	}
@@ -2368,7 +2379,15 @@ class Client{
 	
 	public function sendError($errorCode = 9999, $msgName = ''){
 		$msg = static::getErrorMsg($errorCode);
-		$this->log('debug', 'send ERROR: '.$errorCode.', '.$msg);
+		
+		if($code >= 2000 && $code <= 3999){
+			// SSL
+			$this->logColor('debug', 'send ERROR: '.$errorCode.', '.$msg, 'green');
+		}
+		else{
+			$this->log('debug', 'send ERROR: '.$errorCode.', '.$msg);
+		}
+		
 		$data = array(
 			'code'   => $errorCode,
 			'msg' => $msg,
@@ -2435,7 +2454,7 @@ class Client{
 			return json_encode($json);
 		}
 		
-		$this->log('debug', 'SSL msg create: failed ('.$name.')');
+		$this->logColor('debug', 'SSL msg create: failed ('.$name.')', 'green');
 		
 		return null;
 	}
@@ -2525,23 +2544,23 @@ class Client{
 	}
 	
 	private function sslPasswordEncrypt($data, $sslPasswordLocalCurrent = null, $sslPasswordPeerCurrent = null){
-		#$this->log('debug', 'SSL password encrypt A: /'.$sslPasswordLocalCurrent.'/ /'.$sslPasswordPeerCurrent.'/');
+		#$this->logColor('debug', 'SSL password encrypt A: /'.$sslPasswordLocalCurrent.'/ /'.$sslPasswordPeerCurrent.'/', 'green');
 		
 		if($sslPasswordLocalCurrent === null){
-			#$this->log('debug', 'SSL password encrypt: no local password set');
+			#$this->logColor('debug', 'SSL password encrypt: no local password set', 'green');
 			$sslPasswordLocalCurrent = $this->sslPasswordLocalCurrent;
 		}
 		if($sslPasswordPeerCurrent === null){
-			#$this->log('debug', 'SSL password encrypt: no peer password set');
+			#$this->logColor('debug', 'SSL password encrypt: no peer password set', 'green');
 			$sslPasswordPeerCurrent = $this->sslPasswordPeerCurrent;
 		}
 		
-		#$this->log('debug', 'SSL password encrypt B: /'.$sslPasswordLocalCurrent.'/ /'.$sslPasswordPeerCurrent.'/');
-		#$this->log('debug', 'SSL password encrypt');
+		#$this->logColor('debug', 'SSL password encrypt B: /'.$sslPasswordLocalCurrent.'/ /'.$sslPasswordPeerCurrent.'/', 'green');
+		#$this->logColor('debug', 'SSL password encrypt', 'green');
 		
 		if($sslPasswordLocalCurrent && $sslPasswordPeerCurrent){
 			$password = $sslPasswordLocalCurrent.'_'.$sslPasswordPeerCurrent;
-			#$this->log('debug', 'SSL password encrypt pwd: '.$password);
+			#$this->logColor('debug', 'SSL password encrypt pwd: '.$password, 'green');
 			
 			if(openssl_sign($data, $sign, $this->getSsl(), OPENSSL_ALGO_SHA1)){
 				$sign = base64_encode($sign);
@@ -2563,26 +2582,26 @@ class Client{
 			}
 		}
 		
-		$this->log('debug', 'SSL password encrypt: failed');
+		$this->logColor('debug', 'SSL password encrypt: failed', 'green');
 		
 		return null;
 	}
 	
 	private function sslPasswordDecrypt($data, $sslPasswordLocalCurrent = null, $sslPasswordPeerCurrent = null){
-		#$this->log('debug', 'SSL password decrypt: /'.$sslPasswordLocalCurrent.'/ /'.$sslPasswordPeerCurrent.'/');
+		#$this->logColor('debug', 'SSL password decrypt: /'.$sslPasswordLocalCurrent.'/ /'.$sslPasswordPeerCurrent.'/', 'green');
 		
 		if($sslPasswordLocalCurrent === null){
-			#$this->log('debug', 'SSL password decrypt: no local password set');
+			#$this->logColor('debug', 'SSL password decrypt: no local password set', 'green');
 			$sslPasswordLocalCurrent = $this->sslPasswordLocalCurrent;
 		}
 		if($sslPasswordPeerCurrent === null){
-			#$this->log('debug', 'SSL password decrypt: no peer password set');
+			#$this->logColor('debug', 'SSL password decrypt: no peer password set', 'green');
 			$sslPasswordPeerCurrent = $this->sslPasswordPeerCurrent;
 		}
 		
 		if($sslPasswordLocalCurrent && $sslPasswordPeerCurrent){
 			$password = $sslPasswordPeerCurrent.'_'.$sslPasswordLocalCurrent;
-			#$this->log('debug', 'SSL password decrypt pwd: '.$password);
+			#$this->logColor('debug', 'SSL password decrypt pwd: '.$password, 'green');
 			
 			$data = base64_decode($data);
 			$json = json_decode(gzdecode($data), true);

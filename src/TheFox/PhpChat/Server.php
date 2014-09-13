@@ -268,6 +268,8 @@ class Server{
 		$this->clients[$this->clientsId] = $client;
 		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.count($this->clients)."\n");
 		
+		$client->logColor('debug', 'client start', 'white', 'black');
+		
 		$this->networkBootstrap($client);
 		
 		return $client;
