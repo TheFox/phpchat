@@ -1865,6 +1865,10 @@ class Client{
 				// SSL
 				$this->logColor('debug', $this->getUri().' recv '.$msgName.': '.$code.', '.$msg.', '.$name, 'green');
 			}
+			elseif($code >= 5000 && $code <= 5999){
+				// Bridge
+				$this->logColor('debug', $this->getUri().' recv '.$msgName.': '.$code.', '.$msg.', '.$name, 'yellow');
+			}
 			else{
 				$this->log('debug', $this->getUri().' recv '.$msgName.': '.$code.', '.$msg.', '.$name);
 			}
@@ -2404,6 +2408,10 @@ class Client{
 		if($code >= 2000 && $code <= 3999){
 			// SSL
 			$this->logColor('debug', 'send ERROR: '.$code.', '.$msg, 'green');
+		}
+		elseif($code >= 5000 && $code <= 5999){
+			// Bridge
+			$this->logColor('debug', 'send ERROR: '.$code.', '.$msg, 'yellow');
 		}
 		else{
 			$this->log('debug', 'send ERROR: '.$code.', '.$msg);
