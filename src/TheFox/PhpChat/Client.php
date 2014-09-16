@@ -215,6 +215,7 @@ class Client{
 	
 	public function logColor($level, $msg, $colorBg = 'green', $colorFg = 'black'){
 		$color = new Color();
+		#$this->log($level, $color($msg)->bg($colorBg));
 		$this->log($level, $color($msg)->bg($colorBg)->fg($colorFg));
 	}
 	
@@ -484,7 +485,7 @@ class Client{
 		}
 		
 		#fwrite(STDOUT, 'msgHandle: /'.$msgName.'/'."\n");
-		$this->logColor('debug', 'SSL status: '.(int)$this->getStatus('hasSslInit').', '.(int)$this->getStatus('hasSendSslInit').', '.(int)$this->getStatus('hasSslInitOk').', '.(int)$this->getStatus('hasSslTest').', '.(int)$this->getStatus('hasSslVerify').'', 'green');
+		#$this->logColor('debug', 'SSL status: '.(int)$this->getStatus('hasSslInit').', '.(int)$this->getStatus('hasSendSslInit').', '.(int)$this->getStatus('hasSslInitOk').', '.(int)$this->getStatus('hasSslTest').', '.(int)$this->getStatus('hasSslVerify').'', 'green');
 		
 		if($msgName == 'noop'){
 			$noop = 0x90;
