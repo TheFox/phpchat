@@ -109,11 +109,12 @@ class Client{
 		$this->status['hasSslTest'] = false;
 		$this->status['hasSslVerify'] = false;
 		$this->status['hasSslPasswortPut'] = false;
-		$this->status['hasReSslPasswortPutInit'] = false;
-		$this->status['hasReSslPasswortPut'] = false;
 		$this->status['hasSslPasswortTest'] = false;
-		$this->status['hasReSslPasswortTest'] = false;
 		$this->status['hasSsl'] = false;
+		
+		$this->status['hasSendReSslPasswortPut'] = false;
+		$this->status['hasReSslPasswortPut'] = false;
+		$this->status['hasReSslPasswortTest'] = false;
 	}
 	
 	public function setServer(Server $server){
@@ -446,7 +447,7 @@ class Client{
 				$this->sslPasswordToken = '';
 				$this->sslPasswordLocalNew = '';
 				$this->sslPasswordPeerNew = '';
-				$this->setStatus('hasReSslPasswortPutInit', true);
+				$this->setStatus('hasSendReSslPasswortPut', false);
 				$this->setStatus('hasReSslPasswortPut', false);
 				$this->setStatus('hasReSslPasswortTest', false);
 				
@@ -1327,51 +1328,6 @@ class Client{
 				$this->logColor('warning', $msgName.' SSL: you need to initialize ssl', 'green');
 			}
 		}
-		elseif($msgName == 'ssl_password_reput'){
-			if($this->getStatus('hasSsl') && !$this->getStatus('hasReSslPasswortPut')){
-				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
-				if($msgData){
-					$password = '';
-					if(array_key_exists('password', $msgData)){
-						$password = $msgData['password'];
-					}
-					
-					if($password){
-						$this->log('debug', 're-SSL: password reput');
-						
-						$this->sslPasswordPeerNew = $password;
-						
-						#$this->logColor('debug', 'SSL: peer password: '.substr($this->sslPasswordPeerCurrent, 0, 20), 'green');
-						#$this->logColor('debug', 'SSL: peer password new: '.substr($this->sslPasswordPeerNew, 0, 20), 'green');
-						
-						if(!$this->getStatus('hasReSslPasswortPutInit')){
-							$this->sslMsgCount = 0;
-							$this->sslPasswordToken = '';
-							$this->sslPasswordLocalNew = '';
-							$this->setStatus('hasReSslPasswortPutInit', true);
-							$this->setStatus('hasReSslPasswortTest', false);
-							
-							$msgHandleReturnValue .= $this->sendSslPasswordReput();
-						}
-						$msgHandleReturnValue .= $this->sendSslPasswordRetest();
-					}
-					else{
-						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
-					}
-				}
-				else{
-					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
-					$this->logColor('warning', $msgName.' re-SSL: decryption failed', 'green');
-				}
-			}
-			else{
-				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
-				$logMsg = $msgName.' re-SSL: you need to initialize ssl, ';
-				$logMsg .= 'hasSsl=/'.(int)$this->getStatus('hasSsl').'/ ';
-				$logMsg .= 'hasReSslPasswortPut=/'.(int)$this->getStatus('hasReSslPasswortPut').'/';
-				$this->logColor('warning', $logMsg, 'green');
-			}
-		}
 		elseif($msgName == 'ssl_password_test'){
 			if($this->getStatus('hasSslPasswortPut') && !$this->getStatus('hasSslPasswortTest')){
 				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
@@ -1397,38 +1353,6 @@ class Client{
 			else{
 				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
 				$this->logColor('warning', $msgName.' SSL: you need to initialize ssl', 'green');
-			}
-		}
-		elseif($msgName == 'ssl_password_retest'){
-			if($this->getStatus('hasSsl') && !$this->getStatus('hasReSslPasswortTest')){
-				$msgData = $this->sslMsgDataPasswordDecrypt($msgData, $this->sslPasswordLocalNew, $this->sslPasswordPeerNew);
-				if($msgData){
-					$token = '';
-					if(array_key_exists('token', $msgData)){
-						$token = $msgData['token'];
-					}
-					
-					if($token){
-						$this->logColor('debug', 're-SSL: password retest', 'green');
-						
-						$this->setStatus('hasReSslPasswortTest', true);
-						$msgHandleReturnValue .= $this->sendSslPasswordReverify($token);
-					}
-					else{
-						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
-					}
-				}
-				else{
-					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
-					$this->logColor('warning', $msgName.' re-SSL: decryption failed', 'green');
-				}
-			}
-			else{
-				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
-				$logMsg = $msgName.' re-SSL: you need to initialize ssl, ';
-				$logMsg .= 'hasSsl=/'.(int)$this->getStatus('hasSsl').'/ ';
-				$logMsg .= 'hasReSslPasswortTest=/'.(int)$this->getStatus('hasReSslPasswortTest').'/';
-				$this->logColor('warning', $logMsg, 'green');
 			}
 		}
 		elseif($msgName == 'ssl_password_verify'){
@@ -1475,8 +1399,88 @@ class Client{
 			$this->sslTestToken = '';
 			$this->sslPasswordToken = '';
 		}
+		
+		elseif($msgName == 'ssl_password_reput'){
+			if($this->getStatus('hasSsl') && !$this->getStatus('hasReSslPasswortPut')){
+				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
+				if($msgData){
+					$password = '';
+					if(array_key_exists('password', $msgData)){
+						$password = $msgData['password'];
+					}
+					
+					if($password){
+						$this->logColor('debug', 're-SSL: password reput', 'green');
+						
+						$this->setStatus('hasReSslPasswortPut', true);
+						$this->sslPasswordPeerNew = $password;
+						
+						#$this->logColor('debug', 'SSL: peer password: '.substr($this->sslPasswordPeerCurrent, 0, 20), 'green');
+						#$this->logColor('debug', 'SSL: peer password new: '.substr($this->sslPasswordPeerNew, 0, 20), 'green');
+						
+						if(!$this->getStatus('hasSendReSslPasswortPut')){
+							$this->sslMsgCount = 0;
+							$this->sslPasswordToken = '';
+							$this->sslPasswordLocalNew = '';
+							#$this->sslPasswordPeerNew = '';
+							#$this->setStatus('hasSendReSslPasswortPut', true);
+							#$this->setStatus('hasReSslPasswortTest', false);
+							
+							$msgHandleReturnValue .= $this->sendSslPasswordReput();
+						}
+						$msgHandleReturnValue .= $this->sendSslPasswordRetest();
+					}
+					else{
+						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
+					}
+				}
+				else{
+					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
+					$this->logColor('warning', $msgName.' re-SSL: decryption failed', 'green');
+				}
+			}
+			else{
+				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
+				$logMsg = $msgName.' re-SSL: you need to initialize ssl, ';
+				$logMsg .= 'hasSsl=/'.(int)$this->getStatus('hasSsl').'/ ';
+				$logMsg .= 'hasReSslPasswortPut=/'.(int)$this->getStatus('hasReSslPasswortPut').'/';
+				$this->logColor('warning', $logMsg, 'green');
+			}
+		}
+		elseif($msgName == 'ssl_password_retest'){
+			if($this->getStatus('hasReSslPasswortPut') && !$this->getStatus('hasReSslPasswortTest')){
+				$msgData = $this->sslMsgDataPasswordDecrypt($msgData, $this->sslPasswordLocalNew, $this->sslPasswordPeerNew);
+				if($msgData){
+					$token = '';
+					if(array_key_exists('token', $msgData)){
+						$token = $msgData['token'];
+					}
+					
+					if($token){
+						$this->logColor('debug', 're-SSL: password retest', 'green');
+						
+						$this->setStatus('hasReSslPasswortTest', true);
+						$msgHandleReturnValue .= $this->sendSslPasswordReverify($token);
+					}
+					else{
+						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
+					}
+				}
+				else{
+					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
+					$this->logColor('warning', $msgName.' re-SSL: decryption failed', 'green');
+				}
+			}
+			else{
+				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
+				$logMsg = $msgName.' re-SSL: you need to initialize ssl, ';
+				$logMsg .= 'hasSsl=/'.(int)$this->getStatus('hasSsl').'/ ';
+				$logMsg .= 'hasReSslPasswortTest=/'.(int)$this->getStatus('hasReSslPasswortTest').'/';
+				$this->logColor('warning', $logMsg, 'green');
+			}
+		}
 		elseif($msgName == 'ssl_password_reverify'){
-			if($this->getStatus('hasSsl') && $this->getStatus('hasReSslPasswortTest')){
+			if($this->getStatus('hasReSslPasswortTest') && $this->getStatus('hasReSslPasswortTest')){
 				$msgData = $this->sslMsgDataPasswordDecrypt($msgData, $this->sslPasswordLocalNew, $this->sslPasswordPeerNew);
 				if($msgData){
 					$token = '';
@@ -1493,7 +1497,7 @@ class Client{
 							$this->logColor('debug', 're-SSL: password verified', 'green');
 							$this->logColor('debug', 're-SSL: OK', 'green');
 							
-							$this->setStatus('hasReSslPasswortPutInit', false);
+							$this->setStatus('hasSendReSslPasswortPut', false);
 							
 							$this->sslPasswordLocalCurrent = $this->sslPasswordLocalNew;
 							$this->sslPasswordPeerCurrent = $this->sslPasswordPeerNew;
@@ -2148,25 +2152,6 @@ class Client{
 		return $this->dataSend($this->sslMsgCreatePublicEncrypt('ssl_password_put', $data));
 	}
 	
-	private function sendSslPasswordReput(){
-		if(!$this->getSsl()){
-			throw new RuntimeException('ssl not set.');
-		}
-		
-		$this->sslPasswordLocalNew = $this->genSslPassword();
-		$this->sslPasswordTime = time();
-		#$this->log('debug', 're-SSL: local password:     '.substr($this->sslPasswordLocalCurrent, 0, 20));
-		#$this->log('debug', 're-SSL: local password new: '.substr($this->sslPasswordLocalNew, 0, 20));
-		#$this->log('debug', 're-SSL: peer password:      '.substr($this->sslPasswordPeerCurrent, 0, 20));
-		#$this->log('debug', 're-SSL: peer password new:  '.substr($this->sslPasswordPeerNew, 0, 20));
-		$this->logColor('debug', 'send SSL password reput', 'green');
-		
-		$data = array(
-			'password' => $this->sslPasswordLocalNew,
-		);
-		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('ssl_password_reput', $data));
-	}
-	
 	private function sendSslPasswordTest(){
 		if(!$this->getSsl()){
 			throw new RuntimeException('ssl not set.');
@@ -2180,6 +2165,42 @@ class Client{
 			'token' => $this->sslPasswordToken,
 		);
 		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('ssl_password_test', $data));
+	}
+	
+	private function sendSslPasswordVerify($token){
+		if(!$this->getSsl()){
+			throw new RuntimeException('ssl not set.');
+		}
+		
+		$this->logColor('debug', 'send SSL password verify', 'green');
+		
+		$token = hash('sha512', $token.'_'.$this->getLocalNode()->getIdHexStr());
+		
+		$data = array(
+			'token' => $token,
+		);
+		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('ssl_password_verify', $data));
+	}
+	
+	public function sendSslPasswordReput(){
+		if(!$this->getSsl()){
+			throw new RuntimeException('ssl not set.');
+		}
+		
+		$this->setStatus('hasSendReSslPasswortPut', true);
+		
+		$this->sslPasswordLocalNew = $this->genSslPassword();
+		$this->sslPasswordTime = time();
+		#$this->log('debug', 're-SSL: local password:     '.substr($this->sslPasswordLocalCurrent, 0, 20));
+		#$this->log('debug', 're-SSL: local password new: '.substr($this->sslPasswordLocalNew, 0, 20));
+		#$this->log('debug', 're-SSL: peer password:      '.substr($this->sslPasswordPeerCurrent, 0, 20));
+		#$this->log('debug', 're-SSL: peer password new:  '.substr($this->sslPasswordPeerNew, 0, 20));
+		$this->logColor('debug', 'send SSL password reput', 'green');
+		
+		$data = array(
+			'password' => $this->sslPasswordLocalNew,
+		);
+		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('ssl_password_reput', $data));
 	}
 	
 	private function sendSslPasswordRetest(){
@@ -2196,21 +2217,6 @@ class Client{
 		);
 		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('ssl_password_retest',
 			$data, $this->sslPasswordLocalNew, $this->sslPasswordPeerNew));
-	}
-	
-	private function sendSslPasswordVerify($token){
-		if(!$this->getSsl()){
-			throw new RuntimeException('ssl not set.');
-		}
-		
-		$this->logColor('debug', 'send SSL password verify', 'green');
-		
-		$token = hash('sha512', $token.'_'.$this->getLocalNode()->getIdHexStr());
-		
-		$data = array(
-			'token' => $token,
-		);
-		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('ssl_password_verify', $data));
 	}
 	
 	private function sendSslPasswordReverify($token){
