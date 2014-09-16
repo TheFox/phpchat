@@ -1561,8 +1561,15 @@ class Client{
 							}
 							else{
 								$msgHandleReturnValue .= $this->sendTalkResponse($rid, 4);
-								$msgHandleReturnValue .= $this->sendQuit();
-								$this->shutdown();
+								#$msgHandleReturnValue .= $this->sendQuit();
+								#$this->shutdown();
+								
+								$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
+								$action->setName('talk_request_after_previous_actions_shutdown');
+								$action->functionSet(function($action, $client){
+									$client->shutdown();
+								});
+								$this->actionAdd($action);
 							}
 						}
 						else{
@@ -1637,8 +1644,18 @@ class Client{
 						elseif($status == 4){
 							// No console, standalone server.
 							$this->consoleMsgAdd($this->getUri().' has no user interface. Can\'t talk to you.', true, true, true);
-							$msgHandleReturnValue .= $this->sendQuit();
-							$this->shutdown();
+							#$msgHandleReturnValue .= $this->sendQuit();
+							#$this->shutdown();
+							
+							$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
+							$action->setName('talk_request_after_previous_actions_shutdown');
+							$action->functionSet(function($action, $client){
+								$client->sendQuit();
+								$client->shutdown();
+							});
+							$this->actionAdd($action);
+							
+							$this->log('debug', 'actions left: '.count($this->actions));
 						}
 					}
 					else{
@@ -1757,7 +1774,7 @@ class Client{
 							$subscribe = $msgData['subscribe'];
 						}
 						
-						$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.(int)$subscribe);
+						$this->logColor('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.(int)$subscribe, 'yellow');
 						
 						if($rid){
 							if($subscribe){
