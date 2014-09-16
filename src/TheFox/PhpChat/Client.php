@@ -662,7 +662,7 @@ class Client{
 						}
 						
 						if(!$this->debug && $node->getBridgeServer()){
-							#$this->log('debug', 'subscribe to bridge server');
+							$this->logColor('debug', 'subscribe to bridge server', 'yellow');
 							
 							$actions = array();
 							
