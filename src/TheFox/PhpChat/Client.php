@@ -484,6 +484,7 @@ class Client{
 		}
 		
 		#fwrite(STDOUT, 'msgHandle: /'.$msgName.'/'."\n");
+		$this->logColor('debug', 'SSL status: '.(int)$this->getStatus('hasSslInit').', '.(int)$this->getStatus('hasSendSslInit').', '.(int)$this->getStatus('hasSslInitOk').', '.(int)$this->getStatus('hasSslTest').', '.(int)$this->getStatus('hasSslVerify').'', 'green');
 		
 		if($msgName == 'noop'){
 			$noop = 0x90;
@@ -2058,7 +2059,7 @@ class Client{
 			throw new RuntimeException('ssl not set.');
 		}
 		
-		$this->logColor('debug', 'send SSL init A', 'green');
+		$this->logColor('debug', 'send SSL init A: '.(int)$this->getStatus('hasSslInit').', '.(int)$this->getStatus('hasSendSslInit'), 'green');
 		
 		if($this->getStatus('hasSendSslInit')){
 			$this->setStatus('hasSslInit', true);
