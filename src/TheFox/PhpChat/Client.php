@@ -1484,7 +1484,7 @@ class Client{
 			}
 		}
 		elseif($msgName == 'ssl_password_reverify'){
-			if($this->getStatus('hasReSslPasswortTest') && $this->getStatus('hasReSslPasswortTest')){
+			if($this->getStatus('hasReSslPasswortTest')){
 				$msgData = $this->sslMsgDataPasswordDecrypt($msgData, $this->sslPasswordLocalNew, $this->sslPasswordPeerNew);
 				if($msgData){
 					$token = '';
