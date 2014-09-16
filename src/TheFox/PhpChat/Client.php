@@ -1261,7 +1261,7 @@ class Client{
 			}
 			else{
 				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
-				$this->logColor('warning', $msgName.' SSL: you need to initialize ssl', 'green');
+				$this->logColor('warning', $msgName.' SSL: you need to initialize ssl /'.(int)$this->getStatus('hasSslInitOk').'/ /'.(int)$this->getStatus('hasSslTest').'/', 'green');
 			}
 		}
 		elseif($msgName == 'ssl_verify'){
