@@ -574,6 +574,9 @@ VNHajAjDUbj1uoKYsuAFQO0CAwEAAQ==
 		$raw = $client1->dataRecv($raw);
 		$raw = $client2->dataRecv($raw);
 		$raw = $client1->dataRecv($raw);
+		
+		$this->assertTrue($client1->getStatus('hasId'));
+		$this->assertTrue($client2->getStatus('hasId'));
 	}
 	
 	public function testSendBasic(){
@@ -595,6 +598,8 @@ VNHajAjDUbj1uoKYsuAFQO0CAwEAAQ==
 		$this->assertTrue(array_key_exists('sslKeyPub', $json[0]['data']));
 		$this->assertTrue(array_key_exists('sslKeyPubSign', $json[0]['data']));
 		$this->assertFalse($json[0]['data']['isChannel']);
+		$this->assertFalse($client1->getStatus('hasId'));
+		$this->assertFalse($client2->getStatus('hasId'));
 		
 		$raw = $client1->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
@@ -606,6 +611,7 @@ VNHajAjDUbj1uoKYsuAFQO0CAwEAAQ==
 		#ve($json);
 		$this->assertEquals(null, $json[0]);
 		$this->assertEquals(static::NODE_LOCAL_SSL_KEY_PUB2, $client1->getNode()->getSslKeyPub());
+		$this->assertTrue($client1->getStatus('hasId'));
 		
 		
 		// Hello Client2
@@ -635,6 +641,7 @@ VNHajAjDUbj1uoKYsuAFQO0CAwEAAQ==
 		#ve($json);
 		$this->assertEquals(null, $json[0]);
 		$this->assertEquals(static::NODE_LOCAL_SSL_KEY_PUB1, $client2->getNode()->getSslKeyPub());
+		$this->assertTrue($client2->getStatus('hasId'));
 		
 		
 		
@@ -844,7 +851,8 @@ VNHajAjDUbj1uoKYsuAFQO0CAwEAAQ==
 		#ve($json);
 		$this->assertEquals('error', $json[0]['name']);
 		$this->assertEquals(3100, $json[0]['data']['code']);
-		
+		$this->assertFalse($client1->getStatus('hasSslInit'));
+		$this->assertFalse($client2->getStatus('hasSslInit'));
 		
 		
 		
@@ -860,6 +868,32 @@ VNHajAjDUbj1uoKYsuAFQO0CAwEAAQ==
 		#ve($json);
 		$this->assertEquals('ssl_init', $json[0]['name']);
 		$this->assertEquals('ssl_init_response', $json[1]['name']);
+		
+		$this->assertFalse($client1->getStatus('hasSslInit'));
+		$this->assertTrue($client1->getStatus('hasSendSslInit'));
+		$this->assertFalse($client1->getStatus('hasSslInitOk'));
+		$this->assertFalse($client1->getStatus('hasSslTest'));
+		$this->assertFalse($client1->getStatus('hasSslVerify'));
+		$this->assertFalse($client1->getStatus('hasSslPasswortPut'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortPutInit'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortPut'));
+		$this->assertFalse($client1->getStatus('hasSslPasswortTest'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortTest'));
+		$this->assertFalse($client1->getStatus('hasSslPasswortVerify'));
+		$this->assertFalse($client1->getStatus('hasSsl'));
+		
+		$this->assertTrue($client2->getStatus('hasSslInit'));
+		$this->assertTrue($client2->getStatus('hasSendSslInit'));
+		$this->assertFalse($client2->getStatus('hasSslInitOk'));
+		$this->assertFalse($client2->getStatus('hasSslTest'));
+		$this->assertFalse($client2->getStatus('hasSslVerify'));
+		$this->assertFalse($client2->getStatus('hasSslPasswortPut'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortPutInit'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortPut'));
+		$this->assertFalse($client2->getStatus('hasSslPasswortTest'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortTest'));
+		$this->assertFalse($client2->getStatus('hasSslPasswortVerify'));
+		$this->assertFalse($client2->getStatus('hasSsl'));
 		#return;
 		
 		// SSL response
@@ -868,6 +902,32 @@ VNHajAjDUbj1uoKYsuAFQO0CAwEAAQ==
 		#ve($json);
 		$this->assertEquals('ssl_init_response', $json[0]['name']);
 		$this->assertEquals('ssl_test', $json[1]['name']);
+		
+		$this->assertTrue($client1->getStatus('hasSslInit'));
+		$this->assertTrue($client1->getStatus('hasSendSslInit'));
+		$this->assertTrue($client1->getStatus('hasSslInitOk'));
+		$this->assertFalse($client1->getStatus('hasSslTest'));
+		$this->assertFalse($client1->getStatus('hasSslVerify'));
+		$this->assertFalse($client1->getStatus('hasSslPasswortPut'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortPutInit'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortPut'));
+		$this->assertFalse($client1->getStatus('hasSslPasswortTest'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortTest'));
+		$this->assertFalse($client1->getStatus('hasSslPasswortVerify'));
+		$this->assertFalse($client1->getStatus('hasSsl'));
+		
+		$this->assertTrue($client2->getStatus('hasSslInit'));
+		$this->assertTrue($client2->getStatus('hasSendSslInit'));
+		$this->assertFalse($client2->getStatus('hasSslInitOk'));
+		$this->assertFalse($client2->getStatus('hasSslTest'));
+		$this->assertFalse($client2->getStatus('hasSslVerify'));
+		$this->assertFalse($client2->getStatus('hasSslPasswortPut'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortPutInit'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortPut'));
+		$this->assertFalse($client2->getStatus('hasSslPasswortTest'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortTest'));
+		$this->assertFalse($client2->getStatus('hasSslPasswortVerify'));
+		$this->assertFalse($client2->getStatus('hasSsl'));
 		#return;
 		
 		$raw = $client2->dataRecv($raw);
@@ -875,6 +935,32 @@ VNHajAjDUbj1uoKYsuAFQO0CAwEAAQ==
 		#ve($json);
 		$this->assertEquals('ssl_test', $json[0]['name']);
 		$this->assertEquals('ssl_verify', $json[1]['name']);
+		
+		$this->assertTrue($client1->getStatus('hasSslInit'));
+		$this->assertTrue($client1->getStatus('hasSendSslInit'));
+		$this->assertTrue($client1->getStatus('hasSslInitOk'));
+		$this->assertFalse($client1->getStatus('hasSslTest'));
+		$this->assertFalse($client1->getStatus('hasSslVerify'));
+		$this->assertFalse($client1->getStatus('hasSslPasswortPut'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortPutInit'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortPut'));
+		$this->assertFalse($client1->getStatus('hasSslPasswortTest'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortTest'));
+		$this->assertFalse($client1->getStatus('hasSslPasswortVerify'));
+		$this->assertFalse($client1->getStatus('hasSsl'));
+		
+		$this->assertTrue($client2->getStatus('hasSslInit'));
+		$this->assertTrue($client2->getStatus('hasSendSslInit'));
+		$this->assertTrue($client2->getStatus('hasSslInitOk'));
+		$this->assertTrue($client2->getStatus('hasSslTest'));
+		$this->assertFalse($client2->getStatus('hasSslVerify'));
+		$this->assertFalse($client2->getStatus('hasSslPasswortPut'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortPutInit'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortPut'));
+		$this->assertFalse($client2->getStatus('hasSslPasswortTest'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortTest'));
+		$this->assertFalse($client2->getStatus('hasSslPasswortVerify'));
+		$this->assertFalse($client2->getStatus('hasSsl'));
 		#return;
 		
 		$raw = $client1->dataRecv($raw);
@@ -883,11 +969,65 @@ VNHajAjDUbj1uoKYsuAFQO0CAwEAAQ==
 		$this->assertEquals('ssl_verify', $json[0]['name']);
 		$this->assertEquals('ssl_password_put', $json[1]['name']);
 		
+		$this->assertTrue($client1->getStatus('hasSslInit'));
+		$this->assertTrue($client1->getStatus('hasSendSslInit'));
+		$this->assertTrue($client1->getStatus('hasSslInitOk'));
+		$this->assertTrue($client1->getStatus('hasSslTest'));
+		$this->assertTrue($client1->getStatus('hasSslVerify'));
+		$this->assertFalse($client1->getStatus('hasSslPasswortPut'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortPutInit'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortPut'));
+		$this->assertFalse($client1->getStatus('hasSslPasswortTest'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortTest'));
+		$this->assertFalse($client1->getStatus('hasSslPasswortVerify'));
+		$this->assertFalse($client1->getStatus('hasSsl'));
+		
+		$this->assertTrue($client2->getStatus('hasSslInit'));
+		$this->assertTrue($client2->getStatus('hasSendSslInit'));
+		$this->assertTrue($client2->getStatus('hasSslInitOk'));
+		$this->assertTrue($client2->getStatus('hasSslTest'));
+		$this->assertFalse($client2->getStatus('hasSslVerify'));
+		$this->assertFalse($client2->getStatus('hasSslPasswortPut'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortPutInit'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortPut'));
+		$this->assertFalse($client2->getStatus('hasSslPasswortTest'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortTest'));
+		$this->assertFalse($client2->getStatus('hasSslPasswortVerify'));
+		$this->assertFalse($client2->getStatus('hasSsl'));
+		
+		
 		$raw = $client2->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
 		$this->assertEquals('ssl_password_put', $json[0]['name']);
 		$this->assertEquals('ssl_password_test', $json[1]['name']);
+		
+		$this->assertTrue($client1->getStatus('hasSslInit'));
+		$this->assertTrue($client1->getStatus('hasSendSslInit'));
+		$this->assertTrue($client1->getStatus('hasSslInitOk'));
+		$this->assertTrue($client1->getStatus('hasSslTest'));
+		$this->assertTrue($client1->getStatus('hasSslVerify'));
+		$this->assertFalse($client1->getStatus('hasSslPasswortPut'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortPutInit'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortPut'));
+		$this->assertFalse($client1->getStatus('hasSslPasswortTest'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortTest'));
+		$this->assertFalse($client1->getStatus('hasSslPasswortVerify'));
+		$this->assertFalse($client1->getStatus('hasSsl'));
+		
+		$this->assertTrue($client2->getStatus('hasSslInit'));
+		$this->assertTrue($client2->getStatus('hasSendSslInit'));
+		$this->assertTrue($client2->getStatus('hasSslInitOk'));
+		$this->assertTrue($client2->getStatus('hasSslTest'));
+		$this->assertTrue($client2->getStatus('hasSslVerify'));
+		$this->assertTrue($client2->getStatus('hasSslPasswortPut'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortPutInit'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortPut'));
+		$this->assertFalse($client2->getStatus('hasSslPasswortTest'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortTest'));
+		$this->assertFalse($client2->getStatus('hasSslPasswortVerify'));
+		$this->assertFalse($client2->getStatus('hasSsl'));
+		
 		
 		$raw = $client1->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
@@ -895,15 +1035,96 @@ VNHajAjDUbj1uoKYsuAFQO0CAwEAAQ==
 		$this->assertEquals('ssl_password_test', $json[0]['name']);
 		$this->assertEquals('ssl_password_verify', $json[1]['name']);
 		
+		$this->assertTrue($client1->getStatus('hasSslInit'));
+		$this->assertTrue($client1->getStatus('hasSendSslInit'));
+		$this->assertTrue($client1->getStatus('hasSslInitOk'));
+		$this->assertTrue($client1->getStatus('hasSslTest'));
+		$this->assertTrue($client1->getStatus('hasSslVerify'));
+		$this->assertTrue($client1->getStatus('hasSslPasswortPut'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortPutInit'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortPut'));
+		$this->assertTrue($client1->getStatus('hasSslPasswortTest'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortTest'));
+		$this->assertFalse($client1->getStatus('hasSslPasswortVerify'));
+		$this->assertFalse($client1->getStatus('hasSsl'));
+		
+		$this->assertTrue($client2->getStatus('hasSslInit'));
+		$this->assertTrue($client2->getStatus('hasSendSslInit'));
+		$this->assertTrue($client2->getStatus('hasSslInitOk'));
+		$this->assertTrue($client2->getStatus('hasSslTest'));
+		$this->assertTrue($client2->getStatus('hasSslVerify'));
+		$this->assertTrue($client2->getStatus('hasSslPasswortPut'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortPutInit'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortPut'));
+		$this->assertFalse($client2->getStatus('hasSslPasswortTest'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortTest'));
+		$this->assertFalse($client2->getStatus('hasSslPasswortVerify'));
+		$this->assertFalse($client2->getStatus('hasSsl'));
+		
+		
 		$raw = $client2->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
 		$this->assertEquals('ssl_password_verify', $json[0]['name']);
 		
+		$this->assertTrue($client1->getStatus('hasSslInit'));
+		$this->assertTrue($client1->getStatus('hasSendSslInit'));
+		$this->assertTrue($client1->getStatus('hasSslInitOk'));
+		$this->assertTrue($client1->getStatus('hasSslTest'));
+		$this->assertTrue($client1->getStatus('hasSslVerify'));
+		$this->assertTrue($client1->getStatus('hasSslPasswortPut'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortPutInit'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortPut'));
+		$this->assertTrue($client1->getStatus('hasSslPasswortTest'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortTest'));
+		$this->assertFalse($client1->getStatus('hasSslPasswortVerify'));
+		$this->assertFalse($client1->getStatus('hasSsl'));
+		
+		$this->assertTrue($client2->getStatus('hasSslInit'));
+		$this->assertTrue($client2->getStatus('hasSendSslInit'));
+		$this->assertTrue($client2->getStatus('hasSslInitOk'));
+		$this->assertTrue($client2->getStatus('hasSslTest'));
+		$this->assertTrue($client2->getStatus('hasSslVerify'));
+		$this->assertTrue($client2->getStatus('hasSslPasswortPut'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortPutInit'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortPut'));
+		$this->assertTrue($client2->getStatus('hasSslPasswortTest'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortTest'));
+		$this->assertFalse($client2->getStatus('hasSslPasswortVerify'));
+		$this->assertTrue($client2->getStatus('hasSsl'));
+		
+		
 		$raw = $client1->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
 		$this->assertEquals(null, $json[0]);
+		
+		$this->assertTrue($client1->getStatus('hasSslInit'));
+		$this->assertTrue($client1->getStatus('hasSendSslInit'));
+		$this->assertTrue($client1->getStatus('hasSslInitOk'));
+		$this->assertTrue($client1->getStatus('hasSslTest'));
+		$this->assertTrue($client1->getStatus('hasSslVerify'));
+		$this->assertTrue($client1->getStatus('hasSslPasswortPut'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortPutInit'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortPut'));
+		$this->assertTrue($client1->getStatus('hasSslPasswortTest'));
+		$this->assertFalse($client1->getStatus('hasReSslPasswortTest'));
+		$this->assertFalse($client1->getStatus('hasSslPasswortVerify'));
+		$this->assertTrue($client1->getStatus('hasSsl'));
+		
+		$this->assertTrue($client2->getStatus('hasSslInit'));
+		$this->assertTrue($client2->getStatus('hasSendSslInit'));
+		$this->assertTrue($client2->getStatus('hasSslInitOk'));
+		$this->assertTrue($client2->getStatus('hasSslTest'));
+		$this->assertTrue($client2->getStatus('hasSslVerify'));
+		$this->assertTrue($client2->getStatus('hasSslPasswortPut'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortPutInit'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortPut'));
+		$this->assertTrue($client2->getStatus('hasSslPasswortTest'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortTest'));
+		$this->assertFalse($client2->getStatus('hasSslPasswortVerify'));
+		$this->assertTrue($client2->getStatus('hasSsl'));
+		
 		
 		$client1->getServer()->getKernel()->shutdown();
 		$client2->getServer()->getKernel()->shutdown();
