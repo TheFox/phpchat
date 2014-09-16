@@ -398,6 +398,8 @@ class Console extends Thread{
 					if($char == PHP_EOL){
 						#$this->log->debug('EOL');
 						$line = $this->buffer;
+						$line = trim($line);
+						
 						$this->buffer = '';
 						$this->bufferOriginal = '';
 						$this->bufferCursorPos = 0;
