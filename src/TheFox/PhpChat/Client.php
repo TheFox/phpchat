@@ -2367,29 +2367,29 @@ class Client{
 		return $errors;
 	}
 	
-	public static function getErrorMsg($errorCode = 9999){
+	public static function getErrorMsg($code = 9999){
 		$errors = static::getError();
 		
-		if(!isset($errors[$errorCode])){
-			throw new RuntimeException('Error '.$errorCode.' not defined.');
+		if(!isset($errors[$code])){
+			throw new RuntimeException('Error '.$code.' not defined.');
 		}
 		
-		return $errors[$errorCode];
+		return $errors[$code];
 	}
 	
-	public function sendError($errorCode = 9999, $msgName = ''){
-		$msg = static::getErrorMsg($errorCode);
+	public function sendError($code = 9999, $msgName = ''){
+		$msg = static::getErrorMsg($code);
 		
 		if($code >= 2000 && $code <= 3999){
 			// SSL
-			$this->logColor('debug', 'send ERROR: '.$errorCode.', '.$msg, 'green');
+			$this->logColor('debug', 'send ERROR: '.$code.', '.$msg, 'green');
 		}
 		else{
-			$this->log('debug', 'send ERROR: '.$errorCode.', '.$msg);
+			$this->log('debug', 'send ERROR: '.$code.', '.$msg);
 		}
 		
 		$data = array(
-			'code'   => $errorCode,
+			'code'   => $code,
 			'msg' => $msg,
 			'name' => $msgName,
 		);
