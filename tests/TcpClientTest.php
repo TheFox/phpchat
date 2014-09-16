@@ -1210,12 +1210,12 @@ VNHajAjDUbj1uoKYsuAFQO0CAwEAAQ==
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
 		$this->assertEquals('talk_response', $json[0]['name']);
-		$this->assertEquals('quit', $json[1]['name']);
+		#$this->assertEquals('quit', $json[1]['name']);
 		
 		$raw = $client1->dataRecv($raw);
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
-		$this->assertEquals('quit', $json[0]['name']);
+		#$this->assertEquals('quit', $json[0]['name']);
 		
 		// Talk Msg
 		$raw = $client1->sendTalkMsg('de0bb575-cead-4ffe-adcb-311388511ed5', 'user1', 'hello world', false);
