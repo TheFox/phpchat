@@ -1410,7 +1410,7 @@ class Client{
 					}
 					
 					if($password){
-						$this->logColor('debug', 're-SSL: password reput', 'green');
+						$this->logColor('debug', 're-SSL: password reput 1A', 'green');
 						
 						$this->setStatus('hasReSslPasswortPut', true);
 						$this->sslPasswordPeerNew = $password;
@@ -1426,8 +1426,11 @@ class Client{
 							#$this->setStatus('hasSendReSslPasswortPut', true);
 							#$this->setStatus('hasReSslPasswortTest', false);
 							
+							$this->logColor('debug', 're-SSL: password reput 1B', 'green');
 							$msgHandleReturnValue .= $this->sendSslPasswordReput();
 						}
+						
+						$this->logColor('debug', 're-SSL: password reput 2', 'green');
 						$msgHandleReturnValue .= $this->sendSslPasswordRetest();
 					}
 					else{
