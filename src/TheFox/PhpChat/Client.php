@@ -1502,6 +1502,7 @@ class Client{
 						if($this->sslPasswordToken && $token == $testToken){
 							$this->logColor('debug', 're-SSL: password verified', 'green');
 							$this->logColor('debug', 're-SSL: OK', 'green');
+							#$this->logColor('debug', 're-SSL: pwd /'.substr($this->sslPasswordLocalNew, 0, 6).'/ /'.substr($this->sslPasswordPeerNew, 0, 6).'/', 'green');
 							
 							$this->setStatus('hasSendReSslPasswortPut', false);
 							$this->setStatus('hasReSslPasswortPut', false);
