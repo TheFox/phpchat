@@ -113,7 +113,6 @@ class Client{
 		$this->status['hasReSslPasswortPut'] = false;
 		$this->status['hasSslPasswortTest'] = false;
 		$this->status['hasReSslPasswortTest'] = false;
-		$this->status['hasSslPasswortVerify'] = false;
 		$this->status['hasSsl'] = false;
 	}
 	
