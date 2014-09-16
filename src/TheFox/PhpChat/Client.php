@@ -1504,6 +1504,8 @@ class Client{
 							$this->logColor('debug', 're-SSL: OK', 'green');
 							
 							$this->setStatus('hasSendReSslPasswortPut', false);
+							$this->setStatus('hasReSslPasswortPut', false);
+							$this->setStatus('hasReSslPasswortTest', false);
 							
 							$this->sslPasswordLocalCurrent = $this->sslPasswordLocalNew;
 							$this->sslPasswordPeerCurrent = $this->sslPasswordPeerNew;
