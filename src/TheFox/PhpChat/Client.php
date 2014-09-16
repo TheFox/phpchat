@@ -69,6 +69,7 @@ class Client{
 		$this->status['isChannelPeer'] = false;
 		$this->status['isOutbound'] = false;
 		$this->status['isInbound'] = false;
+		$this->status['isBridge'] = false;
 		
 		$this->resetStatusSsl();
 	}
@@ -1771,20 +1772,15 @@ class Client{
 							$rid = $msgData['rid'];
 						}
 						if(array_key_exists('subscribe', $msgData)){
-							$subscribe = $msgData['subscribe'];
+							$subscribe = (bool)$msgData['subscribe'];
 						}
 						
 						$this->logColor('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.(int)$subscribe, 'yellow');
 						
 						if($rid){
-							if($subscribe){
-								$this->getNode()->setBridgeClient(true);
-								$this->getNode()->setBridgeSubscribed(true);
-							}
-							else{
-								$this->getNode()->setBridgeClient(false);
-								$this->getNode()->setBridgeSubscribed(false);
-							}
+							$this->setStatus('isBridge', $subscribe);
+							$this->getNode()->setBridgeClient($subscribe);
+							$this->getNode()->setBridgeSubscribed($subscribe);
 							
 							$msgHandleReturnValue .= $this->sendBridgeSubscribeResponse($rid);
 						}
@@ -2317,7 +2313,7 @@ class Client{
 		
 		$data = array(
 			'rid' => $rid,
-			'subscribe' => $subscribe,
+			'subscribe' => (bool)$subscribe,
 		);
 		
 		$this->logColor('debug', 'send bridge_subscribe: '.$rid.', '.(int)$subscribe, 'yellow');

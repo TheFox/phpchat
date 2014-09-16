@@ -195,6 +195,11 @@ class InfoCommand extends BasicCommand{
 								$oldClients[$newClientId]['isInbound'] = $newClient['isInbound'];
 								$oldClients[$newClientId]['lastUpdate'] = time();
 							}
+							if($oldClient['isBridge'] != $newClient['isBridge']){
+								$this->log->debug('update '.$newClientId.': isBridge='.(int)$newClient['isBridge']);
+								$oldClients[$newClientId]['isBridge'] = $newClient['isBridge'];
+								$oldClients[$newClientId]['lastUpdate'] = time();
+							}
 							
 							if($changed){
 								$clientsChanged++;
@@ -214,6 +219,7 @@ class InfoCommand extends BasicCommand{
 								'isChannelLocal' => $newClient['isChannelLocal'],
 								'isOutbound' => $newClient['isOutbound'],
 								'isInbound' => $newClient['isInbound'],
+								'isBridge' => $newClient['isBridge'],
 								
 								'shutdown' => 0,
 								'status' => '.',
@@ -238,6 +244,9 @@ class InfoCommand extends BasicCommand{
 						}
 						if($oldClient['isChannelPeer'] || $oldClient['isChannelLocal']){
 							$oldClients[$oldClientId]['status'] = 'c';
+						}
+						if($oldClient['isBridge']){
+							$oldClients[$oldClientId]['status'] = 'b';
 						}
 						if($oldClient['hasTalkRequest']){
 							$oldClients[$oldClientId]['status'] = 't';
