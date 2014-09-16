@@ -2063,8 +2063,6 @@ class Client{
 		$this->logColor('debug', 'send SSL init A: '.(int)$this->getStatus('hasSslInit').', '.(int)$this->getStatus('hasSendSslInit'), 'green');
 		
 		if($this->getStatus('hasSendSslInit')){
-			$this->setStatus('hasSslInit', true);
-			
 			$this->logColor('debug', 'send SSL init BB', 'green');
 			return '';
 		}
