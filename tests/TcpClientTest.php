@@ -1259,7 +1259,7 @@ VNHajAjDUbj1uoKYsuAFQO0CAwEAAQ==
 		$client2->getServer()->getKernel()->shutdown();
 	}
 	
-	public function testSendBridge1(){
+	public function testSendBridgeSubscribe1(){
 		list($client1, $client2) = $this->sendGenTestDataDefault();
 		
 		$this->sendClientsId($client1, $client2);
@@ -1279,7 +1279,7 @@ VNHajAjDUbj1uoKYsuAFQO0CAwEAAQ==
 		$client2->getServer()->getKernel()->shutdown();
 	}
 	
-	public function testSendBridge2(){
+	public function testSendBridgeSubscribe2(){
 		list($client1, $client2, $client3) = $this->sendGenTestDataBridge();
 		
 		// Bridge Subscribe before ID should cause an error.
