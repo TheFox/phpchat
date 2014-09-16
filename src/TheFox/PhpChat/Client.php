@@ -1803,33 +1803,27 @@ class Client{
 			}
 		}
 		elseif($msgName == 'bridge_subscribe_response'){
-			if($this->getSettings()->data['node']['bridge']['server']['enabled']){
-				if($this->getStatus('hasSsl')){
-					$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
-					if($msgData){
-						$rid = '';
-						$status = 0;
-						if(array_key_exists('rid', $msgData)){
-							$rid = $msgData['rid'];
-						}
-						if(array_key_exists('status', $msgData)){
-							$status = (int)$msgData['status'];
-						}
-						
-						$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.$status);
+			if($this->getStatus('hasSsl')){
+				$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
+				if($msgData){
+					$rid = '';
+					$status = 0;
+					if(array_key_exists('rid', $msgData)){
+						$rid = $msgData['rid'];
 					}
-					else{
-						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
+					if(array_key_exists('status', $msgData)){
+						$status = (int)$msgData['status'];
 					}
+					
+					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.$status);
 				}
 				else{
-					$msgHandleReturnValue .= $this->sendError(2060, $msgName);
-					$this->log('warning', static::getErrorMsg(2060));
+					$msgHandleReturnValue .= $this->sendError(9000, $msgName);
 				}
 			}
 			else{
-				$msgHandleReturnValue .= $this->sendError(5000, $msgName);
-				$this->log('warning', static::getErrorMsg(5000));
+				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
+				$this->log('warning', static::getErrorMsg(2060));
 			}
 		}
 		
