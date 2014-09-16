@@ -582,17 +582,17 @@ class Console extends Thread{
 							print $char;
 							
 							$this->buffer .= $char;
-							$this->log->debug('append buffer: /'.$char.'/');
+							#$this->log->debug('append buffer: /'.$char.'/');
 						}
 						else{
-							$end = 'NOT end';
+							$end = 'NOT_end';
 							
-							$this->log->debug('buffer old: /'.$this->buffer.'/');
+							#$this->log->debug('buffer old: /'.$this->buffer.'/');
 							
 							$bufferOld = $this->buffer;
 							$this->buffer = substr($bufferOld, 0, $this->bufferCursorPos);
 							$this->buffer .= $char.substr($bufferOld, $this->bufferCursorPos);
-							$this->log->debug('buffer new: /'.$this->buffer.'/');
+							#$this->log->debug('buffer new: /'.$this->buffer.'/');
 							
 							#sleep(1);
 							static::lineClearRight();

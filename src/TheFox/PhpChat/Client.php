@@ -1480,7 +1480,7 @@ class Client{
 			else{
 				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
 				$logMsg = $msgName.' re-SSL: you need to initialize ssl, ';
-				$logMsg .= 'hasSsl=/'.(int)$this->getStatus('hasSsl').'/ ';
+				$logMsg .= 'hasReSslPasswortPut=/'.(int)$this->getStatus('hasReSslPasswortPut').'/ ';
 				$logMsg .= 'hasReSslPasswortTest=/'.(int)$this->getStatus('hasReSslPasswortTest').'/';
 				$this->logColor('warning', $logMsg, 'green');
 			}
@@ -1527,7 +1527,6 @@ class Client{
 			else{
 				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
 				$logMsg = $msgName.' re-SSL: you need to initialize ssl, ';
-				$logMsg .= 'hasSsl=/'.(int)$this->getStatus('hasSsl').'/ ';
 				$logMsg .= 'hasReSslPasswortTest=/'.(int)$this->getStatus('hasReSslPasswortTest').'/';
 				$this->logColor('warning', $logMsg, 'green');
 			}
