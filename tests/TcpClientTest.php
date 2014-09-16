@@ -1267,11 +1267,9 @@ VNHajAjDUbj1uoKYsuAFQO0CAwEAAQ==
 		
 		// Bridge Subscribe to no bridge server should cause an error.
 		$raw = $client1->sendBridgeSubscribe(true);
-		ve($raw);
 		$raw = $client2->dataRecv($raw);
-		ve($raw);
 		$json = $this->rawMsgToJson($raw);
-		ve($json);
+		#ve($json);
 		$this->assertEquals('error', $json[0]['name']);
 		$this->assertEquals(5000, $json[0]['data']['code']);
 		
