@@ -2442,7 +2442,7 @@ class Client{
 	
 	public function sendBridgeConnect($uri){
 		$data = array(
-			'uri' => $uri,
+			'uri' => (string)$uri,
 		);
 		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('bridge_connect', $data));
 	}
