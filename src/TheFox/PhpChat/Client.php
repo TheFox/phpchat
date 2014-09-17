@@ -1913,7 +1913,8 @@ class Client{
 							$uri = $msgData['uri'];
 						}
 						
-						$this->logColor('debug', $this->getUri().' recv '.$msgName.': '.$uri, 'yellow');
+						$this->logColor('debug', $this->getUri().' recv '.$msgName.': /'.$uri.'/', 'yellow');
+						
 					}
 					else{
 						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
