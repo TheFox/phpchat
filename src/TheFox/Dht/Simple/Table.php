@@ -96,7 +96,9 @@ class Table extends YamlStorage{
 	public function getNodesBridgeServer(){
 		$rv = array();
 		foreach($this->nodes as $nodeId => $node){
+			#fwrite(STDOUT, 'getNodesBridgeServer: '.$nodeId.' '.$node->getUri()."\n");
 			if($node->getBridgeServer()){
+				#fwrite(STDOUT, '  server'."\n");
 				$rv[] = $node;
 			}
 		}
