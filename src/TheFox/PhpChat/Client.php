@@ -2387,15 +2387,11 @@ class Client{
 		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('bridge_subscribe_response', $data));
 	}
 	
-	public function msgCreateBridgeConnect($uri){
+	public function sendBridgeConnect($uri){
 		$data = array(
 			'uri' => $uri,
 		);
-		return $this->msgCreate('bridge_connect', $data);
-	}
-	
-	public function sendBridgeConnect($uri){
-		return $this->dataSend($this->msgCreateBridgeConnect($uri));
+		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('bridge_connect', $data));
 	}
 	
 	public function sendPing($rid = ''){
