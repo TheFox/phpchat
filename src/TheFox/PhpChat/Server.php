@@ -406,13 +406,17 @@ class Server{
 			$uriConnect = $uri;
 		}
 		
+		return $this->connectRaw($uriConnect, $clientActions);
+	}
+	
+	public function connectRaw($uri, $clientActions = array()){
 		try{
-			if(is_object($uriConnect)){
-				if($uriConnect->getScheme() == 'tcp'){
-					if($uriConnect->getHost() && $uriConnect->getPort()){
+			if(is_object($uri)){
+				if($uri->getScheme() == 'tcp'){
+					if($uri->getHost() && $uri->getPort()){
 						$socket = new Socket();
 						$connected = false;
-						$connected = $socket->connect($uriConnect->getHost(), $uriConnect->getPort());
+						$connected = $socket->connect($uri->getHost(), $uri->getPort());
 						
 						$client = null;
 						$client = $this->clientNewTcp($socket);
