@@ -666,6 +666,8 @@ class Client{
 							$this->getNode()->incConnectionsInboundSucceed();
 						}
 						
+						$this->setStatus('isBridgeConnection', $node->getBridgeServer());
+						
 						/*if(!$this->debug && $node->getBridgeServer()){
 							$this->logColor('debug', 'subscribe to bridge server', 'yellow');
 							
