@@ -1382,7 +1382,7 @@ VNHajAjDUbj1uoKYsuAFQO0CAwEAAQ==
 		list($client1, $client2) = $this->sendGenTestDataDefault();
 		
 		// Unknown Command
-		$raw = $client2->msgHandle('{"name":"blaaaaa"}');
+		$raw = $client2->msgHandleRaw('{"name":"blaaaaa"}');
 		$json = $this->rawMsgToJson($raw);
 		#ve($json);
 		$this->assertEquals('error', $json[0]['name']);

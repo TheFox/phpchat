@@ -86,7 +86,7 @@ class TcpClient extends Client{
 				#fwrite(STDOUT, $this->getId().' dataRecv msg: /'.$msg.'/'."\n");
 				
 				#$dataRecvReturnValue .= $this->msgHandle($msg);
-				$msgHandleReturnValue = $this->msgHandle($msg);
+				$msgHandleReturnValue = $this->msgHandleRaw($msg);
 				$dataRecvReturnValue .= $msgHandleReturnValue;
 				#$dataRecvReturnValue = array_merge($dataRecvReturnValue, $msgHandleReturnValue);
 				#fwrite(STDOUT, 'msgHandle rv:         /'.$msgHandleReturnValue.'/'."\n");

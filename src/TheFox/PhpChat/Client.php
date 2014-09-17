@@ -465,14 +465,12 @@ class Client{
 		
 	}
 	
-	public function msgHandle($msgRaw){
-		#fwrite(STDOUT, 'msgHandle: /'.$msgRaw.'/'."\n");
-		
-		$msgHandleReturnValue = '';
+	protected function msgHandleEncode($msgRaw){
 		$msg = json_decode($msgRaw, true);
 		
 		$msgName = '';
 		$msgData = array();
+		
 		if($msg){
 			$msgName = substr(strtolower($msg['name']), 0, 256);
 			if(array_key_exists('data', $msg)){
@@ -485,9 +483,19 @@ class Client{
 			#$this->log('error', 'json_decode failed');
 		}
 		
-		#fwrite(STDOUT, 'msgHandle: /'.$msgName.'/'."\n");
-		#$this->logColor('debug', 'SSL status: '.(int)$this->getStatus('hasSslInit').', '.(int)$this->getStatus('hasSendSslInit').', '.(int)$this->getStatus('hasSslInitOk').', '.(int)$this->getStatus('hasSslTest').', '.(int)$this->getStatus('hasSslVerify').'', 'green');
+		return array($msgName, $msgData);
+	}
+	
+	public function msgHandleRaw($msgRaw){
+		list($msgName, $msgData) = $this->msgHandleEncode($msgRaw);
 		
+		return $this->msgHandle($msgName, $msgData);
+	}
+	
+	public function msgHandle($msgName, $msgData){
+		#fwrite(STDOUT, 'msgHandle: /'.$msgRaw.'/'."\n");
+		
+		$msgHandleReturnValue = '';
 		if($msgName == 'noop'){
 			$noop = 0x90;
 		}
