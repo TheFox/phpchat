@@ -49,6 +49,8 @@ class Client{
 	private $actionsId = 0;
 	private $actions = array();
 	#private $actionsTime = 0;
+	private $bridgeActionsId = 0;
+	private $bridgeActions = array();
 	protected $pingTime = 0;
 	protected $pongTime = 0;
 	private $trafficIn = 0;
@@ -384,6 +386,57 @@ class Client{
 	public function actionRemove(ClientAction $action){
 		#print __CLASS__.'->'.__FUNCTION__.': '.$action->getId()."\n";
 		unset($this->actions[$action->getId()]);
+	}
+	
+	public function bridgeActionsExecute($criterion){
+		$bridgeActions = $this->bridgeActionsGetByCriterion($criterion);
+		
+		$this->log('debug', 'bridgeActions execute: '.count($bridgeActions));
+		foreach($bridgeActions as $bridgeActionId => $bridgeAction){
+			$this->log('debug', 'action execute: /'.$bridgeAction->getName().'/ /'.join(',', $bridgeAction->getCriteria()).'/');
+			$this->bridgeActionRemove($bridgeAction);
+			$bridgeAction->functionExec($this);
+		}
+		$this->log('debug', 'bridgeActions left: '.count($this->bridgeActions));
+	}
+	
+	public function bridgeActionsAdd($bridgeActions){
+		foreach($bridgeActions as $bridgeAction){
+			$this->bridgeActionAdd($bridgeAction);
+		}
+	}
+	
+	public function bridgeActionAdd(ClientAction $bridgeAction){
+		$this->bridgeActionsId++;
+		
+		$bridgeAction->setId($this->bridgeActionsId);
+		
+		$this->bridgeActions[$this->bridgeActionsId] = $bridgeAction;
+	}
+	
+	public function bridgeActionsGetByCriterion($criterion){
+		$rv = array();
+		foreach($this->bridgeActions as $bridgeActionsId => $bridgeAction){
+			if($bridgeAction->hasCriterion($criterion)){
+				$rv[] = $bridgeAction;
+			}
+		}
+		return $rv;
+	}
+	
+	public function bridgeActionGetByCriterion($criterion){
+		foreach($this->bridgeActions as $bridgeActionsId => $bridgeAction){
+			if($bridgeAction->hasCriterion($criterion)){
+				return $bridgeAction;
+			}
+		}
+		
+		return null;
+	}
+	
+	public function bridgeActionRemove(ClientAction $action){
+		#print __CLASS__.'->'.__FUNCTION__.': '.$action->getId()."\n";
+		unset($this->bridgeActions[$action->getId()]);
 	}
 	
 	public function incTrafficIn($inc){
