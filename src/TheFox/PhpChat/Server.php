@@ -433,7 +433,7 @@ class Server{
 						if($client && $connected){
 							$client->sendHello();
 							
-							return true;
+							return $client;
 						}
 					}
 				}
@@ -454,7 +454,7 @@ class Server{
 			$this->log->warning('connection to '.$uri.' failed: '.$e->getMessage());
 		}
 		
-		return false;
+		return null;
 	}
 	
 	public function consoleMsgAdd($msgText = '', $showDate = false, $printPs1 = false, $clearLine = false){

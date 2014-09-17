@@ -253,7 +253,8 @@ class Kernel extends Thread{
 			});
 			$clientActions[] = $action;
 			
-			return $this->getServer()->connect($uri, $clientActions);
+			$client = $this->getServer()->connect($uri, $clientActions);
+			return $client !== null;
 		}
 		
 		return false;
@@ -278,7 +279,8 @@ class Kernel extends Thread{
 			});
 			$clientActions[] = $action;
 			
-			return $this->getServer()->connect($uri, $clientActions);
+			$client = $this->getServer()->connect($uri, $clientActions);
+			return $client !== null;
 		}
 		
 		return false;
@@ -330,7 +332,8 @@ class Kernel extends Thread{
 			});
 			$clientActions[] = $action;
 			
-			return $this->getServer()->connect($uri, $clientActions);
+			$client = $this->getServer()->connect($uri, $clientActions);
+			return $client !== null;
 		}
 		
 		return false;
