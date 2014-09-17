@@ -23,6 +23,7 @@
 		<testsuite name="My Test Suite">
 			<file>tests/BasicTest.php</file>
 			<file>tests/ClientTest.php</file>
+			<file>tests/ColorTest.php</file>
 			<file>tests/ConsoleTest.php</file>
 			<file>tests/CronjobTest.php</file>
 			<file>tests/KademliaBucketTest.php</file>
