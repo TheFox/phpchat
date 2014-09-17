@@ -71,6 +71,7 @@ class Client{
 		$this->status['isInbound'] = false;
 		$this->status['isBridgeConnection'] = false;
 		$this->status['isBridgeChannel'] = false;
+		$this->status['bridgeChannelUri'] = null;
 		
 		$this->resetStatusSsl();
 	}
@@ -685,10 +686,8 @@ class Client{
 							$this->getNode()->incConnectionsInboundSucceed();
 						}
 						
-						
-						
-						/*if(!$this->debug && $node->getBridgeServer()){
-							$this->logColor('debug', 'subscribe to bridge server', 'yellow');
+						if(!$this->debug && $node->getBridgeServer() && $this->getStatus('isBridgeChannel')){
+							$this->logColor('debug', 'bridge server connection', 'yellow');
 							
 							$actions = array();
 							
@@ -703,13 +702,13 @@ class Client{
 							$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
 							$action->setName('bridge_server_send_subscribe');
 							$action->functionSet(function($action, $client){
-								$this->logColor('debug', 'bridge subscribe ('.(int)$client->getSettings()->data['node']['bridge']['client']['enabled'].') because of bridge server', 'yellow');
-								$client->sendBridgeSubscribe($client->getSettings()->data['node']['bridge']['client']['enabled']);
+								$this->logColor('debug', 'bridge ssl ok', 'yellow');
+								$client->sendBridgeConnect($client->getStatus('bridgeChannelUri'));
 							});
 							$actions[] = $action;
 							
 							$this->actionsAdd($actions);
-						}*/
+						}
 						
 						$msgHandleReturnValue .= $this->sendIdOk();
 						
@@ -1856,6 +1855,32 @@ class Client{
 				$this->log('warning', static::getErrorMsg(2060));
 			}
 		}
+		elseif($msgName == 'bridge_connect'){
+			if($this->getSettings()->data['node']['bridge']['server']['enabled']){
+				if($this->getStatus('hasSsl')){
+					$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
+					if($msgData){
+						$uri = '';
+						if(array_key_exists('uri', $msgData)){
+							$uri = $msgData['uri'];
+						}
+						
+						$this->logColor('debug', $this->getUri().' recv '.$msgName.': '.$uri, 'yellow');
+					}
+					else{
+						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
+					}
+				}
+				else{
+					$msgHandleReturnValue .= $this->sendError(2060, $msgName);
+					$this->log('warning', static::getErrorMsg(2060));
+				}
+			}
+			else{
+				$msgHandleReturnValue .= $this->sendError(5000, $msgName);
+				$this->log('warning', static::getErrorMsg(5000));
+			}
+		}
 		
 		elseif($msgName == 'ping'){
 			$rid = '';
@@ -2360,6 +2385,17 @@ class Client{
 		$this->logColor('debug', 'send bridge_subscribe_response: '.$rid.', '.$status, 'yellow');
 		
 		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('bridge_subscribe_response', $data));
+	}
+	
+	public function msgCreateBridgeConnect($uri){
+		$data = array(
+			'uri' => $uri,
+		);
+		return $this->msgCreate('bridge_connect', $data);
+	}
+	
+	public function sendBridgeConnect($uri){
+		return $this->dataSend($this->msgCreateBridgeConnect($uri));
 	}
 	
 	public function sendPing($rid = ''){

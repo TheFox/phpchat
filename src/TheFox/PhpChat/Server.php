@@ -373,42 +373,79 @@ class Server{
 			$this->log->debug('connect action: '.join(', ', $clientAction->getCriteria()));
 		}*/
 		
-		$onode = $this->getTable()->nodeFindByUri($uri);
+		$isBridgeChannel = false;
+		$onode = null;
+		
+		if($this->getSettings()->data['node']['bridge']['client']['enabled']){
+			if($this->getTable()->getNodesNum()){
+				$onodes = $this->getTable()->getNodesClosestBridgeServer(1);
+				if(count($onodes)){
+					$onode = array_shift($onodes);
+					$this->log->debug('connect found bridge server: '.$onode->getIdHexStr());
+					$isBridgeChannel = true;
+				}
+				else{
+					$this->log->debug('connect: no bridge server found');
+				}
+			}
+			else{
+				$this->log->debug('connect: no nodes available');
+			}
+		}
+		
+		if(!$onode){
+			$this->log->debug('connect find by uri: '.$uri);
+			$onode = $this->getTable()->nodeFindByUri($uri);
+		}
+		
 		if($onode){
-			$this->log->debug('connect '.$uri.': '.$onode->getIdHexStr());
+			$this->log->debug('connect onode: '.$onode->getIdHexStr().' '.$onode->getUri());
 			$onode->incConnectionsOutboundAttempts();
+			$uri = $onode->getUri();
+		}
+		else{
+			$this->log->debug('connect: old node not found');
 		}
 		
 		try{
 			if(is_object($uri)){
 				if($uri->getScheme() == 'tcp'){
-					$connected = false;
 					if($uri->getHost() && $uri->getPort()){
 						$socket = new Socket();
+						$connected = false;
 						$connected = $socket->connect($uri->getHost(), $uri->getPort());
+						
+						$client = null;
 						$client = $this->clientNewTcp($socket);
 						$client->setStatus('isOutbound', true);
-					}
-					if($connected){
-						$client->actionsAdd($clientActions);
-						$client->sendHello();
 						
-						return true;
+						if($isBridgeChannel){
+							$client->setStatus('isBridgeChannel', true);
+							$client->setStatus('bridgeChannelUri', $uri);
+							$client->bridgeActionsAdd($clientActions);
+						}
+						else{
+							$client->setStatus('isOutbound', true);
+							$client->actionsAdd($clientActions);
+						}
+						if($client && $connected){
+							$client->sendHello();
+							
+							return true;
+						}
 					}
 				}
 				else{
-					$this->log->warning('connection to '.$uri.' failed: invalid uri scheme ('.$uri->getScheme().')');
+					$this->log->warning('connection to /'.$uri.'/ failed: invalid uri scheme ('.$uri->getScheme().')');
 				}
-				
 				/*elseif($uri->getScheme() == 'http'){
 					$client = $this->clientNewHttp($uri);
 					$client->actionsAdd($clientActions);
 					return true;
 				}*/
-				
 			}
 			else{
-				$this->log->warning('connection to '.$uri.' failed: uri is no object');
+				$this->log->warning('connection to /'.$uri.'/ failed: uri is no object');
 			}
 		}
 		catch(Exception $e){
