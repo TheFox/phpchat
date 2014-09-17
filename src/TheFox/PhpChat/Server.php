@@ -370,10 +370,6 @@ class Server{
 	public function connect($uri, $clientActions = array()){
 		$this->log->debug('connect: '.$uri);
 		
-		/*foreach($clientActions as $clientActionId => $clientAction){
-			$this->log->debug('connect action: '.join(', ', $clientAction->getCriteria()));
-		}*/
-		
 		$isBridgeChannel = false;
 		$onode = null;
 		$uriConnect = '';
