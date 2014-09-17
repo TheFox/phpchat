@@ -527,6 +527,7 @@ class Client{
 					$strKeyPubSign = '';
 					$strKeyPubFingerprint = '';
 					$bridgeServer = false;
+					$bridgeClient = false;
 					$isChannelPeer = false;
 					$hashcash = '';
 					if(array_key_exists('release', $msgData)){
@@ -547,6 +548,9 @@ class Client{
 					if(array_key_exists('bridgeServer', $msgData)){
 						$bridgeServer = (bool)$msgData['bridgeServer'];
 					}
+					if(array_key_exists('bridgeServer', $msgData)){
+						$bridgeClient = (bool)$msgData['bridgeClient'];
+					}
 					if(array_key_exists('isChannel', $msgData)){ // isChannelPeer
 						$isChannelPeer = (bool)$msgData['isChannel'];
 					}
@@ -564,6 +568,7 @@ class Client{
 						$node->setIdHexStr($id);
 						$node->setUri('tcp://'.$this->getUri()->getHost().':'.$port);
 						$node->setBridgeServer($bridgeServer);
+						$node->setBridgeClient($bridgeClient);
 						$node->setTimeLastSeen(time());
 						
 						$node = $this->getTable()->nodeEnclose($node);
@@ -661,7 +666,7 @@ class Client{
 							$this->getNode()->incConnectionsInboundSucceed();
 						}
 						
-						if(!$this->debug && $node->getBridgeServer()){
+						/*if(!$this->debug && $node->getBridgeServer()){
 							$this->logColor('debug', 'subscribe to bridge server', 'yellow');
 							
 							$actions = array();
@@ -683,7 +688,7 @@ class Client{
 							$actions[] = $action;
 							
 							$this->actionsAdd($actions);
-						}
+						}*/
 						
 						$msgHandleReturnValue .= $this->sendIdOk();
 						
@@ -1951,6 +1956,7 @@ class Client{
 				'sslKeyPub' => $sslKeyPubBase64,
 				'sslKeyPubSign' => $sslKeyPubSign,
 				'bridgeServer' => $this->getSettings()->data['node']['bridge']['server']['enabled'],
+				'bridgeClient' => $this->getSettings()->data['node']['bridge']['client']['enabled'],
 				
 				'isChannel' => $this->getStatus('isChannelLocal'),
 			);
