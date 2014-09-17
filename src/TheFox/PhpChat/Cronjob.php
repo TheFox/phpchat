@@ -248,7 +248,7 @@ class Cronjob extends Thread{
 			$this->log->debug('ping closest bridge server nodes');
 			foreach($this->table->getNodesClosestBridgeServer(20) as $nodeId => $node){
 				$this->log->debug('ping: '.$node->getUri());
-				$this->ipcKernelConnection->execAsync('serverConnect', array($node->getUri(), false, true));
+				$this->ipcKernelConnection->execAsync('serverConnectPingOnly', array($node->getUri()));
 			}
 		}
 		else{
@@ -257,7 +257,7 @@ class Cronjob extends Thread{
 			foreach($this->table->getNodes() as $nodeId => $node){
 				if($node->getSslKeyPubStatus() == 'U'){
 					$this->log->debug('ping: /'.$node->getUri().'/ /'.$node->getSslKeyPubStatus().'/');
-					$this->ipcKernelConnection->execAsync('serverConnect', array($node->getUri(), false, true));
+					$this->ipcKernelConnection->execAsync('serverConnectPingOnly', array($node->getUri()));
 				}
 			}
 			
@@ -265,7 +265,7 @@ class Cronjob extends Thread{
 			$this->log->debug('ping closest nodes');
 			foreach($this->table->getNodesClosest(20) as $nodeId => $node){
 				$this->log->debug('ping: '.$node->getUri());
-				$this->ipcKernelConnection->execAsync('serverConnect', array($node->getUri(), false, true));
+				$this->ipcKernelConnection->execAsync('serverConnectPingOnly', array($node->getUri()));
 			}
 		}
 	}
@@ -583,8 +583,8 @@ class Cronjob extends Thread{
 			
 			#$this->log->debug('     msgs sending: '.count($msgIds));
 			if($msgIds && $this->ipcKernelConnection){
-				$serverConnectArgs = array($node->getUri(), false, false, $msgIds);
-				$this->ipcKernelConnection->execSync('serverConnect', $serverConnectArgs);
+				$serverConnectArgs = array($node->getUri(), $msgIds);
+				$this->ipcKernelConnection->execSync('serverConnectTransmitMsgs', $serverConnectArgs);
 			}
 		}
 		
@@ -869,7 +869,7 @@ class Cronjob extends Thread{
 		$this->log->debug('node connect: '.(string)$node->getUri().' /'.(int)$node->getBridgeServer().'/');
 		
 		if($this->ipcKernelConnection){
-			$connected = $this->ipcKernelConnection->execSync('serverConnect', array($node->getUri(), false, true));
+			$connected = $this->ipcKernelConnection->execSync('serverConnectPingOnly', array($node->getUri()));
 			if($connected){
 				$this->log->debug('node remove: '.$nodeId);
 				$this->ipcKernelConnection->execAsync('nodesNewDbNodeRemove', array($nodeId));

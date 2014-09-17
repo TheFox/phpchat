@@ -1278,7 +1278,7 @@ class Console extends Thread{
 		$this->msgAdd();
 		$this->msgAdd('Connecting to '.$uri.' ...', true, false);
 		
-		$connected = $this->ipcKernelConnection->execSync('serverConnect', array($uri, true));
+		$connected = $this->ipcKernelConnection->execSync('serverConnectTalkRequest', array($uri));
 		
 		$msg = 'Connection to '.$uri.' ';
 		$printPs1 = false;
