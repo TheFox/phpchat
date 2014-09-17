@@ -357,7 +357,7 @@ class Server{
 				'isChannelLocal' => $client->getStatus('isChannelLocal'),
 				'isOutbound' => $client->getStatus('isOutbound'),
 				'isInbound' => $client->getStatus('isInbound'),
-				'isBridgeConnection' => $client->getStatus('isBridgeConnection'),
+				'isBridgeChannel' => $client->getStatus('isBridgeChannel'),
 			);
 		}
 		

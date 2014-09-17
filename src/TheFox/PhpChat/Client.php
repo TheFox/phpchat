@@ -71,7 +71,6 @@ class Client{
 		$this->status['isChannelPeer'] = false;
 		$this->status['isOutbound'] = false;
 		$this->status['isInbound'] = false;
-		$this->status['isBridgeConnection'] = false;
 		$this->status['isBridgeChannel'] = false;
 		$this->status['bridgeChannelUri'] = null;
 		
@@ -622,9 +621,6 @@ class Client{
 						$isChannelPeer = (bool)$msgData['isChannel'];
 					}
 					
-					if($bridgeServer || $bridgeClient){
-						$this->setStatus('isBridgeConnection', true);
-					}
 					if($bridgeChannel){
 						$this->setStatus('isBridgeChannel', true);
 					}
@@ -1860,7 +1856,6 @@ class Client{
 						$this->logColor('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.(int)$subscribe, 'yellow');
 						
 						if($rid){
-							$this->setStatus('isBridgeConnection', $subscribe);
 							$this->getNode()->setBridgeClient($subscribe);
 							$this->getNode()->setBridgeSubscribed($subscribe);
 							
