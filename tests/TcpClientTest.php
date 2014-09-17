@@ -1139,8 +1139,8 @@ VNHajAjDUbj1uoKYsuAFQO0CAwEAAQ==
 		$this->assertTrue($client1->getStatus('hasReSslPasswortTest'));
 		
 		$this->assertFalse($client2->getStatus('hasSendReSslPasswortPut'));
-		$this->assertTrue($client2->getStatus('hasReSslPasswortPut'));
-		$this->assertTrue($client2->getStatus('hasReSslPasswortTest'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortPut'));
+		$this->assertFalse($client2->getStatus('hasReSslPasswortTest'));
 		
 		
 		$client1->getServer()->getKernel()->shutdown();
