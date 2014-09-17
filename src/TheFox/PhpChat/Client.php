@@ -548,7 +548,7 @@ class Client{
 					if(array_key_exists('bridgeServer', $msgData)){
 						$bridgeServer = (bool)$msgData['bridgeServer'];
 					}
-					if(array_key_exists('bridgeServer', $msgData)){
+					if(array_key_exists('bridgeClient', $msgData)){
 						$bridgeClient = (bool)$msgData['bridgeClient'];
 					}
 					if(array_key_exists('isChannel', $msgData)){ // isChannelPeer
