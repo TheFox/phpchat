@@ -70,6 +70,7 @@ class Client{
 		$this->status['isOutbound'] = false;
 		$this->status['isInbound'] = false;
 		$this->status['isBridgeConnection'] = false;
+		$this->status['isBridgeChannel'] = false;
 		
 		$this->resetStatusSsl();
 	}
@@ -536,6 +537,7 @@ class Client{
 					$strKeyPubFingerprint = '';
 					$bridgeServer = false;
 					$bridgeClient = false;
+					$bridgeChannel = false;
 					$isChannelPeer = false;
 					$hashcash = '';
 					if(array_key_exists('release', $msgData)){
@@ -559,12 +561,18 @@ class Client{
 					if(array_key_exists('bridgeClient', $msgData)){
 						$bridgeClient = (bool)$msgData['bridgeClient'];
 					}
+					if(array_key_exists('bridgeChannel', $msgData)){
+						$bridgeChannel = (bool)$msgData['bridgeChannel'];
+					}
 					if(array_key_exists('isChannel', $msgData)){ // isChannelPeer
 						$isChannelPeer = (bool)$msgData['isChannel'];
 					}
 					
 					if($bridgeServer || $bridgeClient){
 						$this->setStatus('isBridgeConnection', true);
+					}
+					if($bridgeChannel){
+						$this->setStatus('isBridgeChannel', true);
 					}
 					if($isChannelPeer){
 						$this->setStatus('isChannelPeer', true);
@@ -1970,6 +1978,7 @@ class Client{
 				'sslKeyPubSign' => $sslKeyPubSign,
 				'bridgeServer' => $this->getSettings()->data['node']['bridge']['server']['enabled'],
 				'bridgeClient' => $this->getSettings()->data['node']['bridge']['client']['enabled'],
+				'bridgeChannel' => $this->getStatus('isBridgeChannel'),
 				
 				'isChannel' => $this->getStatus('isChannelLocal'),
 			);
