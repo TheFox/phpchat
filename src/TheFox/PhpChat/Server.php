@@ -375,6 +375,7 @@ class Server{
 		
 		$isBridgeChannel = false;
 		$onode = null;
+		$uriConnect = '';
 		
 		if($this->getSettings()->data['node']['bridge']['client']['enabled']){
 			if($this->getTable()->getNodesNum()){
@@ -401,19 +402,20 @@ class Server{
 		if($onode){
 			$this->log->debug('connect onode: '.$onode->getIdHexStr().' '.$onode->getUri());
 			$onode->incConnectionsOutboundAttempts();
-			$uri = $onode->getUri();
+			$uriConnect = $onode->getUri();
 		}
 		else{
 			$this->log->debug('connect: old node not found');
+			$uriConnect = $uri;
 		}
 		
 		try{
-			if(is_object($uri)){
-				if($uri->getScheme() == 'tcp'){
-					if($uri->getHost() && $uri->getPort()){
+			if(is_object($uriConnect)){
+				if($uriConnect->getScheme() == 'tcp'){
+					if($uriConnect->getHost() && $uriConnect->getPort()){
 						$socket = new Socket();
 						$connected = false;
-						$connected = $socket->connect($uri->getHost(), $uri->getPort());
+						$connected = $socket->connect($uriConnect->getHost(), $uriConnect->getPort());
 						
 						$client = null;
 						$client = $this->clientNewTcp($socket);
