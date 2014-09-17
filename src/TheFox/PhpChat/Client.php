@@ -555,6 +555,9 @@ class Client{
 						$isChannelPeer = (bool)$msgData['isChannel'];
 					}
 					
+					if($bridgeServer || $bridgeClient){
+						$this->setStatus('isBridgeConnection', true);
+					}
 					if($isChannelPeer){
 						$this->setStatus('isChannelPeer', true);
 					}
@@ -666,7 +669,7 @@ class Client{
 							$this->getNode()->incConnectionsInboundSucceed();
 						}
 						
-						$this->setStatus('isBridgeConnection', $node->getBridgeServer());
+						
 						
 						/*if(!$this->debug && $node->getBridgeServer()){
 							$this->logColor('debug', 'subscribe to bridge server', 'yellow');
