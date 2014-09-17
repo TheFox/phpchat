@@ -71,7 +71,6 @@ class Client{
 		$this->status['isChannelPeer'] = false;
 		$this->status['isOutbound'] = false;
 		$this->status['isInbound'] = false;
-		$this->status['isBridgeChannel'] = false;
 		$this->status['bridgeChannelUri'] = null;
 		
 		$this->resetStatusSsl();
@@ -590,7 +589,6 @@ class Client{
 					$strKeyPubFingerprint = '';
 					$bridgeServer = false;
 					$bridgeClient = false;
-					$bridgeChannel = false;
 					$isChannelPeer = false;
 					$hashcash = '';
 					if(array_key_exists('release', $msgData)){
@@ -614,16 +612,10 @@ class Client{
 					if(array_key_exists('bridgeClient', $msgData)){
 						$bridgeClient = (bool)$msgData['bridgeClient'];
 					}
-					if(array_key_exists('bridgeChannel', $msgData)){
-						$bridgeChannel = (bool)$msgData['bridgeChannel'];
-					}
 					if(array_key_exists('isChannel', $msgData)){ // isChannelPeer
 						$isChannelPeer = (bool)$msgData['isChannel'];
 					}
 					
-					if($bridgeChannel){
-						$this->setStatus('isBridgeChannel', true);
-					}
 					if($isChannelPeer){
 						$this->setStatus('isChannelPeer', true);
 					}
@@ -735,8 +727,8 @@ class Client{
 							$this->getNode()->incConnectionsInboundSucceed();
 						}
 						
-						if(!$this->debug && $node->getBridgeServer() && $this->getStatus('isBridgeChannel')){
-							$this->logColor('debug', 'bridge server connection', 'yellow');
+						if(!$this->debug && $node->getBridgeServer() && $this->getStatus('bridgeChannelUri')){
+							$this->logColor('debug', 'bridge server connection: '.$this->getStatus('bridgeChannelUri'), 'yellow');
 							
 							$actions = array();
 							
@@ -2052,7 +2044,6 @@ class Client{
 				'sslKeyPubSign' => $sslKeyPubSign,
 				'bridgeServer' => $this->getSettings()->data['node']['bridge']['server']['enabled'],
 				'bridgeClient' => $this->getSettings()->data['node']['bridge']['client']['enabled'],
-				'bridgeChannel' => $this->getStatus('isBridgeChannel'),
 				
 				'isChannel' => $this->getStatus('isChannelLocal'),
 			);

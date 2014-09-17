@@ -357,7 +357,8 @@ class Server{
 				'isChannelLocal' => $client->getStatus('isChannelLocal'),
 				'isOutbound' => $client->getStatus('isOutbound'),
 				'isInbound' => $client->getStatus('isInbound'),
-				'isBridgeChannel' => $client->getStatus('isBridgeChannel'),
+				'isBridgeServer' => $client->getStatus('isBridgeServer'),
+				'isBridgeClient' => $client->getStatus('isBridgeClient'),
 			);
 		}
 		
@@ -422,7 +423,6 @@ class Server{
 						$client->setStatus('isOutbound', true);
 						
 						if($isBridgeChannel){
-							$client->setStatus('isBridgeChannel', true);
 							$client->setStatus('bridgeChannelUri', $uri);
 							$client->bridgeActionsAdd($clientActions);
 						}
