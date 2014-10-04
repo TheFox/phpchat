@@ -357,9 +357,15 @@ class Server{
 				'isChannelLocal' => $client->getStatus('isChannelLocal'),
 				'isOutbound' => $client->getStatus('isOutbound'),
 				'isInbound' => $client->getStatus('isInbound'),
-				'isBridgeServer' => $client->getNode()->setBridgeServer(),
-				'isBridgeClient' => $client->getNode()->setBridgeClient(),
+				
+				'isBridgeServer' => false,
+				'isBridgeClient' => false,
 			);
+			
+			if($node = $client->getNode()){
+				$rv['clients'][$clientId]['isBridgeServer'] = $node->getBridgeServer();
+				$rv['clients'][$clientId]['isBridgeClient'] = $node->getBridgeClient();
+			}
 		}
 		
 		$rv['clientsId'] = $this->clientsId;
@@ -406,24 +412,20 @@ class Server{
 			$uriConnect = $uri;
 		}
 		
-		return $this->connectRaw($uriConnect, $clientActions);
-	}
-	
-	public function connectRaw($uri, $clientActions = array()){
 		try{
-			if(is_object($uri)){
-				if($uri->getScheme() == 'tcp'){
-					if($uri->getHost() && $uri->getPort()){
+			if(is_object($uriConnect)){
+				if($uriConnect->getScheme() == 'tcp'){
+					if($uriConnect->getHost() && $uriConnect->getPort()){
 						$socket = new Socket();
 						$connected = false;
-						$connected = $socket->connect($uri->getHost(), $uri->getPort());
+						$connected = $socket->connect($uriConnect->getHost(), $uriConnect->getPort());
 						
 						$client = null;
 						$client = $this->clientNewTcp($socket);
 						$client->setStatus('isOutbound', true);
 						
 						if($isBridgeChannel){
-							$client->setStatus('bridgeChannelUri', $uri);
+							$client->setStatus('bridgeChannelUri', $uriConnect);
 							$client->bridgeActionsAdd($clientActions);
 						}
 						else{
@@ -438,20 +440,20 @@ class Server{
 					}
 				}
 				else{
-					$this->log->warning('connection to /'.$uri.'/ failed: invalid uri scheme ('.$uri->getScheme().')');
+					$this->log->warning('connection to /'.$uriConnect.'/ failed: invalid uri scheme ('.$uriConnect->getScheme().')');
 				}
-				/*elseif($uri->getScheme() == 'http'){
-					$client = $this->clientNewHttp($uri);
+				/*elseif($uriConnect->getScheme() == 'http'){
+					$client = $this->clientNewHttp($uriConnect);
 					$client->actionsAdd($clientActions);
 					return true;
 				}*/
 			}
 			else{
-				$this->log->warning('connection to /'.$uri.'/ failed: uri is no object');
+				$this->log->warning('connection to /'.$uriConnect.'/ failed: uri is no object');
 			}
 		}
 		catch(Exception $e){
-			$this->log->warning('connection to '.$uri.' failed: '.$e->getMessage());
+			$this->log->warning('connection to '.$uriConnect.' failed: '.$e->getMessage());
 		}
 		
 		return null;
