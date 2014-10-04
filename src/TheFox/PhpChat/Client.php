@@ -741,7 +741,7 @@ class Client{
 							$actions[] = $action;
 							
 							$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
-							$action->setName('bridge_server_send_subscribe');
+							$action->setName('bridge_server_send_connect');
 							$action->functionSet(function($action, $client){
 								$this->logColor('debug', 'bridge ssl ok', 'yellow');
 								$client->sendBridgeConnect($client->getStatus('bridgeChannelUri'));
