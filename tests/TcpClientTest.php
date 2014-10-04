@@ -1259,7 +1259,7 @@ VNHajAjDUbj1uoKYsuAFQO0CAwEAAQ==
 		$client2->getServer()->getKernel()->shutdown();
 	}
 	
-	public function testSendBridgeSubscribe1(){
+	/*public function testSendBridgeSubscribe1(){
 		list($client1, $client2) = $this->sendGenTestDataDefault();
 		
 		$this->sendClientsId($client1, $client2);
@@ -1309,7 +1309,7 @@ VNHajAjDUbj1uoKYsuAFQO0CAwEAAQ==
 		$client1->getServer()->getKernel()->shutdown();
 		$client2->getServer()->getKernel()->shutdown();
 		$client3->getServer()->getKernel()->shutdown();
-	}
+	}*/
 	
 	public function testSendPingPong(){
 		list($client1, $client2) = $this->sendGenTestDataDefault();
