@@ -390,13 +390,13 @@ class Client{
 	public function bridgeActionsExecute($criterion){
 		$bridgeActions = $this->bridgeActionsGetByCriterion($criterion);
 		
-		$this->log('debug', 'bridgeActions execute: '.count($bridgeActions));
+		$this->logColor('debug', 'bridgeActions execute: '.count($bridgeActions), 'yellow');
 		foreach($bridgeActions as $bridgeActionId => $bridgeAction){
-			$this->log('debug', 'action execute: /'.$bridgeAction->getName().'/ /'.join(',', $bridgeAction->getCriteria()).'/');
+			$this->logColor('debug', 'action execute: /'.$bridgeAction->getName().'/ /'.join(',', $bridgeAction->getCriteria()).'/', 'yellow');
 			$this->bridgeActionRemove($bridgeAction);
 			$bridgeAction->functionExec($this);
 		}
-		$this->log('debug', 'bridgeActions left: '.count($this->bridgeActions));
+		$this->logColor('debug', 'bridgeActions left: '.count($this->bridgeActions), 'yellow');
 	}
 	
 	public function bridgeActionsAdd($bridgeActions){
@@ -436,6 +436,12 @@ class Client{
 	public function bridgeActionRemove(ClientAction $action){
 		#print __CLASS__.'->'.__FUNCTION__.': '.$action->getId()."\n";
 		unset($this->bridgeActions[$action->getId()]);
+	}
+	
+	public function bridgeActionRemoveByCriterion($criterion){
+		foreach($this->bridgeActionsGetByCriterion($criterion) as $bridgeAction){
+			$this->bridgeActionRemove($bridgeAction);
+		}
 	}
 	
 	public function setBridgeClient(Client $bridgeClient){
