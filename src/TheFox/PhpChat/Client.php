@@ -1985,6 +1985,33 @@ class Client{
 				$this->log('warning', static::getErrorMsg(5100));
 			}
 		}
+		elseif($msgName == 'bridge_msg'){
+			if($this->getSettings()->data['node']['bridge']['server']['enabled']){
+				if($this->getStatus('hasSsl')){
+					$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
+					if($msgData){
+						$data = '';
+						if(array_key_exists('data', $msgData)){
+							$data = $msgData['data'];
+						}
+						
+						$this->logColor('debug', $this->getUri().' recv '.$msgName.': /'.$data.'/', 'yellow');
+						# TODO
+					}
+					else{
+						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
+					}
+				}
+				else{
+					$msgHandleReturnValue .= $this->sendError(2060, $msgName);
+					$this->log('warning', static::getErrorMsg(2060));
+				}
+			}
+			else{
+				$msgHandleReturnValue .= $this->sendError(5200, $msgName);
+				$this->log('warning', static::getErrorMsg(5200));
+			}
+		}
 		
 		elseif($msgName == 'ping'){
 			$rid = '';
@@ -2507,6 +2534,15 @@ class Client{
 		);
 		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('bridge_connect_response', $data));
 	}
+	
+	public function sendBridgeMsg($data){
+		$data = array(
+			#'name' => $name,
+			'data' => $data,
+		);
+		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('bridge_msg', $data));
+	}
+	
 	public function sendPing($rid = ''){
 		$this->pingTime = time();
 		
@@ -2551,7 +2587,9 @@ class Client{
 			4000 => 'Hashcash: verification failed',
 			
 			// 5000-5999: Bridge
-			5000 => 'Bridge: No Server',
+			5000 => 'Bridge: no server',
+			5100 => 'Bridge: no client',
+			5200 => 'Bridge: no server or client',
 			
 			// 9000-9999: Misc
 			9000 => 'Invalid data',
