@@ -1945,7 +1945,8 @@ class Client{
 			}
 		}
 		elseif($msgName == 'bridge_connect_response'){
-			if($this->getSettings()->data['node']['bridge']['server']['enabled']){
+			if($this->getSettings()->data['node']['bridge']['server']['enabled'] ||
+				$this->getSettings()->data['node']['bridge']['client']['enabled']){
 				if($this->getStatus('hasSsl')){
 					$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
 					if($msgData){
@@ -1980,8 +1981,8 @@ class Client{
 				}
 			}
 			else{
-				$msgHandleReturnValue .= $this->sendError(5000, $msgName);
-				$this->log('warning', static::getErrorMsg(5000));
+				$msgHandleReturnValue .= $this->sendError(5100, $msgName);
+				$this->log('warning', static::getErrorMsg(5100));
 			}
 		}
 		
