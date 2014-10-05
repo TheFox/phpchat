@@ -2466,7 +2466,7 @@ class Client{
 		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('talk_close', $data));
 	}
 	
-	public function sendBridgeSubscribe($subscribe = true){
+	/*public function sendBridgeSubscribe($subscribe = true){
 		$rid = (string)Uuid::uuid4();
 		
 		$data = array(
@@ -2488,7 +2488,7 @@ class Client{
 		$this->logColor('debug', 'send bridge_subscribe_response: '.$rid.', '.$status, 'yellow');
 		
 		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('bridge_subscribe_response', $data));
-	}
+	}*/
 	
 	public function sendBridgeConnect($uri){
 		$data = array(
