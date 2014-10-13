@@ -14,6 +14,7 @@ PHPUNIT = vendor/bin/phpunit
 all: install tests
 
 install: composer.phar
+	$(CHMOD) 700 ./application.php
 
 update: composer.phar
 	./composer.phar selfupdate
@@ -22,6 +23,7 @@ update: composer.phar
 
 composer.phar:
 	curl -sS https://getcomposer.org/installer | php
+	$(CHMOD) 700 ./composer.phar
 	./composer.phar install
 	php bootstrap.php
 
