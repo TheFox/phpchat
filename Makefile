@@ -1,9 +1,5 @@
 
 RM = rm -rf
-MKDIR = mkdir -p
-GZIP = gzip
-MV = mv -i
-CP = cp -rp
 CHMOD = chmod
 PHPCS = vendor/bin/phpcs
 PHPUNIT = vendor/bin/phpunit
@@ -14,18 +10,15 @@ PHPUNIT = vendor/bin/phpunit
 all: install tests
 
 install: composer.phar
-	$(CHMOD) 700 ./application.php
+	./composer.phar install --prefer-source --no-interaction --dev
 
 update: composer.phar
 	./composer.phar selfupdate
 	./composer.phar update
-	php bootstrap.php
 
 composer.phar:
 	curl -sS https://getcomposer.org/installer | php
-	$(CHMOD) 700 ./composer.phar
-	./composer.phar install
-	php bootstrap.php
+	$(CHMOD) 755 ./composer.phar
 
 $(PHPCS): composer.phar
 
@@ -43,7 +36,7 @@ test_clean:
 	$(RM) tests/testfile_*
 	$(RM) tests/*.yml
 
-release:
+release: release.sh
 	./release.sh
 
 clean: test_clean
