@@ -29,7 +29,7 @@
 		"thefox/utilities": "<1.2",
 		"thefox/hashcash": "~1.5",
 		"thefox/imapd": "~0.1",
-		"thefox/smtpd": "~0.1"
+		"thefox/smtpd": "<0.1.2"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "~4.1",
