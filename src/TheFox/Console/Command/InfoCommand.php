@@ -37,10 +37,10 @@ class InfoCommand extends BasicCommand{
 	protected function configure(){
 		$this->setName('info');
 		$this->setDescription('Show infos about this node.');
-		$this->addOption('name', null, InputOption::VALUE_NONE, 'Print the name this application.');
-		$this->addOption('name_lc', null, InputOption::VALUE_NONE, 'Print the lower-case name this application.');
-		$this->addOption('version_number', null, InputOption::VALUE_NONE, 'Print the version this application.');
-		$this->addOption('connections', 'c', InputOption::VALUE_NONE, 'Print connections infos.');
+		$this->addOption('name', null, InputOption::VALUE_NONE, 'Prints the name of this application.');
+		$this->addOption('name_lc', null, InputOption::VALUE_NONE, 'Prints the lower-case name of this application.');
+		$this->addOption('version_number', null, InputOption::VALUE_NONE, 'Prints the version of this application.');
+		$this->addOption('connections', 'c', InputOption::VALUE_NONE, 'Print connection infos.');
 	}
 	
 	private function initIpcKernelConnection(){
