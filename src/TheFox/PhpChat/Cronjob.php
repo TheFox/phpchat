@@ -5,6 +5,8 @@ namespace TheFox\PhpChat;
 use Exception;
 use RuntimeException;
 
+use GuzzleHttp\Client;
+
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler as LoggerStreamHandler;
 use TheFox\Ipc\ClientConnection;
@@ -611,6 +613,15 @@ class Cronjob extends Thread{
 			'http://phpchat.fox21.at/nodes.json',
 		);
 		$userAgent = PhpChat::NAME.'/'.PhpChat::VERSION.' PHP/'.PHP_VERSION.' curl/'.curl_version()['version'];
+		$clientOptions = array(
+			'headers' => array(
+				'User-Agent' => $userAgent,
+				'Accept' => 'application/json',
+			),
+			'connect_timeout' => 3,
+			'timeout' => 5,
+			'verify' => false,
+		);
 		
 		if(!$this->table){
 			$this->log->debug('get table');
@@ -620,20 +631,12 @@ class Cronjob extends Thread{
 		$this->log->debug('local node: /'.$this->table->getLocalNode()->getIdHexStr().'/');
 		
 		foreach($urls as $url){
-			$client = new \GuzzleHttp\Client();
+			$client = new Client();
 			$response = null;
 			
 			try{
 				$this->log->debug('get url "'.$url.'"');
-				$response = $client->get($url, array(
-					'headers' => array(
-						'User-Agent' => $userAgent,
-						'Accept' => 'application/json',
-					),
-					'connect_timeout' => 3,
-					'timeout' => 5,
-					'verify' => false,
-				));
+				$response = $client->get($url, $clientOptions);
 			}
 			catch(Exception $e){
 				$this->log->error('url failed, "'.$url.'": '.$e->getMessage());
