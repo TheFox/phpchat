@@ -5,7 +5,7 @@ namespace TheFox\PhpChat;
 use Exception;
 use RuntimeException;
 
-use GuzzleHttp\Client;
+use GuzzleHttp\Client as GuzzleHttpClient;
 
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler as LoggerStreamHandler;
@@ -631,12 +631,12 @@ class Cronjob extends Thread{
 		$this->log->debug('local node: /'.$this->table->getLocalNode()->getIdHexStr().'/');
 		
 		foreach($urls as $url){
-			$client = new Client();
+			$client = new GuzzleHttpClient($clientOptions);
 			$response = null;
 			
 			try{
 				$this->log->debug('get url "'.$url.'"');
-				$response = $client->get($url, $clientOptions);
+				$response = $client->get($url);
 			}
 			catch(Exception $e){
 				$this->log->error('url failed, "'.$url.'": '.$e->getMessage());
