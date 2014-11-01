@@ -5,9 +5,9 @@ PHPCS = vendor/bin/phpcs
 PHPUNIT = vendor/bin/phpunit
 
 
-.PHONY: all install tests test_phpcs test_phpunit test_clean release clean clean_nodes clean_data clean_all
+.PHONY: all install test test_phpcs test_phpunit test_clean release clean clean_nodes clean_data clean_all
 
-all: install tests
+all: install test
 
 install: composer.phar
 	./composer.phar install --prefer-source --no-interaction --dev
@@ -22,7 +22,7 @@ composer.phar:
 
 $(PHPCS): composer.phar
 
-tests: test_phpcs test_phpunit
+test: test_phpcs test_phpunit
 
 test_phpcs: $(PHPCS) vendor/thefox/phpcsrs/Standards/TheFox
 	$(PHPCS) -v -s --report=full --report-width=160 --standard=vendor/thefox/phpcsrs/Standards/TheFox src tests
