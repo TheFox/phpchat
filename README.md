@@ -49,6 +49,10 @@ I also like the [Bitmessage](https://bitmessage.org) project. But building think
 ## Contribute
 You're welcome to contribute to this project. Fork this project at <https://github.com/TheFox/phpchat>. You should read GitHub's [How to Fork a Repo](https://help.github.com/articles/fork-a-repo).
 
+## Links
+- [Packagist Package](https://packagist.org/packages/thefox/phpchat)
+- [Travis CI Repository](https://travis-ci.org/TheFox/phpchat)
+
 ## License
 Copyright (C) 2014 Christian Mayer <http://fox21.at>
 
