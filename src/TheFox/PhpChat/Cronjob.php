@@ -5,7 +5,8 @@ namespace TheFox\PhpChat;
 use Exception;
 use RuntimeException;
 
-use GuzzleHttp\Client as GuzzleHttpClient;
+use Guzzle\Http\Client as GuzzleHttpClient; // v==3
+#use GuzzleHttp\Client as GuzzleHttpClient; // v>=4
 
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler as LoggerStreamHandler;
@@ -612,16 +613,6 @@ class Cronjob extends Thread{
 		$urls = array(
 			'http://phpchat.fox21.at/nodes.json',
 		);
-		$userAgent = PhpChat::NAME.'/'.PhpChat::VERSION.' PHP/'.PHP_VERSION.' curl/'.curl_version()['version'];
-		$clientOptions = array(
-			'headers' => array(
-				'User-Agent' => $userAgent,
-				'Accept' => 'application/json',
-			),
-			'connect_timeout' => 3,
-			'timeout' => 5,
-			'verify' => false,
-		);
 		
 		if(!$this->table){
 			$this->log->debug('get table');
@@ -631,7 +622,7 @@ class Cronjob extends Thread{
 		$this->log->debug('local node: /'.$this->table->getLocalNode()->getIdHexStr().'/');
 		
 		foreach($urls as $url){
-			$client = new GuzzleHttpClient($clientOptions);
+			$client = $this->createGuzzleHttpClient();
 			$response = null;
 			
 			try{
@@ -664,6 +655,22 @@ class Cronjob extends Thread{
 				}
 			}
 		}
+	}
+	
+	public function createGuzzleHttpClient(){
+		$userAgent = PhpChat::NAME.'/'.PhpChat::VERSION.' PHP/'.PHP_VERSION.' curl/'.curl_version()['version'];
+		$clientOptions = array(
+			'headers' => array(
+				'User-Agent' => $userAgent,
+				'Accept' => 'application/json',
+			),
+			'connect_timeout' => 3,
+			'timeout' => 5,
+			'verify' => false,
+		);
+		$client = new GuzzleHttpClient($clientOptions);
+		
+		return $client;
 	}
 	
 	public function bootstrapNodesEncloseJson($json){
