@@ -2525,6 +2525,8 @@ class Client{
 	}*/
 	
 	public function sendBridgeConnect($uri){
+		$this->logColor('debug', 'bridge connect: '.$uri, 'yellow');
+		
 		$data = array(
 			'uri' => (string)$uri,
 		);
