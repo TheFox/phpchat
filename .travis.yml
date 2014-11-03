@@ -9,7 +9,7 @@ install:
     - make install
 before_script:
     - phpenv rehash
-script: make test
+script: make test_phpunit
 matrix:
     allow_failures:
         - php: hhvm

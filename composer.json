@@ -23,7 +23,7 @@
 		"rhumsaa/uuid": "~2.7",
 		"liip/process-manager": "~1.0",
 		"zendframework/zend-uri": "~2.3",
-		"guzzlehttp/guzzle": "~5.0",
+		"guzzlehttp/guzzle": "~4.0",
 		"kevinlebrun/colors.php": "~0.4",
 		"rych/bytesize": "1.0.0",
 		"thefox/utilities": "<1.2",
