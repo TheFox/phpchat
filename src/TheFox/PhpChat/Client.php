@@ -1918,6 +1918,7 @@ class Client{
 						$uri = '';
 						if(array_key_exists('uri', $msgData)){
 							$uri = $msgData['uri'];
+							$uri = UriFactory::factory($uri);
 						}
 						
 						$this->logColor('debug', $this->getUri().' recv '.$msgName.': /'.$uri.'/', 'yellow');
