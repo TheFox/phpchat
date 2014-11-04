@@ -4,6 +4,8 @@ namespace TheFox\PhpChat;
 
 use Exception;
 
+use Colors\Color;
+
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler;
 use TheFox\Network\Socket;
@@ -36,6 +38,11 @@ class Server{
 	
 	public function getLog(){
 		return $this->log;
+	}
+	
+	public function logColor($level, $msg, $colorBg = 'green', $colorFg = 'black'){
+		$color = new Color();
+		$this->log->$level($color($msg)->bg($colorBg)->fg($colorFg));
 	}
 	
 	public function setKernel($kernel){
@@ -268,7 +275,7 @@ class Server{
 		$this->clients[$this->clientsId] = $client;
 		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.count($this->clients)."\n");
 		
-		$client->logColor('debug', 'client start', 'white', 'black');
+		$this->logColor('debug', 'client start', 'white', 'black');
 		
 		$this->networkBootstrap($client);
 		
@@ -385,15 +392,15 @@ class Server{
 				$onodes = $this->getTable()->getNodesClosestBridgeServer(1);
 				if(count($onodes)){
 					$onode = array_shift($onodes);
-					$this->log->debug('connect found bridge server: '.$onode->getIdHexStr());
+					$this->logColor('debug', 'connect found bridge server: '.$onode->getIdHexStr(), 'yellow');
 					$isBridgeChannel = true;
 				}
 				else{
-					$this->log->debug('connect: no bridge server found');
+					$this->logColor('debug', 'connect: no bridge server found', 'yellow');
 				}
 			}
 			else{
-				$this->log->debug('connect: no nodes available');
+				$this->logColor('debug', 'connect: no nodes available', 'yellow');
 			}
 		}
 		
