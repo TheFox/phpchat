@@ -658,7 +658,8 @@ class Cronjob extends Thread{
 	}
 	
 	public function createGuzzleHttpClient(){
-		$userAgent = PhpChat::NAME.'/'.PhpChat::VERSION.' PHP/'.PHP_VERSION.' curl/'.curl_version()['version'];
+		$curlVersion = curl_version();
+		$userAgent = PhpChat::NAME.'/'.PhpChat::VERSION.' PHP/'.PHP_VERSION.' curl/'.$curlVersion['version'];
 		$clientOptions = array(
 			'headers' => array(
 				'User-Agent' => $userAgent,
