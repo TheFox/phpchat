@@ -73,6 +73,7 @@ class Client{
 		$this->status['isOutbound'] = false;
 		$this->status['isInbound'] = false;
 		$this->status['bridgeChannelUri'] = null;
+		$this->status['bridgeTargetUri'] = null;
 		
 		$this->resetStatusSsl();
 	}
@@ -755,13 +756,13 @@ class Client{
 							});
 							$actions[] = $action;
 							
-							$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
+							/*$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
 							$action->setName('bridge_server_send_connect');
 							$action->functionSet(function($action, $client){
 								$this->logColor('debug', 'bridge ssl ok', 'yellow');
 								$client->sendBridgeConnect($client->getStatus('bridgeChannelUri'));
 							});
-							$actions[] = $action;
+							$actions[] = $action;*/
 							
 							$this->actionsAdd($actions);
 						}
@@ -1915,25 +1916,26 @@ class Client{
 				if($this->getStatus('hasSsl')){
 					$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
 					if($msgData){
-						$uri = '';
+						$targetUri = '';
 						if(array_key_exists('uri', $msgData)){
-							$uri = $msgData['uri'];
-							$uri = UriFactory::factory($uri);
+							$targetUri = $msgData['uri'];
+							$targetUri = UriFactory::factory($targetUri);
 						}
 						
-						$this->logColor('debug', $this->getUri().' recv '.$msgName.': /'.$uri.'/', 'yellow');
+						$this->logColor('debug', $this->getUri().' recv '.$msgName.': target /'.$targetUri.'/', 'yellow');
 						
-						$client = $this->getServer()->connect($uri);
+						$client = $this->getServer()->connect($targetUri);
 						if($client !== null){
-							$this->logColor('debug', 'bridge connected to /'.$uri.'/', 'yellow');
+							$this->logColor('debug', 'bridge connected to target /'.$targetUri.'/', 'yellow');
 							
 							$this->setBridgeClient($client);
 							$client->setBridgeClient($client);
+							$client->setStatus('bridgeTargetUri', $targetUri);
 							
 							$msgHandleReturnValue .= $this->sendBridgeConnectResponse(1);
 						}
 						else{
-							$this->logColor('debug', 'bridge connection to /'.$uri.'/ failed', 'yellow');
+							$this->logColor('debug', 'bridge connection to target /'.$targetUri.'/ failed', 'yellow');
 							$msgHandleReturnValue .= $this->sendBridgeConnectResponse(2);
 						}
 					}
@@ -2524,11 +2526,11 @@ class Client{
 		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('bridge_subscribe_response', $data));
 	}*/
 	
-	public function sendBridgeConnect($uri){
-		$this->logColor('debug', 'bridge connect: '.$uri, 'yellow');
+	public function sendBridgeConnect($targetUri){
+		$this->logColor('debug', 'bridge target: '.$targetUri, 'yellow');
 		
 		$data = array(
-			'uri' => (string)$uri,
+			'uri' => (string)$targetUri,
 		);
 		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('bridge_connect', $data));
 	}
