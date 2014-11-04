@@ -72,7 +72,7 @@ class Client{
 		$this->status['isChannelPeer'] = false;
 		$this->status['isOutbound'] = false;
 		$this->status['isInbound'] = false;
-		$this->status['bridgeChannelUri'] = null;
+		$this->status['bridgeServerUri'] = null;
 		$this->status['bridgeTargetUri'] = null;
 		
 		$this->resetStatusSsl();
@@ -743,8 +743,9 @@ class Client{
 							$this->getNode()->incConnectionsInboundSucceed();
 						}
 						
-						if(!$this->debug && $node->getBridgeServer() && $this->getStatus('bridgeChannelUri')){
-							$this->logColor('debug', 'bridge server connection: '.$this->getStatus('bridgeChannelUri'), 'yellow');
+						if(!$this->debug && $node->getBridgeServer() && $this->getStatus('bridgeTargetUri')){
+							$this->logColor('debug', 'bridge server: '.$this->getStatus('bridgeServerUri'), 'yellow');
+							$this->logColor('debug', 'bridge target: '.$this->getStatus('bridgeTargetUri'), 'yellow');
 							
 							$actions = array();
 							
@@ -756,13 +757,13 @@ class Client{
 							});
 							$actions[] = $action;
 							
-							/*$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
+							$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
 							$action->setName('bridge_server_send_connect');
 							$action->functionSet(function($action, $client){
 								$this->logColor('debug', 'bridge ssl ok', 'yellow');
-								$client->sendBridgeConnect($client->getStatus('bridgeChannelUri'));
+								$client->sendBridgeConnect($client->getStatus('bridgeTargetUri'));
 							});
-							$actions[] = $action;*/
+							$actions[] = $action;
 							
 							$this->actionsAdd($actions);
 						}
@@ -1847,7 +1848,7 @@ class Client{
 			}
 		}
 		
-		elseif($msgName == 'bridge_subscribe'){
+		/*elseif($msgName == 'bridge_subscribe'){
 			if($this->getSettings()->data['node']['bridge']['server']['enabled']){
 				if($this->getStatus('hasSsl')){
 					$msgData = $this->sslMsgDataPasswordDecrypt($msgData);
@@ -1910,7 +1911,7 @@ class Client{
 				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
 				$this->log('warning', static::getErrorMsg(2060));
 			}
-		}
+		}*/
 		elseif($msgName == 'bridge_connect'){
 			if($this->getSettings()->data['node']['bridge']['server']['enabled']){
 				if($this->getStatus('hasSsl')){

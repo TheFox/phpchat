@@ -385,7 +385,8 @@ class Server{
 		
 		$isBridgeChannel = false;
 		$onode = null;
-		$uriConnect = '';
+		$uriConnect = null;
+		$bridgeTargetUri = null;
 		
 		if($this->getSettings()->data['node']['bridge']['client']['enabled']){
 			if($this->getTable()->getNodesNum()){
@@ -394,6 +395,7 @@ class Server{
 					$onode = array_shift($onodes);
 					$this->logColor('debug', 'connect found bridge server: '.$onode->getIdHexStr(), 'yellow');
 					$isBridgeChannel = true;
+					$bridgeTargetUri = $uri;
 				}
 				else{
 					$this->logColor('debug', 'connect: no bridge server found', 'yellow');
@@ -432,7 +434,8 @@ class Server{
 						$client->setStatus('isOutbound', true);
 						
 						if($isBridgeChannel){
-							$client->setStatus('bridgeChannelUri', $uriConnect);
+							$client->setStatus('bridgeServerUri', $uriConnect);
+							$client->setStatus('bridgeTargetUri', $bridgeTargetUri);
 							$client->bridgeActionsAdd($clientActions);
 						}
 						else{
