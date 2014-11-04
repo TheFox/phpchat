@@ -284,9 +284,10 @@ class Table extends YamlStorage{
 	}
 	
 	public function nodesSort(){
-		uasort($this->nodes, function($node_a, $node_b){
-			$dist_a = $this->getLocalNode()->distance($node_a);
-			$dist_b = $this->getLocalNode()->distance($node_b);
+		$table = $this;
+		uasort($this->nodes, function($node_a, $node_b) use($table) {
+			$dist_a = $table->getLocalNode()->distance($node_a);
+			$dist_b = $table->getLocalNode()->distance($node_b);
 			
 			if($dist_a == $dist_b){
 				return 0;
