@@ -8,20 +8,20 @@ class BasicTest extends PHPUnit_Framework_TestCase{
 	}
 	
 	public function testFunctions(){
-		$this->assertTrue(function_exists('gzdecode'));
-		$this->assertTrue(function_exists('gzcompress'));
-		$this->assertTrue(function_exists('mt_rand'));
-		$this->assertTrue(function_exists('strIsIp'));
-		$this->assertTrue(function_exists('sslKeyPubClean'));
-		$this->assertTrue(function_exists('intToBin'));
-		$this->assertTrue(function_exists('timeStop'));
+		$this->assertTrue(function_exists('gzdecode'), 'gzdecode function not found.');
+		$this->assertTrue(function_exists('gzcompress'), 'gzcompress function not found.');
+		$this->assertTrue(function_exists('mt_rand'), 'mt_rand function not found.');
+		$this->assertTrue(function_exists('strIsIp'), 'strIsIp function not found.');
+		$this->assertTrue(function_exists('sslKeyPubClean'), 'sslKeyPubClean function not found.');
+		$this->assertTrue(function_exists('intToBin'), 'intToBin function not found.');
+		$this->assertTrue(function_exists('timeStop'), 'timeStop function not found.');
 	}
 	
 	public function testExtensions(){
-		$this->assertTrue(extension_loaded('openssl'));
-		$this->assertTrue(extension_loaded('sockets'));
-		$this->assertTrue(extension_loaded('curl'));
-		$this->assertTrue(extension_loaded('bcmath'));
+		$this->assertTrue(extension_loaded('openssl'), 'openssl extension not found.');
+		$this->assertTrue(extension_loaded('sockets'), 'sockets extension not found.');
+		$this->assertTrue(extension_loaded('curl'), 'curl extension not found.');
+		$this->assertTrue(extension_loaded('bcmath'), 'bcmath extension not found.');
 	}
 	
 }
