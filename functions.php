@@ -38,3 +38,9 @@ function timeStop($name = ''){
 	#fwrite(STDOUT, '[time] '.$name.' '.sprintf('%d', ($diff * 1000)).PHP_EOL);
 	fwrite(STDOUT, '[time] '.$name.' '.sprintf('%f', $diff).PHP_EOL);
 }
+
+if(!function_exists('gzdecode') && function_exists('gzinflate')){
+	function gzdecode($data){
+		return gzinflate(substr($data, 10, -8));
+	}
+}
