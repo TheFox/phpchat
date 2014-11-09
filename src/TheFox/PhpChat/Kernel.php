@@ -104,6 +104,8 @@ class Kernel extends Thread{
 		$this->localNode->setIdHexStr($this->settings->data['node']['id']);
 		$this->localNode->setUri($this->settings->data['node']['uriLocal']);
 		$this->localNode->setSslKeyPub(file_get_contents($this->settings->data['node']['sslKeyPubPath']));
+		$this->localNode->setBridgeServer($this->settings->data['node']['bridge']['server']['enabled']);
+		$this->localNode->setBridgeClient($this->settings->data['node']['bridge']['client']['enabled']);
 		$this->getLog()->info('setup local node: done');
 		
 		$this->getLog()->info('setup table');
@@ -163,7 +165,7 @@ class Kernel extends Thread{
 		$this->ipcConsoleConnection->functionAdd('shutdown', $this, 'ipcConsoleShutdown');
 		foreach(array(
 			'setSettingsUserNickname',
-			'serverConnect', 'serverTalkResponseSend', 'serverTalkMsgSend', 'serverTalkUserNicknameChangeSend',
+			'serverConnectTalkRequest', 'serverTalkResponseSend', 'serverTalkMsgSend', 'serverTalkUserNicknameChangeSend',
 				'serverTalkCloseSend',
 			'getAddressbook', 'addressbookContactAdd', 'addressbookContactRemove',
 			'getMsgDb', 'msgDbMsgAdd', 'msgDbMsgUpdate', 'msgDbMsgGetMsgsForDst',
@@ -181,9 +183,9 @@ class Kernel extends Thread{
 			'getSettings', 'getLocalNode',
 			'getTable', 'tableNodeEnclose', 'tableNodesClean', 'tableNodesSort',
 			'getMsgDb', 'msgDbMsgUpdate', 'msgDbMsgIncForwardCyclesById', 'msgDbMsgSetStatusById',
-			'getNodesNewDb', 'nodesNewDbNodeAddUri', 'nodesNewDbNodeAddId', 'nodesNewDbNodeIncConnectAttempt',
+			'getNodesNewDb', 'nodesNewDbNodeAddConnect', 'nodesNewDbNodeAddFind', 'nodesNewDbNodeIncConnectAttempt',
 				'nodesNewDbNodeIncFindAttempt', 'nodesNewDbNodeRemove',
-			'serverConnect', 'serverNodeFind',
+			'serverConnectPingOnly', 'serverConnectTransmitMsgs', 'serverNodeFind',
 			'save', 
 		) as $functionName){
 			$this->ipcCronjobConnection->functionAdd($functionName, $this, $functionName);
@@ -224,93 +226,118 @@ class Kernel extends Thread{
 		$this->ipcInfoConnection->connect();
 	}
 	
-	public function serverConnect($uri, $isTalkRequest = false, $isPingOnly = false, $msgIds = array()){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		#ve($uri);
+	public function serverConnectTalkRequest($uri){
+		if($this->getServer()){
+			$clientActions = array();
+			
+			$action = new ClientAction(ClientAction::CRITERION_AFTER_HELLO);
+			$action->setName('talk_request_set_status_is_channel_local');
+			$action->functionSet(function($action, $client){
+				$client->setStatus('isChannelLocal', true);
+			});
+			$clientActions[] = $action;
+			
+			$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
+			$action->setName('talk_request_ssl_init');
+			$action->functionSet(function($action, $client){
+				$client->sendSslInit();
+			});
+			$clientActions[] = $action;
+			
+			$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
+			$action->setName('talk_request_after_has_ssl_send_talk_request');
+			$action->functionSet(function($action, $client){
+				$uri = $client->getUri();
+				if($client->getStatus('bridgeTargetUri')){
+					$uri = $client->getStatus('bridgeTargetUri');
+				}
+				$this->ipcConsoleMsgSend('Sending talk request to '.$uri.' ...', true, false);
+				$client->sendTalkRequest($this->getSettingsUserNickname());
+				$this->ipcConsoleMsgSend('Talk request sent to '.$uri.'. Waiting for response ...', true, true);
+			});
+			$clientActions[] = $action;
+			
+			$client = $this->getServer()->connect($uri, $clientActions);
+			return $client !== null;
+		}
 		
+		return false;
+	}
+	
+	public function serverConnectPingOnly($uri){
 		if($this->getServer()){
 			
 			$clientActions = array();
-			if($isTalkRequest){
-				$action = new ClientAction(ClientAction::CRITERION_AFTER_HELLO);
-				$action->functionSet(function($action, $client){
-					$client->setStatus('isChannelLocal', true);
-				});
-				$clientActions[] = $action;
-				
-				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
-				$action->functionSet(function($action, $client){
-					$client->sendSslInit();
-				});
-				$clientActions[] = $action;
-				
-				$action = new ClientAction(ClientAction::CRITERION_AFTER_HAS_SSL);
-				$action->functionSet(function($action, $client){
-					$this->ipcConsoleMsgSend('Sening talk request to '.$client->getUri().' ...', true, false);
-					$client->sendTalkRequest($this->getSettingsUserNickname());
-					$this->ipcConsoleMsgSend('Talk request sent to '.$client->getUri().'. Waiting for response ...', true, true);
-				});
-				$clientActions[] = $action;
-			}
 			
-			if($isPingOnly){
-				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
-				$action->functionSet(function($action, $client){
-					$client->sendQuit();
-				});
-				$clientActions[] = $action;
-				
-				$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
-				$action->functionSet(function($action, $client){
-					$client->shutdown();
-				});
-				$clientActions[] = $action;
-			}
+			$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
+			$action->setName('ping_only_send_quit');
+			$action->functionSet(function($action, $client){
+				$client->sendQuit();
+			});
+			$clientActions[] = $action;
 			
-			if($msgIds){
-				
-				#print __CLASS__.'->'.__FUNCTION__.''."\n"; ve($msgIds);
-				
-				$msgs = array();
-				foreach($msgIds as $msgId){
-					$msg = $this->getMsgDb()->getMsgById($msgId);
-					if($msg){
-						$msgs[] = $msg;
-					}
+			$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
+			$action->setName('ping_only_after_previous_actions_shutdown');
+			$action->functionSet(function($action, $client){
+				$client->shutdown();
+			});
+			$clientActions[] = $action;
+			
+			$client = $this->getServer()->connect($uri, $clientActions);
+			return $client !== null;
+		}
+		
+		return false;
+	}
+	
+	public function serverConnectTransmitMsgs($uri, $msgIds = array()){
+		if($this->getServer() && $msgIds){
+			
+			$clientActions = array();
+			
+			$msgs = array();
+			foreach($msgIds as $msgId){
+				$msg = $this->getMsgDb()->getMsgById($msgId);
+				if($msg){
+					$msgs[] = $msg;
 				}
+			}
+			
+			$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
+			$action->setName('msgs_send_msgs');
+			$action->functionSet(function($action, $client){
+				#print __CLASS__.'->'.__FUNCTION__.': send msgs'."\n";
 				
-				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
-				$action->functionSet(function($action, $client){
-					#print __CLASS__.'->'.__FUNCTION__.': send msgs'."\n";
-					
-					$msgs = $action->getVar('msgs');
-					foreach($msgs as $msgId => $msg){
-						#print __CLASS__.'->'.__FUNCTION__.': send msg '.$msg->getId()."\n";
-						$client->sendMsg($msg);
-					}
-				}, array('msgs' => $msgs));
-				$clientActions[] = $action;
-				
-				// Wait to get response. Don't disconnect instantly after sending.
+				$msgs = $action->getVar('msgs');
 				foreach($msgs as $msgId => $msg){
-					$action = new ClientAction(ClientAction::CRITERION_AFTER_MSG_RESPONSE);
-					$action->functionSet(function($action, $client){
-						#print __CLASS__.'->'.__FUNCTION__.': CRITERION_AFTER_MSG_RESPONSE'."\n";
-					});
-					$clientActions[] = $action;
+					#print __CLASS__.'->'.__FUNCTION__.': send msg '.$msg->getId()."\n";
+					$client->sendMsg($msg);
 				}
-				
-				$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
+			}, array('msgs' => $msgs));
+			$clientActions[] = $action;
+			
+			// Wait to get response. Don't disconnect instantly after sending.
+			foreach($msgs as $msgId => $msg){
+				$action = new ClientAction(ClientAction::CRITERION_AFTER_MSG_RESPONSE);
+				$action->setName('msgs_response_for_msg'.$msgId);
 				$action->functionSet(function($action, $client){
-					#print __CLASS__.'->'.__FUNCTION__.': shutdown'."\n";
-					
-					$client->sendQuit();
-					$client->shutdown();
+					#print __CLASS__.'->'.__FUNCTION__.': CRITERION_AFTER_MSG_RESPONSE'."\n";
 				});
 				$clientActions[] = $action;
 			}
 			
-			return $this->getServer()->connect($uri, $clientActions);
+			$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
+			$action->setName('msgs_after_previous_actions_send_quit');
+			$action->functionSet(function($action, $client){
+				#print __CLASS__.'->'.__FUNCTION__.': shutdown'."\n";
+				
+				$client->sendQuit();
+				$client->shutdown();
+			});
+			$clientActions[] = $action;
+			
+			$client = $this->getServer()->connect($uri, $clientActions);
+			return $client !== null;
 		}
 		
 		return false;
@@ -436,12 +463,12 @@ class Kernel extends Thread{
 		return $this->nodesNewDb;
 	}
 	
-	public function nodesNewDbNodeAddUri($uri){
-		return $this->getNodesNewDb()->nodeAddUri($uri);
+	public function nodesNewDbNodeAddConnect($uri, $bridgeServer = false){
+		return $this->getNodesNewDb()->nodeAddConnect($uri, $bridgeServer);
 	}
 	
-	public function nodesNewDbNodeAddId($id){
-		return $this->getNodesNewDb()->nodeAddId($id);
+	public function nodesNewDbNodeAddFind($id, $bridgeServer = false){
+		return $this->getNodesNewDb()->nodeAddFind($id, $bridgeServer);
 	}
 	
 	public function nodesNewDbNodeIncConnectAttempt($id){

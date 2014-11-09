@@ -1,33 +1,29 @@
 
 RM = rm -rf
-MKDIR = mkdir -p
-GZIP = gzip
-MV = mv -i
-CP = cp -rp
 CHMOD = chmod
 PHPCS = vendor/bin/phpcs
 PHPUNIT = vendor/bin/phpunit
+COMPOSER_PREFER_SOURCE := $(shell echo $(COMPOSER_PREFER_SOURCE))
 
 
-.PHONY: all install tests test_phpcs test_phpunit test_clean release clean clean_nodes clean_data clean_all
+.PHONY: all install test test_phpcs test_phpunit test_clean release clean clean_nodes clean_data clean_all
 
-all: install tests
+all: install test
 
 install: composer.phar
+	./composer.phar install $(COMPOSER_PREFER_SOURCE) --no-interaction --dev
 
 update: composer.phar
 	./composer.phar selfupdate
 	./composer.phar update
-	php bootstrap.php
 
 composer.phar:
 	curl -sS https://getcomposer.org/installer | php
-	./composer.phar install
-	php bootstrap.php
+	$(CHMOD) 755 ./composer.phar
 
 $(PHPCS): composer.phar
 
-tests: test_phpcs test_phpunit
+test: test_phpcs test_phpunit
 
 test_phpcs: $(PHPCS) vendor/thefox/phpcsrs/Standards/TheFox
 	$(PHPCS) -v -s --report=full --report-width=160 --standard=vendor/thefox/phpcsrs/Standards/TheFox src tests
@@ -41,7 +37,7 @@ test_clean:
 	$(RM) tests/testfile_*
 	$(RM) tests/*.yml
 
-release:
+release: release.sh
 	./release.sh
 
 clean: test_clean

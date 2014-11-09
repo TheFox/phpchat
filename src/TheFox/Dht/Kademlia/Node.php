@@ -38,6 +38,10 @@ class Node extends YamlStorage{
 		$this->data['connectionsOutboundAttempts'] = 0;
 		$this->data['connectionsInboundSucceed'] = 0;
 		#$this->data['connectionsInboundAttempts'] = 0;
+		$this->data['bridgeServer'] = false;
+		$this->data['bridgeClient'] = false;
+		$this->data['bridgeDst'] = array();
+		$this->data['bridgeSubscribed'] = false;
 		$this->data['timeCreated'] = time();
 		$this->data['timeLastSeen'] = 0;
 		
@@ -316,6 +320,48 @@ class Node extends YamlStorage{
 		$this->setDataChanged(true);
 	}*/
 	
+	public function setBridgeServer($bridgeServer){
+		$this->data['bridgeServer'] = (bool)$bridgeServer;
+		$this->setDataChanged(true);
+	}
+	
+	public function getBridgeServer(){
+		return (bool)$this->data['bridgeServer'];
+	}
+	
+	public function setBridgeClient($bridgeClient){
+		$this->data['bridgeClient'] = (bool)$bridgeClient;
+		$this->setDataChanged(true);
+	}
+	
+	public function getBridgeClient(){
+		return (bool)$this->data['bridgeClient'];
+	}
+	
+	public function addBridgeDst($bridgeDst){
+		if(is_array($bridgeDst)){
+			$this->data['bridgeDst'] = array_merge($this->data['bridgeDst'], $bridgeDst);
+		}
+		else{
+			$this->data['bridgeDst'][] = $bridgeDst;
+		}
+		$this->data['bridgeDst'] = array_unique($this->data['bridgeDst']);
+		$this->setDataChanged(true);
+	}
+	
+	public function getBridgeDst(){
+		return $this->data['bridgeDst'];
+	}
+	
+	public function setBridgeSubscribed($bridgeSubscribed){
+		$this->data['bridgeSubscribed'] = (bool)$bridgeSubscribed;
+		$this->setDataChanged(true);
+	}
+	
+	public function getBridgeSubscribed(){
+		return (bool)$this->data['bridgeSubscribed'];
+	}
+	
 	public function setTimeCreated($timeCreated){
 		$this->data['timeCreated'] = $timeCreated;
 	}
@@ -410,6 +456,12 @@ class Node extends YamlStorage{
 			#$this->setConnectionsOutboundAttempts($node->getConnectionsOutboundAttempts());
 			#$this->setConnectionsInboundSucceed($node->getConnectionsInboundSucceed());
 			#$this->setConnectionsInboundAttempts($node->getConnectionsInboundAttempts());
+			
+			$this->setBridgeServer($node->getBridgeServer());
+			$this->setBridgeClient($node->getBridgeClient());
+			#$this->addBridgeDst($node->getBridgeDst()); # TODO
+			$this->setBridgeSubscribed($node->getBridgeSubscribed());
+			
 			$this->setTimeLastSeen($node->getTimeLastSeen());
 			$this->setDataChanged(true);
 		}

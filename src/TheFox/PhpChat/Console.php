@@ -398,6 +398,8 @@ class Console extends Thread{
 					if($char == PHP_EOL){
 						#$this->log->debug('EOL');
 						$line = $this->buffer;
+						$line = trim($line);
+						
 						$this->buffer = '';
 						$this->bufferOriginal = '';
 						$this->bufferCursorPos = 0;
@@ -580,17 +582,17 @@ class Console extends Thread{
 							print $char;
 							
 							$this->buffer .= $char;
-							$this->log->debug('append buffer: /'.$char.'/');
+							#$this->log->debug('append buffer: /'.$char.'/');
 						}
 						else{
-							$end = 'NOT end';
+							$end = 'NOT_end';
 							
-							$this->log->debug('buffer old: /'.$this->buffer.'/');
+							#$this->log->debug('buffer old: /'.$this->buffer.'/');
 							
 							$bufferOld = $this->buffer;
 							$this->buffer = substr($bufferOld, 0, $this->bufferCursorPos);
 							$this->buffer .= $char.substr($bufferOld, $this->bufferCursorPos);
-							$this->log->debug('buffer new: /'.$this->buffer.'/');
+							#$this->log->debug('buffer new: /'.$this->buffer.'/');
 							
 							#sleep(1);
 							static::lineClearRight();
@@ -1276,7 +1278,7 @@ class Console extends Thread{
 		$this->msgAdd();
 		$this->msgAdd('Connecting to '.$uri.' ...', true, false);
 		
-		$connected = $this->ipcKernelConnection->execSync('serverConnect', array($uri, true));
+		$connected = $this->ipcKernelConnection->execSync('serverConnectTalkRequest', array($uri));
 		
 		$msg = 'Connection to '.$uri.' ';
 		$printPs1 = false;

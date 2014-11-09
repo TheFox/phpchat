@@ -93,17 +93,32 @@ class Table extends YamlStorage{
 		return count($this->getNodes());
 	}
 	
-	public function getNodesClosest($num = 20){
-		if(!$this->getLocalNode()){
-			throw new RuntimeException('localNode not set.');
+	public function getNodesBridgeServer(){
+		$rv = array();
+		foreach($this->nodes as $nodeId => $node){
+			#fwrite(STDOUT, 'getNodesBridgeServer: '.$nodeId.' '.$node->getUri()."\n");
+			if($node->getBridgeServer()){
+				#fwrite(STDOUT, '  server'."\n");
+				$rv[] = $node;
+			}
 		}
-		
+		return $rv;
+	}
+	
+	public function getNodesClosest($max = 20){
 		$nodes = $this->nodes;
-		$nodes = array_slice($nodes, 0, $num);
+		$nodes = array_slice($nodes, 0, $max);
 		ksort($nodes, SORT_STRING);
 		
-		$rv = array_values($nodes);
-		return $rv;
+		return $nodes;
+	}
+	
+	public function getNodesClosestBridgeServer($max = 20){
+		$nodes = $this->getNodesBridgeServer();
+		$nodes = array_slice($nodes, 0, $max);
+		ksort($nodes, SORT_STRING);
+		
+		return $nodes;
 	}
 	
 	public function nodeFind(Node $node){
@@ -151,13 +166,26 @@ class Table extends YamlStorage{
 		return null;
 	}
 	
-	public function nodeFindClosest(Node $node, $num = 8){
+	public function nodeFindClosest(Node $node, $max = 8){
 		$nodes = array();
 		foreach($this->nodes as $onodeId => $onode){
 			if(!$onode->isEqual($node)){
 				$nodes[$onode->distanceHexStr($node)] = $onode;
 				ksort($nodes, SORT_STRING);
-				$nodes = array_slice($nodes, 0, $num);
+				$nodes = array_slice($nodes, 0, $max);
+			}
+		}
+		$rv = array_values($nodes);
+		return $rv;
+	}
+	
+	public function nodeFindClosestBridgeServer(Node $node, $max = 8){
+		$nodes = array();
+		foreach($this->nodes as $onodeId => $onode){
+			if($onode->getBridgeServer() && !$onode->isEqual($node)){
+				$nodes[$onode->distanceHexStr($node)] = $onode;
+				ksort($nodes, SORT_STRING);
+				$nodes = array_slice($nodes, 0, $max);
 			}
 		}
 		$rv = array_values($nodes);
@@ -256,9 +284,10 @@ class Table extends YamlStorage{
 	}
 	
 	public function nodesSort(){
-		uasort($this->nodes, function($node_a, $node_b){
-			$dist_a = $this->getLocalNode()->distance($node_a);
-			$dist_b = $this->getLocalNode()->distance($node_b);
+		$table = $this;
+		uasort($this->nodes, function($node_a, $node_b) use($table) {
+			$dist_a = $table->getLocalNode()->distance($node_a);
+			$dist_b = $table->getLocalNode()->distance($node_b);
 			
 			if($dist_a == $dist_b){
 				return 0;

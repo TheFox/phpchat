@@ -37,10 +37,10 @@ class InfoCommand extends BasicCommand{
 	protected function configure(){
 		$this->setName('info');
 		$this->setDescription('Show infos about this node.');
-		$this->addOption('name', null, InputOption::VALUE_NONE, 'Print the name this application.');
-		$this->addOption('name_lc', null, InputOption::VALUE_NONE, 'Print the lower-case name this application.');
-		$this->addOption('version_number', null, InputOption::VALUE_NONE, 'Print the version this application.');
-		$this->addOption('connections', 'c', InputOption::VALUE_NONE, 'Print connections infos.');
+		$this->addOption('name', null, InputOption::VALUE_NONE, 'Prints the name of this application.');
+		$this->addOption('name_lc', null, InputOption::VALUE_NONE, 'Prints the lower-case name of this application.');
+		$this->addOption('version_number', null, InputOption::VALUE_NONE, 'Prints the version of this application.');
+		$this->addOption('connections', 'c', InputOption::VALUE_NONE, 'Print connection infos.');
 	}
 	
 	private function initIpcKernelConnection(){
@@ -195,6 +195,16 @@ class InfoCommand extends BasicCommand{
 								$oldClients[$newClientId]['isInbound'] = $newClient['isInbound'];
 								$oldClients[$newClientId]['lastUpdate'] = time();
 							}
+							if($oldClient['isBridgeServer'] != $newClient['isBridgeServer']){
+								$this->log->debug('update '.$newClientId.': isBridgeServer='.(int)$newClient['isBridgeServer']);
+								$oldClients[$newClientId]['isBridgeServer'] = $newClient['isBridgeServer'];
+								$oldClients[$newClientId]['lastUpdate'] = time();
+							}
+							if($oldClient['isBridgeClient'] != $newClient['isBridgeClient']){
+								$this->log->debug('update '.$newClientId.': isBridgeClient='.(int)$newClient['isBridgeClient']);
+								$oldClients[$newClientId]['isBridgeClient'] = $newClient['isBridgeClient'];
+								$oldClients[$newClientId]['lastUpdate'] = time();
+							}
 							
 							if($changed){
 								$clientsChanged++;
@@ -214,6 +224,8 @@ class InfoCommand extends BasicCommand{
 								'isChannelLocal' => $newClient['isChannelLocal'],
 								'isOutbound' => $newClient['isOutbound'],
 								'isInbound' => $newClient['isInbound'],
+								'isBridgeServer' => $newClient['isBridgeServer'],
+								'isBridgeClient' => $newClient['isBridgeClient'],
 								
 								'shutdown' => 0,
 								'status' => '.',
@@ -238,6 +250,9 @@ class InfoCommand extends BasicCommand{
 						}
 						if($oldClient['isChannelPeer'] || $oldClient['isChannelLocal']){
 							$oldClients[$oldClientId]['status'] = 'c';
+						}
+						if($oldClient['isBridgeServer'] || $oldClient['isBridgeClient']){
+							$oldClients[$oldClientId]['status'] = 'b';
 						}
 						if($oldClient['hasTalkRequest']){
 							$oldClients[$oldClientId]['status'] = 't';
@@ -362,7 +377,7 @@ class InfoCommand extends BasicCommand{
 			
 			print '--------'.PHP_EOL;
 			print 'Informations about local node:'.PHP_EOL;
-			print '   Version: '.PhpChat::NAME.'/'.PhpChat::VERSION.' ('.PhpChat::RELEASE.')'.PHP_EOL;
+			print '   Version: '.PhpChat::NAME.'/'.PhpChat::VERSION.' (release '.PhpChat::RELEASE.')'.PHP_EOL;
 			print '   ID: '.$localNode->getIdHexStr().PHP_EOL;
 			print '   Public key fingerprint: '.$localNode->getSslKeyPubFingerprint().PHP_EOL;
 			print '   Last public IP: '.$settings->data['node']['uriPub'].PHP_EOL;
