@@ -1971,6 +1971,9 @@ class Client{
 							if($status == 1){
 								$this->logColor('debug', 'bridge connection ok', 'yellow');
 								
+								$this->bridgeActionsExecute(ClientAction::CRITERION_AFTER_HELLO);
+								$this->bridgeActionsExecute(ClientAction::CRITERION_AFTER_HAS_SSL);
+								
 								/*foreach($this->bridgeActions as $bridgeActionId => $bridgeAction){
 									$this->logColor('debug', 'bridgeAction: /'.$bridgeAction->getName().'/ /'.join(',', $bridgeAction->getCriteria()).'/', 'yellow');
 									#$this->bridgeActionRemove($bridgeAction);
@@ -2474,6 +2477,10 @@ class Client{
 		#$this->logColor('debug', 'bridge server: '.$this->getStatus('bridgeServerUri'), 'yellow');
 		#$this->logColor('debug', 'bridge target: '.$this->getStatus('bridgeTargetUri'), 'yellow');
 		#$this->logColor('debug', 'bridge client: '.(int)($this->bridgeClient !== null), 'yellow');
+		if($this->getStatus('bridgeServerUri')){
+			$this->logColor('debug', 'send talk request over bridge', 'yellow');
+			return $this->sendBridgeMsg($this->msgCreate('talk_request', $data));
+		}
 		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('talk_request', $data));
 	}
 	
