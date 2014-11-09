@@ -2023,6 +2023,9 @@ class Client{
 						
 						
 						# TODO
+						if($this->bridgeClient){
+							
+						}
 						
 						
 					}
@@ -2577,7 +2580,6 @@ class Client{
 	
 	public function sendBridgeMsg($data){
 		$data = array(
-			#'name' => $name,
 			'data' => $data,
 		);
 		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('bridge_msg', $data));

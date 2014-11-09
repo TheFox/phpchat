@@ -248,8 +248,8 @@ class Kernel extends Thread{
 			$action->setName('talk_request_after_has_ssl_send_talk_request');
 			$action->functionSet(function($action, $client){
 				$uri = $client->getUri();
-				if($client->getStatus('bridgeServerUri')){
-					$uri = $client->getStatus('bridgeServerUri');
+				if($client->getStatus('bridgeTargetUri')){
+					$uri = $client->getStatus('bridgeTargetUri');
 				}
 				$this->ipcConsoleMsgSend('Sending talk request to '.$uri.' ...', true, false);
 				$client->sendTalkRequest($this->getSettingsUserNickname());
