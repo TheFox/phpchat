@@ -377,7 +377,7 @@ class InfoCommand extends BasicCommand{
 			
 			print '--------'.PHP_EOL;
 			print 'Informations about local node:'.PHP_EOL;
-			print '   Version: '.PhpChat::NAME.'/'.PhpChat::VERSION.' ('.PhpChat::RELEASE.')'.PHP_EOL;
+			print '   Version: '.PhpChat::NAME.'/'.PhpChat::VERSION.' (release '.PhpChat::RELEASE.')'.PHP_EOL;
 			print '   ID: '.$localNode->getIdHexStr().PHP_EOL;
 			print '   Public key fingerprint: '.$localNode->getSslKeyPubFingerprint().PHP_EOL;
 			print '   Last public IP: '.$settings->data['node']['uriPub'].PHP_EOL;

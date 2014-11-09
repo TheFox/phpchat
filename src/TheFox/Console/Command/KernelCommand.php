@@ -6,6 +6,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use TheFox\PhpChat\PhpChat;
 use TheFox\PhpChat\Kernel;
 
 class KernelCommand extends BasicCommand{
@@ -26,6 +27,7 @@ class KernelCommand extends BasicCommand{
 	protected function execute(InputInterface $input, OutputInterface $output){
 		$this->executePre($input, $output);
 		
+		$this->log->info(PhpChat::NAME.' version: '.PhpChat::VERSION.' (release '.PhpChat::RELEASE.')');
 		$this->log->info('SSL version: '.OPENSSL_VERSION_TEXT);
 		
 		$this->log->info('kernel start');
