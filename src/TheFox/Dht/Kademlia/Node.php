@@ -7,10 +7,10 @@ use RuntimeException;
 use Zend\Uri\UriFactory;
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
+use StephenHill\Base58;
 
 use TheFox\Storage\YamlStorage;
 use TheFox\Utilities\Hex;
-use TheFox\Utilities\Base58;
 
 class Node extends YamlStorage{
 	
@@ -215,7 +215,10 @@ class Node extends YamlStorage{
 		$checksumHex = substr($checksumHex, 0, 8); // 4 Bytes
 		
 		$num = Hex::decode($fingerprintHex.$checksumHex);
-		$numBase58 = Base58::encode($num);
+		#$numBase58 = Base58::encode($num);
+		$base58 = new Base58();
+		$numBase58 = $base58->encode((string)$num);
+		#$numBase58 = $base58->encode($num);
 		
 		$rv = 'FC_'.$numBase58;
 		
@@ -226,7 +229,9 @@ class Node extends YamlStorage{
 		if(substr($fingerprint, 0, 3) == 'FC_'){
 			$fingerprint = substr($fingerprint, 3);
 			
-			$fingerprintNum = Base58::decode($fingerprint);
+			#$fingerprintNum = Base58::decode($fingerprint);
+			$base58 = new Base58();
+			$fingerprintNum = $base58->decode((string)$fingerprint);
 			
 			$fingerprintHex = Hex::encode($fingerprintNum);
 			$fingerprintHex = str_repeat('0', strlen($fingerprintHex) % 2).$fingerprintHex;

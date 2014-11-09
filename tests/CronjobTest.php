@@ -197,7 +197,8 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$localNode->setSslKeyPub(file_get_contents($settings->data['node']['sslKeyPubPath']));
 		
 		$this->assertEquals(static::NODE_LOCAL_SSL_KEY_PUB, $localNode->getSslKeyPub());
-		$this->assertEquals('FC_WwG2GdTmCLSKhpEmJso6pejm9c6oACjX', Node::genSslKeyFingerprint($localNode->getSslKeyPub()));
+		#$this->assertEquals('FC_WwG2GdTmCLSKhpEmJso6pejm9c6oACjX', Node::genSslKeyFingerprint($localNode->getSslKeyPub()));
+		$this->assertEquals('FC_6t6Z9dYVWEDfEzGQGDSAteLQsFE8SDwZFK2PoiQuM2ezFUA2yNpBPiT9oBwvFBfzDWZzZF5sxBtcSd', Node::genSslKeyFingerprint($localNode->getSslKeyPub()));
 		
 		$nodes = array();
 		$nodes[0] = new Node();
