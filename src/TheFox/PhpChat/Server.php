@@ -437,6 +437,8 @@ class Server{
 							$client->setStatus('bridgeServerUri', $uriConnect);
 							$client->setStatus('bridgeTargetUri', $bridgeTargetUri);
 							$client->bridgeActionsAdd($clientActions);
+							
+							$this->logColor('debug', 'bridge actions: '.count($clientActions), 'yellow');
 						}
 						else{
 							$client->setStatus('isOutbound', true);

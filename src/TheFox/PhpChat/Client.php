@@ -393,7 +393,7 @@ class Client{
 		
 		$this->logColor('debug', 'bridgeActions execute: '.count($bridgeActions), 'yellow');
 		foreach($bridgeActions as $bridgeActionId => $bridgeAction){
-			$this->logColor('debug', 'action execute: /'.$bridgeAction->getName().'/ /'.join(',', $bridgeAction->getCriteria()).'/', 'yellow');
+			$this->logColor('debug', 'bridgeAction execute: /'.$bridgeAction->getName().'/ /'.join(',', $bridgeAction->getCriteria()).'/', 'yellow');
 			$this->bridgeActionRemove($bridgeAction);
 			$bridgeAction->functionExec($this);
 		}
@@ -1934,6 +1934,7 @@ class Client{
 							$client->setStatus('bridgeTargetUri', $targetUri);
 							
 							$msgHandleReturnValue .= $this->sendBridgeConnectResponse(1);
+							
 						}
 						else{
 							$this->logColor('debug', 'bridge connection to target /'.$targetUri.'/ failed', 'yellow');
@@ -1969,6 +1970,12 @@ class Client{
 						if($status){
 							if($status == 1){
 								$this->logColor('debug', 'bridge connection ok', 'yellow');
+								
+								/*foreach($this->bridgeActions as $bridgeActionId => $bridgeAction){
+									$this->logColor('debug', 'bridgeAction: /'.$bridgeAction->getName().'/ /'.join(',', $bridgeAction->getCriteria()).'/', 'yellow');
+									#$this->bridgeActionRemove($bridgeAction);
+									#$bridgeAction->functionExec($this);
+								}*/
 							}
 							elseif($status == 2){
 								$this->logColor('debug', 'bridge connection failed', 'yellow');
@@ -2450,6 +2457,8 @@ class Client{
 	public function sendTalkRequest($userNickname){
 		$rid = (string)Uuid::uuid4();
 		
+		$this->log('debug', 'send talk request: '.$rid);
+		
 		$this->setStatus('hasTalkRequest', true);
 		
 		$this->requestAdd('talk_request', $rid, array(
@@ -2461,6 +2470,10 @@ class Client{
 			'userNickname' => $userNickname,
 			'hashcash' => $this->hashcashMint(static::HASHCASH_BITS_MAX),
 		);
+		
+		#$this->logColor('debug', 'bridge server: '.$this->getStatus('bridgeServerUri'), 'yellow');
+		#$this->logColor('debug', 'bridge target: '.$this->getStatus('bridgeTargetUri'), 'yellow');
+		#$this->logColor('debug', 'bridge client: '.(int)($this->bridgeClient !== null), 'yellow');
 		return $this->dataSend($this->sslMsgCreatePasswordEncrypt('talk_request', $data));
 	}
 	
