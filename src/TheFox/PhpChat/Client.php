@@ -2016,7 +2016,15 @@ class Client{
 						}
 						
 						$this->logColor('debug', $this->getUri().' recv '.$msgName.': /'.$data.'/', 'yellow');
+						$this->logColor('debug', 'bridge server: '.$this->getStatus('bridgeServerUri'), 'yellow');
+						$this->logColor('debug', 'bridge target: '.$this->getStatus('bridgeTargetUri'), 'yellow');
+						$this->logColor('debug', 'bridge client: '.(int)($this->bridgeClient !== null), 'yellow');
+						
+						
+						
 						# TODO
+						
+						
 					}
 					else{
 						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
