@@ -12,3 +12,4 @@ data
 id_rsa*
 settings.yml
 releases
+build

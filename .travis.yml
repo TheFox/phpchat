@@ -9,6 +9,9 @@ install:
 before_script:
     - phpenv rehash
 script: make test_phpunit
+after_script:
+    - vendor/bin/coveralls -v
 env:
     global:
         - COMPOSER_PREFER_SOURCE=--prefer-source
+        - PHPUNIT_COVERAGE_CLOVER="--coverage-clover build/logs/clover.xml"
