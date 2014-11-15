@@ -249,17 +249,28 @@ class Table extends YamlStorage{
 		$this->nodesSort();
 		
 		foreach($this->nodes as $nodeId => $node){
-			#$msgOut = (time() - $node->getTimeCreated()).' '.(time() - $node->getTimeLastSeen()).' ';
-			#fwrite(STDOUT, 'node delete: '.$msgOut.PHP_EOL);
-			if(
-				$node->getTimeCreated() <= time() - static::$NODE_TTL && !$node->getTimeLastSeen()
-				|| $node->getTimeLastSeen() && $node->getTimeLastSeen() <= time() - static::$NODE_TTL
-				|| $node->getConnectionsOutboundAttempts() >= static::$NODE_CONNECTIONS_OUTBOUND_ATTEMPTS_MAX
+			$timeCreatedCond = !$node->getTimeLastSeen() && $node->getTimeCreated() <= time() - static::$NODE_TTL;
+			$timeLastSeenCond = $node->getTimeLastSeen() && $node->getTimeLastSeen() <= time() - static::$NODE_TTL;
+			$connectionsOutboundAttemptsCond = $node->getConnectionsOutboundAttempts() >= static::$NODE_CONNECTIONS_OUTBOUND_ATTEMPTS_MAX
 					&& $node->getConnectionsOutboundSucceed() == 0
-					&& $node->getConnectionsInboundSucceed() == 0
+					&& $node->getConnectionsInboundSucceed() == 0;
+			
+			#$msgOut = (time() - $node->getTimeCreated()).' '.(time() - $node->getTimeLastSeen()).' ';
+			#$msgOut = $node->getTimeCreated().' '.$node->getTimeLastSeen().' '.$node->getConnectionsOutboundAttempts();
+			$msgOut = $node->getIdHexStr().' '.(int)$timeCreatedCond.' '.(int)$timeLastSeenCond.' '.(int)$connectionsOutboundAttemptsCond;
+			#fwrite(STDOUT, 'node delete: '.$msgOut.PHP_EOL);
+			
+			if(
+				$timeCreatedCond
+				|| $timeLastSeenCond
+				|| $connectionsOutboundAttemptsCond
 			){
 				$this->nodeRemove($node);
+				#fwrite(STDOUT, 'node delete: '.$msgOut.PHP_EOL);
 			}
+			/*if($timeLastSeenCond){
+				fwrite(STDOUT, ' -> '.(time() - $node->getTimeLastSeen()).' '.$node->getTimeLastSeen().' <= '.(time() - static::$NODE_TTL).' '.time().' '.static::$NODE_TTL.PHP_EOL);
+			}*/
 		}
 		
 		if(count($this->nodes) > static::$NODES_MAX){

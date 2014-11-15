@@ -57,9 +57,12 @@ class TcpClient extends Client{
 	
 	public function dataRecv($data = null){
 		$dataRecvReturnValue = '';
+		
+		// @codeCoverageIgnoreStart
 		if($data === null && $this->getSocket()){
 			$data = $this->getSocket()->read();
 		}
+		// @codeCoverageIgnoreEnd
 		
 		$this->incTrafficIn(strlen($data));
 		
@@ -92,8 +95,11 @@ class TcpClient extends Client{
 			$data = base64_encode($data);
 			$this->incTrafficOut(strlen($data) + static::MSG_SEPARATOR_LEN);
 			$msg = $data.static::MSG_SEPARATOR;
+			
 			if($this->getSocket()){
+				// @codeCoverageIgnoreStart
 				$this->getSocket()->write($msg);
+				// @codeCoverageIgnoreEnd
 			}
 		}
 		return $msg;
@@ -105,8 +111,10 @@ class TcpClient extends Client{
 			$this->logColor('debug', $this->getUri().' shutdown', 'white', 'black');
 			
 			if($this->getSocket()){
+				// @codeCoverageIgnoreStart
 				$this->getSocket()->shutdown();
 				$this->getSocket()->close();
+				// @codeCoverageIgnoreEnd
 			}
 			
 			if($this->getSsl()){

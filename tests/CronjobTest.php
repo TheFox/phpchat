@@ -7,6 +7,8 @@ use TheFox\PhpChat\Settings;
 use TheFox\Dht\Simple\Table;
 use TheFox\Dht\Kademlia\Node;
 use TheFox\PhpChat\NodesNewDb;
+use TheFox\Logger\Logger;
+use TheFox\Logger\StreamHandler as LoggerStreamHandler;
 
 class CronjobTest extends PHPUnit_Framework_TestCase{
 	
@@ -176,17 +178,17 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$uuid1 = '10000000-1000-4001-8001-1000000000';
 		$uuid2 = '20000000-2000-4002-8002-20000000';
 		
-		@unlink('tests/bucket_root.yml');
+		@unlink('test_data/bucket_root.yml');
 		
-		file_put_contents('tests/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
-		file_put_contents('tests/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+		file_put_contents('test_data/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('test_data/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
 		
-		$settings = new Settings('tests/testfile_cronjob_settings.yml');
-		$settings->data['datadir'] = 'tests';
+		$settings = new Settings('test_data/testfile_cronjob_settings.yml');
+		$settings->data['datadir'] = 'test_data';
 		$settings->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB);
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_cronjob_id_rsa.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'tests/testfile_cronjob_id_rsa.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'test_data/testfile_cronjob_id_rsa.prv';
+		$settings->data['node']['sslKeyPubPath'] = 'test_data/testfile_cronjob_id_rsa.pub';
 		$settings->data['node']['bridge']['client']['enabled'] = false;
 		#$settings->setDataChanged(true);
 		#$settings->save();
@@ -307,7 +309,11 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$msgDb = new MsgDb();
 		$msgDb->setDatadirBasePath($settings->data['datadir']);
 		
+		$cronjobLog = new Logger('cronjob');
+		#$cronjobLog->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
+		
 		$cronjob = new Cronjob();
+		$cronjob->setLog($cronjobLog);
 		$cronjob->setMsgDb($msgDb);
 		$cronjob->setSettings($settings);
 		$cronjob->setTable($table);
@@ -438,15 +444,15 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$uuid1 = '11000000-1000-4001-8001-1000000000';
 		$uuid2 = '21000000-2000-4002-8002-20000000';
 		
-		file_put_contents('tests/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
-		file_put_contents('tests/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+		file_put_contents('test_data/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('test_data/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
 		
-		$settings = new Settings('tests/testfile_cronjob_settings.yml');
-		$settings->data['datadir'] = 'tests';
+		$settings = new Settings('test_data/testfile_cronjob_settings.yml');
+		$settings->data['datadir'] = 'test_data';
 		$settings->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB);
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_cronjob_id_rsa.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'tests/testfile_cronjob_id_rsa.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'test_data/testfile_cronjob_id_rsa.prv';
+		$settings->data['node']['sslKeyPubPath'] = 'test_data/testfile_cronjob_id_rsa.pub';
 		$settings->data['node']['bridge']['client']['enabled'] = true;
 		
 		$localNode = new Node();
@@ -536,7 +542,11 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$msgDb = new MsgDb();
 		$msgDb->setDatadirBasePath($settings->data['datadir']);
 		
+		$cronjobLog = new Logger('cronjob');
+		#$cronjobLog->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
+		
 		$cronjob = new Cronjob();
+		$cronjob->setLog($cronjobLog);
 		$cronjob->setMsgDb($msgDb);
 		$cronjob->setSettings($settings);
 		$cronjob->setTable($table);
@@ -607,15 +617,15 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 	}
 	
 	public function testBootstrapNodesEncloseDefault(){
-		file_put_contents('tests/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
-		file_put_contents('tests/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+		file_put_contents('test_data/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('test_data/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
 		
-		$settings = new Settings('tests/testfile_cronjob_settings.yml');
-		$settings->data['datadir'] = 'tests';
+		$settings = new Settings('test_data/testfile_cronjob_settings.yml');
+		$settings->data['datadir'] = 'test_data';
 		$settings->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB);
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_cronjob_id_rsa.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'tests/testfile_cronjob_id_rsa.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'test_data/testfile_cronjob_id_rsa.prv';
+		$settings->data['node']['sslKeyPubPath'] = 'test_data/testfile_cronjob_id_rsa.pub';
 		$settings->data['node']['bridge']['client']['enabled'] = false;
 		
 		$localNode = new Node();
@@ -627,7 +637,11 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$table->setDatadirBasePath($settings->data['datadir']);
 		$table->setLocalNode($localNode);
 		
+		$cronjobLog = new Logger('cronjob');
+		#$cronjobLog->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
+		
 		$cronjob = new Cronjob();
+		$cronjob->setLog($cronjobLog);
 		$cronjob->setSettings($settings);
 		$cronjob->setTable($table);
 		
@@ -680,15 +694,15 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 	}
 	
 	public function testBootstrapNodesEncloseBridge(){
-		file_put_contents('tests/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
-		file_put_contents('tests/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+		file_put_contents('test_data/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('test_data/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
 		
-		$settings = new Settings('tests/testfile_cronjob_settings.yml');
-		$settings->data['datadir'] = 'tests';
+		$settings = new Settings('test_data/testfile_cronjob_settings.yml');
+		$settings->data['datadir'] = 'test_data';
 		$settings->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB);
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_cronjob_id_rsa.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'tests/testfile_cronjob_id_rsa.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'test_data/testfile_cronjob_id_rsa.prv';
+		$settings->data['node']['sslKeyPubPath'] = 'test_data/testfile_cronjob_id_rsa.pub';
 		$settings->data['node']['bridge']['client']['enabled'] = true;
 		
 		$localNode = new Node();
@@ -700,7 +714,11 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$table->setDatadirBasePath($settings->data['datadir']);
 		$table->setLocalNode($localNode);
 		
+		$cronjobLog = new Logger('cronjob');
+		#$cronjobLog->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
+		
 		$cronjob = new Cronjob();
+		$cronjob->setLog($cronjobLog);
 		$cronjob->setSettings($settings);
 		$cronjob->setTable($table);
 		
@@ -747,15 +765,15 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 	}
 	
 	public function testNodesNewEncloseDefault(){
-		file_put_contents('tests/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
-		file_put_contents('tests/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+		file_put_contents('test_data/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('test_data/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
 		
-		$settings = new Settings('tests/testfile_cronjob_settings.yml');
-		$settings->data['datadir'] = 'tests';
+		$settings = new Settings('test_data/testfile_cronjob_settings.yml');
+		$settings->data['datadir'] = 'test_data';
 		$settings->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB);
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_cronjob_id_rsa.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'tests/testfile_cronjob_id_rsa.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'test_data/testfile_cronjob_id_rsa.prv';
+		$settings->data['node']['sslKeyPubPath'] = 'test_data/testfile_cronjob_id_rsa.pub';
 		$settings->data['node']['bridge']['client']['enabled'] = false;
 		
 		$localNode = new Node();
@@ -767,7 +785,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$table->setDatadirBasePath($settings->data['datadir']);
 		$table->setLocalNode($localNode);
 		
-		$nodesNewDb = new NodesNewDb('tests/testfile_cronjob_nodesnewdb1.yml');
+		$nodesNewDb = new NodesNewDb('test_data/testfile_cronjob_nodesnewdb1.yml');
 		$nodesNewDb->nodeAddConnect('tcp://192.168.241.21', false);
 		$nodesNewDb->nodeAddConnect('tcp://192.168.241.22', true);
 		$nodesNewDb->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1742', false);
@@ -775,7 +793,11 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		#$nodesNewDb->setDataChanged(true);
 		#$nodesNewDb->save();
 		
+		$cronjobLog = new Logger('cronjob');
+		#$cronjobLog->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
+		
 		$cronjob = new Cronjob();
+		$cronjob->setLog($cronjobLog);
 		$cronjob->setSettings($settings);
 		$cronjob->setTable($table);
 		$cronjob->setNodesNewDb($nodesNewDb);
@@ -804,15 +826,15 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 	}
 	
 	public function testNodesNewEncloseBridge(){
-		file_put_contents('tests/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
-		file_put_contents('tests/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+		file_put_contents('test_data/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('test_data/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
 		
-		$settings = new Settings('tests/testfile_cronjob_settings.yml');
-		$settings->data['datadir'] = 'tests';
+		$settings = new Settings('test_data/testfile_cronjob_settings.yml');
+		$settings->data['datadir'] = 'test_data';
 		$settings->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB);
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_cronjob_id_rsa.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'tests/testfile_cronjob_id_rsa.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'test_data/testfile_cronjob_id_rsa.prv';
+		$settings->data['node']['sslKeyPubPath'] = 'test_data/testfile_cronjob_id_rsa.pub';
 		$settings->data['node']['bridge']['client']['enabled'] = true;
 		
 		$localNode = new Node();
@@ -824,7 +846,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$table->setDatadirBasePath($settings->data['datadir']);
 		$table->setLocalNode($localNode);
 		
-		$nodesNewDb = new NodesNewDb('tests/testfile_cronjob_nodesnewdb2.yml');
+		$nodesNewDb = new NodesNewDb('test_data/testfile_cronjob_nodesnewdb2.yml');
 		$nodesNewDb->nodeAddConnect('tcp://192.168.241.21', false);
 		$nodesNewDb->nodeAddConnect('tcp://192.168.241.22', true);
 		$nodesNewDb->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1742', false);
@@ -832,7 +854,11 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		#$nodesNewDb->setDataChanged(true);
 		#$nodesNewDb->save();
 		
+		$cronjobLog = new Logger('cronjob');
+		#$cronjobLog->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
+		
 		$cronjob = new Cronjob();
+		$cronjob->setLog($cronjobLog);
 		$cronjob->setSettings($settings);
 		$cronjob->setTable($table);
 		$cronjob->setNodesNewDb($nodesNewDb);
@@ -862,15 +888,15 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 	}
 	
 	public function testCreateGuzzleHttpClient(){
-		file_put_contents('tests/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
-		file_put_contents('tests/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+		file_put_contents('test_data/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('test_data/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
 		
-		$settings = new Settings('tests/testfile_cronjob_settings.yml');
-		$settings->data['datadir'] = 'tests';
+		$settings = new Settings('test_data/testfile_cronjob_settings.yml');
+		$settings->data['datadir'] = 'test_data';
 		$settings->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB);
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'tests/testfile_cronjob_id_rsa.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'tests/testfile_cronjob_id_rsa.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'test_data/testfile_cronjob_id_rsa.prv';
+		$settings->data['node']['sslKeyPubPath'] = 'test_data/testfile_cronjob_id_rsa.pub';
 		$settings->data['node']['bridge']['client']['enabled'] = true;
 		
 		$localNode = new Node();
@@ -882,44 +908,47 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$table->setDatadirBasePath($settings->data['datadir']);
 		$table->setLocalNode($localNode);
 		
-		$nodesNewDb = new NodesNewDb('tests/testfile_cronjob_nodesnewdb2.yml');
+		$nodesNewDb = new NodesNewDb('test_data/testfile_cronjob_nodesnewdb2.yml');
 		$nodesNewDb->nodeAddConnect('tcp://192.168.241.21', false);
 		$nodesNewDb->nodeAddConnect('tcp://192.168.241.22', true);
 		$nodesNewDb->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1742', false);
 		$nodesNewDb->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1743', true);
 		
+		$cronjobLog = new Logger('cronjob');
+		#$cronjobLog->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
+		
 		$cronjob = new Cronjob();
+		$cronjob->setLog($cronjobLog);
 		$cronjob->setSettings($settings);
 		$cronjob->setTable($table);
 		$cronjob->setNodesNewDb($nodesNewDb);
 		
 		$httpClient = $cronjob->createGuzzleHttpClient();
-		fwrite(STDOUT, 'client: '.get_class($httpClient).''.PHP_EOL);
+		#fwrite(STDOUT, 'client: '.get_class($httpClient).''.PHP_EOL);
 		#\Doctrine\Common\Util\Debug::dump($httpClient);
 		$this->assertTrue(is_object($httpClient));
 		
 		$url = 'http://www.example.com/';
-		
 		$response = null;
 		try{
-			fwrite(STDOUT, 'get url: '.$url.''.PHP_EOL);
+			#fwrite(STDOUT, 'get url: '.$url.''.PHP_EOL);
 			$request = $httpClient->get($url);
-			fwrite(STDOUT, 'request: '.get_class($request).''.PHP_EOL);
+			#fwrite(STDOUT, 'request: '.get_class($request).''.PHP_EOL);
 			
 			$response = $request->send();
-			fwrite(STDOUT, 'response: '.get_class($response).''.PHP_EOL);
+			#fwrite(STDOUT, 'response: '.get_class($response).''.PHP_EOL);
 		}
 		catch(Exception $e){
-			fwrite(STDOUT, 'url failed, "'.$url.'": '.$e->getMessage().PHP_EOL);
+			#fwrite(STDOUT, 'url failed, "'.$url.'": '.$e->getMessage().PHP_EOL);
 		}
 		
-		if($response){
+		/*if($response){
 			fwrite(STDOUT, 'response: '.$response->getStatusCode().PHP_EOL);
 			fwrite(STDOUT, 'content-type: '.$response->getHeader('content-type').PHP_EOL);
 		}
 		else{
 			fwrite(STDOUT, 'response failed'.PHP_EOL);
-		}
+		}*/
 	}
 	
 }

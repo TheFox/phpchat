@@ -12,8 +12,15 @@ if(@date_default_timezone_get() == 'UTC') date_default_timezone_set('UTC');
 
 chdir(__DIR__);
 
-#define('DEBUG', 1, true);
+#define('DEBUG', true, true);
 define('PHP_EOL_LEN', strlen(PHP_EOL), true);
+
+if(getenv('TEST')){
+	define('TEST', true, true);
+}
+else{
+	define('TEST', false, true);
+}
 
 
 if(PHP_SAPI != 'cli'){

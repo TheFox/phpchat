@@ -12,6 +12,10 @@ class ConsoleCommand extends BasicCommand{
 	
 	private $console;
 	
+	public function getLogfilePath(){
+		return 'log/console.log';
+	}
+	
 	public function getPidfilePath(){
 		return 'pid/console.pid';
 	}
@@ -28,6 +32,7 @@ class ConsoleCommand extends BasicCommand{
 		try{
 			$this->log->info('console start');
 			$this->console = new Console();
+			$this->console->setLog($this->log);
 		}
 		catch(Exception $e){
 			$this->log->error('console create: '.$e->getMessage());

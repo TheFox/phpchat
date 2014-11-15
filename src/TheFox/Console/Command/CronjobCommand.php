@@ -12,6 +12,10 @@ class CronjobCommand extends BasicCommand{
 	
 	private $cronjob;
 	
+	public function getLogfilePath(){
+		return 'log/cronjob.log';
+	}
+	
 	public function getPidfilePath(){
 		return 'pid/cronjob.pid';
 	}
@@ -33,6 +37,7 @@ class CronjobCommand extends BasicCommand{
 		
 		$this->log->info('cronjob start');
 		$this->cronjob = new Cronjob();
+		$this->cronjob->setLog($this->log);
 
 		try{
 			$this->cronjob->init();

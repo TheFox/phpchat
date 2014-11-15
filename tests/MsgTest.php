@@ -237,8 +237,8 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 	}
 	
 	public function testSave(){
-		$msg = new Msg('tests/testfile_msg.yml');
-		$msg->setDatadirBasePath('tests');
+		$msg = new Msg('test_data/testfile_msg.yml');
+		$msg->setDatadirBasePath('test_data');
 		$msg->setDataChanged(true);
 		
 		$msg->setVersion(21);
@@ -304,7 +304,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$this->assertTrue( (bool)$msg->save() );
 		
 		$finder = new Finder();
-		$files = $finder->in('tests')->depth(0)->name('testfile_msg.yml');
+		$files = $finder->in('test_data')->depth(0)->name('testfile_msg.yml');
 		$this->assertEquals(1, count($files));
 	}
 	
@@ -368,8 +368,8 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 	 */
 	public function testLoad(){
 		#$this->markTestIncomplete('This test has not been implemented yet.');
-		$msg = new Msg('tests/testfile_msg.yml');
-		$msg->setDatadirBasePath('tests');
+		$msg = new Msg('test_data/testfile_msg.yml');
+		$msg->setDatadirBasePath('test_data');
 		
 		$this->assertTrue($msg->load());
 		
@@ -392,8 +392,8 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 	 */
 	public function testLoadDst1(){
 		#$this->markTestIncomplete('This test has not been implemented yet.');
-		$msg = new Msg('tests/testfile_msg.yml');
-		$msg->setDatadirBasePath('tests');
+		$msg = new Msg('test_data/testfile_msg.yml');
+		$msg->setDatadirBasePath('test_data');
 		
 		$this->assertTrue($msg->load());
 		
@@ -420,8 +420,8 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 	 */
 	public function testLoadDst2(){
 		#$this->markTestIncomplete('This test has not been implemented yet.');
-		$msg = new Msg('tests/testfile_msg.yml');
-		$msg->setDatadirBasePath('tests');
+		$msg = new Msg('test_data/testfile_msg.yml');
+		$msg->setDatadirBasePath('test_data');
 		
 		$this->assertTrue($msg->load());
 		

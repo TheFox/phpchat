@@ -29,16 +29,15 @@ test_phpcs: $(PHPCS) vendor/thefox/phpcsrs/Standards/TheFox
 	$(PHPCS) -v -s --report=full --report-width=160 --standard=vendor/thefox/phpcsrs/Standards/TheFox src tests bootstrap.php
 
 test_phpunit: $(PHPUNIT) phpunit.xml
-	$(PHPUNIT) $(PHPUNIT_COVERAGE_HTML) $(PHPUNIT_COVERAGE_CLOVER)
+	mkdir -p test_data
+	TEST=true $(PHPUNIT) $(PHPUNIT_COVERAGE_HTML) $(PHPUNIT_COVERAGE_CLOVER)
 	$(MAKE) test_clean
 
 test_phpunit_cc:
 	$(MAKE) test_phpunit PHPUNIT_COVERAGE_HTML="--coverage-html build/report"
 
 test_clean:
-	$(RM) tests/testdir_*
-	$(RM) tests/testfile_*
-	$(RM) tests/*.yml
+	$(RM) test_data
 
 release: release.sh
 	./release.sh

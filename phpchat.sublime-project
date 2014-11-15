@@ -3,7 +3,7 @@
 		{
 			"path": ".",
 			"name": "PHPChat",
-			"folder_exclude_patterns": [ ],
+			"folder_exclude_patterns": [ "log", "vendor" ],
 			"file_exclude_patterns": [ ]
 		}
 	]

@@ -313,8 +313,8 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$localNode = new Node();
 		$localNode->setIdHexStr('11000001-2002-4004-8008-100000000006');
 		
-		$table = new Table('tests/testfile_table.yml');
-		$table->setDatadirBasePath('tests');
+		$table = new Table('test_data/testfile_table_nodeenclose3a.yml');
+		$table->setDatadirBasePath('test_data');
 		$table->setLocalNode($localNode);
 		#$table->load();
 		
@@ -373,13 +373,14 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 	public function testNodeEnclose3b(){
 		#fwrite(STDOUT, 'testNodeEnclose3b'.PHP_EOL);
 		
+		$originalNodeTtl = Table::$NODE_TTL;
 		Table::$NODE_TTL = 4;
 		
 		$localNode = new Node();
 		$localNode->setIdHexStr('11000001-2002-4004-8008-100000000006');
 		
-		$table = new Table('tests/testfile_table.yml');
-		$table->setDatadirBasePath('tests');
+		$table = new Table('test_data/testfile_table_nodeenclose3b.yml');
+		$table->setDatadirBasePath('test_data');
 		$table->setLocalNode($localNode);
 		#$table->load();
 		
@@ -424,10 +425,12 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$table->save();
 		
 		$finder = new Finder();
-		$files = $finder->in('tests')->depth(0)->name('node_*.yml');
+		$files = $finder->in('test_data')->depth(0)->name('node_*.yml');
 		$this->assertEquals(1, count($files));
 		
 		$this->clean();
+		
+		Table::$NODE_TTL = $originalNodeTtl;
 	}
 	
 	public function testNodeEnclose3c(){
@@ -436,8 +439,8 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$localNode = new Node();
 		$localNode->setIdHexStr('11000001-2002-4004-8008-100000000006');
 		
-		$table = new Table('tests/testfile_table.yml');
-		$table->setDatadirBasePath('tests');
+		$table = new Table('test_data/testfile_table_nodeenclose3c.yml');
+		$table->setDatadirBasePath('test_data');
 		$table->setLocalNode($localNode);
 		#$table->load();
 		
@@ -524,7 +527,7 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$table->save();
 		
 		$finder = new Finder();
-		$files = $finder->in('tests')->depth(0)->name('node_*.yml');
+		$files = $finder->in('test_data')->depth(0)->name('node_*.yml');
 		$this->assertEquals(9, count($files));
 		
 		$this->clean();
@@ -536,8 +539,8 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		
 		$localNode = new Node();
 		$localNode->setIdHexStr('12000001-2002-4004-8008-100000000001');
-		$table = new Table('tests/testfile_table.yml');
-		$table->setDatadirBasePath('tests');
+		$table = new Table('test_data/testfile_table_nodeenclose4.yml');
+		$table->setDatadirBasePath('test_data');
 		$table->setLocalNode($localNode);
 		$table->load();
 		
@@ -548,6 +551,9 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 			
 			$node = new Node();
 			$node->setIdHexStr('12000001-2002-4004-8008-'.$nodeNo);
+			$node->setTimeLastSeen(time());
+			
+			#$this->assertTrue(true);
 			
 			$table->nodeEnclose($node);
 		}
@@ -560,7 +566,7 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$this->assertEquals(50, $nodeNum);
 		
 		$finder = new Finder();
-		$files = $finder->in('tests')->depth(0)->name('node_*.yml');
+		$files = $finder->in('test_data')->depth(0)->name('node_*.yml');
 		$this->assertEquals(50, count($files));
 		
 		$this->clean();
@@ -570,8 +576,8 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$localNode = new Node();
 		$localNode->setIdHexStr('11000001-2002-4004-8008-100000000006');
 		
-		$table = new Table('tests/testfile_table.yml');
-		$table->setDatadirBasePath('tests');
+		$table = new Table('test_data/testfile_table_nodeenclose5.yml');
+		$table->setDatadirBasePath('test_data');
 		$table->setLocalNode($localNode);
 		
 		$node1 = new Node();
@@ -603,21 +609,13 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$this->assertEquals('', (string)$node2->getUri());
 		
 		$table->save();
+		
+		$this->clean();
 	}
 	
 	private function clean(){
-		@unlink('tests/testfile_table.yml');
-		@unlink('tests/bucket_root.yml');
-		
 		$finder = new Finder();
-		$files = $finder->in('tests')->depth(0)->name('bucket_*.yml');
-		$filesystem = new Filesystem();
-		foreach($files as $fileId => $file){
-			$filesystem->remove($file->getRealPath());
-		}
-		
-		$finder = new Finder();
-		$files = $finder->in('tests')->depth(0)->name('node_*.yml');
+		$files = $finder->in('test_data')->depth(0)->name('*.yml')->files();
 		$filesystem = new Filesystem();
 		foreach($files as $fileId => $file){
 			$filesystem->remove($file->getRealPath());

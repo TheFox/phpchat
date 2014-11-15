@@ -31,7 +31,6 @@ class Console extends Thread{
 	const RANDOM_MSG_CHAR_SET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 	const RANDOM_MSG_CHAR_SET_LEN = 58;
 	
-	private $debug = false;
 	private $log = null;
 	private $settings = null;
 	private $ipcKernelConnection = null;
@@ -66,18 +65,12 @@ class Console extends Thread{
 			throw new RuntimeException('STDOUT: Invalid TTY.', 1);
 		}
 		
-		$this->log = new Logger('console');
-		$this->log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::INFO));
-		$this->log->pushHandler(new LoggerStreamHandler('log/console.log', Logger::DEBUG));
-		
-		$this->log->info('start');
-		
 		$this->nextRandomMsg = time() + static::RANDOM_MSG_DELAY_MIN;
 		$this->randomMsgDebug();
 	}
 	
-	public function setDebug($debug){
-		$this->debug = $debug;
+	public function setLog($log){
+		$this->log = $log;
 	}
 	
 	private function getLog(){
@@ -115,6 +108,9 @@ class Console extends Thread{
 		return $this->modeChannelClient;
 	}
 	
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public function printPs1($printBuffer = true, $debug = ''){
 		#$this->log->debug('printPs1');
 		
@@ -123,62 +119,122 @@ class Console extends Thread{
 			$output .= $this->buffer;
 		}
 		#print $output;
-		fwrite(STDOUT, $output);
+		
+		if(!TEST){
+			fwrite(STDOUT, $output);
+		}
 	}
 	
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public static function cursorUp($lines = 1){
-		print static::CHAR_ESCAPE.'['.$lines.'A';
+		if(!TEST){
+			print static::CHAR_ESCAPE.'['.$lines.'A';
+		}
 	}
 	
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public static function cursorDown($lines = 1){
-		print static::CHAR_ESCAPE.'['.$lines.'B';
+		if(!TEST){
+			print static::CHAR_ESCAPE.'['.$lines.'B';
+		}
 	}
 	
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public static function cursorJumpToTop(){
-		print static::CHAR_ESCAPE.'[1;1f';
+		if(!TEST){
+			print static::CHAR_ESCAPE.'[1;1f';
+		}
 	}
 	
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public static function cursorJumpToColumn($column = 1){
-		print static::CHAR_ESCAPE.'['.$column.'G';
+		if(!TEST){
+			print static::CHAR_ESCAPE.'['.$column.'G';
+		}
 	}
 	
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public static function cursorRight($offset = 1){
-		print static::CHAR_ESCAPE.'['.$offset.'C';
+		if(!TEST){
+			print static::CHAR_ESCAPE.'['.$offset.'C';
+		}
 	}
 	
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public static function cursorLeft($offset = 1){
-		print static::CHAR_ESCAPE.'['.$offset.'D';
+		if(!TEST){
+			print static::CHAR_ESCAPE.'['.$offset.'D';
+		}
 	}
 	
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public static function lineClear(){
 		#$this->log->debug('line clear');
-		print "\r".static::CHAR_ESCAPE.'[K';
+		if(!TEST){
+			print "\r".static::CHAR_ESCAPE.'[K';
+		}
 	}
 	
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public static function lineClearRight(){
 		#$this->log->debug('line clear');
-		#print static::CHAR_ESCAPE.'[J';
-		print static::CHAR_ESCAPE.'[0K';
+		if(!TEST){
+			#print static::CHAR_ESCAPE.'[J';
+			print static::CHAR_ESCAPE.'[0K';
+		}
 	}
 	
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public static function screenClearToBottom(){
-		print static::CHAR_ESCAPE.'[J';
+		if(!TEST){
+			print static::CHAR_ESCAPE.'[J';
+		}
 	}
 	
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public static function scrollUp(){
 		#$this->log->debug('scrollUp');
-		print static::CHAR_ESCAPE.'[S';
+		if(!TEST){
+			print static::CHAR_ESCAPE.'[S';
+		}
 	}
 	
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public static function scrollDown(){
 		#$this->log->debug('scrollDown');
-		print static::CHAR_ESCAPE.'[T';
+		if(!TEST){
+			print static::CHAR_ESCAPE.'[T';
+		}
 	}
 	
 	private function linePrint($text){
 		#$this->log->debug('line print "'.$text.'"');
 		#print $text.PHP_EOL;
-		fwrite(STDOUT, $text.PHP_EOL);
+		if(!TEST){
+			fwrite(STDOUT, $text.PHP_EOL);
+		}
 	}
 	
 	private function printMsgStack(){
@@ -187,10 +243,10 @@ class Console extends Thread{
 			
 			$this->msgStackPrintPs1 = true;
 			foreach($this->msgStack as $msgId => $msg){
-				$logMsg = 'msg d='.(int)$msg['showDate'].' ';
-				$logMsg .= 'ps1='.(int)$msg['printPs1'].' ';
-				$logMsg .= 'cl='.(int)$msg['clearLine'].' ';
-				$logMsg .= '"'.$msg['text'].'"';
+				#$logMsg = 'msg d='.(int)$msg['showDate'].' ';
+				#$logMsg .= 'ps1='.(int)$msg['printPs1'].' ';
+				#$logMsg .= 'cl='.(int)$msg['clearLine'].' ';
+				#$logMsg .= '"'.$msg['text'].'"';
 				#$this->log->debug($logMsg);
 				
 				if($msg['clearLine']){
@@ -241,16 +297,21 @@ class Console extends Thread{
 	}
 	
 	public function init(){
-		if(!$this->debug){
+		// @codeCoverageIgnoreStart
+		if(!TEST){
 			$this->initIpcKernelConnection();
+			$this->sttySetup();
 		}
+		// @codeCoverageIgnoreEnd
 		
-		$this->sttySetup();
 		$this->keybindingsSetup();
 		
+		// @codeCoverageIgnoreStart
 		if($this->ipcKernelConnection){
 			$this->settings = $this->ipcKernelConnection->execSync('getSettings');
 		}
+		// @codeCoverageIgnoreEnd
+		
 		$this->userNickname = $this->settings->data['user']['nickname'];
 		
 		$historyStoragePath = $this->settings->data['datadir'].'/history.yml';
@@ -270,14 +331,20 @@ class Console extends Thread{
 			}
 		}
 		
-		#print PHP_EOL."Type '/help' for help.".PHP_EOL;
-		fwrite(STDOUT, PHP_EOL."Type '/help' for help.".PHP_EOL);
+		// @codeCoverageIgnoreStart
+		if(!TEST){
+			fwrite(STDOUT, PHP_EOL."Type '/help' for help.".PHP_EOL);
+		}
+		// @codeCoverageIgnoreEnd
 		
 		$this->msgAdd('start', true, true);
 		
 		return true;
 	}
 	
+	/**
+	 * @codeCoverageIgnore
+	 */
 	private function sttySetup(){
 		$this->log->debug('stty setup');
 		
@@ -292,6 +359,18 @@ class Console extends Thread{
 		
 		$this->sttyEnterIcanonMode();
 		$this->sttyEchoOff();
+	}
+	
+	/**
+	 * @codeCoverageIgnore
+	 */
+	private function sttyReset(){
+		$this->log->debug('tty restore');
+		
+		#$this->sttyExitIcanonMode();
+		
+		#system('stty sane');
+		exec('stty '.$this->sttySettings);
 	}
 	
 	private function keybindingsSetup(){
@@ -315,15 +394,6 @@ class Console extends Thread{
 				}
 			}
 		}
-	}
-	
-	private function sttyReset(){
-		$this->log->debug('tty restore');
-		
-		#$this->sttyExitIcanonMode();
-		
-		#system('stty sane');
-		exec('stty '.$this->sttySettings);
 	}
 	
 	private function sttyEnterIcanonMode(){
@@ -1229,7 +1299,10 @@ class Console extends Thread{
 	
 	public function shutdown(){
 		#print __CLASS__.'->'.__FUNCTION__.': '.(int)$this->ipcKernelShutdown."\n";
-		fwrite(STDOUT, PHP_EOL);
+		if(!TEST){
+			fwrite(STDOUT, PHP_EOL);
+		}
+		
 		$this->getLog()->info('shutdown');
 		#$this->msgAdd('Shutting down...', true, true);
 		
@@ -1256,7 +1329,9 @@ class Console extends Thread{
 			$historyStorage->save();
 		}
 		
-		$this->sttyReset();
+		if(!TEST){
+			$this->sttyReset();
+		}
 	}
 	
 	public function ipcKernelShutdown(){
@@ -1396,7 +1471,9 @@ class Console extends Thread{
 		$dt = new DateTime();
 		$dt->setTimestamp($this->nextRandomMsg);
 		
-		$this->log->debug('next random msg: '.$dt->format('Y/m/d H:i:s'));
+		if($this->log){
+			$this->log->debug('next random msg: '.$dt->format('Y/m/d H:i:s'));
+		}
 	}
 	
 	private function historyAdd($line){

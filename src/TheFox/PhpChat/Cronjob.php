@@ -8,8 +8,6 @@ use RuntimeException;
 use Guzzle\Http\Client as GuzzleHttpClient; // v==3
 #use GuzzleHttp\Client as GuzzleHttpClient; // v>=4
 
-use TheFox\Logger\Logger;
-use TheFox\Logger\StreamHandler as LoggerStreamHandler;
 use TheFox\Ipc\ClientConnection;
 use TheFox\Ipc\StreamHandler as IpcStreamHandler;
 use TheFox\Dht\Kademlia\Node;
@@ -32,13 +30,15 @@ class Cronjob extends Thread{
 	private $seconds = 0;
 	
 	public function __construct(){
-		#print __FUNCTION__.''."\n";
 		
-		$this->log = new Logger('cronjob');
-		$this->log->pushHandler(new LoggerStreamHandler('php://stdout', Logger::DEBUG));
-		$this->log->pushHandler(new LoggerStreamHandler('log/cronjob.log', Logger::DEBUG));
-		
-		$this->log->info('start');
+	}
+	
+	public function setLog($log){
+		$this->log = $log;
+	}
+	
+	public function getLog(){
+		return $this->log;
 	}
 	
 	public function setMsgDb($msgDb){
