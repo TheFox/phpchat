@@ -52,6 +52,7 @@ You're welcome to contribute to this project. Fork this project at <https://gith
 ## Links
 - [Packagist Package](https://packagist.org/packages/thefox/phpchat)
 - [Travis CI Repository](https://travis-ci.org/TheFox/phpchat)
+- [Coveralls Repository](https://coveralls.io/r/TheFox/phpchat)
 
 ## License
 Copyright (C) 2014 Christian Mayer <http://fox21.at>
