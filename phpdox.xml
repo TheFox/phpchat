@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<phpdox xmlns="http://xml.phpdox.net/config" silent="false">
+	<project name="PHPChat" source="${basedir}/src" workdir="${basedir}/build/phpdox/xml">
+		<collector publiconly="true" backend="parser">
+			<include mask="*.php" />
+		</collector>
+		<generator output="${basedir}/build/phpdox">
+			<enrich base="${basedir}/build">
+				<source type="build" />
+				<source type="phploc">
+					<file name="logs/phploc.xml" />
+				</source>
+				<source type="git">
+					<git binary="/usr/bin/git" />
+					<history enabled="true" limit="15" cache="${phpDox.project.workdir}/gitlog.xml" />
+				</source>
+				<source type="phpunit">
+					<file name="logs/phpunit.xml" />
+				</source>
+				<source type="phpcs">
+					<file name="logs/phpcs.xml" />
+				</source>
+				<!--<source type="pmd" />//-->
+			</enrich>
+			<build engine="html" enabled="true" output="html">
+				<template dir="${phpDox.home}/templates/html" />
+				<file extension="html" />
+			</build>
+		</generator>
+	</project>
+</phpdox>

@@ -36,6 +36,8 @@
 		"phpunit/phpunit": "~4.1",
 		"doctrine/common": "~2.4",
 		"satooshi/php-coveralls": "dev-master",
+		"theseer/phpdox": "~0.7",
+		"phploc/phploc": "~2.0",
 		"thefox/phpcsrs": "~1.0"
 	},
 	"autoload": {
