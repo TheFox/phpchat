@@ -7,6 +7,9 @@ use RuntimeException;
 
 use TheFox\Storage\YamlStorage;
 
+/**
+ * @codeCoverageIgnore
+ */
 class Table extends YamlStorage{
 	
 	#private $buckets = array();

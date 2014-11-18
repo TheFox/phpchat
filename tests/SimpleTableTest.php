@@ -134,6 +134,43 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$this->assertEquals(5, count($nodes));
 	}
 	
+	public function testGetNodesClosest(){
+		$localNode = new Node();
+		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
+		$table = new Table();
+		$table->setLocalNode($localNode);
+		
+		$node_a = new Node();
+		$node_a->setIdHexStr('10000001-2002-4004-8008-100000000002');
+		$table->nodeEnclose($node_a);
+		
+		$node_b = new Node();
+		$node_b->setIdHexStr('10000001-2002-4004-8008-100000000003');
+		$table->nodeEnclose($node_b);
+		
+		$node_c = new Node();
+		$node_c->setIdHexStr('10000001-2002-4004-8008-100000000004');
+		$table->nodeEnclose($node_c);
+		
+		$node_d = new Node();
+		$node_d->setIdHexStr('10000001-2002-4004-8008-100000000005');
+		$table->nodeEnclose($node_d);
+		
+		$nodes = $table->getNodesClosest(3);
+		
+		#\Doctrine\Common\Util\Debug::dump($nodes);
+		
+		$this->assertEquals(3, count($nodes));
+		
+		$this->assertTrue(isset($nodes['10000001-2002-4004-8008-100000000002']));
+		$this->assertTrue(isset($nodes['10000001-2002-4004-8008-100000000003']));
+		$this->assertTrue(isset($nodes['10000001-2002-4004-8008-100000000005']));
+		
+		$this->assertEquals($node_a, $nodes['10000001-2002-4004-8008-100000000002']);
+		$this->assertEquals($node_b, $nodes['10000001-2002-4004-8008-100000000003']);
+		$this->assertEquals($node_d, $nodes['10000001-2002-4004-8008-100000000005']);
+	}
+	
 	public function testNodeFind1(){
 		$localNode = new Node();
 		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
@@ -268,6 +305,7 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$this->assertEquals($node_b, $table->nodeFindByKeyPubFingerprint('FC_U2SazcAsbeRFz7zUXLZsdKvR28XNRk9C7CBNhi2vFe9fbi9QjBUy1Wqb3LK6MHBmNmvMUr69ChaqZe1'));
 		$this->assertEquals($node_c, $table->nodeFindByKeyPubFingerprint('FC_V5XQ3ReRPSWeakGv8o48cMXycnqTfK4kfRa9LGSxbxE6ee9s4zz5ucWcfwEUTmBFcHtZBLK2dpY1DHH'));
 		$this->assertEquals($node_d, $table->nodeFindByKeyPubFingerprint('FC_U25pDTHoiEEpop6PLggboYRiGjMszhRp4cstJE6aUJXLn79YjnQYfDLgbppw4FzR455Fr5nUCbvdiuw'));
+		$this->assertEquals(null, $table->nodeFindByKeyPubFingerprint('xyz'));
 	}
 	
 	public function testNodeEnclose1(){

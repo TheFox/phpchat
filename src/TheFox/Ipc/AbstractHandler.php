@@ -4,6 +4,9 @@ namespace TheFox\Ipc;
 
 use Closure;
 
+/**
+ * @codeCoverageIgnore
+ */
 abstract class AbstractHandler{
 	
 	private $ip;

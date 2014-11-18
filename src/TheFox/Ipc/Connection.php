@@ -7,6 +7,9 @@ use RuntimeException;
 use OutOfBoundsException;
 use Closure;
 
+/**
+ * @codeCoverageIgnore
+ */
 class Connection{
 	
 	const LOOP_USLEEP = 100000;

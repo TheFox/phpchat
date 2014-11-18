@@ -6,6 +6,9 @@ use RuntimeException;
 
 use TheFox\Storage\YamlStorage;
 
+/**
+ * @codeCoverageIgnore
+ */
 class Bucket extends YamlStorage{
 	
 	public static $SIZE_MAX = 20;

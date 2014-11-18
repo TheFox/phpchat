@@ -5,6 +5,9 @@ namespace TheFox\Ipc;
 use RuntimeException;
 use Closure;
 
+/**
+ * @codeCoverageIgnore
+ */
 class StreamHandler extends AbstractHandler{
 	
 	public function __construct($ip = '', $port = 0){
