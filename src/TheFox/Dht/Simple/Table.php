@@ -196,7 +196,7 @@ class Table extends YamlStorage{
 		#fwrite(STDOUT, __FUNCTION__.': '.$node."\n");
 		
 		if(!$this->getLocalNode()){
-			throw new RuntimeException('localNode not set.');
+			throw new RuntimeException('localNode not set.', 1);
 		}
 		
 		$returnNode = $node;
@@ -301,7 +301,7 @@ class Table extends YamlStorage{
 			$dist_b = $table->getLocalNode()->distance($node_b);
 			
 			if($dist_a == $dist_b){
-				return 0;
+				return 0; // @codeCoverageIgnore
 			}
 			return $dist_a < $dist_b ? -1 : 1;
 		});

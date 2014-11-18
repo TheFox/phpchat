@@ -308,7 +308,7 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$this->assertEquals(null, $table->nodeFindByKeyPubFingerprint('xyz'));
 	}
 	
-	public function testNodeEnclose1(){
+	public function testNodeEnclose1a(){
 		$localNode = new Node();
 		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
 		$table = new Table();
@@ -320,6 +320,21 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$onode = $table->nodeEnclose($node);
 		
 		$this->assertEquals($node, $onode);
+	}
+	
+	/**
+	 * @expectedException RuntimeException
+	 * @expectedExceptionCode 1
+	 */
+	public function testNodeEnclose1b(){
+		$localNode = new Node();
+		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
+		$table = new Table();
+		
+		$node = new Node();
+		$node->setIdHexStr('10000001-2002-4004-8008-100000000002');
+		
+		$onode = $table->nodeEnclose($node);
 	}
 	
 	public function testNodeEnclose2(){
