@@ -3,10 +3,13 @@ RM = rm -rf
 CHMOD = chmod
 MKDIR = mkdir -p
 PHPCS = vendor/bin/phpcs
+PHPCS_STANDARD = vendor/thefox/phpcsrs/Standards/TheFox
+PHPCS_REPORT = --report=full --report-width=160 --report-xml=build/logs/phpcs.xml
 PHPUNIT = vendor/bin/phpunit
 PHPDOX = vendor/bin/phpdox
 PHPLOC = vendor/bin/phploc
 COMPOSER = ./composer.phar
+COMPOSER_DEV ?= --dev
 
 
 .PHONY: all install test test_phpcs test_phpunit test_phpunit_cc test_clean release docs build clean clean_nodes clean_data clean_release clean_all
@@ -14,10 +17,10 @@ COMPOSER = ./composer.phar
 all: install test
 
 install: $(COMPOSER)
-	$(COMPOSER) install $(COMPOSER_PREFER_SOURCE) --no-interaction --dev
+	$(COMPOSER) install $(COMPOSER_PREFER_SOURCE) --no-interaction $(COMPOSER_DEV)
 
 install_release: $(COMPOSER)
-	$(COMPOSER) install $(COMPOSER_PREFER_SOURCE) --no-interaction --no-dev
+	$(MAKE) install COMPOSER_DEV=--no-dev
 
 update: $(COMPOSER)
 	$(COMPOSER) selfupdate
@@ -31,8 +34,8 @@ $(PHPCS): $(COMPOSER)
 
 test: test_phpcs test_phpunit
 
-test_phpcs: $(PHPCS) vendor/thefox/phpcsrs/Standards/TheFox
-	$(PHPCS) -v -s -p --report=full --report-width=160 --report-xml=build/logs/phpcs.xml --standard=vendor/thefox/phpcsrs/Standards/TheFox src tests bootstrap.php
+test_phpcs: $(PHPCS) $(PHPCS_STANDARD)
+	$(PHPCS) -v -s -p $(PHPCS_REPORT) --standard=$(PHPCS_STANDARD) src tests bootstrap.php
 
 test_phpunit: $(PHPUNIT) phpunit.xml
 	mkdir -p test_data
