@@ -42,7 +42,7 @@ test_phpunit: $(PHPUNIT) phpunit.xml
 	TEST=true $(PHPUNIT) $(PHPUNIT_COVERAGE_HTML) $(PHPUNIT_COVERAGE_XML) $(PHPUNIT_COVERAGE_CLOVER)
 	$(MAKE) test_clean
 
-test_phpunit_cc:
+test_phpunit_cc: build
 	$(MAKE) test_phpunit PHPUNIT_COVERAGE_HTML="--coverage-html build/report"
 
 test_clean:
@@ -51,14 +51,16 @@ test_clean:
 release: release.sh
 	./release.sh
 
-docs:
-	$(MKDIR) build
-	$(MKDIR) build/logs
-	$(CHMOD) 0700 build
+docs: build
 	#$(MAKE) test_phpcs
 	$(MAKE) test_phpunit PHPUNIT_COVERAGE_XML="--coverage-xml build/coverage"
 	$(PHPLOC) --count-tests --progress --log-xml=build/logs/phploc.xml src
 	$(PHPDOX)
+
+build:
+	$(MKDIR) build
+	$(MKDIR) build/logs
+	$(CHMOD) 0700 build
 
 clean: test_clean
 	$(RM) composer.lock composer.phar
