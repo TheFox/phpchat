@@ -37,8 +37,7 @@ test: test_phpcs test_phpunit
 test_phpcs: $(PHPCS) $(PHPCS_STANDARD)
 	$(PHPCS) -v -s -p $(PHPCS_REPORT) --standard=$(PHPCS_STANDARD) src tests bootstrap.php
 
-test_phpunit: $(PHPUNIT) phpunit.xml
-	mkdir -p test_data
+test_phpunit: $(PHPUNIT) phpunit.xml test_data
 	TEST=true $(PHPUNIT) $(PHPUNIT_COVERAGE_HTML) $(PHPUNIT_COVERAGE_XML) $(PHPUNIT_COVERAGE_CLOVER)
 	$(MAKE) test_clean
 
@@ -47,6 +46,9 @@ test_phpunit_cc: build
 
 test_clean:
 	$(RM) test_data
+
+test_data:
+	$(MKDIR) test_data
 
 release: release.sh
 	./release.sh
