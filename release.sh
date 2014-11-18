@@ -13,6 +13,7 @@ RELEASE_VERSION=$(./application.php info --version_number)
 DST="$RELEASE_NAME-$RELEASE_VERSION"
 
 
+set -e
 export COMPOSER_PREFER_SOURCE
 
 cd $SCRIPT_BASEDIR
@@ -23,14 +24,14 @@ for file in application.php bootstrap.php composer.json functions.php Makefile R
 done
 
 cd releases/$DST
-make install_release || exit 1
+make install_release
 make clean_release
 cd ..
 #exit
 
-find $DST -name .DS_Store -delete
+find $DST -name .DS_Store -exec rm -vf {} \;
 tar -cpzf $DST.tar.gz $DST
 chmod -R 777 $DST
 $RM $DST
 
-echo "release '$RELEASE_NAME-$RELEASE_VERSION' done"
+echo "release '$DST' done"
