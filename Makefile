@@ -65,7 +65,7 @@ build:
 	$(CHMOD) 0700 build
 
 clean: test_clean
-	$(RM) composer.lock composer.phar
+	$(RM) composer.lock $(COMPOSER)
 	$(RM) vendor/*
 	$(RM) vendor
 
@@ -83,7 +83,7 @@ clean_release: clean_data
 	$(CHMOD) 600 id_rsa.prv id_rsa.pub
 	$(RM) id_rsa.prv id_rsa.pub
 	$(RM) settings.yml
-	$(RM) composer.lock composer.phar
-	$(RM) build log pid
+	$(RM) composer.lock $(COMPOSER)
+	$(RM) log pid
 
 clean_all: clean clean_data clean_release
