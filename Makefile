@@ -16,6 +16,9 @@ all: install test
 install: $(COMPOSER)
 	$(COMPOSER) install $(COMPOSER_PREFER_SOURCE) --no-interaction --dev
 
+install_release: $(COMPOSER)
+	$(COMPOSER) install $(COMPOSER_PREFER_SOURCE) --no-interaction --no-dev
+
 update: $(COMPOSER)
 	$(COMPOSER) selfupdate
 	$(COMPOSER) update
@@ -70,11 +73,10 @@ clean_data:
 	$(RM) data
 
 clean_release: clean_data
-	$(RM) composer.lock composer.phar
-	$(RM) build log pid
-
-clean_all: clean clean_data
 	$(CHMOD) 600 id_rsa.prv id_rsa.pub
 	$(RM) id_rsa.prv id_rsa.pub
 	$(RM) settings.yml
-	$(RM) build
+	$(RM) composer.lock composer.phar
+	$(RM) build log pid
+
+clean_all: clean clean_data clean_release
