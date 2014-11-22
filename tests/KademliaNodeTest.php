@@ -60,18 +60,7 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 2JGsj8q54He5gnVI01MEWr0CAwEAAQ==
 -----END PUBLIC KEY-----';
 	
-	public function testSerialize(){
-		$node = new Node();
-		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$node->setUri('tcp://192.168.241.21:25001');
-		
-		$node = unserialize(serialize($node));
-		
-		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
-		$this->assertEquals('tcp://192.168.241.21:25001', (string)$node->getUri());
-	}
-	
-	public function testIdInt(){
+	public function testId(){
 		$this->assertEquals(Node::ID_LEN_BIT, Node::ID_LEN_BYTE * 8);
 		$this->assertEquals(Node::ID_LEN_BYTE, Node::ID_LEN_BIT / 8);
 		
@@ -87,7 +76,78 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		$this->assertEquals(15, floor(127 / 8));
 	}
 	
-	public function testIdHexStr(){
+	public function testCompareSslKey(){
+		$this->assertFalse(static::SSL_KEY_PUB2_A == static::SSL_KEY_PUB2_B);
+	}
+	
+	public function testSerialize(){
+		$node = new Node();
+		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		$node->setUri('tcp://192.168.241.21:25001');
+		
+		$node = unserialize(serialize($node));
+		
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
+		$this->assertEquals('tcp://192.168.241.21:25001', (string)$node->getUri());
+	}
+	
+	public function testToString1(){
+		$node = new Node();
+		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		$this->assertEquals('TheFox\Dht\Kademlia\Node->{ID:cafed00d-2131-4159-8e11-0b4dbadb1738}', (string)$node);
+	}
+	
+	public function testToString2(){
+		$node = new Node();
+		$node->setUri('tcp://192.168.241.21:25001');
+		$this->assertEquals('TheFox\Dht\Kademlia\Node->{URI:tcp://192.168.241.21:25001}', (string)$node);
+	}
+	
+	public function testToString3(){
+		$node = new Node();
+		$this->assertEquals('TheFox\Dht\Kademlia\Node', (string)$node);
+	}
+	
+	public function testSaveNode(){
+		$node = new Node('test_data/testfile_node_tcp.yml');
+		$node->setDatadirBasePath('test_data');
+		$node->setDataChanged(true);
+		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		$node->setUri('tcp://192.168.241.21:25001');
+		
+		$node->setSslKeyPub(static::SSL_KEY_PUB1);
+		$this->assertFalse( $node->setSslKeyPub(static::SSL_KEY_PUB1) );
+		
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
+		#$this->assertEquals('FC_BtK4HvbdX9wNQ6hGopSrFxs71SuuwMZra', $node->getSslKeyPubFingerprint());
+		$this->assertEquals('FC_TVqkkaeVwy5HMADDy1ErtdSsBUQ8Ch5zVPNYegNnHBVgejj8Mu8UYW78v5TyUC7aCB2Wo11hrMsfrVk', $node->getSslKeyPubFingerprint());
+		
+		$this->assertTrue( (bool)$node->save() );
+	}
+	
+	/**
+	* @depends testSaveNode
+	*/
+	public function testLoadNode1(){
+		$node = new Node('test_data/testfile_node_tcp.yml');
+		$node->setDatadirBasePath('test_data');
+		
+		$this->assertTrue($node->load());
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
+		#ve($node->getUri());
+		$this->assertEquals('tcp', $node->getUri()->getScheme());
+		$this->assertEquals('FC_TVqkkaeVwy5HMADDy1ErtdSsBUQ8Ch5zVPNYegNnHBVgejj8Mu8UYW78v5TyUC7aCB2Wo11hrMsfrVk', $node->getSslKeyPubFingerprint());
+		$this->assertEquals(static::SSL_KEY_PUB1, $node->getSslKeyPub());
+	}
+	
+	public function testLoadNode2(){
+		$node = new Node('test_data/testfile_node_tcp2.yml');
+		$node->setDatadirBasePath('test_data');
+		
+		$this->assertFalse($node->load());
+	}
+	
+	public function testGetIdHexStr(){
 		$id = (string)Uuid::uuid4();
 		
 		$node = new Node();
@@ -115,11 +175,36 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		$this->assertEquals('cafed00d-2131-0159-0e11-0b4dbadb1738', $node->getIdHexStr());
 	}
 	
-	public function testUri(){
+	public function testGenIdHexStr(){
+		$this->assertEquals('d4773c00-6a11-540a-b72c-ed106ef8309b', Node::genIdHexStr(static::SSL_KEY_PUB1));
+		$this->assertEquals('4a5b4d4e-0025-5d8d-ae5c-ca1c5548dfba', Node::genIdHexStr(static::SSL_KEY_PUB2_A));
+		$this->assertEquals('4a5b4d4e-0025-5d8d-ae5c-ca1c5548dfba', Node::genIdHexStr(static::SSL_KEY_PUB2_B));
+	}
+	
+	public function testGetIdBitStr(){
+		$expected = '';
+		$expected .= '11001010111111101101000000001101001000010011000101000001010110011000';
+		$expected .= '111000010001000010110100110110111010110110110001011100111000';
+		$node = new Node();
+		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		$this->assertEquals($expected, $node->getIdBitStr());
+	}
+	
+	public function testGetUri(){
 		$node = new Node();
 		$this->assertTrue($node->getUri() instanceof TcpUri);
 		$this->assertEquals('tcp', $node->getUri()->getScheme());
-		#ve($node->getUri());
+		
+		$node = new Node();
+		$node->setUri('');
+		$this->assertEquals('tcp', $node->getUri()->getScheme());
+		
+		$node = new Node();
+		$node->setUri('tcp://192.168.241.21:25001');
+		$this->assertEquals('tcp', $node->getUri()->getScheme());
+		$this->assertEquals('192.168.241.21', $node->getUri()->getHost());
+		$this->assertEquals('25001', $node->getUri()->getPort());
+		$this->assertEquals('tcp://192.168.241.21:25001', (string)$node->getUri());
 		
 		$uri = UriFactory::factory('tcp://192.168.241.21:25001');
 		$this->assertTrue($uri instanceof TcpUri);
@@ -142,66 +227,48 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		$this->assertEquals('http://phpchat.fox21.at/web/phpchat.php', (string)$node->getUri());
 	}
 	
-	public function testSaveTcpnode(){
-		$node = new Node('test_data/testfile_node_tcp.yml');
-		$node->setDatadirBasePath('test_data');
-		$node->setDataChanged(true);
-		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		
-		$node->setSslKeyPub(static::SSL_KEY_PUB1);
-		$this->assertFalse( $node->setSslKeyPub(static::SSL_KEY_PUB1) );
-		
-		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
-		#$this->assertEquals('FC_BtK4HvbdX9wNQ6hGopSrFxs71SuuwMZra', $node->getSslKeyPubFingerprint());
-		$this->assertEquals('FC_TVqkkaeVwy5HMADDy1ErtdSsBUQ8Ch5zVPNYegNnHBVgejj8Mu8UYW78v5TyUC7aCB2Wo11hrMsfrVk', $node->getSslKeyPubFingerprint());
-		
-		$this->assertTrue( (bool)$node->save() );
+	public function testSetSslKeyPub1(){
+		$node = new Node();
+		$this->assertTrue($node->setSslKeyPub(static::SSL_KEY_PUB1));
+		$this->assertFalse($node->setSslKeyPub(static::SSL_KEY_PUB1));
 	}
 	
-	public function testSaveHttpnode(){
-		$node = new Node('test_data/testfile_node_http.yml');
-		$node->setDatadirBasePath('test_data');
-		$node->setDataChanged(true);
-		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$node->setUri('http://phpchat.fox21.at:8080/web/phpchat.php');
-		#ve($node->getUri());
+	public function testSetSslKeyPub2(){
+		$node = new Node();
+		$node->setSslKeyPub(static::SSL_KEY_PUB2_A);
 		
-		$node->setSslKeyPub(static::SSL_KEY_PUB1);
-		$this->assertFalse( $node->setSslKeyPub(static::SSL_KEY_PUB1) );
+		#$this->assertEquals('FC_5zk4NskvcrQdJJLYQFb4V6fai8bzMV82G', $node->getSslKeyPubFingerprint());
+		$this->assertEquals('FC_SxXQaupNHdvtYVknJyqasrqsabsdZCwGMFrh34GiggcuF9Ry1LrWgdm9RjJeG8sd4rhgpjAvfnPaK9t', $node->getSslKeyPubFingerprint());
+		$this->assertEquals(static::SSL_KEY_PUB2_A, $node->getSslKeyPub());
+	}
+	
+	public function testSetSslKeyPub3(){
+		$node = new Node();
+		$node->setSslKeyPub(static::SSL_KEY_PUB2_B);
 		
-		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
-		$this->assertEquals('FC_TVqkkaeVwy5HMADDy1ErtdSsBUQ8Ch5zVPNYegNnHBVgejj8Mu8UYW78v5TyUC7aCB2Wo11hrMsfrVk', $node->getSslKeyPubFingerprint());
-		
-		$this->assertTrue( (bool)$node->save() );
+		$this->assertEquals('FC_SxXQaupNHdvtYVknJyqasrqsabsdZCwGMFrh34GiggcuF9Ry1LrWgdm9RjJeG8sd4rhgpjAvfnPaK9t', $node->getSslKeyPubFingerprint());
+		$this->assertEquals(static::SSL_KEY_PUB2_A, $node->getSslKeyPub());
 	}
 	
 	/**
-	* @depends testSaveTcpnode
-	*/
-	public function testLoadTcpnode(){
-		$node = new Node('test_data/testfile_node_tcp.yml');
-		$node->setDatadirBasePath('test_data');
-		
-		$this->assertTrue($node->load());
-		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
-		#ve($node->getUri());
-		$this->assertEquals('tcp', $node->getUri()->getScheme());
-		$this->assertEquals('FC_TVqkkaeVwy5HMADDy1ErtdSsBUQ8Ch5zVPNYegNnHBVgejj8Mu8UYW78v5TyUC7aCB2Wo11hrMsfrVk', $node->getSslKeyPubFingerprint());
-		$this->assertEquals(static::SSL_KEY_PUB1, $node->getSslKeyPub());
+	 * @expectedException RuntimeException
+	 */
+	public function testSetSslKeyPubRuntimeException(){
+		$node = new Node();
+		$node->setSslKeyPub('invalid');
 	}
 	
-	/**
-	* @depends testSaveHttpnode
-	*/
-	public function testLoadHttpnode(){
-		$node = new Node('test_data/testfile_node_http.yml');
-		$node->setDatadirBasePath('test_data');
+	public function testSetSslKeyPubStatus(){
+		$node = new Node();
 		
-		$this->assertTrue($node->load());
-		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
-		$this->assertEquals('http', $node->getUri()->getScheme());
-		$this->assertEquals('FC_TVqkkaeVwy5HMADDy1ErtdSsBUQ8Ch5zVPNYegNnHBVgejj8Mu8UYW78v5TyUC7aCB2Wo11hrMsfrVk', $node->getSslKeyPubFingerprint());
-		$this->assertEquals(static::SSL_KEY_PUB1, $node->getSslKeyPub());
+		$node->setSslKeyPubStatus('U');
+		$this->assertEquals('U', $node->getSslKeyPubStatus());
+		
+		$node->setSslKeyPubStatus('C');
+		$this->assertEquals('C', $node->getSslKeyPubStatus());
+		
+		$node->setSslKeyPubStatus('U');
+		$this->assertEquals('C', $node->getSslKeyPubStatus());
 	}
 	
 	public function testSslKeyPubFingerprintVerify(){
@@ -214,10 +281,23 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		$this->assertFalse(Node::sslKeyPubFingerprintVerify(''));
 	}
 	
-	public function testGenIdHexStr(){
-		$this->assertEquals('d4773c00-6a11-540a-b72c-ed106ef8309b', Node::genIdHexStr(static::SSL_KEY_PUB1));
-		$this->assertEquals('4a5b4d4e-0025-5d8d-ae5c-ca1c5548dfba', Node::genIdHexStr(static::SSL_KEY_PUB2_A));
-		$this->assertEquals('4a5b4d4e-0025-5d8d-ae5c-ca1c5548dfba', Node::genIdHexStr(static::SSL_KEY_PUB2_B));
+	public function testDistanceHexStr(){
+		$node_a = new Node();
+		$node_a->setIdHexStr('11111111-1111-4111-8111-111111111100');
+		
+		$node_b = new Node();
+		$node_b->setIdHexStr('11111111-1111-4111-8111-111111111100');
+		
+		$node_c = new Node();
+		$node_c->setIdHexStr('11111111-1111-4111-8111-111111111102');
+		
+		$node_d = new Node();
+		$node_d->setIdHexStr('11111111-1111-4111-8111-111111111104');
+		
+		$zeros = str_repeat('0', 120);
+		$this->assertEquals($zeros.'00000000', $node_a->distanceBitStr($node_b));
+		$this->assertEquals($zeros.'00000010', $node_a->distanceBitStr($node_c));
+		$this->assertEquals($zeros.'00000110', $node_c->distanceBitStr($node_d));
 	}
 	
 	public function testDistanceHexStr(){
@@ -236,46 +316,6 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		$this->assertEquals('00000000-0000-0000-0000-000000000000', $node_a->distanceHexStr($node_b));
 		$this->assertEquals('00000000-0000-0000-0000-000000000002', $node_a->distanceHexStr($node_c));
 		$this->assertEquals('00000000-0000-0000-0000-000000000006', $node_c->distanceHexStr($node_d));
-		
-		$zeros = str_repeat('0', 120);
-		$this->assertEquals($zeros.'00000000', $node_a->distanceBitStr($node_b));
-		$this->assertEquals($zeros.'00000010', $node_a->distanceBitStr($node_c));
-		$this->assertEquals($zeros.'00000110', $node_c->distanceBitStr($node_d));
-	}
-	
-	public function testSetSslKeyPub(){
-		$node = new Node();
-		$this->assertTrue($node->setSslKeyPub(static::SSL_KEY_PUB1));
-		$this->assertFalse($node->setSslKeyPub(static::SSL_KEY_PUB1));
-	}
-	
-	/**
-	 * @expectedException RuntimeException
-	 */
-	public function testSetSslKeyPubRuntimeException(){
-		$node = new Node();
-		$node->setSslKeyPub('invalid');
-	}
-	
-	public function testSslKey1(){
-		$this->assertFalse(static::SSL_KEY_PUB2_A == static::SSL_KEY_PUB2_B);
-	}
-	
-	public function testSslKey2(){
-		$node = new Node();
-		$node->setSslKeyPub(static::SSL_KEY_PUB2_A);
-		
-		#$this->assertEquals('FC_5zk4NskvcrQdJJLYQFb4V6fai8bzMV82G', $node->getSslKeyPubFingerprint());
-		$this->assertEquals('FC_SxXQaupNHdvtYVknJyqasrqsabsdZCwGMFrh34GiggcuF9Ry1LrWgdm9RjJeG8sd4rhgpjAvfnPaK9t', $node->getSslKeyPubFingerprint());
-		$this->assertEquals(static::SSL_KEY_PUB2_A, $node->getSslKeyPub());
-	}
-	
-	public function testSslKey3(){
-		$node = new Node();
-		$node->setSslKeyPub(static::SSL_KEY_PUB2_B);
-		
-		$this->assertEquals('FC_SxXQaupNHdvtYVknJyqasrqsabsdZCwGMFrh34GiggcuF9Ry1LrWgdm9RjJeG8sd4rhgpjAvfnPaK9t', $node->getSslKeyPubFingerprint());
-		$this->assertEquals(static::SSL_KEY_PUB2_A, $node->getSslKeyPub());
 	}
 	
 }

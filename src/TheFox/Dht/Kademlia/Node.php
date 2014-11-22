@@ -59,6 +59,8 @@ class Node extends YamlStorage{
 		if((string)$this->getUri()){
 			return __CLASS__.'->{URI:'.$this->getUri().'}';
 		}
+		
+		return __CLASS__;
 	}
 	
 	public function save(){
@@ -130,6 +132,20 @@ class Node extends YamlStorage{
 		return $this->data['id'];
 	}
 	
+	public static function genIdHexStr($key){
+		$key = sslKeyPubClean($key);
+		
+		$keyBin = base64_decode($key);
+		
+		try{
+			$id = (string)Uuid::uuid5(Uuid::NAMESPACE_X500, $keyBin);
+			return $id;
+		}
+		catch(UnsatisfiedDependencyException $e){
+			return null;
+		}
+	}
+	
 	public function getIdBitStr(){
 		$rv = '';
 		for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
@@ -158,6 +174,8 @@ class Node extends YamlStorage{
 	}
 	
 	public function setSslKeyPub($strKeyPub, $force = false){
+		$rv = false;
+		
 		if(!$this->sslKeyPub || $force){
 			$sslPubKey = openssl_pkey_get_public($strKeyPub);
 			if($sslPubKey !== false){
@@ -167,7 +185,7 @@ class Node extends YamlStorage{
 					$this->sslKeyPub = $sslPubKeyDetails['key'];
 					$this->setSslKeyPubFingerprint(static::genSslKeyFingerprint($strKeyPub));
 					
-					return true;
+					$rv = true;
 				}
 			}
 			else{
@@ -175,7 +193,7 @@ class Node extends YamlStorage{
 			}
 		}
 		
-		return false;
+		return $rv;
 	}
 	
 	public function getSslKeyPub(){
@@ -249,20 +267,6 @@ class Node extends YamlStorage{
 		return false;
 	}
 	
-	public static function genIdHexStr($key){
-		$key = sslKeyPubClean($key);
-		
-		$keyBin = base64_decode($key);
-		
-		try{
-			$id = (string)Uuid::uuid5(Uuid::NAMESPACE_X500, $keyBin);
-			return $id;
-		}
-		catch(UnsatisfiedDependencyException $e){
-			return null;
-		}
-	}
-	
 	public function setDistance($distance){
 		$this->data['distance'] = $distance;
 		#$this->distance = $distance;
@@ -271,6 +275,52 @@ class Node extends YamlStorage{
 	public function getDistance(){
 		return $this->data['distance'];
 		#return $this->distance;
+	}
+	
+	public function distance(Node $node){
+		#fwrite(STDOUT, __FUNCTION__.''."\n");
+		$rv = array_fill(0, static::ID_LEN_BYTE, 0);
+		#ve($rv);
+		
+		if($node && $this !== $node){
+			$thisId = $this->getId();
+			$nodeId = $node->getId();
+			
+			#ve($thisId);
+			#ve($nodeId);
+			
+			for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
+				$rv[$idPos] = $thisId[$idPos] ^ $nodeId[$idPos];
+				#fwrite(STDOUT, __FUNCTION__.'     pos: '.$idPos.' -> '.$rv[$idPos]."\n");
+			}
+		}
+		
+		return $rv;
+	}
+	
+	public function distanceBitStr(Node $node){
+		$distance = $this->distance($node);
+		
+		$rv = '';
+		for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
+			#fwrite(STDOUT, __FUNCTION__.' pos: '.$idPos."\n");
+			for($bits = 7; $bits >= 0; $bits--){
+				#fwrite(STDOUT, __FUNCTION__.'     bit: '.$bits.' -> '.(1 << $bits)."\n");
+				$rv .= $distance[$idPos] & (1 << $bits) ? '1' : '0';
+			}
+			#$rv .= ' ';
+		}
+		return $rv;
+	}
+	
+	public function distanceHexStr(Node $node){
+		$distance = $this->distance($node);
+		
+		return sprintf('%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x',
+			$distance[0], $distance[1], $distance[2], $distance[3],
+			$distance[4], $distance[5], $distance[6], $distance[7],
+			$distance[8], $distance[9], $distance[10], $distance[11],
+			$distance[12], $distance[13], $distance[14], $distance[15]);
 	}
 	
 	public function setConnectionsOutboundSucceed($connectionsOutboundSucceed){
@@ -391,51 +441,7 @@ class Node extends YamlStorage{
 		return $this->bucket;
 	}
 	
-	public function distance(Node $node){
-		#fwrite(STDOUT, __FUNCTION__.''."\n");
-		$rv = array_fill(0, static::ID_LEN_BYTE, 0);
-		#ve($rv);
-		
-		if($node && $this !== $node){
-			$thisId = $this->getId();
-			$nodeId = $node->getId();
-			
-			#ve($thisId);
-			#ve($nodeId);
-			
-			for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
-				$rv[$idPos] = $thisId[$idPos] ^ $nodeId[$idPos];
-				#fwrite(STDOUT, __FUNCTION__.'     pos: '.$idPos.' -> '.$rv[$idPos]."\n");
-			}
-		}
-		
-		return $rv;
-	}
 	
-	public function distanceBitStr(Node $node){
-		$distance = $this->distance($node);
-		
-		$rv = '';
-		for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
-			#fwrite(STDOUT, __FUNCTION__.' pos: '.$idPos."\n");
-			for($bits = 7; $bits >= 0; $bits--){
-				#fwrite(STDOUT, __FUNCTION__.'     bit: '.$bits.' -> '.(1 << $bits)."\n");
-				$rv .= $distance[$idPos] & (1 << $bits) ? '1' : '0';
-			}
-			#$rv .= ' ';
-		}
-		return $rv;
-	}
-	
-	public function distanceHexStr(Node $node){
-		$distance = $this->distance($node);
-		
-		return sprintf('%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x',
-			$distance[0], $distance[1], $distance[2], $distance[3],
-			$distance[4], $distance[5], $distance[6], $distance[7],
-			$distance[8], $distance[9], $distance[10], $distance[11],
-			$distance[12], $distance[13], $distance[14], $distance[15]);
-	}
 	
 	public function isEqual(Node $node){
 		return $this->getIdHexStr() == $node->getIdHexStr();

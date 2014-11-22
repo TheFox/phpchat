@@ -3,6 +3,7 @@
 	xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/3.7/phpunit.xsd"
 	backupGlobals="true"
 	backupStaticAttributes="false"
+	beStrictAboutTestsThatDoNotTestAnything="true"
 	bootstrap="bootstrap.php"
 	checkForUnintentionallyCoveredCode="true"
 	colors="true"
@@ -21,7 +22,7 @@
 	verbose="true">
 	
 	<testsuites>
-		<testsuite name="My Test Suite">
+		<testsuite name="all">
 			<file>tests/BasicTest.php</file>
 			<file>tests/ClientTest.php</file>
 			<file>tests/ColorTest.php</file>
@@ -36,10 +37,17 @@
 			<file>tests/SslTest.php</file>
 			<file>tests/TcpClientTest.php</file>
 			<file>tests/UuidTest.php</file>
+			<file>tests/YamlStorageTest.php</file>
+		</testsuite>
+		<testsuite name="dht">
+			<file>tests/KademliaBucketTest.php</file>
+			<file>tests/KademliaNodeTest.php</file>
+			<!--<file>tests/KademliaTableTest.php</file>//-->
+			<file>tests/SimpleTableTest.php</file>
 		</testsuite>
 	</testsuites>
 	<filter>
-		<whitelist addUncoveredFilesFromWhitelist="true">
+		<whitelist addUncoveredFilesFromWhitelist="false" processUncoveredFilesFromWhitelist="false">
 			<directory suffix=".php">src</directory>
 		</whitelist>
 	</filter>
