@@ -110,7 +110,10 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 	}
 	
 	public function testSaveNode(){
-		$node = new Node('test_data/testfile_node_tcp.yml');
+		$runName = uniqid('', true);
+		$fileName = 'testfile_node_tcp1_'.date('Ymd_H').'.yml';
+		
+		$node = new Node('test_data/'.$fileName);
 		$node->setDatadirBasePath('test_data');
 		$node->setDataChanged(true);
 		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
@@ -130,7 +133,10 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 	* @depends testSaveNode
 	*/
 	public function testLoadNode1(){
-		$node = new Node('test_data/testfile_node_tcp.yml');
+		$runName = uniqid('', true);
+		$fileName = 'testfile_node_tcp1_'.date('Ymd_H').'.yml';
+		
+		$node = new Node('test_data/'.$fileName);
 		$node->setDatadirBasePath('test_data');
 		
 		$this->assertTrue($node->load());
@@ -142,7 +148,10 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 	}
 	
 	public function testLoadNode2(){
-		$node = new Node('test_data/testfile_node_tcp2.yml');
+		$runName = uniqid('', true);
+		$fileName = 'testfile_node_tcp2_'.date('Ymd_His').'_'.$runName.'.yml';
+		
+		$node = new Node('test_data/'.$fileName);
 		$node->setDatadirBasePath('test_data');
 		
 		$this->assertFalse($node->load());

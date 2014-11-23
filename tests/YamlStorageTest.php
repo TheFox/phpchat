@@ -13,7 +13,9 @@ class YamlStorageTest extends PHPUnit_Framework_TestCase{
 	}
 	
 	public function testSave(){
-		$storage = new YamlStorage('test_data/test1.yml');
+		$fileName = 'test1_'.date('Ymd_His').'_'.uniqid('', true).'.yml';
+		
+		$storage = new YamlStorage('test_data/'.$fileName);
 		$storage->data['test'] = array('test1' => 123, 'test2' => 'test3');
 		
 		$this->assertFalse($storage->getDataChanged());
@@ -24,16 +26,16 @@ class YamlStorageTest extends PHPUnit_Framework_TestCase{
 		$storage->save();
 		
 		$finder = new Finder();
-		$files = $finder->in('test_data')->name('test1.yml');
+		$files = $finder->in('test_data')->name($fileName);
 		$this->assertEquals(1, count($files));
 	}
 	
 	public function testLoad1(){
-		$storage = new YamlStorage('test_data/test1.yml');
+		$storage = new YamlStorage('test_data/'.$fileName);
 		$storage->setDataChanged();
 		$storage->save();
 		
-		$storage = new YamlStorage('test_data/test1.yml');
+		$storage = new YamlStorage('test_data/'.$fileName);
 		$storage->load();
 		
 		$this->assertTrue($storage->isLoaded());

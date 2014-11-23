@@ -309,8 +309,8 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 	public function testNodeEnclose3(){
 		fwrite(STDOUT, 'testNodeEnclose3'.PHP_EOL);
 		
-		#@unlink('test_data/testfile_table_table.yml');
-		#@unlink('test_data/bucket_root.yml');
+		$runName = uniqid('', true);
+		$fileName = 'testfile_table_table_'.date('Ymd_His').'_'.$runName.'.yml';
 		
 		$this->assertEquals(20, Bucket::$SIZE_MAX);
 		
@@ -320,7 +320,7 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$localNode = new Node();
 		$localNode->setIdHexStr('11000001-2002-4004-8008-100000000006');
 		
-		$table = new Table('test_data/testfile_table_table.yml');
+		$table = new Table('test_data/'.$fileName);
 		$table->setDatadirBasePath('test_data');
 		$table->setLocalNode($localNode);
 		
@@ -381,14 +381,17 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 	 * @group large
 	 */
 	public function testNodeEnclose4(){
-		fwrite(STDOUT, 'testNodeEnclose4'.PHP_EOL);
+		#fwrite(STDOUT, 'testNodeEnclose4'.PHP_EOL);
+		
+		$runName = uniqid('', true);
+		$fileName = 'testfile_table_table_'.date('Ymd_His').'_'.$runName.'.yml';
 		
 		$NODES = 100;
 		Bucket::$SIZE_MAX = 20;
 		
 		$localNode = new Node();
 		$localNode->setIdHexStr('12000001-2002-4004-8008-100000000001');
-		$table = new Table('test_data/testfile_table_table.yml');
+		$table = new Table('test_data/'.$fileName);
 		$table->setDatadirBasePath('test_data');
 		$table->setLocalNode($localNode);
 		$table->load();

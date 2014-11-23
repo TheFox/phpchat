@@ -362,37 +362,47 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 	
 	public function testNodeEnclose3a(){
 		#fwrite(STDOUT, 'testNodeEnclose3a'.PHP_EOL);
+		$runName = uniqid('', true);
+		$fileName = 'testfile_table_nodeenclose3a_'.date('Ymd_His').'_'.$runName.'.yml';
 		
 		$localNode = new Node();
 		$localNode->setIdHexStr('11000001-2002-4004-8008-100000000006');
 		
-		$table = new Table('test_data/testfile_table_nodeenclose3a.yml');
+		$table = new Table('test_data/'.$fileName);
 		$table->setDatadirBasePath('test_data');
 		$table->setLocalNode($localNode);
 		#$table->load();
 		
-		$node0 = new Node();
+		$fileName = 'testfile_node_nodeenclose3a_00_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node0 = new Node('test_data/'.$fileName);
 		$node0->setIdHexStr('11000001-2002-4004-8008-100000000000');
 		
-		$node1 = new Node();
+		$fileName = 'testfile_node_nodeenclose3a_01_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node1 = new Node('test_data/'.$fileName);
 		$node1->setIdHexStr('11000001-2002-4004-8008-100000000001');
 		
-		$node2 = new Node();
+		$fileName = 'testfile_node_nodeenclose3a_02_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node2 = new Node('test_data/'.$fileName);
 		$node2->setIdHexStr('11000001-2002-4004-8008-100000000002');
 		
-		$node3 = new Node();
+		$fileName = 'testfile_node_nodeenclose3a_03_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node3 = new Node('test_data/'.$fileName);
 		$node3->setIdHexStr('11000001-2002-4004-8008-100000000003');
 		
-		$node4 = new Node();
+		$fileName = 'testfile_node_nodeenclose3a_04_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node4 = new Node('test_data/'.$fileName);
 		$node4->setIdHexStr('11000001-2002-4004-8008-100000000004');
 		
-		$node5 = new Node();
+		$fileName = 'testfile_node_nodeenclose3a_05_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node5 = new Node('test_data/'.$fileName);
 		$node5->setIdHexStr('11000001-2002-4004-8008-100000000005');
 		
-		$node7 = new Node();
+		$fileName = 'testfile_node_nodeenclose3a_07_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node7 = new Node('test_data/'.$fileName);
 		$node7->setIdHexStr('11000001-2002-4004-8008-100000000007');
 		
-		$node20 = new Node();
+		$fileName = 'testfile_node_nodeenclose3a_20_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node20 = new Node('test_data/'.$fileName);
 		$node20->setIdHexStr('11000001-2002-4004-8008-100000000020');
 		$node20->setTimeLastSeen(time());
 		
@@ -425,6 +435,8 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 	 */
 	public function testNodeEnclose3b(){
 		#fwrite(STDOUT, 'testNodeEnclose3b'.PHP_EOL);
+		$runName = uniqid('', true);
+		$fileName = 'testfile_table_nodeenclose3b_'.date('Ymd_His').'_'.$runName.'.yml';
 		
 		$originalNodeTtl = Table::$NODE_TTL;
 		Table::$NODE_TTL = 4;
@@ -432,33 +444,41 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$localNode = new Node();
 		$localNode->setIdHexStr('11000001-2002-4004-8008-100000000006');
 		
-		$table = new Table('test_data/testfile_table_nodeenclose3b.yml');
+		$table = new Table('test_data/'.$fileName);
 		$table->setDatadirBasePath('test_data');
 		$table->setLocalNode($localNode);
 		#$table->load();
 		
-		$node0 = new Node();
+		$fileName = 'testfile_node_nodeenclose3b_00_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node0 = new Node('test_data/'.$fileName);
 		$node0->setIdHexStr('11000001-2002-4004-8008-100000000000');
 		
-		$node1 = new Node();
+		$fileName = 'testfile_node_nodeenclose3b_01_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node1 = new Node('test_data/'.$fileName);
 		$node1->setIdHexStr('11000001-2002-4004-8008-100000000001');
 		
-		$node2 = new Node();
+		$fileName = 'testfile_node_nodeenclose3b_02_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node2 = new Node('test_data/'.$fileName);
 		$node2->setIdHexStr('11000001-2002-4004-8008-100000000002');
 		
-		#$node3 = new Node();
+		#$fileName = 'testfile_node_nodeenclose3b_03_'.date('Ymd_His').'_'.$runName.'.yml';
+		#$node3 = new Node('test_data/'.$fileName);
 		#$node3->setIdHexStr('11000001-2002-4004-8008-100000000003');
 		
-		$node4 = new Node();
+		$fileName = 'testfile_node_nodeenclose3b_04_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node4 = new Node('test_data/'.$fileName);
 		$node4->setIdHexStr('11000001-2002-4004-8008-100000000004');
 		
-		$node5 = new Node();
+		$fileName = 'testfile_node_nodeenclose3b_05_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node5 = new Node('test_data/'.$fileName);
 		$node5->setIdHexStr('11000001-2002-4004-8008-100000000005');
 		
-		$node7 = new Node();
+		$fileName = 'testfile_node_nodeenclose3b_07_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node7 = new Node('test_data/'.$fileName);
 		$node7->setIdHexStr('11000001-2002-4004-8008-100000000007');
 		
-		$node20 = new Node();
+		$fileName = 'testfile_node_nodeenclose3b_20_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node20 = new Node('test_data/'.$fileName);
 		$node20->setIdHexStr('11000001-2002-4004-8008-100000000020');
 		
 		
@@ -478,7 +498,7 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$table->save();
 		
 		$finder = new Finder();
-		$files = $finder->in('test_data')->depth(0)->name('node_*.yml');
+		$files = $finder->in('test_data')->depth(0)->name('testfile_node_nodeenclose3b_*_'.$runName.'.yml')->files();
 		$this->assertEquals(1, count($files));
 		
 		$this->clean();
@@ -489,85 +509,99 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 	public function testNodeEnclose3c(){
 		Table::$NODE_CONNECTIONS_OUTBOUND_ATTEMPTS_MAX = 4;
 		
+		$runName = uniqid('', true);
+		$fileName = 'testfile_table_nodeenclose3c_'.date('Ymd_His').'_'.$runName.'.yml';
+		
 		$localNode = new Node();
 		$localNode->setIdHexStr('11000001-2002-4004-8008-100000000006');
 		
-		$table = new Table('test_data/testfile_table_nodeenclose3c.yml');
+		$table = new Table('test_data/'.$fileName);
 		$table->setDatadirBasePath('test_data');
 		$table->setLocalNode($localNode);
 		#$table->load();
 		
-		$node = new Node();
+		$fileName = 'testfile_node_nodeenclose3c_00_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node = new Node('test_data/'.$fileName);
 		$node->setIdHexStr('11000001-2002-4004-8008-100000000000');
 		$node->setConnectionsOutboundAttempts(0);
 		$node->setConnectionsOutboundSucceed(0);
 		$node->setConnectionsInboundSucceed(0);
 		$table->nodeEnclose($node);
 		
-		$node = new Node();
+		$fileName = 'testfile_node_nodeenclose3c_01_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node = new Node('test_data/'.$fileName);
 		$node->setIdHexStr('11000001-2002-4004-8008-100000000001');
 		$node->setConnectionsOutboundAttempts(1);
 		$node->setConnectionsOutboundSucceed(0);
 		$node->setConnectionsInboundSucceed(0);
 		$table->nodeEnclose($node);
 		
-		$node = new Node();
+		$fileName = 'testfile_node_nodeenclose3c_02_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node = new Node('test_data/'.$fileName);
 		$node->setIdHexStr('11000001-2002-4004-8008-100000000002');
 		$node->setConnectionsOutboundAttempts(2);
 		$node->setConnectionsOutboundSucceed(1);
 		$node->setConnectionsInboundSucceed(0);
 		$table->nodeEnclose($node);
 		
-		$node = new Node();
+		$fileName = 'testfile_node_nodeenclose3c_03_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node = new Node('test_data/'.$fileName);
 		$node->setIdHexStr('11000001-2002-4004-8008-100000000003');
 		$node->setConnectionsOutboundAttempts(3);
 		$node->setConnectionsOutboundSucceed(1);
 		$node->setConnectionsInboundSucceed(1);
 		$table->nodeEnclose($node);
 		
-		$node = new Node();
+		$fileName = 'testfile_node_nodeenclose3c_04_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node = new Node('test_data/'.$fileName);
 		$node->setIdHexStr('11000001-2002-4004-8008-100000000004');
 		$node->setConnectionsOutboundAttempts(7);
 		$node->setConnectionsOutboundSucceed(0);
 		$node->setConnectionsInboundSucceed(0);
 		$table->nodeEnclose($node);
 		
-		$node = new Node();
+		$fileName = 'testfile_node_nodeenclose3c_05_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node = new Node('test_data/'.$fileName);
 		$node->setIdHexStr('11000001-2002-4004-8008-100000000005');
 		$node->setConnectionsOutboundAttempts(7);
 		$node->setConnectionsOutboundSucceed(2);
 		$node->setConnectionsInboundSucceed(0);
 		$table->nodeEnclose($node);
 		
-		$node = new Node();
+		$fileName = 'testfile_node_nodeenclose3c_06_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node = new Node('test_data/'.$fileName);
 		$node->setIdHexStr('11000001-2002-4004-8008-100000000006');
 		$node->setConnectionsOutboundAttempts(1);
 		$node->setConnectionsOutboundSucceed(0);
 		$node->setConnectionsInboundSucceed(7);
 		$table->nodeEnclose($node);
 		
-		$node = new Node();
+		$fileName = 'testfile_node_nodeenclose3c_07_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node = new Node('test_data/'.$fileName);
 		$node->setIdHexStr('11000001-2002-4004-8008-100000000007');
 		$node->setConnectionsOutboundAttempts(7);
 		$node->setConnectionsOutboundSucceed(0);
 		$node->setConnectionsInboundSucceed(7);
 		$table->nodeEnclose($node);
 		
-		$node = new Node();
+		$fileName = 'testfile_node_nodeenclose3c_08_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node = new Node('test_data/'.$fileName);
 		$node->setIdHexStr('11000001-2002-4004-8008-100000000008');
 		$node->setConnectionsOutboundAttempts(7);
 		$node->setConnectionsOutboundSucceed(7);
 		$node->setConnectionsInboundSucceed(7);
 		$table->nodeEnclose($node);
 		
-		$node = new Node();
+		$fileName = 'testfile_node_nodeenclose3c_09_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node = new Node('test_data/'.$fileName);
 		$node->setIdHexStr('11000001-2002-4004-8008-100000000009');
 		$node->setConnectionsOutboundAttempts(0);
 		$node->setConnectionsOutboundSucceed(0);
 		$node->setConnectionsInboundSucceed(1);
 		$table->nodeEnclose($node);
 		
-		$node = new Node();
+		$fileName = 'testfile_node_nodeenclose3c_10_'.date('Ymd_His').'_'.$runName.'.yml';
+		$node = new Node('test_data/'.$fileName);
 		$node->setIdHexStr('11000001-2002-4004-8008-100000000010');
 		$node->setConnectionsOutboundAttempts(0);
 		$node->setConnectionsOutboundSucceed(0);
@@ -580,7 +614,7 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$table->save();
 		
 		$finder = new Finder();
-		$files = $finder->in('test_data')->depth(0)->name('node_*.yml');
+		$files = $finder->in('test_data')->depth(0)->name('testfile_node_nodeenclose3c_*_'.$runName.'.yml')->files();
 		$this->assertEquals(9, count($files));
 		
 		$this->clean();
@@ -590,9 +624,12 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$NODES = 100;
 		Table::$NODES_MAX = 50;
 		
+		$runName = uniqid('', true);
+		$fileName = 'testfile_table_nodeenclose4_'.date('Ymd_His').'_'.$runName.'.yml';
+		
 		$localNode = new Node();
 		$localNode->setIdHexStr('12000001-2002-4004-8008-100000000001');
-		$table = new Table('test_data/testfile_table_nodeenclose4.yml');
+		$table = new Table('test_data/'.$fileName);
 		$table->setDatadirBasePath('test_data');
 		$table->setLocalNode($localNode);
 		$table->load();
@@ -602,7 +639,8 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		for($nodeNo = $nodeNoBegin; $nodeNo < $nodeNoEnd; $nodeNo++){
 			#fwrite(STDOUT, __METHOD__.' node setup: '.$nodeNo.''.PHP_EOL);
 			
-			$node = new Node();
+			$fileName = 'testfile_node_nodeenclose4_'.$nodeNo.'_'.date('Ymd_His').'_'.$runName.'.yml';
+			$node = new Node('test_data/'.$fileName);
 			$node->setIdHexStr('12000001-2002-4004-8008-'.$nodeNo);
 			$node->setTimeLastSeen(time());
 			
@@ -619,17 +657,20 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$this->assertEquals(50, $nodeNum);
 		
 		$finder = new Finder();
-		$files = $finder->in('test_data')->depth(0)->name('node_*.yml');
+		$files = $finder->in('test_data')->depth(0)->name('testfile_node_nodeenclose4_*'.$runName.'.yml')->files();
 		$this->assertEquals(50, count($files));
 		
 		$this->clean();
 	}
 	
 	public function testNodeEnclose5(){
+		$runName = uniqid('', true);
+		$fileName = 'testfile_table_nodeenclose5_'.date('Ymd_His').'_'.$runName.'.yml';
+		
 		$localNode = new Node();
 		$localNode->setIdHexStr('11000001-2002-4004-8008-100000000006');
 		
-		$table = new Table('test_data/testfile_table_nodeenclose5.yml');
+		$table = new Table('test_data/'.$fileName);
 		$table->setDatadirBasePath('test_data');
 		$table->setLocalNode($localNode);
 		
