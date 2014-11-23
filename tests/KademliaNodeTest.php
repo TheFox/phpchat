@@ -126,7 +126,7 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		#$this->assertEquals('FC_BtK4HvbdX9wNQ6hGopSrFxs71SuuwMZra', $node->getSslKeyPubFingerprint());
 		$this->assertEquals('FC_TVqkkaeVwy5HMADDy1ErtdSsBUQ8Ch5zVPNYegNnHBVgejj8Mu8UYW78v5TyUC7aCB2Wo11hrMsfrVk', $node->getSslKeyPubFingerprint());
 		
-		$this->assertTrue( (bool)$node->save() );
+		$this->assertTrue((bool)$node->save());
 	}
 	
 	/**

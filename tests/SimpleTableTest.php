@@ -426,8 +426,6 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$table->nodeEnclose($node20);
 		
 		$table->save();
-		
-		$this->clean();
 	}
 	
 	/**
@@ -500,8 +498,6 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$finder = new Finder();
 		$files = $finder->in('test_data')->depth(0)->name('testfile_node_nodeenclose3b_*_'.$runName.'.yml')->files();
 		$this->assertEquals(1, count($files));
-		
-		$this->clean();
 		
 		Table::$NODE_TTL = $originalNodeTtl;
 	}
@@ -616,8 +612,6 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$finder = new Finder();
 		$files = $finder->in('test_data')->depth(0)->name('testfile_node_nodeenclose3c_*_'.$runName.'.yml')->files();
 		$this->assertEquals(9, count($files));
-		
-		$this->clean();
 	}
 	
 	public function testNodeEnclose4(){
@@ -659,8 +653,6 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$finder = new Finder();
 		$files = $finder->in('test_data')->depth(0)->name('testfile_node_nodeenclose4_*'.$runName.'.yml')->files();
 		$this->assertEquals(50, count($files));
-		
-		$this->clean();
 	}
 	
 	public function testNodeEnclose5(){
@@ -703,17 +695,6 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$this->assertEquals('', (string)$node2->getUri());
 		
 		$table->save();
-		
-		$this->clean();
-	}
-	
-	private function clean(){
-		$finder = new Finder();
-		$files = $finder->in('test_data')->depth(0)->name('*.yml')->files();
-		$filesystem = new Filesystem();
-		foreach($files as $fileId => $file){
-			$filesystem->remove($file->getRealPath());
-		}
 	}
 	
 }

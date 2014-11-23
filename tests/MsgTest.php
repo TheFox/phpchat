@@ -219,7 +219,6 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 	#public function testSerialize(){}
 	
 	public function testId(){
-		#$this->markTestIncomplete('This test has not been implemented yet.');
 		$msg = new Msg();
 		
 		$this->assertTrue(Uuid::isValid($msg->getId()));
@@ -369,7 +368,6 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 	 * @depends testSave
 	 */
 	public function testLoad(){
-		#$this->markTestIncomplete('This test has not been implemented yet.');
 		$fileName = 'testfile_msg_'.date('Ymd_H').'.yml';
 		
 		$msg = new Msg('test_data/'.$fileName);
@@ -395,7 +393,6 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 	 * @depends testLoad
 	 */
 	public function testLoadDst1(){
-		#$this->markTestIncomplete('This test has not been implemented yet.');
 		$fileName = 'testfile_msg_'.date('Ymd_H').'.yml';
 		
 		$msg = new Msg('test_data/'.$fileName);
@@ -425,7 +422,6 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 	 * @depends testLoad
 	 */
 	public function testLoadDst2(){
-		#$this->markTestIncomplete('This test has not been implemented yet.');
 		$fileName = 'testfile_msg_'.date('Ymd_H').'.yml';
 		
 		$msg = new Msg('test_data/'.$fileName);
