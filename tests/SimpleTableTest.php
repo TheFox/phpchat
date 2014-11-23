@@ -134,6 +134,37 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$this->assertEquals(5, count($nodes));
 	}
 	
+	public function testSave(){
+		$runName = uniqid('', true);
+		$fileName = 'testfile_table_'.date('Ymd_His').'_'.$runName.'.yml';
+		
+		$localNode = new Node();
+		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
+		$localNode->setTimeCreated(1408371221);
+		$table = new Table('test_data/'.$fileName);
+		$table->setLocalNode($localNode);
+		$table->setDatadirBasePath('test_data');
+		
+		$node_a = new Node();
+		$node_a->setIdHexStr('10000001-2002-4004-8008-010000000002');
+		$node_a->setTimeCreated(1408371221);
+		$table->nodeEnclose($node_a);
+		
+		$table->save();
+		
+		$finder = new Finder();
+		$files = $finder->in('test_data')->depth(0)->name($fileName)->files();
+		$this->assertEquals(1, count($files));
+		
+		
+		$table = new Table('test_data/'.$fileName);
+		#\Doctrine\Common\Util\Debug::dump($table->load());
+		
+		$this->assertTrue($table->load());
+		
+		#\Doctrine\Common\Util\Debug::dump($files);
+	}
+	
 	public function testGetNodesClosest(){
 		$localNode = new Node();
 		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
@@ -232,42 +263,6 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$this->assertEquals($node_b, $onode);
 	}
 	
-	public function testNodeFindClosest(){
-		$localNode = new Node();
-		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
-		$table = new Table();
-		$table->setLocalNode($localNode);
-		
-		
-		$node_a = new Node();
-		$node_a->setIdHexStr('10000001-2002-4004-8008-010000000002');
-		$table->nodeEnclose($node_a);
-		
-		$node_b = new Node();
-		$node_b->setIdHexStr('10000001-2002-4004-8008-010000000004');
-		$table->nodeEnclose($node_b);
-		
-		$node_c = new Node();
-		$node_c->setIdHexStr('10000001-2002-4004-8008-010000000008');
-		$table->nodeEnclose($node_c);
-		
-		$node_d = new Node();
-		$node_d->setIdHexStr('10000001-2002-4004-8008-010000000010');
-		$table->nodeEnclose($node_d);
-		
-		
-		$node_e = new Node();
-		$node_e->setIdHexStr('10000001-2002-4004-8008-020000000008');
-		
-		$nodes = $table->nodeFindClosest($node_e);
-		
-		$this->assertEquals(4, count($nodes));
-		$this->assertEquals(array($node_c, $node_a, $node_b, $node_d), $nodes);
-		#foreach($nodes as $nodeId => $node){
-		#	fwrite(STDOUT, 'node: /'.$nodeId.'/ '.$node->getIdHexStr()."\n");
-		#}
-	}
-	
 	public function testNodeFindByKeyPubFingerprint(){
 		$localNode = new Node();
 		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
@@ -306,6 +301,82 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$this->assertEquals($node_c, $table->nodeFindByKeyPubFingerprint('FC_V5XQ3ReRPSWeakGv8o48cMXycnqTfK4kfRa9LGSxbxE6ee9s4zz5ucWcfwEUTmBFcHtZBLK2dpY1DHH'));
 		$this->assertEquals($node_d, $table->nodeFindByKeyPubFingerprint('FC_U25pDTHoiEEpop6PLggboYRiGjMszhRp4cstJE6aUJXLn79YjnQYfDLgbppw4FzR455Fr5nUCbvdiuw'));
 		$this->assertEquals(null, $table->nodeFindByKeyPubFingerprint('xyz'));
+	}
+	
+	public function testNodeFindClosest(){
+		$localNode = new Node();
+		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
+		$table = new Table();
+		$table->setLocalNode($localNode);
+		
+		
+		$node_a = new Node();
+		$node_a->setIdHexStr('10000001-2002-4004-8008-010000000002');
+		$table->nodeEnclose($node_a);
+		
+		$node_b = new Node();
+		$node_b->setIdHexStr('10000001-2002-4004-8008-010000000004');
+		$table->nodeEnclose($node_b);
+		
+		$node_c = new Node();
+		$node_c->setIdHexStr('10000001-2002-4004-8008-010000000008');
+		$table->nodeEnclose($node_c);
+		
+		$node_d = new Node();
+		$node_d->setIdHexStr('10000001-2002-4004-8008-010000000010');
+		$table->nodeEnclose($node_d);
+		
+		
+		$node_e = new Node();
+		$node_e->setIdHexStr('10000001-2002-4004-8008-020000000008');
+		
+		$nodes = $table->nodeFindClosest($node_e);
+		
+		$this->assertEquals(4, count($nodes));
+		$this->assertEquals(array($node_c, $node_a, $node_b, $node_d), $nodes);
+		#foreach($nodes as $nodeId => $node){
+		#	fwrite(STDOUT, 'node: /'.$nodeId.'/ '.$node->getIdHexStr()."\n");
+		#}
+	}
+	
+	public function testNodeFindClosestBridgeServer(){
+		$localNode = new Node();
+		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
+		$table = new Table();
+		$table->setLocalNode($localNode);
+		
+		$node_a = new Node();
+		$node_a->setIdHexStr('10000001-2002-4004-8008-010000000002');
+		$table->nodeEnclose($node_a);
+		
+		$node_b = new Node();
+		$node_b->setIdHexStr('10000001-2002-4004-8008-010000000004');
+		$table->nodeEnclose($node_b);
+		
+		$node_c = new Node();
+		$node_c->setIdHexStr('10000001-2002-4004-8008-010000000008');
+		$table->nodeEnclose($node_c);
+		
+		$node_d = new Node();
+		$node_d->setIdHexStr('10000001-2002-4004-8008-010000000010');
+		$table->nodeEnclose($node_d);
+		
+		
+		$node_e = new Node();
+		$node_e->setIdHexStr('10000001-2002-4004-8008-020000000008');
+		
+		
+		$nodes = $table->nodeFindClosestBridgeServer($node_e);
+		$this->assertEquals(array(), $nodes);
+		
+		$node_a->setBridgeServer(true);
+		$nodes = $table->nodeFindClosestBridgeServer($node_e);
+		$this->assertEquals(array($node_a), $nodes);
+		
+		$node_b->setBridgeServer(true);
+		$node_d->setBridgeServer(true);
+		$nodes = $table->nodeFindClosestBridgeServer($node_e);
+		$this->assertEquals(array($node_a, $node_b, $node_d), $nodes);
 	}
 	
 	public function testNodeEnclose1a(){

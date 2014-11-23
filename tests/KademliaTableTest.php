@@ -418,7 +418,7 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$this->assertTrue(true);
 		
 		$finder = new Finder();
-		$files = $finder->in('test_data')->depth(0)->name('node_*.yml');
+		$files = $finder->in('test_data')->depth(0)->name('node_*.yml')->files();
 		#$this->assertEquals(160, count($files));
 		
 		$this->clean();
@@ -429,14 +429,14 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		@unlink('test_data/bucket_root.yml');
 		
 		$finder = new Finder();
-		$files = $finder->in('test_data')->depth(0)->name('bucket_*.yml');
+		$files = $finder->in('test_data')->depth(0)->name('bucket_*.yml')->files();
 		$filesystem = new Filesystem();
 		foreach($files as $fileId => $file){
 			$filesystem->remove($file->getRealPath());
 		}
 		
 		$finder = new Finder();
-		$files = $finder->in('test_data')->depth(0)->name('node_*.yml');
+		$files = $finder->in('test_data')->depth(0)->name('node_*.yml')->files();
 		$filesystem = new Filesystem();
 		foreach($files as $fileId => $file){
 			$filesystem->remove($file->getRealPath());

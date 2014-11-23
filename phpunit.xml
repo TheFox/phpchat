@@ -28,6 +28,7 @@
 			<file>tests/ColorTest.php</file>
 			<file>tests/ConsoleTest.php</file>
 			<file>tests/CronjobTest.php</file>
+			<file>tests/HttpUriTest.php</file>
 			<file>tests/KademliaBucketTest.php</file>
 			<file>tests/KademliaNodeTest.php</file>
 			<!--<file>tests/KademliaTableTest.php</file>//-->
@@ -36,6 +37,8 @@
 			<file>tests/SimpleTableTest.php</file>
 			<file>tests/SslTest.php</file>
 			<file>tests/TcpClientTest.php</file>
+			<file>tests/TcpUriTest.php</file>
+			<file>tests/ThreadTest.php</file>
 			<file>tests/UuidTest.php</file>
 			<file>tests/YamlStorageTest.php</file>
 		</testsuite>
