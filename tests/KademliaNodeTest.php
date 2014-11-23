@@ -6,6 +6,7 @@ use Zend\Uri\UriFactory;
 use Zend\Uri\Http;
 
 use TheFox\Dht\Kademlia\Node;
+use TheFox\Dht\Kademlia\Bucket;
 use TheFox\PhpChat\TcpUri;
 use TheFox\PhpChat\HttpUri;
 
@@ -188,6 +189,19 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		$node = new Node();
 		$node->setIdHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738');
 		$this->assertEquals($expected, $node->getIdBitStr());
+	}
+	
+	public function testIdMinHexStr(){
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738',
+			Node::idMinHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738', 'cafed00d-2131-4159-8e11-0b4dbadb1738'));
+		
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738',
+			Node::idMinHexStr('cafed00d-2131-4159-8e11-0b4dbadb1738', 'cafed00d-2131-4159-8e11-0b4dbadb1739'));
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738',
+			Node::idMinHexStr('cafed00d-2131-4159-8e11-0b4dbadb1739', 'cafed00d-2131-4159-8e11-0b4dbadb1738'));
+		
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1740',
+			Node::idMinHexStr('cafed00d-2131-4159-8e11-0b4dbadb174a', 'cafed00d-2131-4159-8e11-0b4dbadb1740'));
 	}
 	
 	public function testGetUri(){
@@ -416,6 +430,108 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		
 		$node->incConnectionsInboundSucceed(2);
 		$this->assertEquals(4, $node->getConnectionsInboundSucceed());
+	}
+	
+	public function testSetBridgeServer(){
+		$node = new Node();
+		$this->assertFalse($node->getBridgeServer());
+		
+		$node->setBridgeServer(true);
+		$this->assertTrue($node->getBridgeServer());
+	}
+	
+	public function testSetBridgeClient(){
+		$node = new Node();
+		$this->assertFalse($node->getBridgeClient());
+		
+		$node->setBridgeClient(true);
+		$this->assertTrue($node->getBridgeClient());
+	}
+	
+	public function testAddBridgeDst(){
+		$node = new Node();
+		$this->assertEquals(array(), $node->getBridgeDst());
+		
+		$node->addBridgeDst(array());
+		$this->assertEquals(array(), $node->getBridgeDst());
+		
+		$node->addBridgeDst(array('192.168.241.24:25000'));
+		$this->assertEquals(array('192.168.241.24:25000'), $node->getBridgeDst());
+		
+		$node->addBridgeDst(array('192.168.241.25:25000'));
+		$this->assertEquals(array('192.168.241.24:25000', '192.168.241.25:25000'), $node->getBridgeDst());
+		
+		$node->addBridgeDst('192.168.241.26:25000');
+		$this->assertEquals(array('192.168.241.24:25000', '192.168.241.25:25000',
+			'192.168.241.26:25000'), $node->getBridgeDst());
+	}
+	
+	public function testSetTimeCreated(){
+		$node = new Node();
+		$this->assertEquals(time(), $node->getTimeCreated());
+		
+		$node->setTimeCreated(24);
+		$this->assertEquals(24, $node->getTimeCreated());
+	}
+	
+	public function testSetTimeLastSeen(){
+		$node = new Node();
+		$this->assertEquals(0, $node->getTimeLastSeen());
+		
+		$node->setTimeLastSeen(24);
+		$this->assertEquals(24, $node->getTimeLastSeen());
+	}
+	
+	public function testSetBucket(){
+		$bucket = new Bucket();
+		
+		$node = new Node();
+		$this->assertEquals(null, $node->getBucket());
+		
+		$node->setBucket($bucket);
+		$this->assertEquals($bucket, $node->getBucket());
+	}
+	
+	public function testIsEqual(){
+		$node_a = new Node();
+		$node_a->setIdHexStr('11111111-1111-4111-8111-111111111100');
+		
+		$node_b = new Node();
+		$node_b->setIdHexStr('11111111-1111-4111-8111-111111111100');
+		
+		$node_c = new Node();
+		$node_c->setIdHexStr('11111111-1111-4111-8111-111111111101');
+		
+		$this->assertTrue($node_a->isEqual($node_b));
+		$this->assertFalse($node_a->isEqual($node_c));
+	}
+	
+	public function testUpdate(){
+		$node_a = new Node();
+		$node_a->setIdHexStr('11111111-1111-4111-8111-111111111100');
+		$node_a->setUri('tcp://192.168.241.24:25000');
+		
+		$node_b = new Node();
+		$node_b->setIdHexStr('11111111-1111-4111-8111-111111111101');
+		$node_b->setUri('tcp://192.168.241.25:25000');
+		$node_b->setBridgeServer(true);
+		$node_b->setBridgeClient(true);
+		
+		$node_a->update($node_b);
+		$this->assertEquals('11111111-1111-4111-8111-111111111100', $node_a->getIdHexStr());
+		$this->assertEquals('tcp://192.168.241.24:25000', (string)$node_a->getUri());
+		$this->assertFalse($node_a->getBridgeServer());
+		$this->assertFalse($node_a->getBridgeClient());
+		$this->assertFalse($node_a->getDataChanged());
+		
+		$node_b->setTimeLastSeen(time());
+		
+		$node_a->update($node_b);
+		$this->assertEquals('11111111-1111-4111-8111-111111111100', $node_a->getIdHexStr());
+		$this->assertEquals('tcp://192.168.241.25:25000', (string)$node_a->getUri());
+		$this->assertTrue($node_a->getBridgeServer());
+		$this->assertTrue($node_a->getBridgeClient());
+		$this->assertTrue($node_a->getDataChanged());
 	}
 	
 }

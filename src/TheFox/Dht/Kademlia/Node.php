@@ -159,6 +159,19 @@ class Node extends YamlStorage{
 		return $rv;
 	}
 	
+	public static function idMinHexStr($hex_a, $hex_b){
+		if($hex_a == $hex_b){
+			return $hex_a;
+		}
+		
+		$ar = array();
+		$ar[] = $hex_a;
+		$ar[] = $hex_b;
+		sort($ar, SORT_STRING);
+		
+		return array_shift($ar);
+	}
+	
 	public function setUri($uri){
 		if(is_string($uri)){
 			if($uri){
@@ -410,14 +423,14 @@ class Node extends YamlStorage{
 		return $this->data['bridgeDst'];
 	}
 	
-	public function setBridgeSubscribed($bridgeSubscribed){
+	/*public function setBridgeSubscribed($bridgeSubscribed){
 		$this->data['bridgeSubscribed'] = (bool)$bridgeSubscribed;
 		$this->setDataChanged(true);
 	}
 	
 	public function getBridgeSubscribed(){
 		return (bool)$this->data['bridgeSubscribed'];
-	}
+	}*/
 	
 	public function setTimeCreated($timeCreated){
 		$this->data['timeCreated'] = $timeCreated;
@@ -443,25 +456,10 @@ class Node extends YamlStorage{
 		return $this->bucket;
 	}
 	
-	
-	
 	public function isEqual(Node $node){
 		return $this->getIdHexStr() == $node->getIdHexStr();
 	}
-	
-	public static function idMinHexStr($hex_a, $hex_b){
-		if($hex_a == $hex_b){
-			return $hex_a;
-		}
 		
-		$ar = array();
-		$ar[] = $hex_a;
-		$ar[] = $hex_b;
-		sort($ar, SORT_STRING);
-		
-		return array_shift($ar);
-	}
-	
 	public function update(Node $node){
 		if($node->getTimeLastSeen() > $this->getTimeLastSeen()){
 			$this->setUri($node->getUri());
@@ -473,7 +471,7 @@ class Node extends YamlStorage{
 			$this->setBridgeServer($node->getBridgeServer());
 			$this->setBridgeClient($node->getBridgeClient());
 			#$this->addBridgeDst($node->getBridgeDst()); # TODO
-			$this->setBridgeSubscribed($node->getBridgeSubscribed());
+			#$this->setBridgeSubscribed($node->getBridgeSubscribed());
 			
 			$this->setTimeLastSeen($node->getTimeLastSeen());
 			$this->setDataChanged(true);
