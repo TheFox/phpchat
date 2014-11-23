@@ -356,4 +356,66 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		$this->assertEquals('00000000-0000-0000-0000-000000000006', $node_c->distanceHexStr($node_d));
 	}
 	
+	public function testSetConnectionsOutboundSucceed(){
+		$node = new Node();
+		$this->assertEquals(0, $node->getConnectionsOutboundSucceed());
+		
+		$node->setConnectionsOutboundSucceed(24);
+		$this->assertEquals(24, $node->getConnectionsOutboundSucceed());
+	}
+	
+	public function testIncConnectionsOutboundSucceed(){
+		$node = new Node();
+		$node->incConnectionsOutboundSucceed();
+		$this->assertEquals(1, $node->getConnectionsOutboundSucceed());
+		
+		$node->incConnectionsOutboundSucceed();
+		$this->assertEquals(2, $node->getConnectionsOutboundSucceed());
+		
+		$node->incConnectionsOutboundSucceed(2);
+		$this->assertEquals(4, $node->getConnectionsOutboundSucceed());
+	}
+	
+	public function testSetConnectionsOutboundAttempts(){
+		$node = new Node();
+		$this->assertEquals(0, $node->getConnectionsOutboundAttempts());
+		
+		$node->setConnectionsOutboundAttempts(24);
+		$this->assertEquals(24, $node->getConnectionsOutboundAttempts());
+	}
+	
+	public function testIncConnectionsOutboundAttempts(){
+		$node = new Node();
+		
+		$node->incConnectionsOutboundAttempts();
+		$this->assertEquals(1, $node->getConnectionsOutboundAttempts());
+		
+		$node->incConnectionsOutboundAttempts();
+		$this->assertEquals(2, $node->getConnectionsOutboundAttempts());
+		
+		$node->incConnectionsOutboundAttempts(2);
+		$this->assertEquals(4, $node->getConnectionsOutboundAttempts());
+	}
+	
+	public function testSetConnectionsInboundSucceed(){
+		$node = new Node();
+		$this->assertEquals(0, $node->getConnectionsInboundSucceed());
+		
+		$node->setConnectionsInboundSucceed(24);
+		$this->assertEquals(24, $node->getConnectionsInboundSucceed());
+	}
+	
+	public function testIncConnectionsInboundSucceed(){
+		$node = new Node();
+		
+		$node->incConnectionsInboundSucceed();
+		$this->assertEquals(1, $node->getConnectionsInboundSucceed());
+		
+		$node->incConnectionsInboundSucceed();
+		$this->assertEquals(2, $node->getConnectionsInboundSucceed());
+		
+		$node->incConnectionsInboundSucceed(2);
+		$this->assertEquals(4, $node->getConnectionsInboundSucceed());
+	}
+	
 }

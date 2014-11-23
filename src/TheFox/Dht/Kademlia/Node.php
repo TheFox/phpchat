@@ -141,9 +141,11 @@ class Node extends YamlStorage{
 			$id = (string)Uuid::uuid5(Uuid::NAMESPACE_X500, $keyBin);
 			return $id;
 		}
+		// @codeCoverageIgnoreStart
 		catch(UnsatisfiedDependencyException $e){
 			return null;
 		}
+		// @codeCoverageIgnoreEnd
 	}
 	
 	public function getIdBitStr(){
