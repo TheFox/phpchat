@@ -281,7 +281,45 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		$this->assertFalse(Node::sslKeyPubFingerprintVerify(''));
 	}
 	
-	public function testDistanceHexStr(){
+	public function testSetDistance(){
+		$distance = array_fill(0, Node::ID_LEN_BYTE, 0);
+		$distance[0] = 1;
+		$distance[1] = 2;
+		$distance[2] = 3;
+		$distance[3] = 4;
+		
+		$node = new Node();
+		$node->setDistance($distance);
+		$this->assertEquals($distance, $node->getDistance());
+	}
+	
+	public function testDistance(){
+		$node_a = new Node();
+		$node_a->setIdHexStr('11111111-1111-4111-8111-111111111100');
+		
+		$node_b = new Node();
+		$node_b->setIdHexStr('11111111-1111-4111-8111-111111111100');
+		
+		$node_c = new Node();
+		$node_c->setIdHexStr('11111111-1111-4111-8111-111111111102');
+		
+		$node_d = new Node();
+		$node_d->setIdHexStr('11111111-1111-4111-8111-111111111104');
+		
+		
+		$distance = array_fill(0, Node::ID_LEN_BYTE, 0);
+		$this->assertEquals($distance, $node_a->distance($node_b));
+		
+		$distance = array_fill(0, Node::ID_LEN_BYTE, 0);
+		$distance[15] = 2;
+		$this->assertEquals($distance, $node_a->distance($node_c));
+		
+		$distance = array_fill(0, Node::ID_LEN_BYTE, 0);
+		$distance[15] = 4;
+		$this->assertEquals($distance, $node_a->distance($node_d));
+	}
+	
+	public function testDistanceBitStr(){
 		$node_a = new Node();
 		$node_a->setIdHexStr('11111111-1111-4111-8111-111111111100');
 		
