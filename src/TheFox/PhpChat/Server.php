@@ -535,7 +535,8 @@ class Server{
 			foreach($this->getTable()->getNodesClosest() as $nodeId => $node){
 				$connect = $node->getBridgeServer() && $settingsBridgeClient
 					|| !$settingsBridgeClient;
-				#fwrite(STDOUT, 'send node find to '.$node->getIdHexStr().': /'.(int)$node->getBridgeServer().'/ /'.(int)$connect.'/'."\n");
+				#$logTmp = '/'.(int)$node->getBridgeServer().'/ /'.(int)$connect.'/';
+				#fwrite(STDOUT, 'send node find to '.$node->getIdHexStr().': '.$logTmp."\n");
 				
 				if($connect){
 					$clientActions = array();

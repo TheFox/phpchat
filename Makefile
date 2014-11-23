@@ -4,7 +4,7 @@ CHMOD = chmod
 MKDIR = mkdir -p
 PHPCS = vendor/bin/phpcs
 PHPCS_STANDARD = vendor/thefox/phpcsrs/Standards/TheFox
-PHPCS_REPORT = --report=full --report-width=160 --report-xml=build/logs/phpcs.xml
+PHPCS_REPORT = --report=full --report-width=160 $(PHPCS_REPORT_XML)
 PHPUNIT = vendor/bin/phpunit
 PHPDOX = vendor/bin/phpdox
 PHPLOC = vendor/bin/phploc

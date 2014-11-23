@@ -711,20 +711,21 @@ class Cronjob extends Thread{
 							}*/
 							
 							if((string)$nodeObj->getUri()){
-								#$this->log->debug('    NO ID, URI ('.(int)$nodeObj->getBridgeServer().','.(int)$this->settings->data['node']['bridge']['client']['enabled'].')');
+								#$logTmp = '('.(int)$nodeObj->getBridgeServer().',';
+								#$logTmp .= (int)$this->settings->data['node']['bridge']['client']['enabled'].')';
+								#$this->log->debug('    NO ID, URI '.$logTmp);
 								
-								if(
-									  !$nodeObj->getBridgeServer() && !$settingsBridgeClient
-									|| $nodeObj->getBridgeServer() && !$settingsBridgeClient
-									|| $nodeObj->getBridgeServer() &&  $settingsBridgeClient
-								){
+								$noBridge = !$nodeObj->getBridgeServer() && !$settingsBridgeClient;
+								$isBridgeServer = $nodeObj->getBridgeServer() && !$settingsBridgeClient;
+								$isBridgeService = $nodeObj->getBridgeServer() && $settingsBridgeClient;
+								if($noBridge || $isBridgeServer || $isBridgeService){
 									$nodes[] = array('type' => 'connect', 'node' => $nodeObj);
 									#$this->log->debug('    add connect');
 								}
 							}
-							else{
-								#$this->log->debug('    NO ID, NO URI');
-							}
+							/*else{
+								$this->log->debug('    NO ID, NO URI');
+							}*/
 						}
 						else{
 							if((string)$nodeObj->getUri()){
@@ -737,9 +738,9 @@ class Cronjob extends Thread{
 							}
 						}
 					}
-					else{
-						#$this->log->debug('    ignore local node');
-					}
+					/*else{
+						$this->log->debug('    ignore local node');
+					}*/
 				}
 			}
 		}
@@ -870,7 +871,8 @@ class Cronjob extends Thread{
 		}
 		
 		/*foreach($nodes as $nodeId => $node){
-			fwrite(STDOUT, 'node: '.$node['type'].' /'.(int)is_object($node['node']).'/ /'.(int)$node['node']->getBridgeServer().'/'.PHP_EOL);
+			$logTmp = '/'.(int)is_object($node['node']).'/ /'.(int)$node['node']->getBridgeServer().'/';
+			fwrite(STDOUT, 'node: '.$node['type'].' '.$logTmp.PHP_EOL);
 		}*/
 		
 		return $nodes; // Return only for tests.

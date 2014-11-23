@@ -199,8 +199,11 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$localNode->setSslKeyPub(file_get_contents($settings->data['node']['sslKeyPubPath']));
 		
 		$this->assertEquals(static::NODE_LOCAL_SSL_KEY_PUB, $localNode->getSslKeyPub());
+		
+		// @codingStandardsIgnoreStart
 		#$this->assertEquals('FC_WwG2GdTmCLSKhpEmJso6pejm9c6oACjX', Node::genSslKeyFingerprint($localNode->getSslKeyPub()));
 		$this->assertEquals('FC_6t6Z9dYVWEDfEzGQGDSAteLQsFE8SDwZFK2PoiQuM2ezFUA2yNpBPiT9oBwvFBfzDWZzZF5sxBtcSd', Node::genSslKeyFingerprint($localNode->getSslKeyPub()));
+		// @codingStandardsIgnoreEnd
 		
 		$nodes = array();
 		$nodes[0] = new Node();
@@ -730,7 +733,8 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 				
 				array('active' => true, 'id' => 'cafed00d-2131-4159-8e11-0b4dbadb1744', 'bridgeServer' => true),
 				array('active' => true, 'uri' => 'tcp://192.168.241.29', 'bridgeServer' => true),
-				array('active' => true, 'id' => 'cafed00d-2131-4159-8e11-0b4dbadb1745', 'uri' => 'tcp://192.168.241.30', 'bridgeServer' => true),
+				array('active' => true, 'id' => 'cafed00d-2131-4159-8e11-0b4dbadb1745',
+					'uri' => 'tcp://192.168.241.30', 'bridgeServer' => true),
 			),
 		));
 		

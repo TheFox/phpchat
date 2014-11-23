@@ -251,13 +251,15 @@ class Table extends YamlStorage{
 		foreach($this->nodes as $nodeId => $node){
 			$timeCreatedCond = !$node->getTimeLastSeen() && $node->getTimeCreated() <= time() - static::$NODE_TTL;
 			$timeLastSeenCond = $node->getTimeLastSeen() && $node->getTimeLastSeen() <= time() - static::$NODE_TTL;
-			$connectionsOutboundAttemptsCond = $node->getConnectionsOutboundAttempts() >= static::$NODE_CONNECTIONS_OUTBOUND_ATTEMPTS_MAX
+			$connectionsOutboundAttemptsCond =
+					$node->getConnectionsOutboundAttempts() >= static::$NODE_CONNECTIONS_OUTBOUND_ATTEMPTS_MAX
 					&& $node->getConnectionsOutboundSucceed() == 0
 					&& $node->getConnectionsInboundSucceed() == 0;
 			
 			#$msgOut = (time() - $node->getTimeCreated()).' '.(time() - $node->getTimeLastSeen()).' ';
 			#$msgOut = $node->getTimeCreated().' '.$node->getTimeLastSeen().' '.$node->getConnectionsOutboundAttempts();
-			$msgOut = $node->getIdHexStr().' '.(int)$timeCreatedCond.' '.(int)$timeLastSeenCond.' '.(int)$connectionsOutboundAttemptsCond;
+			#$msgOut = $node->getIdHexStr().' '.(int)$timeCreatedCond.' ';
+			#$msgOut .= (int)$timeLastSeenCond.' '.(int)$connectionsOutboundAttemptsCond;
 			#fwrite(STDOUT, 'node delete: '.$msgOut.PHP_EOL);
 			
 			if(
@@ -269,7 +271,10 @@ class Table extends YamlStorage{
 				#fwrite(STDOUT, 'node delete: '.$msgOut.PHP_EOL);
 			}
 			/*if($timeLastSeenCond){
-				fwrite(STDOUT, ' -> '.(time() - $node->getTimeLastSeen()).' '.$node->getTimeLastSeen().' <= '.(time() - static::$NODE_TTL).' '.time().' '.static::$NODE_TTL.PHP_EOL);
+				$msgOut = (time() - $node->getTimeLastSeen()).' ';
+				$msgOut .= $node->getTimeLastSeen().' <= '.(time() - static::$NODE_TTL).' ';
+				$msgOut .= time().' '.static::$NODE_TTL;
+				fwrite(STDOUT, ' -> '.$msgOut.PHP_EOL);
 			}*/
 		}
 		

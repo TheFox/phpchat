@@ -15,3 +15,4 @@ env:
     global:
         - COMPOSER_PREFER_SOURCE=--prefer-source
         - PHPUNIT_COVERAGE_CLOVER="--coverage-clover build/logs/clover.xml"
+        - PHPCS_REPORT_XML="--report-xml=build/logs/phpcs.xml"

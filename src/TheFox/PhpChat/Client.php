@@ -393,7 +393,8 @@ class Client{
 		
 		$this->logColor('debug', 'bridgeActions execute: '.count($bridgeActions), 'yellow');
 		foreach($bridgeActions as $bridgeActionId => $bridgeAction){
-			$this->logColor('debug', 'bridgeAction execute: /'.$bridgeAction->getName().'/ /'.join(',', $bridgeAction->getCriteria()).'/', 'yellow');
+			$logTmp = '/'.$bridgeAction->getName().'/ /'.join(',', $bridgeAction->getCriteria()).'/';
+			$this->logColor('debug', 'bridgeAction execute: '.$logTmp, 'yellow');
 			$this->bridgeActionRemove($bridgeAction);
 			$bridgeAction->functionExec($this);
 		}
@@ -1347,7 +1348,9 @@ class Client{
 			}
 			else{
 				$msgHandleReturnValue .= $this->sendError(2060, $msgName);
-				$this->logColor('warning', $msgName.' SSL: you need to initialize ssl /'.(int)$this->getStatus('hasSslInitOk').'/ /'.(int)$this->getStatus('hasSslTest').'/', 'green');
+				$logTmp = 'you need to initialize ssl /'.(int)$this->getStatus('hasSslInitOk').'/';
+				$logTmp .= ' /'.(int)$this->getStatus('hasSslTest').'/';
+				$this->logColor('warning', $msgName.' SSL: '.$logTmp, 'green');
 			}
 		}
 		elseif($msgName == 'ssl_verify'){
@@ -1585,7 +1588,6 @@ class Client{
 						if($this->sslPasswordToken && $token == $testToken){
 							$this->logColor('debug', 're-SSL: password verified', 'green');
 							$this->logColor('debug', 're-SSL: OK', 'green');
-							#$this->logColor('debug', 're-SSL: pwd /'.substr($this->sslPasswordLocalNew, 0, 6).'/ /'.substr($this->sslPasswordPeerNew, 0, 6).'/', 'green');
 							
 							$this->setStatus('hasSendReSslPasswortPut', false);
 							$this->setStatus('hasReSslPasswortPut', false);
@@ -1975,7 +1977,9 @@ class Client{
 								$this->bridgeActionsExecute(ClientAction::CRITERION_AFTER_HAS_SSL);
 								
 								/*foreach($this->bridgeActions as $bridgeActionId => $bridgeAction){
-									$this->logColor('debug', 'bridgeAction: /'.$bridgeAction->getName().'/ /'.join(',', $bridgeAction->getCriteria()).'/', 'yellow');
+									$name = $bridgeAction->getName();
+									$criteria = join(',', $bridgeAction->getCriteria());
+									$this->logColor('debug', 'bridgeAction: /'.$name.'/ /'.$criteria.'/', 'yellow');
 									#$this->bridgeActionRemove($bridgeAction);
 									#$bridgeAction->functionExec($this);
 								}*/
@@ -2295,7 +2299,8 @@ class Client{
 			throw new RuntimeException('ssl not set.');
 		}
 		
-		$this->logColor('debug', 'send SSL init A: '.(int)$this->getStatus('hasSslInit').', '.(int)$this->getStatus('hasSendSslInit'), 'green');
+		$logTmp = (int)$this->getStatus('hasSslInit').', '.(int)$this->getStatus('hasSendSslInit');
+		$this->logColor('debug', 'send SSL init A: '.$logTmp, 'green');
 		
 		if($this->getStatus('hasSendSslInit')){
 			$this->logColor('debug', 'send SSL init BB', 'green');
@@ -2824,7 +2829,7 @@ class Client{
 	}
 	
 	private function sslPasswordEncrypt($data, $sslPasswordLocalCurrent = null, $sslPasswordPeerCurrent = null){
-		#$this->logColor('debug', 'SSL password encrypt A: /'.$sslPasswordLocalCurrent.'/ /'.$sslPasswordPeerCurrent.'/', 'green');
+		#$this->logColor('debug', 'SSL password encrypt A', 'green');
 		
 		if($sslPasswordLocalCurrent === null){
 			#$this->logColor('debug', 'SSL password encrypt: no local password set', 'green');
@@ -2835,7 +2840,6 @@ class Client{
 			$sslPasswordPeerCurrent = $this->sslPasswordPeerCurrent;
 		}
 		
-		#$this->logColor('debug', 'SSL password encrypt B: /'.$sslPasswordLocalCurrent.'/ /'.$sslPasswordPeerCurrent.'/', 'green');
 		#$this->logColor('debug', 'SSL password encrypt', 'green');
 		
 		if($sslPasswordLocalCurrent && $sslPasswordPeerCurrent){
@@ -2868,7 +2872,7 @@ class Client{
 	}
 	
 	private function sslPasswordDecrypt($data, $sslPasswordLocalCurrent = null, $sslPasswordPeerCurrent = null){
-		#$this->logColor('debug', 'SSL password decrypt: /'.$sslPasswordLocalCurrent.'/ /'.$sslPasswordPeerCurrent.'/', 'green');
+		#$this->logColor('debug', 'SSL password decrypt', 'green');
 		
 		if($sslPasswordLocalCurrent === null){
 			#$this->logColor('debug', 'SSL password decrypt: no local password set', 'green');

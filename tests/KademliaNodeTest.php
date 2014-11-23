@@ -124,7 +124,9 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		
 		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
 		#$this->assertEquals('FC_BtK4HvbdX9wNQ6hGopSrFxs71SuuwMZra', $node->getSslKeyPubFingerprint());
+		// @codingStandardsIgnoreStart
 		$this->assertEquals('FC_TVqkkaeVwy5HMADDy1ErtdSsBUQ8Ch5zVPNYegNnHBVgejj8Mu8UYW78v5TyUC7aCB2Wo11hrMsfrVk', $node->getSslKeyPubFingerprint());
+		// @codingStandardsIgnoreEnd
 		
 		$this->assertTrue((bool)$node->save());
 	}
@@ -143,7 +145,9 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $node->getIdHexStr());
 		#ve($node->getUri());
 		$this->assertEquals('tcp', $node->getUri()->getScheme());
+		// @codingStandardsIgnoreStart
 		$this->assertEquals('FC_TVqkkaeVwy5HMADDy1ErtdSsBUQ8Ch5zVPNYegNnHBVgejj8Mu8UYW78v5TyUC7aCB2Wo11hrMsfrVk', $node->getSslKeyPubFingerprint());
+		// @codingStandardsIgnoreEnd
 		$this->assertEquals(static::SSL_KEY_PUB1, $node->getSslKeyPub());
 	}
 	
@@ -261,7 +265,11 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		$node->setSslKeyPub(static::SSL_KEY_PUB2_A);
 		
 		#$this->assertEquals('FC_5zk4NskvcrQdJJLYQFb4V6fai8bzMV82G', $node->getSslKeyPubFingerprint());
+		
+		// @codingStandardsIgnoreStart
 		$this->assertEquals('FC_SxXQaupNHdvtYVknJyqasrqsabsdZCwGMFrh34GiggcuF9Ry1LrWgdm9RjJeG8sd4rhgpjAvfnPaK9t', $node->getSslKeyPubFingerprint());
+		// @codingStandardsIgnoreEnd
+		
 		$this->assertEquals(static::SSL_KEY_PUB2_A, $node->getSslKeyPub());
 	}
 	
@@ -269,7 +277,10 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 		$node = new Node();
 		$node->setSslKeyPub(static::SSL_KEY_PUB2_B);
 		
+		// @codingStandardsIgnoreStart
 		$this->assertEquals('FC_SxXQaupNHdvtYVknJyqasrqsabsdZCwGMFrh34GiggcuF9Ry1LrWgdm9RjJeG8sd4rhgpjAvfnPaK9t', $node->getSslKeyPubFingerprint());
+		// @codingStandardsIgnoreEnd
+		
 		$this->assertEquals(static::SSL_KEY_PUB2_A, $node->getSslKeyPub());
 	}
 	
@@ -295,7 +306,10 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 	}
 	
 	public function testSslKeyPubFingerprintVerify(){
+		// @codingStandardsIgnoreStart
 		$this->assertTrue (Node::sslKeyPubFingerprintVerify('FC_TVqkkaeVwy5HMADDy1ErtdSsBUQ8Ch5zVPNYegNnHBVgejj8Mu8UYW78v5TyUC7aCB2Wo11hrMsfrVk'));
+		// @codingStandardsIgnoreEnd
+		
 		$this->assertFalse(Node::sslKeyPubFingerprintVerify('FC_BtK4HvbdX9wNQ6hGopSrFxs71SuuwM'));
 		$this->assertFalse(Node::sslKeyPubFingerprintVerify('FC_BtK4HvbdX9wNQ6hGopSrFxs71SuuwMXYZ'));
 		#$this->assertFalse(Node::sslKeyPubFingerprintVerify('FC_BtK4HvbdX9wNQ6hGopSrFxs71SuuwM_XY'));
