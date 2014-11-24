@@ -6,5 +6,13 @@
 			"folder_exclude_patterns": [ "log", "vendor", "test_data" ],
 			"file_exclude_patterns": [ ]
 		}
+	],
+	"build_systems":[
+		{
+			"name": "Tests",
+			"cmd": [ "make test" ],
+			"working_dir": "${project_path:${folder}}",
+			"shell": true
+		}
 	]
 }
