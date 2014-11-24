@@ -69,7 +69,7 @@ class CronjobCommand extends BasicCommand{
 				$this->cronjob->loop();
 			}
 			catch(Exception $e){
-				$log->error('loop: '.$e->getMessage());
+				$this->log->error('loop: '.$e->getMessage());
 				exit(1);
 			}
 		}

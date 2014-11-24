@@ -22,6 +22,12 @@ use TheFox\Logger\StreamHandler;
 class InfoCommand extends BasicCommand{
 	
 	const LOOP_USLEEP = 50000;
+	public static $CONNECTION_INFO_FIELDS = array(
+		'hasId', 'hasShutdown',
+		'hasTalkRequest', 'hasTalk', 'hasTalkClose',
+		'isChannelPeer', 'isChannelLocal',
+		'isOutbound', 'isInbound',
+		'isBridgeServer', 'isBridgeClient');
 	
 	private $ipcKernelConnection = null;
 	private $ipcKernelShutdown = false;
@@ -150,60 +156,13 @@ class InfoCommand extends BasicCommand{
 							$oldClient = $oldClients[$newClientId];
 							
 							$changed = false;
-							if($oldClient['hasId'] != $newClient['hasId']){
-								$this->log->debug('update '.$newClientId.': hasId='.(int)$newClient['hasId']);
-								$oldClients[$newClientId]['hasId'] = $newClient['hasId'];
-								$oldClients[$newClientId]['lastUpdate'] = time();
-							}
-							if($oldClient['hasTalkRequest'] != $newClient['hasTalkRequest']){
-								$this->log->debug('update '.$newClientId.': hasTalkRequest='.(int)$newClient['hasTalkRequest']);
-								$oldClients[$newClientId]['hasTalkRequest'] = $newClient['hasTalkRequest'];
-								$oldClients[$newClientId]['lastUpdate'] = time();
-							}
-							if($oldClient['hasTalk'] != $newClient['hasTalk']){
-								$this->log->debug('update '.$newClientId.': hasTalk='.(int)$newClient['hasTalk']);
-								$oldClients[$newClientId]['hasTalk'] = $newClient['hasTalk'];
-								$oldClients[$newClientId]['lastUpdate'] = time();
-							}
-							if($oldClient['hasTalkClose'] != $newClient['hasTalkClose']){
-								$this->log->debug('update '.$newClientId.': hasTalkClose='.(int)$newClient['hasTalkClose']);
-								$oldClients[$newClientId]['hasTalkClose'] = $newClient['hasTalkClose'];
-								$oldClients[$newClientId]['lastUpdate'] = time();
-							}
-							if($oldClient['hasShutdown'] != $newClient['hasShutdown']){
-								$this->log->debug('update '.$newClientId.': hasShutdown='.(int)$newClient['hasShutdown']);
-								$oldClients[$newClientId]['hasShutdown'] = $newClient['hasShutdown'];
-								$oldClients[$newClientId]['lastUpdate'] = time();
-							}
-							if($oldClient['isChannelPeer'] != $newClient['isChannelPeer']){
-								$this->log->debug('update '.$newClientId.': isChannelPeer='.(int)$newClient['isChannelPeer']);
-								$oldClients[$newClientId]['isChannelPeer'] = $newClient['isChannelPeer'];
-								$oldClients[$newClientId]['lastUpdate'] = time();
-							}
-							if($oldClient['isChannelLocal'] != $newClient['isChannelLocal']){
-								$this->log->debug('update '.$newClientId.': isChannelLocal='.(int)$newClient['isChannelLocal']);
-								$oldClients[$newClientId]['isChannelLocal'] = $newClient['isChannelLocal'];
-								$oldClients[$newClientId]['lastUpdate'] = time();
-							}
-							if($oldClient['isOutbound'] != $newClient['isOutbound']){
-								$this->log->debug('update '.$newClientId.': isOutbound='.(int)$newClient['isOutbound']);
-								$oldClients[$newClientId]['isOutbound'] = $newClient['isOutbound'];
-								$oldClients[$newClientId]['lastUpdate'] = time();
-							}
-							if($oldClient['isInbound'] != $newClient['isInbound']){
-								$this->log->debug('update '.$newClientId.': isInbound='.(int)$newClient['isInbound']);
-								$oldClients[$newClientId]['isInbound'] = $newClient['isInbound'];
-								$oldClients[$newClientId]['lastUpdate'] = time();
-							}
-							if($oldClient['isBridgeServer'] != $newClient['isBridgeServer']){
-								$this->log->debug('update '.$newClientId.': isBridgeServer='.(int)$newClient['isBridgeServer']);
-								$oldClients[$newClientId]['isBridgeServer'] = $newClient['isBridgeServer'];
-								$oldClients[$newClientId]['lastUpdate'] = time();
-							}
-							if($oldClient['isBridgeClient'] != $newClient['isBridgeClient']){
-								$this->log->debug('update '.$newClientId.': isBridgeClient='.(int)$newClient['isBridgeClient']);
-								$oldClients[$newClientId]['isBridgeClient'] = $newClient['isBridgeClient'];
-								$oldClients[$newClientId]['lastUpdate'] = time();
+							
+							foreach(static::$CONNECTION_INFO_FIELDS as $fieldName){
+								if($oldClient[$fieldName] != $newClient[$fieldName]){
+									$this->log->debug('update '.$newClientId.': '.$fieldName.'='.(int)$newClient[$fieldName]);
+									$oldClients[$newClientId][$fieldName] = $newClient[$fieldName];
+									$oldClients[$newClientId]['lastUpdate'] = time();
+								}
 							}
 							
 							if($changed){

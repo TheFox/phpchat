@@ -567,7 +567,7 @@ class Client{
 		
 		$msgHandleReturnValue = '';
 		if($msgName == 'noop'){
-			$noop = 0x90;
+			$this->log('debug', 'no operation');
 		}
 		elseif($msgName == 'test'){
 			$len = 0;
@@ -578,6 +578,8 @@ class Client{
 			if(array_key_exists('test_data', $msgData)){
 				$test_data = $msgData['test_data'];
 			}
+			
+			$this->log('debug', 'test: '.$len.' /'.$test_data.'/');
 		}
 		elseif($msgName == 'hello'){
 			if(array_key_exists('ip', $msgData)){
@@ -1060,7 +1062,7 @@ class Client{
 					$checksum = '';
 					$relayCount = 0;
 					$timeCreated = 0;
-					$timeCreated = '';
+					$hashcash = '';
 					if(array_key_exists('rid', $msgData)){
 						$rid = $msgData['rid'];
 					}
