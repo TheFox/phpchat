@@ -31,6 +31,8 @@ class YamlStorageTest extends PHPUnit_Framework_TestCase{
 	}
 	
 	public function testLoad1(){
+		$fileName = 'test1_'.date('Ymd_His').'_'.uniqid('', true).'.yml';
+		
 		$storage = new YamlStorage('test_data/'.$fileName);
 		$storage->setDataChanged();
 		$storage->save();
