@@ -36,6 +36,7 @@
 			<file>tests/MsgTest.php</file>
 			<file>tests/SimpleTableTest.php</file>
 			<file>tests/SslTest.php</file>
+			<file>tests/TalkRequestTest.php</file>
 			<file>tests/TcpClientTest.php</file>
 			<file>tests/TcpUriTest.php</file>
 			<file>tests/ThreadTest.php</file>

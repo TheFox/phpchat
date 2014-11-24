@@ -58,10 +58,11 @@ class Client{
 	private $bridgeClient = null;
 	
 	public function __construct(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.''."\n");
 		
 		$this->uri = new TcpUri();
 		
+		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': set vars'."\n");
 		$this->status['hasId'] = false;
 		$this->status['hasTalkRequest'] = false;
 		$this->status['hasTalk'] = false;
@@ -76,6 +77,8 @@ class Client{
 		$this->status['bridgeTargetUri'] = null;
 		
 		$this->resetStatusSsl();
+		
+		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': end'."\n");
 	}
 	
 	public function __sleep(){
@@ -108,6 +111,8 @@ class Client{
 	}
 	
 	private function resetStatusSsl(){
+		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.''."\n");
+		
 		$this->status['hasSslInit'] = false;
 		$this->status['hasSendSslInit'] = false;
 		$this->status['hasSslInitOk'] = false;
