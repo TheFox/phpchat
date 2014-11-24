@@ -28,7 +28,7 @@ class Table extends YamlStorage{
 	
 	public function __sleep(){
 		return array(
-			'data',
+			'data', 'dataChanged',
 			#'buckets',
 			'localNode',
 			'rootBucket',

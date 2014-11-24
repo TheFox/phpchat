@@ -17,7 +17,7 @@ class NodesNewDb extends YamlStorage{
 	}
 	
 	public function __sleep(){
-		return array('data');
+		return array('data', 'dataChanged');
 	}
 	
 	public function nodeAddConnect($uri, $bridgeServer = false){

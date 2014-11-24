@@ -62,7 +62,7 @@ class Settings extends YamlStorage{
 	}
 	
 	public function __sleep(){
-		return array('data');
+		return array('data', 'dataChanged');
 	}
 	
 }
