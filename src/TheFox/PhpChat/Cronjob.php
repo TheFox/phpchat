@@ -627,7 +627,8 @@ class Cronjob extends Thread{
 			
 			try{
 				$this->log->debug('get url "'.$url.'"');
-				$response = $client->get($url);
+				$request = $client->get($url);
+				$response = $request->send();
 			}
 			catch(Exception $e){
 				$this->log->error('url failed, "'.$url.'": '.$e->getMessage());

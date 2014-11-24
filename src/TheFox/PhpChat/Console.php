@@ -376,20 +376,23 @@ class Console extends Thread{
 	private function keybindingsSetup(){
 		// Default
 		$this->charControlH = static::VT100_CHAR_CONTROL_H;
-		$this->backspace = static::VT100_CHAR_BACKSPACE;
+		$this->charBackspace = static::VT100_CHAR_BACKSPACE;
 		
 		$keys = array();
+		$lines = array();
 		exec('infocmp', $lines);
-		foreach($lines as $line){
-			if($line[0] == "\t"){
-				#print "line '".substr($line, 1)."'\n";
-				#ve(\TheFox\Utilities\Hex::dataEncode($line));
-				$items = preg_split('/, ?/', substr($line, 1));
-				foreach($items as $item){
-					#print "item '$item'\n";
-					$pos = strpos($item, '=');
-					if($pos !== false){
-						$keys[substr($item, 0, $pos)] = substr($item, $pos + 1);
+		if($lines && is_array($lines)){
+			foreach($lines as $line){
+				if($line[0] == "\t"){
+					#print "line '".substr($line, 1)."'\n";
+					#ve(\TheFox\Utilities\Hex::dataEncode($line));
+					$items = preg_split('/, ?/', substr($line, 1));
+					foreach($items as $item){
+						#print "item '$item'\n";
+						$pos = strpos($item, '=');
+						if($pos !== false){
+							$keys[substr($item, 0, $pos)] = substr($item, $pos + 1);
+						}
 					}
 				}
 			}

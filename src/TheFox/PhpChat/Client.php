@@ -1017,7 +1017,8 @@ class Client{
 								
 								$clientActions = array();
 								$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
-								$action->functionSet(function($action, $client) use($nodeId) {
+								$action->functionSet(function($action, $client)
+									use($nodeId, $distanceOld, $nodesFoundIds) {
 									$client->sendNodeFind($nodeId, $distanceOld, $nodesFoundIds);
 								});
 								$clientActions[] = $action;
@@ -1059,6 +1060,7 @@ class Client{
 					$checksum = '';
 					$relayCount = 0;
 					$timeCreated = 0;
+					$timeCreated = '';
 					if(array_key_exists('rid', $msgData)){
 						$rid = $msgData['rid'];
 					}
@@ -2183,7 +2185,7 @@ class Client{
 		return $this->dataSend($this->msgCreateId());
 	}
 	
-	private function sendIdOk(){
+	public function sendIdOk(){
 		return $this->dataSend($this->msgCreate('id_ok'));
 	}
 	

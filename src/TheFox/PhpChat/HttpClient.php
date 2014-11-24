@@ -76,7 +76,7 @@ class HttpClient extends Client{
 		return '';
 	}
 	
-	private function sendIdOk(){
+	public function sendIdOk(){
 		return '';
 	}
 	

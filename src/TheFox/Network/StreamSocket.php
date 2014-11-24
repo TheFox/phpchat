@@ -48,8 +48,9 @@ class StreamSocket extends AbstractSocket{
 			$class = __CLASS__;
 			$socket = new $class();
 			$socket->setHandle($handle);
+			return $socket;
 		}
-		return $socket;
+		return null;
 	}
 	
 	public function select(&$readHandles, &$writeHandles, &$exceptHandles){

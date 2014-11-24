@@ -40,7 +40,7 @@ class YamlStorage{
 		
 		if($this->getFilePath()){
 			if(file_exists($this->getFilePath())){
-				$this->data = Yaml::parse($this->getFilePath());
+				$this->data = (array)Yaml::parse($this->getFilePath());
 				return $this->isLoaded(true);
 			}
 		}

@@ -252,10 +252,10 @@ class Bucket extends YamlStorage{
 			}
 		}
 		if($this->childBucketUpper){
-			return $this->childBucketUpper->nodeFindByUri($id);
+			return $this->childBucketUpper->nodeFindByUri($uri);
 		}
 		if($this->childBucketLower){
-			return $this->childBucketLower->nodeFindByUri($id);
+			return $this->childBucketLower->nodeFindByUri($uri);
 		}
 		return null;
 	}

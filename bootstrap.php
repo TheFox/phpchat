@@ -5,7 +5,7 @@ declare(ticks = 1);
 
 error_reporting(E_ALL | E_STRICT);
 
-ini_set('display_errors', true);
+ini_set('display_errors', 'On');
 ini_set('memory_limit', '128M');
 
 if(@date_default_timezone_get() == 'UTC') date_default_timezone_set('UTC');

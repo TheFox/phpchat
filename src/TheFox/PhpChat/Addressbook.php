@@ -49,7 +49,7 @@ class Addressbook extends YamlStorage{
 			if(isset($this->data['contacts']) && $this->data['contacts']){
 				foreach($this->data['contacts'] as $contactId => $contactAr){
 					#$this->contactsId++;
-					$this->contactsId = $contactId;
+					$this->contactsId = (int)$contactId;
 					#print __CLASS__.'->'.__FUNCTION__.': '.$this->contactsId."\n";
 					
 					$contact = new Contact();

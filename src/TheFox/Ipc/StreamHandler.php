@@ -51,8 +51,8 @@ class StreamHandler extends AbstractHandler{
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		$readHandles = array();
-		$writeHandles = null;
-		$exceptHandles = null;
+		$writeHandles = array();
+		$exceptHandles = array();
 		
 		if($this->isListening()){
 			$readHandles[] = $this->getHandle();

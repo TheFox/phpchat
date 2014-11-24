@@ -2,14 +2,16 @@
 
 namespace TheFox\Console\Command;
 
+use Exception;
 use RuntimeException;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Zend\Mail\Message;
-use Zend\Mail\Headers;
+use Zend\Mail\Message as ZendMailMessage;
+use Zend\Mail\Headers as ZendMailHeaders;
 
+use TheFox\Imap\Storage\DirectoryStorage;
 use TheFox\Imap\Server;
 use TheFox\Imap\Event;
 use TheFox\Ipc\ClientConnection;
@@ -20,7 +22,6 @@ class ImapCommand extends BasicCommand{
 	const LOOP_USLEEP = 10000;
 	
 	private $server;
-	private $settings;
 	private $ipcKernelConnection = null;
 	private $ipcKernelShutdown = false;
 	
@@ -64,8 +65,8 @@ class ImapCommand extends BasicCommand{
 		$this->executePre($input, $output);
 		$this->initIpcKernelConnection();
 		
-		$this->settings = $this->ipcKernelConnection->execSync('getSettings');
-		$this->log->debug('settings: '.(is_object($this->settings) ? 'OK' : 'failed'));
+		$settings = $this->ipcKernelConnection->execSync('getSettings');
+		$this->log->debug('settings: '.(is_object($settings) ? 'OK' : 'failed'));
 		
 		$address = '127.0.0.1';
 		if($input->getOption('address')){
@@ -77,7 +78,7 @@ class ImapCommand extends BasicCommand{
 			$port = (int)$input->getOption('port');
 		}
 		
-		$maildirPath = $this->settings->data['datadir'].'/mailbox';
+		$maildirPath = $settings->data['datadir'].'/mailbox';
 		$this->log->debug('maildir: '.$maildirPath);
 		
 		$this->log->info('server start');
@@ -95,13 +96,8 @@ class ImapCommand extends BasicCommand{
 			exit(1);
 		}
 		
-		try{
-			$this->server->storageAddMaildir($maildirPath);
-		}
-		catch(Exception $e){
-			$this->log->error('storage: '.$e->getMessage());
-			exit(1);
-		}
+		$directoryStorage = new DirectoryStorage();
+		$this->server->addStorage($directoryStorage);
 		
 		try{
 			$this->server->listen();
@@ -198,7 +194,7 @@ class ImapCommand extends BasicCommand{
 		$this->log->info('from: '.$srcNodeId);
 		$this->log->info('nick: '.$srcUserNickname);
 		
-		$headers = new Headers();
+		$headers = new ZendMailHeaders();
 		$headers->addHeaderLine('Date', date('r', $timeReceived));
 		$headers->addHeaderLine('X-Version', $version);
 		$headers->addHeaderLine('X-Id', $id);
@@ -209,14 +205,14 @@ class ImapCommand extends BasicCommand{
 		$headers->addHeaderLine('X-TimeCreated', $timeCreated);
 		$headers->addHeaderLine('X-TimeReceived', $timeReceived);
 		
-		$message = new Message();
+		$message = new ZendMailMessage();
 		$message->setHeaders($headers);
 		$message->addFrom($srcNodeId.'@phpchat.fox21.at', $srcUserNickname);
 		$message->addTo($dstNodeId.'@phpchat.fox21.at');
 		$message->setSubject($subject);
 		$message->setBody($text);
 		
-		$this->server->mailAdd($message);
+		$this->server->addMail($message);
 	}
 	
 }

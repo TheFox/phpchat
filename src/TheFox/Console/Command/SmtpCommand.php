@@ -2,6 +2,7 @@
 
 namespace TheFox\Console\Command;
 
+use Exception;
 use RuntimeException;
 
 use Symfony\Component\Console\Input\InputInterface;
@@ -66,8 +67,9 @@ class SmtpCommand extends BasicCommand{
 		$this->executePre($input, $output);
 		$this->initIpcKernelConnection();
 		
-		$this->settings = $this->ipcKernelConnection->execSync('getSettings');
-		$this->log->debug('settings: '.(is_object($this->settings) ? 'OK' : 'failed'));
+		$settings = $this->ipcKernelConnection->execSync('getSettings');
+		$this->log->debug('settings: '.(is_object($settings) ? 'OK' : 'failed'));
+		$this->setSettings($settings);
 		
 		$address = '127.0.0.1';
 		if($input->getOption('address')){
@@ -181,6 +183,7 @@ class SmtpCommand extends BasicCommand{
 	public function mailNew($event, $from, $rcpt, $mail){
 		#fwrite(STDOUT, 'mail new: /'.$from.'/ a/'.join('/ /', $rcpt).'/'."\n");
 		#$this->log->debug('mailNew: '.$event->getTrigger().' /'.$from.'/');
+		$settings = $this->getSettings();
 		
 		$table = $this->ipcKernelConnection->execSync('getTable');
 		$text = $mail->getBody();
@@ -191,9 +194,9 @@ class SmtpCommand extends BasicCommand{
 			#fwrite(STDOUT, 'to: /'.$dstNodeId.'/'."\n");
 			
 			$msg = new Msg();
-			$msg->setSrcNodeId($this->settings->data['node']['id']);
+			$msg->setSrcNodeId($settings->data['node']['id']);
 			$msg->setSrcSslKeyPub($table->getLocalNode()->getSslKeyPub());
-			$msg->setSrcUserNickname($this->settings->data['user']['nickname']);
+			$msg->setSrcUserNickname($settings->data['user']['nickname']);
 			
 			$dstNode = new Node();
 			$dstNode->setIdHexStr($dstNodeId);
@@ -207,8 +210,8 @@ class SmtpCommand extends BasicCommand{
 			
 			$msg->setSubject($mail->getSubject());
 			$msg->setText($text);
-			$msg->setSslKeyPrvPath($this->settings->data['node']['sslKeyPrvPath'],
-				$this->settings->data['node']['sslKeyPrvPass']);
+			$msg->setSslKeyPrvPath($settings->data['node']['sslKeyPrvPath'],
+				$settings->data['node']['sslKeyPrvPass']);
 			$msg->setStatus('O');
 			
 			$encrypted = false;
