@@ -8,6 +8,7 @@ PHPCS_REPORT = --report=full --report-width=160 $(PHPCS_REPORT_XML)
 PHPUNIT = vendor/bin/phpunit
 PHPDOX = vendor/bin/phpdox
 PHPLOC = vendor/bin/phploc
+PHPMD = vendor/bin/phpmd
 COMPOSER = ./composer.phar
 COMPOSER_DEV ?= --dev
 
@@ -43,6 +44,9 @@ test_phpunit: $(PHPUNIT) phpunit.xml test_data
 
 test_phpunit_cc: build
 	$(MAKE) test_phpunit PHPUNIT_COVERAGE_HTML="--coverage-html build/report"
+
+test_phpmd:
+	$(PHPMD) src,tests text phpmd.xml
 
 test_clean:
 	$(RM) test_data
