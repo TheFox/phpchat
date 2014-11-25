@@ -175,8 +175,12 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 	}
 	
 	public function testBasic(){
-		file_put_contents('test_data/testfile_client_id_rsa1.prv', static::NODE_LOCAL_SSL_KEY_PRV1);
-		file_put_contents('test_data/testfile_client_id_rsa1.pub', static::NODE_LOCAL_SSL_KEY_PUB1);
+		$runName = uniqid('', true);
+		$prvFileName = 'testfile_client_id_rsa_'.date('Ymd_His').'_'.$runName.'.prv';
+		$pubFileName = 'testfile_client_id_rsa_'.date('Ymd_His').'_'.$runName.'.pub';
+		
+		file_put_contents('test_data/'.$prvFileName, static::NODE_LOCAL_SSL_KEY_PRV1);
+		file_put_contents('test_data/'.$pubFileName, static::NODE_LOCAL_SSL_KEY_PUB1);
 		
 		$settings = new Settings();
 		$settings->data['datadir'] = 'test_data';
@@ -185,8 +189,8 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings->data['node']['uriLocal'] = '';
 		$settings->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'test_data/testfile_client_id_rsa1.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'test_data/testfile_client_id_rsa1.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'test_data/'.$prvFileName;
+		$settings->data['node']['sslKeyPubPath'] = 'test_data/'.$pubFileName;
 		$settings->data['user']['nickname'] = 'user_'.substr(md5(time()), 0, 4);
 		
 		$log = new Logger('test_application');
@@ -234,8 +238,12 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		@unlink('test_data/msgdb.yml');
 		@unlink('test_data/nodesnewdb.yml');
 		
-		file_put_contents('test_data/testfile_client_id_rsa1.prv', static::NODE_LOCAL_SSL_KEY_PRV1);
-		file_put_contents('test_data/testfile_client_id_rsa1.pub', static::NODE_LOCAL_SSL_KEY_PUB1);
+		$runName = uniqid('', true);
+		$prvFileName = 'testfile_client_id_rsa_'.date('Ymd_His').'_'.$runName.'.prv';
+		$pubFileName = 'testfile_client_id_rsa_'.date('Ymd_His').'_'.$runName.'.pub';
+		
+		file_put_contents('test_data/'.$prvFileName, static::NODE_LOCAL_SSL_KEY_PRV1);
+		file_put_contents('test_data/'.$pubFileName, static::NODE_LOCAL_SSL_KEY_PUB1);
 		
 		$settings = new Settings();
 		$settings->data['datadir'] = 'test_data';
@@ -244,8 +252,8 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings->data['node']['uriLocal'] = '';
 		$settings->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'test_data/testfile_client_id_rsa1.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'test_data/testfile_client_id_rsa1.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'test_data/'.$prvFileName;
+		$settings->data['node']['sslKeyPubPath'] = 'test_data/'.$pubFileName;
 		$settings->data['user']['nickname'] = 'user_'.substr(md5(time()), 0, 4);
 		
 		$log = new Logger('test_application');
@@ -282,8 +290,12 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 	}
 	
 	public function testRequest(){
-		file_put_contents('test_data/testfile_client_id_rsa1.prv', static::NODE_LOCAL_SSL_KEY_PRV1);
-		file_put_contents('test_data/testfile_client_id_rsa1.pub', static::NODE_LOCAL_SSL_KEY_PUB1);
+		$runName = uniqid('', true);
+		$prvFileName = 'testfile_client_id_rsa_'.date('Ymd_His').'_'.$runName.'.prv';
+		$pubFileName = 'testfile_client_id_rsa_'.date('Ymd_His').'_'.$runName.'.pub';
+		
+		file_put_contents('test_data/'.$prvFileName, static::NODE_LOCAL_SSL_KEY_PRV1);
+		file_put_contents('test_data/'.$pubFileName, static::NODE_LOCAL_SSL_KEY_PUB1);
 		
 		$settings = new Settings();
 		$settings->data['datadir'] = 'test_data';
@@ -292,8 +304,8 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings->data['node']['uriLocal'] = '';
 		$settings->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'test_data/testfile_client_id_rsa1.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'test_data/testfile_client_id_rsa1.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'test_data/'.$prvFileName;
+		$settings->data['node']['sslKeyPubPath'] = 'test_data/'.$pubFileName;
 		$settings->data['user']['nickname'] = 'user_'.substr(md5(time()), 0, 4);
 		
 		$log = new Logger('test_application');
@@ -329,8 +341,12 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 	}
 	
 	public function testAction(){
-		file_put_contents('test_data/testfile_client_id_rsa1.prv', static::NODE_LOCAL_SSL_KEY_PRV1);
-		file_put_contents('test_data/testfile_client_id_rsa1.pub', static::NODE_LOCAL_SSL_KEY_PUB1);
+		$runName = uniqid('', true);
+		$prvFileName = 'testfile_client_id_rsa_'.date('Ymd_His').'_'.$runName.'.prv';
+		$pubFileName = 'testfile_client_id_rsa_'.date('Ymd_His').'_'.$runName.'.pub';
+		
+		file_put_contents('test_data/'.$prvFileName, static::NODE_LOCAL_SSL_KEY_PRV1);
+		file_put_contents('test_data/'.$pubFileName, static::NODE_LOCAL_SSL_KEY_PUB1);
 		
 		$settings = new Settings();
 		$settings->data['datadir'] = 'test_data';
@@ -339,8 +355,8 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 		$settings->data['node']['uriLocal'] = '';
 		$settings->data['node']['id'] = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'test_data/testfile_client_id_rsa1.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'test_data/testfile_client_id_rsa1.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'test_data/'.$prvFileName;
+		$settings->data['node']['sslKeyPubPath'] = 'test_data/'.$pubFileName;
 		$settings->data['user']['nickname'] = 'user_'.substr(md5(time()), 0, 4);
 		
 		$log = new Logger('test_application');

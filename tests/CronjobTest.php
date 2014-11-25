@@ -180,15 +180,20 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		
 		@unlink('test_data/bucket_root.yml');
 		
-		file_put_contents('test_data/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
-		file_put_contents('test_data/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+		$runName = uniqid('', true);
+		$prvFileName = 'testfile_cronjob_id_rsa_'.date('Ymd_His').'_'.$runName.'.prv';
+		$pubFileName = 'testfile_cronjob_id_rsa_'.date('Ymd_His').'_'.$runName.'.pub';
+		$settignsFileName = 'testfile_cronjob_settings_'.date('Ymd_His').'_'.$runName.'.pub';
 		
-		$settings = new Settings('test_data/testfile_cronjob_settings.yml');
+		file_put_contents('test_data/'.$prvFileName, static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('test_data/'.$pubFileName, static::NODE_LOCAL_SSL_KEY_PUB);
+		
+		$settings = new Settings('test_data/'.$settignsFileName);
 		$settings->data['datadir'] = 'test_data';
 		$settings->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB);
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'test_data/testfile_cronjob_id_rsa.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'test_data/testfile_cronjob_id_rsa.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'test_data/'.$prvFileName;
+		$settings->data['node']['sslKeyPubPath'] = 'test_data/'.$pubFileName;
 		$settings->data['node']['bridge']['client']['enabled'] = false;
 		#$settings->setDataChanged(true);
 		#$settings->save();
@@ -447,15 +452,20 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 		$uuid1 = '11000000-1000-4001-8001-1000000000';
 		$uuid2 = '21000000-2000-4002-8002-20000000';
 		
-		file_put_contents('test_data/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
-		file_put_contents('test_data/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+		$runName = uniqid('', true);
+		$prvFileName = 'testfile_cronjob_id_rsa_'.date('Ymd_His').'_'.$runName.'.prv';
+		$pubFileName = 'testfile_cronjob_id_rsa_'.date('Ymd_His').'_'.$runName.'.pub';
+		$settignsFileName = 'testfile_cronjob_settings_'.date('Ymd_His').'_'.$runName.'.pub';
 		
-		$settings = new Settings('test_data/testfile_cronjob_settings.yml');
+		file_put_contents('test_data/'.$prvFileName, static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('test_data/'.$pubFileName, static::NODE_LOCAL_SSL_KEY_PUB);
+		
+		$settings = new Settings('test_data/'.$settignsFileName);
 		$settings->data['datadir'] = 'test_data';
 		$settings->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB);
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'test_data/testfile_cronjob_id_rsa.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'test_data/testfile_cronjob_id_rsa.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'test_data/'.$prvFileName;
+		$settings->data['node']['sslKeyPubPath'] = 'test_data/'.$pubFileName;
 		$settings->data['node']['bridge']['client']['enabled'] = true;
 		
 		$localNode = new Node();
@@ -620,15 +630,20 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 	}
 	
 	public function testBootstrapNodesEncloseDefault(){
-		file_put_contents('test_data/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
-		file_put_contents('test_data/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+		$runName = uniqid('', true);
+		$prvFileName = 'testfile_cronjob_id_rsa_'.date('Ymd_His').'_'.$runName.'.prv';
+		$pubFileName = 'testfile_cronjob_id_rsa_'.date('Ymd_His').'_'.$runName.'.pub';
+		$settignsFileName = 'testfile_cronjob_settings_'.date('Ymd_His').'_'.$runName.'.pub';
 		
-		$settings = new Settings('test_data/testfile_cronjob_settings.yml');
+		file_put_contents('test_data/'.$prvFileName, static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('test_data/'.$pubFileName, static::NODE_LOCAL_SSL_KEY_PUB);
+		
+		$settings = new Settings('test_data/'.$settignsFileName);
 		$settings->data['datadir'] = 'test_data';
 		$settings->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB);
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'test_data/testfile_cronjob_id_rsa.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'test_data/testfile_cronjob_id_rsa.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'test_data/'.$prvFileName;
+		$settings->data['node']['sslKeyPubPath'] = 'test_data/'.$pubFileName;
 		$settings->data['node']['bridge']['client']['enabled'] = false;
 		
 		$localNode = new Node();
@@ -697,15 +712,20 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 	}
 	
 	public function testBootstrapNodesEncloseBridge(){
-		file_put_contents('test_data/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
-		file_put_contents('test_data/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+		$runName = uniqid('', true);
+		$prvFileName = 'testfile_cronjob_id_rsa_'.date('Ymd_His').'_'.$runName.'.prv';
+		$pubFileName = 'testfile_cronjob_id_rsa_'.date('Ymd_His').'_'.$runName.'.pub';
+		$settignsFileName = 'testfile_cronjob_settings_'.date('Ymd_His').'_'.$runName.'.pub';
 		
-		$settings = new Settings('test_data/testfile_cronjob_settings.yml');
+		file_put_contents('test_data/'.$prvFileName, static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('test_data/'.$pubFileName, static::NODE_LOCAL_SSL_KEY_PUB);
+		
+		$settings = new Settings('test_data/'.$settignsFileName);
 		$settings->data['datadir'] = 'test_data';
 		$settings->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB);
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'test_data/testfile_cronjob_id_rsa.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'test_data/testfile_cronjob_id_rsa.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'test_data/'.$prvFileName;
+		$settings->data['node']['sslKeyPubPath'] = 'test_data/'.$pubFileName;
 		$settings->data['node']['bridge']['client']['enabled'] = true;
 		
 		$localNode = new Node();
@@ -769,15 +789,20 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 	}
 	
 	public function testNodesNewEncloseDefault(){
-		file_put_contents('test_data/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
-		file_put_contents('test_data/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+		$runName = uniqid('', true);
+		$prvFileName = 'testfile_cronjob_id_rsa_'.date('Ymd_His').'_'.$runName.'.prv';
+		$pubFileName = 'testfile_cronjob_id_rsa_'.date('Ymd_His').'_'.$runName.'.pub';
+		$settignsFileName = 'testfile_cronjob_settings_'.date('Ymd_His').'_'.$runName.'.pub';
 		
-		$settings = new Settings('test_data/testfile_cronjob_settings.yml');
+		file_put_contents('test_data/'.$prvFileName, static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('test_data/'.$pubFileName, static::NODE_LOCAL_SSL_KEY_PUB);
+		
+		$settings = new Settings('test_data/'.$settignsFileName);
 		$settings->data['datadir'] = 'test_data';
 		$settings->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB);
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'test_data/testfile_cronjob_id_rsa.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'test_data/testfile_cronjob_id_rsa.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'test_data/'.$prvFileName;
+		$settings->data['node']['sslKeyPubPath'] = 'test_data/'.$pubFileName;
 		$settings->data['node']['bridge']['client']['enabled'] = false;
 		
 		$localNode = new Node();
@@ -830,15 +855,20 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 	}
 	
 	public function testNodesNewEncloseBridge(){
-		file_put_contents('test_data/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
-		file_put_contents('test_data/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+		$runName = uniqid('', true);
+		$prvFileName = 'testfile_cronjob_id_rsa_'.date('Ymd_His').'_'.$runName.'.prv';
+		$pubFileName = 'testfile_cronjob_id_rsa_'.date('Ymd_His').'_'.$runName.'.pub';
+		$settignsFileName = 'testfile_cronjob_settings_'.date('Ymd_His').'_'.$runName.'.pub';
 		
-		$settings = new Settings('test_data/testfile_cronjob_settings.yml');
+		file_put_contents('test_data/'.$prvFileName, static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('test_data/'.$pubFileName, static::NODE_LOCAL_SSL_KEY_PUB);
+		
+		$settings = new Settings('test_data/'.$settignsFileName);
 		$settings->data['datadir'] = 'test_data';
 		$settings->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB);
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'test_data/testfile_cronjob_id_rsa.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'test_data/testfile_cronjob_id_rsa.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'test_data/'.$prvFileName;
+		$settings->data['node']['sslKeyPubPath'] = 'test_data/'.$pubFileName;
 		$settings->data['node']['bridge']['client']['enabled'] = true;
 		
 		$localNode = new Node();
@@ -892,15 +922,20 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 	}
 	
 	public function testCreateGuzzleHttpClient(){
-		file_put_contents('test_data/testfile_cronjob_id_rsa.prv', static::NODE_LOCAL_SSL_KEY_PRV);
-		file_put_contents('test_data/testfile_cronjob_id_rsa.pub', static::NODE_LOCAL_SSL_KEY_PUB);
+		$runName = uniqid('', true);
+		$prvFileName = 'testfile_cronjob_id_rsa_'.date('Ymd_His').'_'.$runName.'.prv';
+		$pubFileName = 'testfile_cronjob_id_rsa_'.date('Ymd_His').'_'.$runName.'.pub';
+		$settignsFileName = 'testfile_cronjob_settings_'.date('Ymd_His').'_'.$runName.'.pub';
 		
-		$settings = new Settings('test_data/testfile_cronjob_settings.yml');
+		file_put_contents('test_data/'.$prvFileName, static::NODE_LOCAL_SSL_KEY_PRV);
+		file_put_contents('test_data/'.$pubFileName, static::NODE_LOCAL_SSL_KEY_PUB);
+		
+		$settings = new Settings('test_data/'.$settignsFileName);
 		$settings->data['datadir'] = 'test_data';
 		$settings->data['node']['id'] = Node::genIdHexStr(static::NODE_LOCAL_SSL_KEY_PUB);
 		$settings->data['node']['sslKeyPrvPass'] = 'my_password';
-		$settings->data['node']['sslKeyPrvPath'] = 'test_data/testfile_cronjob_id_rsa.prv';
-		$settings->data['node']['sslKeyPubPath'] = 'test_data/testfile_cronjob_id_rsa.pub';
+		$settings->data['node']['sslKeyPrvPath'] = 'test_data/'.$prvFileName;
+		$settings->data['node']['sslKeyPubPath'] = 'test_data/'.$pubFileName;
 		$settings->data['node']['bridge']['client']['enabled'] = true;
 		
 		$localNode = new Node();

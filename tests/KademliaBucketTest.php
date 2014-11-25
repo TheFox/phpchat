@@ -5,7 +5,9 @@ use TheFox\Dht\Kademlia\Bucket;
 class KademliaBucketTest extends PHPUnit_Framework_TestCase{
 	
 	public function testSave(){
-		$bucket = new Bucket('test_data/testfile_bucket_bucket1.yml');
+		$fileName = 'testfile_bucket_bucket1_'.date('Ymd_His').'_'.uniqid('', true).'.yml';
+		
+		$bucket = new Bucket('test_data/'.$fileName);
 		$bucket->setDatadirBasePath('test_data');
 		$bucket->setDataChanged(true);
 		
@@ -27,7 +29,7 @@ class KademliaBucketTest extends PHPUnit_Framework_TestCase{
 		$this->assertTrue((bool)$bucket->save());
 		
 		
-		$bucket = new Bucket('test_data/testfile_bucket_bucket1.yml');
+		$bucket = new Bucket('test_data/'.$fileName);
 		
 		$this->assertTrue($bucket->load());
 		
