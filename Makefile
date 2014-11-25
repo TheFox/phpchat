@@ -2,6 +2,7 @@
 RM = rm -rf
 CHMOD = chmod
 MKDIR = mkdir -p
+VENDOR = vendor
 PHPCS = vendor/bin/phpcs
 PHPCS_STANDARD = vendor/thefox/phpcsrs/Standards/TheFox
 PHPCS_REPORT = --report=full --report-width=160 $(PHPCS_REPORT_XML)
@@ -11,14 +12,14 @@ PHPLOC = vendor/bin/phploc
 PHPMD = vendor/bin/phpmd
 COMPOSER = ./composer.phar
 COMPOSER_DEV ?= --dev
+SECURITY_CHECKER = vendor/bin/security-checker
 
 
-.PHONY: all install test test_phpcs test_phpunit test_phpunit_cc test_clean release docs build clean clean_nodes clean_data clean_release clean_all
+.PHONY: all update install_release release test test_phpcs test_phpunit test_phpunit_cc test_security test_phpmd test_clean clean clean_nodes clean_data clean_release clean_all docs
 
-all: install test
+all: install test_phpunit
 
-install: $(COMPOSER)
-	$(COMPOSER) install $(COMPOSER_PREFER_SOURCE) --no-interaction $(COMPOSER_DEV)
+install: $(VENDOR)
 
 install_release: $(COMPOSER)
 	$(MAKE) install COMPOSER_DEV=--no-dev
@@ -27,14 +28,11 @@ update: $(COMPOSER)
 	$(COMPOSER) selfupdate
 	$(COMPOSER) update
 
-$(COMPOSER):
-	curl -sS https://getcomposer.org/installer | php
-	$(CHMOD) 755 $(COMPOSER)
+release: release.sh
+	./release.sh
 
-$(PHPCS): $(COMPOSER)
-
-test: test_phpcs test_phpunit
-
+test: test_phpcs test_phpunit test_security
+	
 test_phpcs: $(PHPCS) $(PHPCS_STANDARD)
 	$(PHPCS) -v -s -p $(PHPCS_REPORT) --standard=$(PHPCS_STANDARD) src tests bootstrap.php
 
@@ -45,28 +43,14 @@ test_phpunit: $(PHPUNIT) phpunit.xml test_data
 test_phpunit_cc: build
 	$(MAKE) test_phpunit PHPUNIT_COVERAGE_HTML="--coverage-html build/report"
 
+test_security: $(SECURITY_CHECKER)
+	$(SECURITY_CHECKER) security:check composer.lock
+
 test_phpmd:
 	$(PHPMD) src,tests text phpmd.xml
 
 test_clean:
 	$(RM) test_data
-
-test_data:
-	$(MKDIR) test_data
-
-release: release.sh
-	./release.sh
-
-docs: build
-	#$(MAKE) test_phpcs
-	$(MAKE) test_phpunit PHPUNIT_COVERAGE_XML="--coverage-xml build/coverage"
-	$(PHPLOC) --count-tests --progress --log-xml=build/logs/phploc.xml src
-	$(PHPDOX)
-
-build:
-	$(MKDIR) build
-	$(MKDIR) build/logs
-	$(CHMOD) 0700 build
 
 clean: test_clean
 	$(RM) composer.lock $(COMPOSER)
@@ -91,3 +75,29 @@ clean_release: clean_data
 	$(RM) log pid
 
 clean_all: clean clean_data clean_release
+
+docs: build test_phpcs
+	$(MAKE) test_phpunit PHPUNIT_COVERAGE_XML="--coverage-xml build/coverage"
+	$(PHPLOC) --count-tests --progress --log-xml=build/logs/phploc.xml src
+	$(PHPDOX)
+
+$(VENDOR): $(COMPOSER)
+	$(COMPOSER) install $(COMPOSER_PREFER_SOURCE) --no-interaction $(COMPOSER_DEV)
+
+$(COMPOSER):
+	curl -sS https://getcomposer.org/installer | php
+	$(CHMOD) 755 $(COMPOSER)
+
+$(PHPCS): $(VENDOR)
+
+$(PHPUNIT): $(VENDOR)
+
+$(SECURITY_CHECKER): $(VENDOR)
+
+test_data:
+	$(MKDIR) test_data
+
+build:
+	$(MKDIR) build
+	$(MKDIR) build/logs
+	$(CHMOD) 0700 build
