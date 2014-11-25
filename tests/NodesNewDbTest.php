@@ -96,4 +96,63 @@ class NodesNewDbTest extends PHPUnit_Framework_TestCase{
 		$this->assertEquals(0, $db->data['nodes'][2]['insertAttempts']);
 	}
 	
+	public function testNodeIncConnectAttempt(){
+		$db = new NodesNewDb();
+		
+		$db->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		$db->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1739');
+		$this->assertEquals(0, $db->data['nodes'][1]['connectAttempts']);
+		
+		$db->nodeIncConnectAttempt(1);
+		$this->assertEquals(1, $db->data['nodes'][1]['connectAttempts']);
+		
+		$db->nodeIncConnectAttempt(1);
+		$this->assertEquals(2, $db->data['nodes'][1]['connectAttempts']);
+	}
+	
+	public function testNodeIncFindAttempt(){
+		$db = new NodesNewDb();
+		
+		$db->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		$db->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1739');
+		$this->assertEquals(0, $db->data['nodes'][1]['findAttempts']);
+		
+		$db->nodeIncFindAttempt(1);
+		$this->assertEquals(1, $db->data['nodes'][1]['findAttempts']);
+		
+		$db->nodeIncFindAttempt(1);
+		$this->assertEquals(2, $db->data['nodes'][1]['findAttempts']);
+	}
+	
+	public function testNodeRemove(){
+		$db = new NodesNewDb();
+		
+		$db->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		$this->assertEquals(1, count($db->data['nodes']));
+		$this->assertTrue(isset($db->data['nodes'][1]));
+		
+		$db->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1739');
+		$this->assertEquals(2, count($db->data['nodes']));
+		$this->assertTrue(isset($db->data['nodes'][2]));
+		
+		$db->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1740');
+		$this->assertEquals(3, count($db->data['nodes']));
+		$this->assertTrue(isset($db->data['nodes'][3]));
+		
+		$db->nodeRemove(2);
+		$this->assertEquals(2, count($db->data['nodes']));
+		$this->assertTrue(isset($db->data['nodes'][1]));
+		$this->assertFalse(isset($db->data['nodes'][2]));
+		$this->assertTrue(isset($db->data['nodes'][3]));
+	}
+	
+	public function testGetNodes(){
+		$db = new NodesNewDb();
+		$this->assertEquals(array(), $db->getNodes());
+		$this->assertEquals(0, count($db->getNodes()));
+		
+		$db->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1738');
+		$this->assertEquals(1, count($db->getNodes()));
+	}
+	
 }
