@@ -34,6 +34,7 @@
 			<file>tests/KademliaNodeTest.php</file>
 			<!--<file>tests/KademliaTableTest.php</file>//-->
 			<file>tests/LogTest.php</file>
+			<file>tests/MsgDbTest.php</file>
 			<file>tests/MsgTest.php</file>
 			<file>tests/NodesNewDbTest.php</file>
 			<file>tests/SimpleTableTest.php</file>
