@@ -105,6 +105,8 @@ class Addressbook extends YamlStorage{
 	}
 	
 	public function contactRemove($id){
+		$rv = false;
+		
 		if(isset($this->contacts[$id])){
 			$contact = $this->contacts[$id];
 			if($contact){
@@ -113,11 +115,11 @@ class Addressbook extends YamlStorage{
 				
 				$this->setDataChanged(true);
 				
-				return true;
+				$rv = true;
 			}
 		}
 		
-		return false;
+		return $rv;
 	}
 	
 	public function getContacts(){

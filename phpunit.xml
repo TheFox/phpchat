@@ -23,6 +23,7 @@
 	
 	<testsuites>
 		<testsuite name="all">
+			<file>tests/AddressbookTest.php</file>
 			<file>tests/BasicTest.php</file>
 			<file>tests/ClientTest.php</file>
 			<file>tests/ColorTest.php</file>
