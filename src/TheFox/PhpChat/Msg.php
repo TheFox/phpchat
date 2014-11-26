@@ -96,9 +96,11 @@ class Msg extends YamlStorage{
 				$this->data['id'] = (string)Uuid::uuid4();
 				#print __CLASS__.'->'.__FUNCTION__.': new id: '.$this->data['id']."\n";
 			}
+			// @codeCoverageIgnoreStart
 			catch(UnsatisfiedDependencyException $e){
 				throw $e;
 			}
+			// @codeCoverageIgnoreEnd
 		}
 		return $this->data['id'];
 	}

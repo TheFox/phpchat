@@ -216,27 +216,24 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 	
 	const SSL_KEY_PRV_PASS = 'test';
 	
-	#public function testSerialize(){}
-	
-	public function testId(){
-		$msg = new Msg();
+	public function testSerialize(){
+		$msg1 = new Msg();
+		$msg1->setId('3d939e1c-9ac6-473c-a00d-4e96014821f9');
 		
-		$this->assertTrue(Uuid::isValid($msg->getId()));
+		$msg2 = unserialize(serialize($msg1));
+		
+		$this->assertEquals('3d939e1c-9ac6-473c-a00d-4e96014821f9', $msg2->getId());
 	}
 	
-	public function testStatus(){
+	public function testToString(){
 		$msg = new Msg();
-		
-		$msg->setStatus('R');
-		$this->assertEquals('R', $msg->getStatus());
-		
-		$msg->setStatus('D');
-		$msg->setStatus('U');
-		$this->assertEquals('D', $msg->getStatus());
+		$msg->setId('3d939e1c-9ac6-473c-a00d-4e96014821f9');
+		$this->assertEquals('TheFox\PhpChat\Msg->{3d939e1c-9ac6-473c-a00d-4e96014821f9}', (string)$msg);
 	}
 	
-	public function testSave(){
-		$fileName = 'testfile_msg_'.date('Ymd_H').'.yml';
+	public function testSaveLoad(){
+		$runName = uniqid('', true);
+		$fileName = 'testfile_msg_'.date('Ymd_His').'_'.$runName.'.yml';
 		
 		$msg = new Msg('test_data/'.$fileName);
 		$msg->setDatadirBasePath('test_data');
@@ -307,6 +304,124 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$finder = new Finder();
 		$files = $finder->in('test_data')->depth(0)->name($fileName)->files();
 		$this->assertEquals(1, count($files));
+		
+		
+		$msg = new Msg('test_data/'.$fileName);
+		$msg->setDatadirBasePath('test_data');
+		
+		$this->assertTrue($msg->load());
+		
+		$this->assertEquals(21, $msg->getVersion());
+		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $msg->getId());
+		$this->assertEquals('cafed00d-2231-4159-8e11-0b4dbadb1738', $msg->getRelayNodeId());
+		$this->assertEquals('cafed00d-2331-4159-8e11-0b4dbadb1738', $msg->getSrcNodeId());
+		$this->assertEquals(static::SRC1_SSL_KEY_PUB, $msg->getSrcSslKeyPub());
+		$this->assertEquals('cafed00d-2431-4159-8e11-0b4dbadb1738', $msg->getDstNodeId());
+		$this->assertEquals(array(21, 2, 1987, 42), $msg->getSentNodes());
+		$this->assertEquals(22, $msg->getRelayCount());
+		$this->assertEquals(24, $msg->getForwardCycles());
+		$this->assertEquals('D', $msg->getEncryptionMode());
+		$this->assertEquals('O', $msg->getStatus());
+		$this->assertEquals(679874400, $msg->getTimeCreated());
+		
+		
+		$msg = new Msg('test_data/'.$fileName);
+		$msg->setDatadirBasePath('test_data');
+		
+		$this->assertTrue($msg->load());
+		
+		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+		$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+		
+		$subject = 'N/A';
+		$text = 'N/A';
+		try{
+			$text = $msg->decrypt();
+			$subject = $msg->getSubject();
+		}
+		catch(Exception $e){
+			$text = $e->getMessage();
+		}
+		
+		$this->assertEquals('my first subject', $subject);
+		$this->assertEquals('hello world! this is a test', $text);
+		$this->assertEquals('thefox', $msg->getSrcUserNickname());
+		
+		
+		$msg = new Msg('test_data/'.$fileName);
+		$msg->setDatadirBasePath('test_data');
+		
+		$this->assertTrue($msg->load());
+		
+		$msg->setDstSslPubKey(static::DST2_SSL_KEY_PUB);
+		$msg->setSslKeyPrv(static::DST2_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+		
+		$subject = 'N/A';
+		$text = 'N/A';
+		try{
+			$text = $msg->decrypt();
+			$subject = $msg->getSubject();
+		}
+		catch(Exception $e){
+			$text = 'FAILED OK';
+		}
+		
+		$this->assertEquals('N/A', $subject);
+		$this->assertEquals('FAILED OK', $text);
+		$this->assertEquals('', $msg->getSrcUserNickname());
+		
+		
+		$msg = new Msg('test_data/not_existing.yml');
+		$this->assertFalse($msg->load());
+	}
+	
+	public function testId(){
+		$msg = new Msg();
+		
+		$this->assertTrue(Uuid::isValid($msg->getId()));
+	}
+	
+	public function testStatus(){
+		$msg = new Msg();
+		
+		$msg->setStatus('R');
+		$this->assertEquals('R', $msg->getStatus());
+		
+		$msg->setStatus('D');
+		$msg->setStatus('U');
+		$this->assertEquals('D', $msg->getStatus());
+	}
+	
+	public function testChecksum1(){
+		$version = 1;
+		$id = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
+		$srcNodeId = 'cafed00d-2331-4159-8e11-0b4dbadb1738';
+		$dstNodeId = 'cafed00d-2431-4159-8e11-0b4dbadb1738';
+		$dstSslPubKey = static::DST1_SSL_KEY_PUB;
+		$text = 'hello world! this is a test';
+		$timeCreated = '1407137420';
+		$password = 'tt9M/WdvXyChAWthKDFaP/tUAG6bZsdalTOxrFNsYX+4NgTNQ7iNCUng0jDPNzoMOYVu';
+		$password .= 'DdV/ZVnja5pamipawuw71wyIa6vDGoJKJ1yOUbVkH9YO34gZTRVz6MfZu2BQ680YIJo';
+		$password .= 'u5J3aPMTcet5jYU2b2ffJSPkYqaEmV2DzLQr/M0bGn3rHml4OovKgX9m1vN7XlTQL+E';
+		$password .= 'wW5MCLqPYsethgoKahKh2O17oZ6VDGVa/b2P4KzM3d41NzUXz/s31Bce+blR2o6oM+n';
+		$password .= 'KIbXNoxs9dZbbCSqDzLk8AZ1+dGI2ZX7hovL+XSv0Ta7S0lgEf44zwDttGvdWpIaFvW+uL70w==';
+		$checksum = Msg::createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey, $text, $timeCreated, $password);
+		
+		$this->assertEquals('7c4459a9bc0ec4b19ebae6d9ded536aa6ee55ba13552dc81', $checksum);
+	}
+	
+	public function testChecksum2(){
+		$version = 1;
+		$id = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
+		$srcNodeId = 'cafed00d-2331-4159-8e11-0b4dbadb1738';
+		$dstNodeId = 'cafed00d-2531-4159-8e11-0b4dbadb1738';
+		$dstSslPubKey = static::DST1_SSL_KEY_PUB;
+		$text = 'hello world!';
+		$timeCreated = '540892800';
+		$password = 'password1';
+		$checksum = Msg::createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey, $text, $timeCreated, $password);
+		
+		$this->assertEquals('1c870e54257e6eb594724508a0a9c616b1905c2aed25de8a', $checksum);
 	}
 	
 	public function providerEncryption(){
@@ -362,121 +477,6 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$this->assertEquals($text, $msg->getText());
 		$this->assertEquals($srcUserNickname, $msg->getSrcUserNickname());
 		$this->assertEquals($ignore, $msg->getIgnore());
-	}
-	
-	/**
-	 * @depends testSave
-	 */
-	public function testLoad(){
-		$fileName = 'testfile_msg_'.date('Ymd_H').'.yml';
-		
-		$msg = new Msg('test_data/'.$fileName);
-		$msg->setDatadirBasePath('test_data');
-		
-		$this->assertTrue($msg->load());
-		
-		$this->assertEquals(21, $msg->getVersion());
-		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $msg->getId());
-		$this->assertEquals('cafed00d-2231-4159-8e11-0b4dbadb1738', $msg->getRelayNodeId());
-		$this->assertEquals('cafed00d-2331-4159-8e11-0b4dbadb1738', $msg->getSrcNodeId());
-		$this->assertEquals(static::SRC1_SSL_KEY_PUB, $msg->getSrcSslKeyPub());
-		$this->assertEquals('cafed00d-2431-4159-8e11-0b4dbadb1738', $msg->getDstNodeId());
-		$this->assertEquals(array(21, 2, 1987, 42), $msg->getSentNodes());
-		$this->assertEquals(22, $msg->getRelayCount());
-		$this->assertEquals(24, $msg->getForwardCycles());
-		$this->assertEquals('D', $msg->getEncryptionMode());
-		$this->assertEquals('O', $msg->getStatus());
-		$this->assertEquals(679874400, $msg->getTimeCreated());
-	}
-	
-	/**
-	 * @depends testLoad
-	 */
-	public function testLoadDst1(){
-		$fileName = 'testfile_msg_'.date('Ymd_H').'.yml';
-		
-		$msg = new Msg('test_data/'.$fileName);
-		$msg->setDatadirBasePath('test_data');
-		
-		$this->assertTrue($msg->load());
-		
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		
-		$subject = 'N/A';
-		$text = 'N/A';
-		try{
-			$text = $msg->decrypt();
-			$subject = $msg->getSubject();
-		}
-		catch(Exception $e){
-			$text = $e->getMessage();
-		}
-		
-		$this->assertEquals('my first subject', $subject);
-		$this->assertEquals('hello world! this is a test', $text);
-		$this->assertEquals('thefox', $msg->getSrcUserNickname());
-	}
-	
-	/**
-	 * @depends testLoad
-	 */
-	public function testLoadDst2(){
-		$fileName = 'testfile_msg_'.date('Ymd_H').'.yml';
-		
-		$msg = new Msg('test_data/'.$fileName);
-		$msg->setDatadirBasePath('test_data');
-		
-		$this->assertTrue($msg->load());
-		
-		$msg->setDstSslPubKey(static::DST2_SSL_KEY_PUB);
-		$msg->setSslKeyPrv(static::DST2_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		
-		$subject = 'N/A';
-		$text = 'N/A';
-		try{
-			$text = $msg->decrypt();
-			$subject = $msg->getSubject();
-		}
-		catch(Exception $e){
-			$text = 'FAILED OK';
-		}
-		
-		$this->assertEquals('N/A', $subject);
-		$this->assertEquals('FAILED OK', $text);
-		$this->assertEquals('', $msg->getSrcUserNickname());
-	}
-	
-	public function testChecksum1(){
-		$version = 1;
-		$id = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
-		$srcNodeId = 'cafed00d-2331-4159-8e11-0b4dbadb1738';
-		$dstNodeId = 'cafed00d-2431-4159-8e11-0b4dbadb1738';
-		$dstSslPubKey = static::DST1_SSL_KEY_PUB;
-		$text = 'hello world! this is a test';
-		$timeCreated = '1407137420';
-		$password = 'tt9M/WdvXyChAWthKDFaP/tUAG6bZsdalTOxrFNsYX+4NgTNQ7iNCUng0jDPNzoMOYVu';
-		$password .= 'DdV/ZVnja5pamipawuw71wyIa6vDGoJKJ1yOUbVkH9YO34gZTRVz6MfZu2BQ680YIJo';
-		$password .= 'u5J3aPMTcet5jYU2b2ffJSPkYqaEmV2DzLQr/M0bGn3rHml4OovKgX9m1vN7XlTQL+E';
-		$password .= 'wW5MCLqPYsethgoKahKh2O17oZ6VDGVa/b2P4KzM3d41NzUXz/s31Bce+blR2o6oM+n';
-		$password .= 'KIbXNoxs9dZbbCSqDzLk8AZ1+dGI2ZX7hovL+XSv0Ta7S0lgEf44zwDttGvdWpIaFvW+uL70w==';
-		$checksum = Msg::createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey, $text, $timeCreated, $password);
-		
-		$this->assertEquals('7c4459a9bc0ec4b19ebae6d9ded536aa6ee55ba13552dc81', $checksum);
-	}
-	
-	public function testChecksum2(){
-		$version = 1;
-		$id = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
-		$srcNodeId = 'cafed00d-2331-4159-8e11-0b4dbadb1738';
-		$dstNodeId = 'cafed00d-2531-4159-8e11-0b4dbadb1738';
-		$dstSslPubKey = static::DST1_SSL_KEY_PUB;
-		$text = 'hello world!';
-		$timeCreated = '540892800';
-		$password = 'password1';
-		$checksum = Msg::createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey, $text, $timeCreated, $password);
-		
-		$this->assertEquals('1c870e54257e6eb594724508a0a9c616b1905c2aed25de8a', $checksum);
 	}
 	
 }
