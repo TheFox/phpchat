@@ -392,6 +392,17 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 		$this->assertEquals('D', $msg->getStatus());
 	}
 	
+	public function testStatusText(){
+		$msg = new Msg();
+		
+		$msg->setStatus('R');
+		$this->assertEquals(Msg::$STATUS_TEXT['R'], $msg->getStatusText());
+		
+		$msg->setStatus('D');
+		$msg->setStatus('U');
+		$this->assertEquals(Msg::$STATUS_TEXT['D'], $msg->getStatusText());
+	}
+	
 	public function testChecksum1(){
 		$version = 1;
 		$id = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
