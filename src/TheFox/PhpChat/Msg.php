@@ -12,6 +12,15 @@ use TheFox\Utilities\Rand;
 
 class Msg extends YamlStorage{
 	
+	public static $STATUS_TEXT = array(
+		'U' => 'unread, got msg from another node',
+		'O' => 'origin, local node created the msg',
+		'S' => 'sent at least to one node',
+		'D' => 'delivered to destination node',
+		'R' => 'read',
+		'X' => 'reached MSG_FORWARD_TO_NODES_MIN or MSG_FORWARD_TO_NODES_MAX',
+	);
+	
 	private $srcSslKeyPub = '';
 	private $srcUserNickname = '';
 	private $dstSslPubKey = '';
@@ -254,16 +263,7 @@ class Msg extends YamlStorage{
 	}
 	
 	public function getStatusText(){
-		$text = array(
-			'U' => 'unread, got msg from another node',
-			'O' => 'origin, local node created the msg',
-			'S' => 'sent at least to one node',
-			'D' => 'delivered to destination node',
-			'R' => 'read',
-			'X' => 'reached MSG_FORWARD_TO_NODES_MIN or MSG_FORWARD_TO_NODES_MAX',
-		);
-		
-		return $text[$this->getStatus()];
+		return static::$STATUS_TEXT[$this->getStatus()];
 	}
 	
 	public function setIgnore($ignore){
