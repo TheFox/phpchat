@@ -12,7 +12,7 @@ class TcpClient extends Client{
 	const PONG_TTL = 300;
 	
 	private $socket = null;
-	private $recvBufferTmp = '';
+	private $tcpRecvBufferTmp = '';
 	
 	public function __construct(){
 		parent::__construct();
@@ -58,9 +58,10 @@ class TcpClient extends Client{
 		}
 	}
 	
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public function dataRecv($data = null){
-		$dataRecvReturnValue = '';
-		
 		// @codeCoverageIgnoreStart
 		if($data === null && $this->getSocket()){
 			$data = $this->getSocket()->read();
@@ -69,15 +70,16 @@ class TcpClient extends Client{
 		
 		$this->incTrafficIn(strlen($data));
 		
+		$dataRecvReturnValue = '';
 		do{
 			$separatorPos = strpos($data, static::MSG_SEPARATOR);
 			if($separatorPos === false){
-				$this->recvBufferTmp .= $data;
+				$this->tcpRecvBufferTmp .= $data;
 				$data = '';
 			}
 			else{
-				$msg = $this->recvBufferTmp.substr($data, 0, $separatorPos);
-				$this->recvBufferTmp = '';
+				$msg = $this->tcpRecvBufferTmp.substr($data, 0, $separatorPos);
+				$this->tcpRecvBufferTmp = '';
 				
 				$msg = base64_decode($msg);
 				
@@ -92,18 +94,13 @@ class TcpClient extends Client{
 		return $dataRecvReturnValue;
 	}
 	
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public function dataSend($data){
-		$msg = '';
-		if($data){
-			$data = base64_encode($data);
-			$this->incTrafficOut(strlen($data) + static::MSG_SEPARATOR_LEN);
-			$msg = $data.static::MSG_SEPARATOR;
-			
-			// @codeCoverageIgnoreStart
-			if($this->getSocket()){
-				$this->getSocket()->write($msg);
-			}
-			// @codeCoverageIgnoreEnd
+		$msg = parent::dataSend($data);
+		if($msg && $this->getSocket()){
+			$this->getSocket()->write($msg);
 		}
 		return $msg;
 	}

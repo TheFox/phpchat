@@ -7,6 +7,7 @@ use RuntimeException;
 
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
+use Zend\Uri\Uri;
 use Zend\Uri\UriFactory;
 use Colors\Color;
 
@@ -56,13 +57,11 @@ class Client{
 	private $trafficIn = 0;
 	private $trafficOut = 0;
 	private $bridgeClient = null;
+	private $recvBufferTmp = '';
 	
 	public function __construct(){
-		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.''."\n");
+		$this->uri = new Uri();
 		
-		$this->uri = new TcpUri();
-		
-		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': set vars'."\n");
 		$this->status['hasId'] = false;
 		$this->status['hasTalkRequest'] = false;
 		$this->status['hasTalk'] = false;
@@ -77,8 +76,6 @@ class Client{
 		$this->status['bridgeTargetUri'] = null;
 		
 		$this->resetStatusSsl();
-		
-		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': end'."\n");
 	}
 	
 	public function __sleep(){
@@ -170,11 +167,14 @@ class Client{
 	public function setSslPrv($sslKeyPrvPath, $sslKeyPrvPass){
 		$this->logColor('debug', 'SSL setup', 'green');
 		
+		$rv = false;
+		
 		$content = file_get_contents($sslKeyPrvPath);
 		$sslHandle = openssl_pkey_get_private($content, $sslKeyPrvPass);
 		if($sslHandle !== false){
 			$this->logColor('debug', 'SSL setup ok', 'green');
 			$this->setSsl($sslHandle);
+			$rv = true;
 		}
 		else{
 			$this->logColor('debug', 'SSL failed', 'green');
@@ -182,6 +182,8 @@ class Client{
 				$this->log('error', 'SSL: '.$openSslErrorStr);
 			}
 		}
+		
+		return $rv;
 	}
 	
 	public function getLocalNode(){
@@ -254,26 +256,26 @@ class Client{
 	}
 	
 	public function hashcashMint($bits = null){
+		$stamp = null;
+		
 		if($bits === null){
 			$bits = static::HASHCASH_BITS_MIN;
 		}
 		if($this->getLocalNode()){
 			$hashcash = new Hashcash($bits, $this->getLocalNode()->getIdHexStr());
 			$hashcash->setDate(date(Hashcash::DATE_FORMAT12));
-			#$hashcash->setMintAttemptsMax(10);
 			
 			try{
-				#$this->log('debug', 'hashcash: mint '.$bits.' bits');
 				$stamp = $hashcash->mint();
-				#$this->log('debug', 'hashcash minted: '.$stamp);
-				return $stamp;
 			}
+			// @codeCoverageIgnoreStart
 			catch(Exception $e){
 				$this->log('error', $e->getMessage());
 			}
+			// @codeCoverageIgnoreEnd
 		}
 		
-		return null;
+		return $stamp;
 	}
 	
 	public function hashcashVerify($hashcashStr, $resource, $bits = null){
@@ -306,9 +308,11 @@ class Client{
 				}
 			}
 		}
+		// @codeCoverageIgnoreStart
 		catch(Exception $e){
 			$this->log('warning', $e->getMessage());
 		}
+		// @codeCoverageIgnoreEnd
 		
 		$this->log('debug', 'hashcash: '.$hashcashStr.' failed');
 		return false;
@@ -479,6 +483,14 @@ class Client{
 		return $rv;
 	}
 	
+	public function setSslMsgCount($sslMsgCount){
+		$this->sslMsgCount = $sslMsgCount;
+	}
+	
+	public function getSslMsgCount(){
+		return $this->sslMsgCount;
+	}
+	
 	/**
 	 * @codeCoverageIgnore
 	 */
@@ -537,16 +549,47 @@ class Client{
 	
 	/**
 	 * @codeCoverageIgnore
+	 *
+	 * Only for testing.
 	 */
 	public function dataRecv($data = null){
+		$this->incTrafficIn(strlen($data));
 		
+		$dataRecvReturnValue = '';
+		do{
+			$separatorPos = strpos($data, static::MSG_SEPARATOR);
+			if($separatorPos === false){
+				$this->recvBufferTmp .= $data;
+				$data = '';
+			}
+			else{
+				$msg = $this->recvBufferTmp.substr($data, 0, $separatorPos);
+				$this->recvBufferTmp = '';
+				
+				$msg = base64_decode($msg);
+				
+				$msgHandleReturnValue = $this->msgHandleRaw($msg);
+				$dataRecvReturnValue .= $msgHandleReturnValue;
+				
+				$data = substr($data, $separatorPos + 1);
+			}
+		}
+		while($data);
+		
+		return $dataRecvReturnValue;
 	}
 	
 	/**
 	 * @codeCoverageIgnore
 	 */
 	public function dataSend($data){
-		
+		$msg = '';
+		if($data){
+			$data = base64_encode($data);
+			$this->incTrafficOut(strlen($data) + static::MSG_SEPARATOR_LEN);
+			$msg = $data.static::MSG_SEPARATOR;
+		}
+		return $msg;
 	}
 	
 	protected function msgHandleEncode($msgRaw){
