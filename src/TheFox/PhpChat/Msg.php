@@ -358,6 +358,7 @@ class Msg extends YamlStorage{
 				
 				$this->setPassword($passwordEncrypted);
 			}
+		// @codeCoverageIgnoreStart
 			else{
 				throw new RuntimeException('openssl_public_encrypt failed: "'.openssl_error_string().'"', 101);
 			}
@@ -365,6 +366,7 @@ class Msg extends YamlStorage{
 		else{
 			throw new RuntimeException('openssl_sign failed.', 102);
 		}
+		// @codeCoverageIgnoreEnd
 		
 		if($passwordEncrypted){
 			$signRv = openssl_sign($text, $sign, $this->getSsl(), $signAlgo);
@@ -427,7 +429,9 @@ class Msg extends YamlStorage{
 			}
 		}
 		else{
+			// @codeCoverageIgnoreStart
 			throw new RuntimeException('Can\'t create password.', 103);
+			// @codeCoverageIgnoreEnd
 		}
 		
 		return $rv;
@@ -483,85 +487,80 @@ class Msg extends YamlStorage{
 			throw new RuntimeException('password json_decode failed.', 101);
 		}
 		
-		if($password){
-			$data = $this->getBody();
-			$data = base64_decode($data);
-			$data = gzdecode($data);
+		$data = $this->getBody();
+		$data = base64_decode($data);
+		$data = gzdecode($data);
+		
+		$json = json_decode($data, true);
+		if($json && isset($json['data']) && isset($json['iv'])){
+			$iv = base64_decode($json['iv']);
+			$data = $json['data'];
 			
-			$json = json_decode($data, true);
-			if($json && isset($json['data']) && isset($json['iv'])){
-				$iv = base64_decode($json['iv']);
-				$data = $json['data'];
+			$data = openssl_decrypt($data, 'AES-256-CBC', $password, 0, $iv);
+			if($data !== false){
+				$data = gzdecode($data);
 				
-				$data = openssl_decrypt($data, 'AES-256-CBC', $password, 0, $iv);
-				if($data !== false){
-					$data = gzdecode($data);
+				$body = json_decode($data, true);
+				if($body && isset($body['subject']) && isset($body['text']) && isset($body['sign'])
+					&& isset($body['signAlgo']) && isset($body['srcUserNickname'])){
+					$subject = base64_decode($body['subject']);
+					$text = base64_decode($body['text']);
+					$sign = base64_decode($body['sign']);
+					$signAlgo = (int)$body['signAlgo'];
+					$srcUserNickname = base64_decode($body['srcUserNickname']);
+					$ignore = (bool)$body['ignore'];
 					
-					$body = json_decode($data, true);
-					if($body && isset($body['subject']) && isset($body['text']) && isset($body['sign'])
-						&& isset($body['signAlgo']) && isset($body['srcUserNickname'])){
-						$subject = base64_decode($body['subject']);
-						$text = base64_decode($body['text']);
-						$sign = base64_decode($body['sign']);
-						$signAlgo = (int)$body['signAlgo'];
-						$srcUserNickname = base64_decode($body['srcUserNickname']);
-						$ignore = (bool)$body['ignore'];
+					if(openssl_verify($text, $sign, $this->getSrcSslKeyPub(), $signAlgo)){
+						$checksum = $this->createCheckSum(
+							$this->getVersion(),
+							$this->getId(),
+							$this->getSrcNodeId(),
+							$this->getDstNodeId(),
+							$this->getDstSslPubKey(),
+							$text,
+							$this->getTimeCreated(),
+							$password);
 						
-						if(openssl_verify($text, $sign, $this->getSrcSslKeyPub(), $signAlgo)){
-							$checksum = $this->createCheckSum(
-								$this->getVersion(),
-								$this->getId(),
-								$this->getSrcNodeId(),
-								$this->getDstNodeId(),
-								$this->getDstSslPubKey(),
-								$text,
-								$this->getTimeCreated(),
-								$password);
+						#fwrite(STDOUT, 'checksum: '.$checksum."\n");
+						
+						if($checksum == $this->getChecksum()){
+							$this->setSubject($subject);
+							$this->setSrcUserNickname($srcUserNickname);
+							$this->setIgnore($ignore);
 							
-							#fwrite(STDOUT, 'checksum: '.$checksum."\n");
-							
-							if($checksum == $this->getChecksum()){
-								$this->setSubject($subject);
-								$this->setSrcUserNickname($srcUserNickname);
-								$this->setIgnore($ignore);
-								
-								$rv = $text;
-							}
-							else{
-								$errorMsg = 'msg checksum does not match.';
-								$errorMsg .= "\n".'    checksum: /'.$checksum.'/ != /'.$this->getChecksum().'/';
-								$errorMsg .= "\n".'    version: /'.$this->getVersion().'/';
-								$errorMsg .= "\n".'    id: /'.$this->getId().'/';
-								$errorMsg .= "\n".'    src node id: /'.$this->getSrcNodeId().'/';
-								$errorMsg .= "\n".'    dst node id: /'.$this->getDstNodeId().'/';
-								$errorMsg .= "\n".'    dst ssl pub key: /'.$this->getDstSslPubKey().'/';
-								$errorMsg .= "\n".'    subject: /'.$subject.'/';
-								$errorMsg .= "\n".'    text: /'.$text.'/';
-								$errorMsg .= "\n".'    time created: /'.$this->getTimeCreated().'/';
-								$errorMsg .= "\n".'    password: /'.$password.'/';
-								throw new RuntimeException($errorMsg, 206);
-							}
+							$rv = $text;
 						}
 						else{
-							throw new RuntimeException('msg openssl_verify failed.', 205);
+				// @codeCoverageIgnoreStart
+							$errorMsg = 'msg checksum does not match.';
+							$errorMsg .= "\n".'    checksum: /'.$checksum.'/ != /'.$this->getChecksum().'/';
+							$errorMsg .= "\n".'    version: /'.$this->getVersion().'/';
+							$errorMsg .= "\n".'    id: /'.$this->getId().'/';
+							$errorMsg .= "\n".'    src node id: /'.$this->getSrcNodeId().'/';
+							$errorMsg .= "\n".'    dst node id: /'.$this->getDstNodeId().'/';
+							$errorMsg .= "\n".'    dst ssl pub key: /'.$this->getDstSslPubKey().'/';
+							$errorMsg .= "\n".'    subject: /'.$subject.'/';
+							$errorMsg .= "\n".'    text: /'.$text.'/';
+							$errorMsg .= "\n".'    time created: /'.$this->getTimeCreated().'/';
+							$errorMsg .= "\n".'    password: /'.$password.'/';
+							throw new RuntimeException($errorMsg, 206);
 						}
 					}
 					else{
-						throw new RuntimeException('msg json_decode B failed.', 204);
+						throw new RuntimeException('msg openssl_verify failed.', 205);
 					}
 				}
 				else{
-					throw new RuntimeException('msg openssl_decrypt failed: "'.openssl_error_string().'"', 203);
+					throw new RuntimeException('msg json_decode B failed.', 204);
 				}
-				
-				
+				// @codeCoverageIgnoreEnd
 			}
 			else{
-				throw new RuntimeException('msg json_decode A failed.', 202);
+				throw new RuntimeException('msg openssl_decrypt failed: "'.openssl_error_string().'"', 203);
 			}
 		}
 		else{
-			throw new RuntimeException('no password set.', 201);
+			throw new RuntimeException('msg json_decode A failed.', 202);
 		}
 		
 		$this->setText($rv);
