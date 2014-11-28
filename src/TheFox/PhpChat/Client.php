@@ -479,6 +479,9 @@ class Client{
 		return $rv;
 	}
 	
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public function run(){
 		
 	}
@@ -532,10 +535,16 @@ class Client{
 		}
 	}
 	
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public function dataRecv($data = null){
 		
 	}
 	
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public function dataSend($data){
 		
 	}
@@ -2938,6 +2947,9 @@ class Client{
 		return null;
 	}
 	
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public function shutdown(){
 		
 	}

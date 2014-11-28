@@ -30,6 +30,9 @@ class TcpClient extends Client{
 		return $this->socket;
 	}
 	
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public function run(){
 		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
@@ -96,11 +99,11 @@ class TcpClient extends Client{
 			$this->incTrafficOut(strlen($data) + static::MSG_SEPARATOR_LEN);
 			$msg = $data.static::MSG_SEPARATOR;
 			
+			// @codeCoverageIgnoreStart
 			if($this->getSocket()){
-				// @codeCoverageIgnoreStart
 				$this->getSocket()->write($msg);
-				// @codeCoverageIgnoreEnd
 			}
+			// @codeCoverageIgnoreEnd
 		}
 		return $msg;
 	}
@@ -110,12 +113,12 @@ class TcpClient extends Client{
 			$this->setStatus('hasShutdown', true);
 			$this->logColor('debug', $this->getUri().' shutdown', 'white', 'black');
 			
+			// @codeCoverageIgnoreStart
 			if($this->getSocket()){
-				// @codeCoverageIgnoreStart
 				$this->getSocket()->shutdown();
 				$this->getSocket()->close();
-				// @codeCoverageIgnoreEnd
 			}
+			// @codeCoverageIgnoreEnd
 			
 			if($this->getSsl()){
 				openssl_free_key($this->getSsl());
