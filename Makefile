@@ -68,7 +68,7 @@ clean_data:
 	$(RM) data
 
 clean_release: clean_data
-	$(CHMOD) 600 id_rsa.prv id_rsa.pub
+	$(CHMOD) a-rwx,u+rw id_rsa.prv id_rsa.pub
 	$(RM) id_rsa.prv id_rsa.pub
 	$(RM) settings.yml
 	$(RM) composer.lock $(COMPOSER)
@@ -86,7 +86,7 @@ $(VENDOR): $(COMPOSER)
 
 $(COMPOSER):
 	curl -sS https://getcomposer.org/installer | php
-	$(CHMOD) 755 $(COMPOSER)
+	$(CHMOD) a+rx-w,u+w $(COMPOSER)
 
 $(PHPCS): $(VENDOR)
 
@@ -100,4 +100,4 @@ test_data:
 build:
 	$(MKDIR) build
 	$(MKDIR) build/logs
-	$(CHMOD) 0700 build
+	$(CHMOD) a-rwx,u+rwx build
