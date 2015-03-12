@@ -1,5 +1,8 @@
 <?php
 
+namespace TheFox\Test;
+
+use PHPUnit_Framework_TestCase;
 use Colors\Color;
 
 class ColorTest extends PHPUnit_Framework_TestCase{

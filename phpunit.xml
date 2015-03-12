@@ -18,39 +18,38 @@
 	timeoutForSmallTests="1"
 	timeoutForMediumTests="10"
 	timeoutForLargeTests="60"
-	strict="true"
 	verbose="true">
 	
 	<testsuites>
 		<testsuite name="all">
-			<file>tests/AddressbookTest.php</file>
-			<file>tests/BasicTest.php</file>
-			<file>tests/ClientTest.php</file>
-			<file>tests/ColorTest.php</file>
-			<file>tests/ConsoleTest.php</file>
-			<file>tests/CronjobTest.php</file>
-			<file>tests/HttpUriTest.php</file>
-			<file>tests/KademliaBucketTest.php</file>
-			<file>tests/KademliaNodeTest.php</file>
-			<!--<file>tests/KademliaTableTest.php</file>//-->
-			<file>tests/LogTest.php</file>
-			<file>tests/MsgDbTest.php</file>
-			<file>tests/MsgTest.php</file>
-			<file>tests/NodesNewDbTest.php</file>
-			<file>tests/SimpleTableTest.php</file>
-			<file>tests/SslTest.php</file>
-			<file>tests/TalkRequestTest.php</file>
-			<file>tests/TcpClientTest.php</file>
-			<file>tests/TcpUriTest.php</file>
-			<file>tests/ThreadTest.php</file>
-			<file>tests/UuidTest.php</file>
-			<file>tests/YamlStorageTest.php</file>
+			<file>tests/TheFox/Test/AddressbookTest.php</file>
+			<file>tests/TheFox/Test/BasicTest.php</file>
+			<file>tests/TheFox/Test/ClientTest.php</file>
+			<file>tests/TheFox/Test/ColorTest.php</file>
+			<file>tests/TheFox/Test/ConsoleTest.php</file>
+			<file>tests/TheFox/Test/CronjobTest.php</file>
+			<file>tests/TheFox/Test/HttpUriTest.php</file>
+			<file>tests/TheFox/Test/KademliaBucketTest.php</file>
+			<file>tests/TheFox/Test/KademliaNodeTest.php</file>
+			<!--<file>tests/TheFox/Test/KademliaTableTest.php</file>//-->
+			<file>tests/TheFox/Test/LogTest.php</file>
+			<file>tests/TheFox/Test/MsgDbTest.php</file>
+			<file>tests/TheFox/Test/MsgTest.php</file>
+			<file>tests/TheFox/Test/NodesNewDbTest.php</file>
+			<file>tests/TheFox/Test/SimpleTableTest.php</file>
+			<file>tests/TheFox/Test/SslTest.php</file>
+			<file>tests/TheFox/Test/TalkRequestTest.php</file>
+			<file>tests/TheFox/Test/TcpClientTest.php</file>
+			<file>tests/TheFox/Test/TcpUriTest.php</file>
+			<file>tests/TheFox/Test/ThreadTest.php</file>
+			<file>tests/TheFox/Test/UuidTest.php</file>
+			<file>tests/TheFox/Test/YamlStorageTest.php</file>
 		</testsuite>
 		<testsuite name="dht">
-			<file>tests/KademliaBucketTest.php</file>
-			<file>tests/KademliaNodeTest.php</file>
-			<!--<file>tests/KademliaTableTest.php</file>//-->
-			<file>tests/SimpleTableTest.php</file>
+			<file>tests/TheFox/Test/KademliaBucketTest.php</file>
+			<file>tests/TheFox/Test/KademliaNodeTest.php</file>
+			<!--<file>tests/TheFox/Test/KademliaTableTest.php</file>//-->
+			<file>tests/TheFox/Test/SimpleTableTest.php</file>
 		</testsuite>
 	</testsuites>
 	<filter>

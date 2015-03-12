@@ -1,5 +1,9 @@
 <?php
 
+namespace TheFox\Test;
+
+use PHPUnit_Framework_TestCase;
+
 use TheFox\Dht\Kademlia\Node;
 use TheFox\PhpChat\TcpClient;
 

@@ -1,5 +1,9 @@
 <?php
 
+namespace TheFox\Test;
+
+use PHPUnit_Framework_TestCase;
+
 class SslTest extends PHPUnit_Framework_TestCase{
 	
 	const SSL_KEY_PUB1 = '-----BEGIN PUBLIC KEY-----

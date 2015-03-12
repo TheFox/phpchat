@@ -1,5 +1,9 @@
 <?php
 
+namespace TheFox\Test;
+
+use PHPUnit_Framework_TestCase;
+
 use TheFox\PhpChat\TalkRequest;
 use TheFox\PhpChat\Client;
 

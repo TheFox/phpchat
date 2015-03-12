@@ -1,7 +1,6 @@
 vendor
 composer.lock
 composer.phar
-test
 test_data
 log
 *.log

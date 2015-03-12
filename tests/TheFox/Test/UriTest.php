@@ -1,6 +1,10 @@
 <?php
 
+namespace TheFox\Test;
+
+use PHPUnit_Framework_TestCase;
 use Zend\Uri\UriFactory;
+
 use TheFox\PhpChat\TcpUri;
 
 class UriTest extends PHPUnit_Framework_TestCase{

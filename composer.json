@@ -42,10 +42,11 @@
 		"thefox/phpcsrs": "~1.0"
 	},
 	"autoload": {
-		"psr-0": {
-			"TheFox": "src"
-		},
+		"psr-0": { "TheFox": "src" },
 		"files": [ "functions.php" ]
+	},
+	"autoload-dev": {
+		"psr-0": { "TheFox": "tests" }
 	},
 	"extra": {
 		"branch-alias": {
