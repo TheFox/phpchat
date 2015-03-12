@@ -11,7 +11,7 @@ PHPDOX = vendor/bin/phpdox
 PHPLOC = vendor/bin/phploc
 PHPMD = vendor/bin/phpmd
 COMPOSER = ./composer.phar
-COMPOSER_DEV ?= --dev
+COMPOSER_DEV ?= 
 SECURITY_CHECKER = vendor/bin/security-checker
 
 
