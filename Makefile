@@ -12,6 +12,8 @@ PHPLOC = vendor/bin/phploc
 PHPMD = vendor/bin/phpmd
 COMPOSER = ./composer.phar
 COMPOSER_DEV ?= 
+COMPOSER_INTERACTION ?= --no-interaction
+COMPOSER_PREFER_SOURCE ?= 
 SECURITY_CHECKER = vendor/bin/security-checker
 
 
@@ -82,7 +84,7 @@ docs: build test_phpcs
 	$(PHPDOX)
 
 $(VENDOR): $(COMPOSER)
-	$(COMPOSER) install $(COMPOSER_PREFER_SOURCE) --no-interaction $(COMPOSER_DEV)
+	$(COMPOSER) install $(COMPOSER_PREFER_SOURCE) $(COMPOSER_INTERACTION) $(COMPOSER_DEV)
 
 $(COMPOSER):
 	curl -sS https://getcomposer.org/installer | php
