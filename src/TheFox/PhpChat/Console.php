@@ -1062,7 +1062,7 @@ class Console extends Thread{
 							if($answer == 'y'){
 								$dstNodeId = $args[1];
 								#$dstNodeId = '42785b21-011b-4093-b61d-000000000001';
-								#$text = 'this is  a test. '.date('Y/m/d H:i:s');
+								#$text = 'this is  a test. '.date('Y-m-d H:i:s');
 								
 								
 								$table = $this->ipcKernelConnection->execSync('getTable');
@@ -1199,8 +1199,8 @@ class Console extends Thread{
 						$this->msgAdd('To: '.$toLine, false, false);
 						$this->msgAdd('Msg ID: '.$msg->getId(), false, false);
 						$this->msgAdd('Status: '.$msg->getStatusText(), false, false);
-						$this->msgAdd('Created:  '.$dateCreated->format('Y/m/d H:i:s'), false, false);
-						$this->msgAdd('Received: '.$dateReceived->format('Y/m/d H:i:s'), false, false);
+						$this->msgAdd('Created:  '.$dateCreated->format('Y-m-d H:i:s'), false, false);
+						$this->msgAdd('Received: '.$dateReceived->format('Y-m-d H:i:s'), false, false);
 						
 						if($text){
 							$this->msgAdd();
@@ -1242,8 +1242,8 @@ class Console extends Thread{
 					$no,
 					$msg->getStatus() == 'U' ? '*' : ' ',
 					$msg->getSrcNodeId(),
-					$dateCreated->format('Y/m/d H:i:s'),
-					$dateReceived->format('Y/m/d H:i:s')
+					$dateCreated->format('Y-m-d H:i:s'),
+					$dateReceived->format('Y-m-d H:i:s')
 				);
 				$this->msgAdd($line, false, false);
 			}
@@ -1475,7 +1475,7 @@ class Console extends Thread{
 		$dt->setTimestamp($this->nextRandomMsg);
 		
 		if($this->log){
-			$this->log->debug('next random msg: '.$dt->format('Y/m/d H:i:s'));
+			$this->log->debug('next random msg: '.$dt->format('Y-m-d H:i:s'));
 		}
 	}
 	

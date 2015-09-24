@@ -264,7 +264,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 			$msg->setSrcSslKeyPub($table->getLocalNode()->getSslKeyPub());
 			$msg->setSrcUserNickname($settings->data['user']['nickname']);
 			
-			$msg->setText('this is  a test. '.date('Y/m/d H:i:s'));
+			$msg->setText('this is  a test. '.date('Y-m-d H:i:s'));
 			$msg->setSslKeyPrvPath(
 				$settings->data['node']['sslKeyPrvPath'], $settings->data['node']['sslKeyPrvPass']);
 			$msg->setStatus('O');
@@ -528,7 +528,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 			$msg->setSrcNodeId($settings->data['node']['id']);
 			$msg->setSrcSslKeyPub($table->getLocalNode()->getSslKeyPub());
 			#$msg->setSrcUserNickname($settings->data['user']['nickname']);
-			$msg->setText('this is  a test. '.date('Y/m/d H:i:s'));
+			$msg->setText('this is  a test. '.date('Y-m-d H:i:s'));
 			$msg->setSslKeyPrvPath($settings->data['node']['sslKeyPrvPath'], $settings->data['node']['sslKeyPrvPass']);
 			$msg->setStatus('O');
 			#$msg->setDstNodeId($nodes[0]->getIdHexStr());
