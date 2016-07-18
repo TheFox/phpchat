@@ -35,7 +35,6 @@
 	"require-dev": {
 		"phpunit/phpunit": "~4.1",
 		"doctrine/common": "~2.4",
-		"satooshi/php-coveralls": "dev-master",
 		"theseer/phpdox": "~0.7",
 		"phploc/phploc": "~2.0",
 		"phpmd/phpmd": "~2.1",
