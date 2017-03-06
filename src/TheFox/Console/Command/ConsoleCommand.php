@@ -43,7 +43,7 @@ class ConsoleCommand extends BasicCommand{
 			$this->console->init();
 		}
 		catch(Exception $e){
-			$log->error('init: '.$e->getMessage());
+			$this->log->error('init: '.$e->getMessage());
 			exit(1);
 		}
 
@@ -51,7 +51,7 @@ class ConsoleCommand extends BasicCommand{
 			$this->console->loop();
 		}
 		catch(Exception $e){
-			$log->error('loop: '.$e->getMessage());
+			$this->log->error('loop: '.$e->getMessage());
 			exit(1);
 		}
 		

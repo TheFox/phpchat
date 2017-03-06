@@ -1728,8 +1728,7 @@ class Client{
 						$userNickname = $msgData['userNickname'];
 					}
 					
-					#$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.(int)$status.', '.$userNickname);
-					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.(int)$status);
+					$this->log('debug', $this->getUri().' recv '.$msgName.': '.$rid.', '.$status);
 					
 					$request = $this->requestGetByRid($rid);
 					if($request){

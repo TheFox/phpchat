@@ -20,8 +20,10 @@ class TcpClient extends Client{
 	}
 	
 	public function setSocket(AbstractSocket $socket){
+		// $ip = null;
+		// $port = null;
 		$this->socket = $socket;
-		$this->socket->getPeerName($ip, $port);
+		$this->socket->getPeerName($ip = null, $port = null);
 		$this->setUri('tcp://'.$ip.':'.$port);
 	}
 	

@@ -2,6 +2,7 @@
 
 namespace TheFox\Test;
 
+use Exception;
 use PHPUnit_Framework_TestCase;
 use Symfony\Component\Finder\Finder;
 use Rhumsaa\Uuid\Uuid;

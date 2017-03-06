@@ -2,6 +2,7 @@
 
 namespace TheFox\Test;
 
+use Exception;
 use PHPUnit_Framework_TestCase;
 
 class TestTest extends PHPUnit_Framework_TestCase{

@@ -643,7 +643,7 @@ class Cronjob extends Thread{
 			'timeout' => 5,
 			'verify' => false,
 		);
-		$client = new GuzzleHttpClient($clientOptions);
+		$client = new GuzzleHttpClient('', $clientOptions);
 		
 		return $client;
 	}

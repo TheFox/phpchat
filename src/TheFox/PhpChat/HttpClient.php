@@ -2,6 +2,8 @@
 
 namespace TheFox\PhpChat;
 
+use RuntimeException;
+use Rhumsaa\Uuid\Uuid;
 use Zend\Uri\UriFactory;
 
 class HttpClient extends Client{
@@ -89,7 +91,7 @@ class HttpClient extends Client{
 			$nodesFoundIds = array();
 		}
 		
-		$rid = (string)Uuid::uuid4();
+		$rid = Uuid::uuid4()->toString();
 		
 		$this->requestAdd('node_find', $rid, array(
 			'nodeId' => $nodeId,
@@ -114,7 +116,7 @@ class HttpClient extends Client{
 	}
 	
 	public function sendMsg(Msg $msg){
-		$rid = (string)Uuid::uuid4();
+		$rid = Uuid::uuid4()->toString();
 		
 		$this->requestAdd('msg', $rid, array(
 			'msg' => $msg,
@@ -163,7 +165,7 @@ class HttpClient extends Client{
 		return '';
 	}
 	
-	private function sendSslPasswordReput(){
+	public function sendSslPasswordReput(){
 		return '';
 	}
 	
@@ -220,7 +222,7 @@ class HttpClient extends Client{
 		return '';
 	}
 	
-	private function sendError($errorCode = 999, $msgName = ''){
+	public function sendError($errorCode = 999, $msgName = ''){
 		return '';
 	}
 	
