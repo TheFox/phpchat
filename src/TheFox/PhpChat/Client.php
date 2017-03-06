@@ -4,13 +4,11 @@ namespace TheFox\PhpChat;
 
 use Exception;
 use RuntimeException;
-
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
 use Zend\Uri\Uri;
 use Zend\Uri\UriFactory;
 use Colors\Color;
-
 use TheFox\Utilities\Hex;
 use TheFox\Dht\Kademlia\Node;
 use TheFox\Pow\Hashcash;
@@ -79,13 +77,7 @@ class Client{
 	}
 	
 	public function __sleep(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		return array('id', 'uri', 'node');
-	}
-	
-	public function __destruct(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 	}
 	
 	public function setId($id){
@@ -108,8 +100,6 @@ class Client{
 	}
 	
 	private function resetStatusSsl(){
-		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.''."\n");
-		
 		$this->status['hasSslInit'] = false;
 		$this->status['hasSendSslInit'] = false;
 		$this->status['hasSslInitOk'] = false;
@@ -202,10 +192,7 @@ class Client{
 	}
 	
 	public function getLog(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		if($this->getServer()){
-			#print __CLASS__.'->'.__FUNCTION__.': get server, ok'."\n";
 			return $this->getServer()->getLog();
 		}
 		
@@ -213,15 +200,12 @@ class Client{
 	}
 	
 	public function log($level, $msg){
-		#print __CLASS__.'->'.__FUNCTION__.': '.$level.', '.$msg."\n";
-		
 		if($this->getLog()){
 			if(method_exists($this->getLog(), $level)){
 				$this->getLog()->$level($msg);
 			}
 		}
 		/*else{
-			print __CLASS__.'->'.__FUNCTION__.': '.$level.', '.$msg."\n";
 		}*/
 	}
 	
@@ -393,7 +377,6 @@ class Client{
 	}
 	
 	public function actionRemove(ClientAction $action){
-		#print __CLASS__.'->'.__FUNCTION__.': '.$action->getId()."\n";
 		unset($this->actions[$action->getId()]);
 	}
 	
@@ -445,7 +428,6 @@ class Client{
 	}
 	
 	public function bridgeActionRemove(ClientAction $action){
-		#print __CLASS__.'->'.__FUNCTION__.': '.$action->getId()."\n";
 		unset($this->bridgeActions[$action->getId()]);
 	}
 	
@@ -499,7 +481,6 @@ class Client{
 	}
 	
 	public function checkActions(){
-		#print __CLASS__.'->'.__FUNCTION__.': after actions'."\n";
 		$action = $this->actionGetByCriterion(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
 		
 		if($action && count($this->actions)){
@@ -653,8 +634,6 @@ class Client{
 			$msgHandleReturnValue .= $this->sendId();
 		}
 		elseif($msgName == 'id'){
-			#print __CLASS__.'->'.__FUNCTION__.': '.$msgName.', '.(int)$this->getStatus('hasId')."\n";
-			
 			if($this->getTable()){
 				if(!$this->getStatus('hasId')){
 					$release = 0;
@@ -1322,9 +1301,6 @@ class Client{
 							$this->setStatus('hasSslInit', true);
 							$msgHandleReturnValue .= $this->sendSslInit();
 							$msgHandleReturnValue .= $this->sendSslInitResponse($rid, 1);
-							
-							#fwrite(STDOUT, 'ssl init: /'.$msgHandleReturnValue.'/'."\n");
-							#ve($msgHandleReturnValue);
 						}
 						else{
 							$this->resetStatusSsl();
@@ -1425,7 +1401,6 @@ class Client{
 					
 					if($token && $this->sslTestToken && $token == $this->sslTestToken){
 						$this->logColor('debug', 'SSL: verified', 'green');
-						#print __CLASS__.'->'.__FUNCTION__.': '.$msgName.' SSL: verified'."\n";
 						
 						$this->setStatus('hasSslVerify', true);
 						$msgHandleReturnValue .= $this->sendSslPasswordPut();
@@ -1511,8 +1486,6 @@ class Client{
 					if(array_key_exists('token', $msgData)){
 						$token = $msgData['token'];
 					}
-					
-					#print __CLASS__.'->'.__FUNCTION__.': '.$msgName.' SSL: password token: '.$token."\n";
 					
 					if($token){
 						$testToken = hash('sha512',
@@ -1640,8 +1613,6 @@ class Client{
 					if(array_key_exists('token', $msgData)){
 						$token = $msgData['token'];
 					}
-					
-					#print __CLASS__.'->'.__FUNCTION__.': '.$msgName.' re-SSL: password token: '.$token."\n";
 					
 					if($token){
 						$testToken = hash('sha512',
@@ -2085,14 +2056,10 @@ class Client{
 						$this->logColor('debug', 'bridge target: '.$this->getStatus('bridgeTargetUri'), 'yellow');
 						$this->logColor('debug', 'bridge client: '.(int)($this->bridgeClient !== null), 'yellow');
 						
-						
-						
-						# TODO
+						// @TODO bridgeClient
 						if($this->bridgeClient){
 							
 						}
-						
-						
 					}
 					else{
 						$msgHandleReturnValue .= $this->sendError(9000, $msgName);
@@ -2161,8 +2128,6 @@ class Client{
 	}
 	
 	public function msgCreate($name, $data = array()){
-		#print __CLASS__.'->'.__FUNCTION__.': "'.$name.'"'."\n";
-		
 		$json = array(
 			'name' => $name,
 		);
@@ -2304,7 +2269,7 @@ class Client{
 				$nodeOut['uri'] = (string)$node->getUri();
 			}
 			if($node->getBridgeClient()){
-				# TODO: alle exit bridges ins array eintragen
+				# @TODO: alle exit bridges ins array eintragen
 				#$nodeOut['bridgeDst'] = 
 			}
 			
@@ -2747,26 +2712,15 @@ class Client{
 	}
 	
 	private function sslMsgCreatePublicEncrypt($name, $data){
-		#fwrite(STDOUT, 'sslMsgCreatePublicEncrypt'."\n");
-		#print __CLASS__.'->'.__FUNCTION__.': "'.$name.'"'."\n";
-		#ve($data);
-		
 		$data = json_encode($data);
-		
-		#ve($data);
 		$dataEnc = $this->sslPublicEncrypt($data);
 		
-		#fwrite(STDOUT, 'sslMsgCreatePublicEncrypt data: /'.$dataEnc.'/'."\n");
-		
 		if($dataEnc){
-			#ve($dataEnc);
-			
 			$json = array(
 				'name' => $name,
 				'data' => $dataEnc,
 			);
 			
-			#print __CLASS__.'->'.__FUNCTION__.': "'.$name.'", "'.json_encode($json).'"'."\n";
 			return json_encode($json);
 		}
 		
@@ -2787,7 +2741,6 @@ class Client{
 	private function sslMsgCreatePasswordEncrypt($name, $data,
 		$sslPasswordLocalCurrent = null, $sslPasswordPeerCurrent = null){
 		$this->sslMsgCount++;
-		#print __CLASS__.'->'.__FUNCTION__.': /'.$name.'/ '.$this->sslMsgCount."\n";
 		
 		$data = json_encode($data);
 		$dataEnc = $this->sslPasswordEncrypt($data, $sslPasswordLocalCurrent, $sslPasswordPeerCurrent);
@@ -2817,7 +2770,6 @@ class Client{
 	}
 	
 	private function sslPublicEncrypt($data){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		
 		if(openssl_sign($data, $sign, $this->getSsl(), OPENSSL_ALGO_SHA1)){
 			$sign = base64_encode($sign);

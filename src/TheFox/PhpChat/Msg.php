@@ -3,10 +3,8 @@
 namespace TheFox\PhpChat;
 
 use RuntimeException;
-
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
-
 use TheFox\Storage\YamlStorage;
 use TheFox\Utilities\Rand;
 
@@ -66,15 +64,11 @@ class Msg extends YamlStorage{
 	}
 	
 	public function save(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		$this->data['srcSslKeyPub'] = base64_encode($this->srcSslKeyPub);
 		return parent::save();
 	}
 	
 	public function load(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		if(parent::load()){
 			$this->setSrcSslKeyPub(base64_decode($this->data['srcSslKeyPub']));
 			unset($this->data['srcSslKeyPub']);
@@ -97,13 +91,9 @@ class Msg extends YamlStorage{
 	}
 	
 	public function getId(){
-		#print __CLASS__.'->'.__FUNCTION__.': "'.$this->data['id'].'"'."\n";
-		
 		if(!isset($this->data['id']) || !$this->data['id']){
-			#print __CLASS__.'->'.__FUNCTION__.': no set'."\n";
 			try{
 				$this->data['id'] = (string)Uuid::uuid4();
-				#print __CLASS__.'->'.__FUNCTION__.': new id: '.$this->data['id']."\n";
 			}
 			// @codeCoverageIgnoreStart
 			catch(UnsatisfiedDependencyException $e){
@@ -155,8 +145,6 @@ class Msg extends YamlStorage{
 	}
 	
 	public function setDstSslPubKey($dstSslPubKey){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		$this->dstSslPubKey = $dstSslPubKey;
 	}
 	
@@ -241,7 +229,6 @@ class Msg extends YamlStorage{
 		// S = encrypted with source node public key
 		// D = encrypted with destination node public key
 		
-		#print __CLASS__.'->'.__FUNCTION__.': '.$encryptionMode."\n";
 		$this->data['encryptionMode'] = $encryptionMode;
 		$this->setDataChanged(true);
 	}
@@ -251,7 +238,6 @@ class Msg extends YamlStorage{
 	}
 	
 	public function setStatus($status){
-		#print __CLASS__.'->'.__FUNCTION__.': '.$status."\n";
 		if($this->data['status'] != 'D'){
 			$this->data['status'] = $status;
 			$this->setDataChanged(true);
@@ -303,7 +289,6 @@ class Msg extends YamlStorage{
 	}
 	
 	public function setSslKeyPrv($sslKeyPrv, $sslKeyPrvPass){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		$ssl = openssl_pkey_get_private($sslKeyPrv, $sslKeyPrvPass);
 		if($ssl){
 			$this->setSsl($ssl);
@@ -322,8 +307,6 @@ class Msg extends YamlStorage{
 	}
 	
 	public function encrypt(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		#print __CLASS__.'->'.__FUNCTION__.': "'.$this->getPassword().'"'."\n";
 		$rv = false;
 		
 		if(!$this->getSsl()){
@@ -438,7 +421,6 @@ class Msg extends YamlStorage{
 	}
 	
 	public function decrypt(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		$rv = '';
 		
 		if(!$this->getSsl()){

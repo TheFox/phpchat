@@ -4,13 +4,11 @@ namespace TheFox\Console\Command;
 
 use Exception;
 use RuntimeException;
-
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 #use Zend\Mail\Message;
 #use Zend\Mail\Headers;
-
 use TheFox\Smtp\Server;
 use TheFox\Smtp\Event;
 use TheFox\Ipc\ClientConnection;
@@ -181,7 +179,6 @@ class SmtpCommand extends BasicCommand{
 	}
 	
 	public function mailNew($event, $from, $rcpt, $mail){
-		#fwrite(STDOUT, 'mail new: /'.$from.'/ a/'.join('/ /', $rcpt).'/'."\n");
 		#$this->log->debug('mailNew: '.$event->getTrigger().' /'.$from.'/');
 		$settings = $this->getSettings();
 		
@@ -190,8 +187,6 @@ class SmtpCommand extends BasicCommand{
 		
 		foreach($rcpt as $dstNodeId){
 			$dstNodeId = substr($dstNodeId, 0, strpos($dstNodeId, '@'));
-			
-			#fwrite(STDOUT, 'to: /'.$dstNodeId.'/'."\n");
 			
 			$msg = new Msg();
 			$msg->setSrcNodeId($settings->data['node']['id']);
@@ -203,10 +198,8 @@ class SmtpCommand extends BasicCommand{
 			
 			$msg->setDstNodeId($dstNode->getIdHexStr());
 			if($oDstNode = $table->nodeFind($dstNode)){
-				#print 'found node in table'.PHP_EOL;
 				$msg->setDstSslPubKey($oDstNode->getSslKeyPub());
 			}
-			#else{ print 'node not found'.PHP_EOL; }
 			
 			$msg->setSubject($mail->getSubject());
 			$msg->setText($text);
@@ -215,16 +208,13 @@ class SmtpCommand extends BasicCommand{
 			$msg->setStatus('O');
 			
 			$encrypted = false;
-			#print 'DstSslPubKey: '.strlen($msg->getDstSslPubKey()).PHP_EOL;
 			if($msg->getDstSslPubKey()){
-				#print 'use dst key'.PHP_EOL;
 				
 				$msg->setEncryptionMode('D');
 			}
 			else{
 				// Encrypt with own public key
 				// while destination public key is not available.
-				#print 'use local key'.PHP_EOL;
 				
 				$msg->setEncryptionMode('S');
 				$msg->setDstSslPubKey($table->getLocalNode()->getSslKeyPub());

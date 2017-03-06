@@ -3,7 +3,6 @@
 namespace TheFox\Test;
 
 use PHPUnit_Framework_TestCase;
-
 use TheFox\PhpChat\NodesNewDb;
 
 class NodesNewDbTest extends PHPUnit_Framework_TestCase{
@@ -13,9 +12,6 @@ class NodesNewDbTest extends PHPUnit_Framework_TestCase{
 		$db1->nodeAddConnect('tcp://192.168.241.24:25000');
 		
 		$db2 = unserialize(serialize($db1));
-		
-		
-		#\Doctrine\Common\Util\Debug::dump($db2);
 		
 		$this->assertEquals($db1, $db2);
 	}

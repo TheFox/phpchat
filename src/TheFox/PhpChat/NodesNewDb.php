@@ -8,7 +8,6 @@ use TheFox\Dht\Kademlia\Node;
 class NodesNewDb extends YamlStorage{
 	
 	public function __construct($filePath = null){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		parent::__construct($filePath);
 		
 		$this->data['timeCreated'] = time();
@@ -21,8 +20,6 @@ class NodesNewDb extends YamlStorage{
 	}
 	
 	public function nodeAddConnect($uri, $bridgeServer = false){
-		#print __CLASS__.'->'.__FUNCTION__.': '.$uri."\n";
-		
 		if((string)$uri){
 			$oldId = 0;
 			foreach($this->data['nodes'] as $nodeId => $node){
@@ -51,8 +48,6 @@ class NodesNewDb extends YamlStorage{
 	}
 	
 	public function nodeAddFind($id, $bridgeServer = false){
-		#print __CLASS__.'->'.__FUNCTION__.': '.$id."\n";
-		
 		if($id != '00000000-0000-4000-8000-000000000000'){
 			$oldId = false;
 			foreach($this->data['nodes'] as $nodeId => $node){

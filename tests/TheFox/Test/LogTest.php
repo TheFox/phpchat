@@ -4,7 +4,6 @@ namespace TheFox\Test;
 
 use PHPUnit_Framework_TestCase;
 use Symfony\Component\Filesystem\Filesystem;
-
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler;
 

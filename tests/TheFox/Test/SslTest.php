@@ -68,19 +68,14 @@ O5mYMzSLyuOXR5xhBhG7fjsCAwEAAQ==
 		$this->assertTrue($ssl ? true : false);
 		
 		openssl_pkey_export_to_file($ssl, 'test_data/'.$fileName.'.prv');
-		#fwrite(STDOUT, 'SSL ERROR: '.openssl_error_string()."\n");
 		openssl_pkey_export_to_file($ssl, 'test_data/'.$fileName.'_pass.prv', 'my_password');
-		#fwrite(STDOUT, 'SSL ERROR: '.openssl_error_string()."\n");
 		
 		$keyPub = openssl_pkey_get_details($ssl);
-		#ve($keyPub);
 		$keyPub = $keyPub['key'];
 		file_put_contents('test_data/'.$fileName.'.pub', $keyPub);
 		
 		openssl_public_encrypt('test my keys', $encrypted, $keyPub);
-		#fwrite(STDOUT, 'SSL ERROR: '.openssl_error_string()."\n");
 		openssl_private_decrypt($encrypted, $decrypted, $ssl);
-		#fwrite(STDOUT, 'SSL ERROR: '.openssl_error_string()."\n");
 		$this->assertEquals('test my keys', $decrypted);
 		
 		openssl_pkey_free($ssl);

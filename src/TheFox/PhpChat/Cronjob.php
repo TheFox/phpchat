@@ -4,10 +4,8 @@ namespace TheFox\PhpChat;
 
 use Exception;
 use RuntimeException;
-
 use Guzzle\Http\Client as GuzzleHttpClient; // v==3
 #use GuzzleHttp\Client as GuzzleHttpClient; // v>=4
-
 use TheFox\Ipc\ClientConnection;
 use TheFox\Ipc\StreamHandler as IpcStreamHandler;
 use TheFox\Dht\Kademlia\Node;
@@ -28,10 +26,6 @@ class Cronjob extends Thread{
 	private $hours = 0;
 	private $minutes = 0;
 	private $seconds = 0;
-	
-	public function __construct(){
-		
-	}
 	
 	public function setLog($log){
 		$this->log = $log;
@@ -174,25 +168,21 @@ class Cronjob extends Thread{
 		}
 		
 		if($this->hours == 0 && $this->minutes == 1 && $this->seconds == 0){
-			#print 'ping'."\n";
 			$this->pingNodes();
 			$this->bootstrapNodesEnclose();
 			$this->nodesNewEnclose();
 		}
 		
 		if($this->seconds == 0){
-			#print 'msgs'."\n";
 			$this->msgDbInit();
 			$this->nodesNewEnclose();
 		}
 		if($this->minutes % 5 == 0 && $this->seconds == 0){
-			#print 'save'."\n";
 			$this->log->debug('save');
 			$this->tableNodesSort();
 			$this->ipcKernelConnection->execAsync('save');
 		}
 		if($this->minutes % 15 == 0 && $this->seconds == 0){
-			#print 'ping'."\n";
 			$this->pingNodes();
 		}
 		if($this->minutes % 30 == 0 && $this->seconds == 0){
@@ -207,7 +197,6 @@ class Cronjob extends Thread{
 			$this->seconds = 0;
 			$this->minutes++;
 			
-			#print __FUNCTION__.': '.$this->getExit().', '.$this->hours.':'.$this->minutes.':'.$this->seconds."\n";
 			$this->log->debug($this->getExit().' '.$this->hours.':'.$this->minutes.':'.$this->seconds);
 		}
 		if($this->minutes >= 60){
@@ -219,8 +208,6 @@ class Cronjob extends Thread{
 	public function loop(){
 		$this->log->debug('loop start');
 		while(!$this->getExit()){
-			#print __FUNCTION__.': '.$this->getExit().', '.$this->hours.', '.$this->minutes.', '.$this->seconds."\n";
-			
 			$this->run();
 			sleep(1);
 		}
@@ -239,7 +226,6 @@ class Cronjob extends Thread{
 	
 	private function pingNodes(){
 		$this->log->debug('ping');
-		#print __FUNCTION__.''."\n";
 		#$this->log->debug(__FUNCTION__);
 		$this->settings = $this->ipcKernelConnection->execSync('getSettings');
 		#$table = $this->ipcKernelConnection->execSync('getTable');
@@ -276,16 +262,10 @@ class Cronjob extends Thread{
 	public function msgDbInit(){
 		$this->log->debug('msgs');
 		#$this->log->debug(__FUNCTION__);
-		#print __FUNCTION__.''."\n";
 		
 		$this->msgDb = $this->ipcKernelConnection->execSync('getMsgDb', array(), 10);
 		$this->settings = $this->ipcKernelConnection->execSync('getSettings');
 		$this->setTable($this->ipcKernelConnection->execSync('getTable'));
-		
-		#ve($this->table);
-		
-		#print __FUNCTION__.': msgDb A '.(int)($this->msgDb===null)."\n";
-		#ve($this->msgDb);
 		
 		try{
 			$this->msgDbInitNodes();
@@ -293,13 +273,11 @@ class Cronjob extends Thread{
 		}
 		catch(Exception $e){
 			$this->log->debug(__FUNCTION__.': '.$e->getMessage());
-			#print __FUNCTION__.': '.$e->getMessage()."\n";
 		}
 	}
 	
 	public function msgDbInitNodes(){
 		#$this->log->debug(__FUNCTION__);
-		#print __FUNCTION__.''."\n";
 		$this->log->debug('msgs init nodes');
 		
 		if(!$this->msgDb){
@@ -321,13 +299,11 @@ class Cronjob extends Thread{
 				&& $msg->getStatus() == 'O'
 				&& $msg->getEncryptionMode() == 'S'
 			){
-				#fwrite(STDOUT, 'msg db, init nodes: find node: '.$msg->getId().' -> '.$msg->getDstNodeId()."\n");
 				
 				$node = new Node();
 				$node->setIdHexStr($msg->getDstNodeId());
 				$onode = $this->table->nodeFind($node);
 				if($onode && $onode->getSslKeyPub()){
-					#fwrite(STDOUT, 'msg db, init nodes:     found node: '.$onode->getIdHexStr()."\n");
 					
 					$msg->setSrcSslKeyPub($this->localNode->getSslKeyPub());
 					$msg->setDstSslPubKey($this->localNode->getSslKeyPub());
@@ -344,7 +320,6 @@ class Cronjob extends Thread{
 					}
 				}
 				else{
-					#fwrite(STDOUT, 'msg db, init nodes:     unknown node: '.$node->getIdHexStr()."\n");
 					if($this->ipcKernelConnection){
 						$this->ipcKernelConnection->execAsync('nodesNewDbNodeAddFind', array($node->getIdHexStr()));
 					}
@@ -353,14 +328,12 @@ class Cronjob extends Thread{
 		}
 		
 		if($this->ipcKernelConnection){
-			#print __FUNCTION__.': reset msgDb'."\n";
 			$this->msgDb = $this->ipcKernelConnection->execSync('getMsgDb', array(), 10);
 		}
 	}
 	
 	public function msgDbSendAll(){
 		#$this->log->debug(__FUNCTION__);
-		#fwrite(STDOUT, __FUNCTION__.''."\n");
 		$this->log->debug('msgs send all');
 		
 		if(!$this->msgDb){
@@ -676,8 +649,6 @@ class Cronjob extends Thread{
 	}
 	
 	public function bootstrapNodesEncloseJson($json){
-		#fwrite(STDOUT, 'json: '.(int)$this->ipcKernelConnection.PHP_EOL);
-		
 		$settingsBridgeClient = $this->settings->data['node']['bridge']['client']['enabled'];
 		
 		$nodes = array();
@@ -899,12 +870,10 @@ class Cronjob extends Thread{
 	}
 	
 	public function shutdown(){
-		#print __FUNCTION__.''."\n";
 		$this->log->info('shutdown');
 	}
 	
 	public function ipcKernelShutdown(){
-		#print __FUNCTION__.''."\n";
 		$this->setExit(1);
 	}
 	

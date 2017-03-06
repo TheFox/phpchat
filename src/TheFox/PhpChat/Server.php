@@ -3,9 +3,7 @@
 namespace TheFox\PhpChat;
 
 use Exception;
-
 use Colors\Color;
-
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler;
 use TheFox\Network\Socket;
@@ -27,10 +25,6 @@ class Server{
 	private $isListening = false;
 	private $socket = null;
 	private $hasDhtNetworkBootstrapped = false;
-	
-	public function __construct(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-	}
 	
 	public function setLog($log){
 		$this->log = $log;
@@ -162,9 +156,6 @@ class Server{
 	}
 	
 	public function run(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		#print __CLASS__.'->'.__FUNCTION__.': client '.count($this->clients)."\n";
-		
 		$readHandles = array();
 		$writeHandles = null;
 		$exceptHandles = null;
@@ -186,7 +177,6 @@ class Server{
 				}
 				
 				// Run client.
-				#print __CLASS__.'->'.__FUNCTION__.': client run'."\n";
 				$client->run();
 				$this->getKernel()->incSettingsTrafficIn($client->resetTrafficIn());
 				$this->getKernel()->incSettingsTrafficOut($client->resetTrafficOut());
@@ -244,7 +234,6 @@ class Server{
 	
 	private function clientNewTcp($socket){
 		$this->clientsId++;
-		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.$this->clientsId."\n");
 		#$this->log->debug('new tcp client: '.$this->clientsId);
 		
 		$client = new TcpClient();
@@ -259,7 +248,6 @@ class Server{
 	
 	private function clientNewHttp($uri){
 		$this->clientsId++;
-		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.$this->clientsId."\n");
 		$this->log->debug('new http client: '.$this->clientsId);
 		
 		$client = new HttpClient();
@@ -273,7 +261,6 @@ class Server{
 		$client->setServer($this);
 		
 		$this->clients[$this->clientsId] = $client;
-		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.count($this->clients)."\n");
 		
 		$this->logColor('debug', 'client start', 'white', 'black');
 		
@@ -529,21 +516,17 @@ class Server{
 	public function nodeFind($nodeIdToFind){
 		$settingsBridgeClient = $this->getSettings()->data['node']['bridge']['client']['enabled'];
 		
-		#fwrite(STDOUT, 'nodeFind: '.$nodeIdToFind.' /'.(int)$settingsBridgeClient.'/'."\n");
-		
 		if($this->getTable()){
 			foreach($this->getTable()->getNodesClosest() as $nodeId => $node){
 				$connect = $node->getBridgeServer() && $settingsBridgeClient
 					|| !$settingsBridgeClient;
 				#$logTmp = '/'.(int)$node->getBridgeServer().'/ /'.(int)$connect.'/';
-				#fwrite(STDOUT, 'send node find to '.$node->getIdHexStr().': '.$logTmp."\n");
 				
 				if($connect){
 					$clientActions = array();
 					$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
 					$action->setName('node_find_after_id');
 					$action->functionSet(function($action, $client) use($nodeIdToFind) {
-						#fwrite(STDOUT, 'action function: CRITERION_AFTER_ID_SUCCESSFULL, '.$nodeIdToFind.''."\n");
 						$client->sendNodeFind($nodeIdToFind);
 					});
 					$clientActions[] = $action;
@@ -552,14 +535,12 @@ class Server{
 					$action = new ClientAction(ClientAction::CRITERION_AFTER_NODE_FOUND);
 					$action->setName('node_find_node_found');
 					$action->functionSet(function($action, $client){
-						#fwrite(STDOUT, 'action function: CRITERION_AFTER_NODE_FOUND'."\n");
 					});
 					$clientActions[] = $action;
 					
 					$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
 					$action->setName('node_find_after_previous_actions_send_quit');
 					$action->functionSet(function($action, $client){
-						#fwrite(STDOUT, 'action function: CRITERION_AFTER_PREVIOUS_ACTIONS'."\n");
 						
 						$client->sendQuit();
 						$client->shutdown();

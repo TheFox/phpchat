@@ -3,12 +3,10 @@
 namespace TheFox\Dht\Kademlia;
 
 use RuntimeException;
-
 use Zend\Uri\UriFactory;
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
 use StephenHill\Base58;
-
 use TheFox\Storage\YamlStorage;
 use TheFox\Utilities\Hex;
 
@@ -27,7 +25,6 @@ class Node extends YamlStorage{
 		parent::__construct($filePath);
 		
 		$this->uri = UriFactory::factory('tcp://');
-		#ve($this->uri);
 		
 		$this->data['id'] = '00000000-0000-4000-8000-000000000000';
 		$this->data['uri'] = '';
@@ -64,17 +61,12 @@ class Node extends YamlStorage{
 	}
 	
 	public function save(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		$this->data['uri'] = (string)$this->uri;
 		$this->data['sslKeyPub'] = base64_encode($this->sslKeyPub);
 		return parent::save();
 	}
 	
 	public function load(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		#fwrite(STDOUT, 'load node'."\n");
-		
 		if(parent::load()){
 			$this->setIdHexStr($this->data['id']);
 			
@@ -87,7 +79,6 @@ class Node extends YamlStorage{
 				}
 				
 				if(array_key_exists('uri', $this->data)){
-					#fwrite(STDOUT, 'load node: uri /'.$this->data['uri'].'/'."\n");
 					if($this->data['uri']){
 						$this->setUri($this->data['uri']);
 					}
@@ -105,16 +96,11 @@ class Node extends YamlStorage{
 	}
 	
 	public function setIdHexStr($id){
-		#fwrite(STDOUT, __FUNCTION__.''."\n");
-		#fwrite(STDOUT, __FUNCTION__.': '.$id."\n");
-		#ve(isset($id) ? $id : null);
-		
 		if($id){
 			$id = strtolower($id);
 			$this->id = array_fill(0, static::ID_LEN_BYTE, 0);
 			
 			if(Uuid::isValid($id)){
-				#print __CLASS__.'->'.__FUNCTION__.': check valid UUID'."\n";
 				$this->data['id'] = $id;
 				
 				$id = str_replace('-', '', $id);
@@ -124,8 +110,6 @@ class Node extends YamlStorage{
 				}
 			}
 		}
-		#ve($this->id);
-		#else{ print __CLASS__.'->'.__FUNCTION__.': check valid UUID FAILED: '.$id."\n"; }
 	}
 	
 	public function getIdHexStr(){
@@ -154,7 +138,6 @@ class Node extends YamlStorage{
 			for($bits = 7; $bits >= 0; $bits--){
 				$rv .= $this->id[$idPos] & (1 << $bits) ? '1' : '0';
 			}
-			#$rv .= ' ';
 		}
 		return $rv;
 	}
@@ -289,24 +272,17 @@ class Node extends YamlStorage{
 	
 	public function getDistance(){
 		return $this->data['distance'];
-		#return $this->distance;
 	}
 	
 	public function distance(Node $node){
-		#fwrite(STDOUT, __FUNCTION__.''."\n");
 		$rv = array_fill(0, static::ID_LEN_BYTE, 0);
-		#ve($rv);
 		
 		if($node && $this !== $node){
 			$thisId = $this->getId();
 			$nodeId = $node->getId();
 			
-			#ve($thisId);
-			#ve($nodeId);
-			
 			for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
 				$rv[$idPos] = $thisId[$idPos] ^ $nodeId[$idPos];
-				#fwrite(STDOUT, __FUNCTION__.'     pos: '.$idPos.' -> '.$rv[$idPos]."\n");
 			}
 		}
 		
@@ -318,12 +294,9 @@ class Node extends YamlStorage{
 		
 		$rv = '';
 		for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
-			#fwrite(STDOUT, __FUNCTION__.' pos: '.$idPos."\n");
 			for($bits = 7; $bits >= 0; $bits--){
-				#fwrite(STDOUT, __FUNCTION__.'     bit: '.$bits.' -> '.(1 << $bits)."\n");
 				$rv .= $distance[$idPos] & (1 << $bits) ? '1' : '0';
 			}
-			#$rv .= ' ';
 		}
 		return $rv;
 	}

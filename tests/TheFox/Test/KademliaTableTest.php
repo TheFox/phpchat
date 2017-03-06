@@ -5,7 +5,6 @@ namespace TheFox\Test;
 use PHPUnit_Framework_TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
-
 use TheFox\Dht\Kademlia\Table;
 use TheFox\Dht\Kademlia\Bucket;
 use TheFox\Dht\Kademlia\Node;
@@ -230,9 +229,6 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		
 		$this->assertEquals(4, count($nodes));
 		$this->assertEquals(array($node_c, $node_a, $node_b, $node_d), $nodes);
-		/*foreach($nodes as $nodeId => $node){
-			fwrite(STDOUT, 'node: /'.$nodeId.'/ '.$node->getIdHexStr()."\n");
-		}*/
 	}
 	
 	public function testNodeFindByKeyPubFingerprint(){

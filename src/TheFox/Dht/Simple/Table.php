@@ -4,9 +4,7 @@ namespace TheFox\Dht\Simple;
 
 use Exception;
 use RuntimeException;
-
 use Symfony\Component\Filesystem\Filesystem;
-
 use TheFox\Storage\YamlStorage;
 use TheFox\Dht\Kademlia\Node;
 
@@ -50,8 +48,6 @@ class Table extends YamlStorage{
 	}
 	
 	public function load(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		if(parent::load()){
 			
 			if($this->data){
@@ -96,9 +92,7 @@ class Table extends YamlStorage{
 	public function getNodesBridgeServer(){
 		$rv = array();
 		foreach($this->nodes as $nodeId => $node){
-			#fwrite(STDOUT, 'getNodesBridgeServer: '.$nodeId.' '.$node->getUri()."\n");
 			if($node->getBridgeServer()){
-				#fwrite(STDOUT, '  server'."\n");
 				$rv[] = $node;
 			}
 		}
@@ -193,8 +187,6 @@ class Table extends YamlStorage{
 	}
 	
 	public function nodeEnclose(Node $node){
-		#fwrite(STDOUT, __FUNCTION__.': '.$node."\n");
-		
 		if(!$this->getLocalNode()){
 			throw new RuntimeException('localNode not set.', 1);
 		}
@@ -295,7 +287,6 @@ class Table extends YamlStorage{
 			unset($this->nodes[$nodeId]);
 		}
 		
-		#fwrite(STDOUT, 'node delete: '.$nodeId.' /'.$node->getFilePath().'/'.PHP_EOL);
 		$filesystem->remove($node->getFilePath());
 	}
 	

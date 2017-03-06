@@ -4,7 +4,6 @@ namespace TheFox\Dht\Kademlia;
 
 use Exception;
 use RuntimeException;
-
 use TheFox\Storage\YamlStorage;
 
 /**
@@ -222,11 +221,7 @@ class Table extends YamlStorage{
 	}
 	
 	public function nodeFindByKeyPubFingerprint($fingerprint){
-		#print __CLASS__.'->'.__FUNCTION__.': '.$fingerprint."\n";
-		
 		foreach($this->rootBucket->getNodes() as $onodeId => $onode){
-			#print __CLASS__.'->'.__FUNCTION__.': node '.$onodeId."\n";
-			
 			if($fingerprint == $onode->getSslKeyPubFingerprint()){
 				return $onode;
 			}
@@ -236,8 +231,6 @@ class Table extends YamlStorage{
 	}
 	
 	public function nodeEnclose(Node $node){
-		#fwrite(STDOUT, __FUNCTION__.''."\n");
-		
 		if(!$this->getLocalNode()){
 			throw new RuntimeException('localNode not set.');
 		}

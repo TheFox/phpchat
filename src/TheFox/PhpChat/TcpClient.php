@@ -3,7 +3,6 @@
 namespace TheFox\PhpChat;
 
 use Zend\Uri\UriFactory;
-
 use TheFox\Network\AbstractSocket;
 
 class TcpClient extends Client{
@@ -34,8 +33,6 @@ class TcpClient extends Client{
 	 * @codeCoverageIgnore
 	 */
 	public function run(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		$this->checkPingSend();
 		$this->checkPongTimeout();
 		$this->checkActions();

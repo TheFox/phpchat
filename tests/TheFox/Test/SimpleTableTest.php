@@ -5,7 +5,6 @@ namespace TheFox\Test;
 use PHPUnit_Framework_TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
-
 use TheFox\Dht\Simple\Table;
 use TheFox\Dht\Kademlia\Node;
 
@@ -161,11 +160,8 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		
 		
 		$table = new Table('test_data/'.$fileName);
-		#\Doctrine\Common\Util\Debug::dump($table->load());
 		
 		$this->assertTrue($table->load());
-		
-		#\Doctrine\Common\Util\Debug::dump($files);
 	}
 	
 	public function testGetNodesClosest(){
@@ -191,8 +187,6 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$table->nodeEnclose($node_d);
 		
 		$nodes = $table->getNodesClosest(3);
-		
-		#\Doctrine\Common\Util\Debug::dump($nodes);
 		
 		$this->assertEquals(3, count($nodes));
 		
@@ -340,9 +334,6 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		
 		$this->assertEquals(4, count($nodes));
 		$this->assertEquals(array($node_c, $node_a, $node_b, $node_d), $nodes);
-		#foreach($nodes as $nodeId => $node){
-		#	fwrite(STDOUT, 'node: /'.$nodeId.'/ '.$node->getIdHexStr()."\n");
-		#}
 	}
 	
 	public function testNodeFindClosestBridgeServer(){
@@ -438,7 +429,6 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 	}
 	
 	public function testNodeEnclose3a(){
-		#fwrite(STDOUT, 'testNodeEnclose3a'.PHP_EOL);
 		$runName = uniqid('', true);
 		$fileName = 'testfile_table_nodeenclose3a_'.date('Ymd_His').'_'.$runName.'.yml';
 		
@@ -509,7 +499,6 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 	 * @group medium
 	 */
 	public function testNodeEnclose3b(){
-		#fwrite(STDOUT, 'testNodeEnclose3b'.PHP_EOL);
 		$runName = uniqid('', true);
 		$fileName = 'testfile_table_nodeenclose3b_'.date('Ymd_His').'_'.$runName.'.yml';
 		
@@ -708,8 +697,6 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$nodeNoBegin = 100000000002;
 		$nodeNoEnd = $nodeNoBegin + $NODES;
 		for($nodeNo = $nodeNoBegin; $nodeNo < $nodeNoEnd; $nodeNo++){
-			#fwrite(STDOUT, __METHOD__.' node setup: '.$nodeNo.''.PHP_EOL);
-			
 			$fileName = 'testfile_node_nodeenclose4_'.$nodeNo.'_'.date('Ymd_His').'_'.$runName.'.yml';
 			$node = new Node('test_data/'.$fileName);
 			$node->setIdHexStr('12000001-2002-4004-8008-'.$nodeNo);
@@ -724,7 +711,6 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$table->save();
 		
 		$nodeNum = $table->getNodesNum();
-		#fwrite(STDOUT, 'nodes: '.$nodeNum.''.PHP_EOL);
 		$this->assertEquals(50, $nodeNum);
 		
 		$finder = new Finder();

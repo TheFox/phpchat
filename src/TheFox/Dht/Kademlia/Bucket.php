@@ -3,7 +3,6 @@
 namespace TheFox\Dht\Kademlia;
 
 use RuntimeException;
-
 use TheFox\Storage\YamlStorage;
 
 /**
@@ -20,7 +19,6 @@ class Bucket extends YamlStorage{
 	private $childBucketLower = null;
 	
 	public function __construct($filePath = null){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		parent::__construct($filePath);
 		
 		#$this->data['id'] = 0;
@@ -44,8 +42,6 @@ class Bucket extends YamlStorage{
 	}
 	
 	public function save(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		#$this->data['prefixName'] = intToBin($this->getPrefix());
 		$this->data['distanceName'] = intToBin($this->getDistance());
 		$this->data['maskBitName'] = intToBin($this->getMaskByte());
@@ -53,8 +49,6 @@ class Bucket extends YamlStorage{
 		
 		$this->data['nodes'] = array();
 		foreach($this->nodes as $nodeId => $node){
-			#print __CLASS__.'->'.__FUNCTION__.': '.$nodeId.', '.(int)$node->getDataChanged()."\n";
-			
 			$this->data['nodes'][$nodeId] = array(
 				'path' => $node->getFilePath(),
 			);
@@ -82,9 +76,6 @@ class Bucket extends YamlStorage{
 	}
 	
 	public function load(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		#fwrite(STDOUT, __FUNCTION__.': '.$this->getFilePath().''."\n");
-		
 		if(parent::load()){
 			
 			if($this->data){
@@ -219,7 +210,6 @@ class Bucket extends YamlStorage{
 	}
 	
 	public function nodeFind(Node $node){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		return $this->nodeFindByIdHexStr($node->getIdHexStr());
 	}
 	
@@ -243,11 +233,8 @@ class Bucket extends YamlStorage{
 	}
 	
 	public function nodeFindByUri($uri){
-		#fwrite(STDOUT, 'nodeFindByUri'."\n");
 		foreach($this->nodes as $nodeId => $node){
-			#fwrite(STDOUT, 'nodeFindByUri: '.$node->getIdHexStr().', '.(string)$node->getUri()."\n");
 			if((string)$node->getUri() == $uri){
-				#fwrite(STDOUT, 'nodeFindByUri: '.$node->getIdHexStr().', found'."\n");
 				return $node;
 			}
 		}
@@ -400,8 +387,6 @@ class Bucket extends YamlStorage{
 		$printPrefix = str_repeat("\t", $printLevel);
 		*/
 		
-		#fwrite(STDOUT, $printPrefix.'reenclose: '.$level."\n");
-		
 		/*if($level >= 129){
 			#fwrite(STDOUT, $printPrefix.'ERROR: level '.$level.' is too deep'."\n");
 			throw new RuntimeException('reenclose level too deep: '.$level);
@@ -434,7 +419,6 @@ class Bucket extends YamlStorage{
 					#$msgOut = 'reenclose child bucket: ';
 					#$msgOut .= '/'.$bucket->getMaskByte().'/ ';
 					#$msgOut .= ''.intToBin($bucket->getMaskBit()).' d='.intToBin($bucket->getDistance()).'';
-					#fwrite(STDOUT, $printPrefix.$msgOut."\n");
 					$bucket->nodeEnclose($node, $sortNodes, $level + 1);
 				}
 				/*else{
@@ -442,7 +426,6 @@ class Bucket extends YamlStorage{
 					$msgOut .= 'l='.$level.' ';
 					$msgOut .= 'd='.intToBin($distance[$maskByte]).' ';
 					$msgOut .= 'm='.intToBin($maskBitValue).' n='.$node->getIdHexStr().'';
-					#fwrite(STDOUT, $printPrefix.$msgOut."\n");
 					#throw new RuntimeException($msgOut);
 					# NOT_IMPLEMENTED
 				}*/
@@ -452,7 +435,6 @@ class Bucket extends YamlStorage{
 			$this->setDataChanged(true);
 		}
 		/*else{
-			#fwrite(STDOUT, $printPrefix.'reenclose failed: '.intToBin($maskBitValue).' ('.$maskBitValue.')'."\n");
 			#throw new RuntimeException('reenclose failed: l='.$level.' m='.intToBin($maskBitValue).'');
 			# NOT_IMPLEMENTED: what happens when a bucket is full?
 		}*/
@@ -488,25 +470,15 @@ class Bucket extends YamlStorage{
 			$maskBit = 7; // Root MaskBit
 			
 			if($this->getIsUpper() || $this->getIsLower()){
-				#fwrite(STDOUT, $printPrefix.'no root bucket'."\n");
 				$maskByte = $this->getMaskByte();
 				$maskBit = $this->getMaskBit();
 			}
 			else{
-				#fwrite(STDOUT, $printPrefix.'root bucket'."\n");
 				$this->setMaskByte($maskByte);
 				$this->setMaskBit($maskBit);
 			}
 			
 			$maskBitValue = 1 << $maskBit;
-			
-			#fwrite(STDOUT, $printPrefix.'level: '.$level."\n");
-			#fwrite(STDOUT, $printPrefix.'node: '.$node->getIdHexStr()."\n");
-			#fwrite(STDOUT, $printPrefix.'dist: '.intToBin($distance[$maskByte])."\n");
-			#fwrite(STDOUT, $printPrefix.'maskByte: '.$maskByte."\n");
-			#fwrite(STDOUT, $printPrefix.'maskBit: '.$maskBit."\n");
-			#fwrite(STDOUT, $printPrefix.'maskBitValue: '.intToBin($maskBitValue)."\n");
-			#fwrite(STDOUT, $printPrefix.'mask: /'.$maskByte.'/ /'.$maskBit.'/ /'.intToBin($maskBitValue).'/'."\n");
 			
 			/*
 			if($this->childBucketUpper){
@@ -527,39 +499,29 @@ class Bucket extends YamlStorage{
 			$onode = $this->nodeFind($node);
 			#timeStop('onode find end');
 			if(!$onode){
-				#fwrite(STDOUT, $printPrefix.'old node not found'."\n");
-				
 				if($this->getNodesNum() < static::$SIZE_MAX && !$this->getIsFull()){
-					#fwrite(STDOUT, $printPrefix.'add node'."\n");
-					
 					$this->nodeAdd($node, $sortNodes);
 					$nodeEncloseReturnValue = $node;
 					
 					if($this->isFull()){
-						#fwrite(STDOUT, $printPrefix.'FULL end'."\n");
 						#timeStop('nodesReEnclose start');
 						$this->nodesReEnclose($sortNodes, $level + 1);
 						#timeStop('nodesReEnclose end');
 					}
 				}
 				else{
-					#fwrite(STDOUT, $printPrefix.'FULL new'."\n");
-					
 					$bucket = null;
 					if($distance[$maskByte] & $maskBitValue){
-						#fwrite(STDOUT, $printPrefix.'match: upper'."\n");
 						$this->setChildBucketUpper($distance[$maskByte]);
 						$bucket = $this->childBucketUpper;
 					}
 					else{
-						#fwrite(STDOUT, $printPrefix.'match: lower'."\n");
 						$this->setChildBucketLower($distance[$maskByte]);
 						$bucket = $this->childBucketLower;
 					}
 					
 					if($bucket !== null){
 						#$msgOut = intToBin($bucket->getMaskBit()).' d='.intToBin($bucket->getDistance()).'';
-						#fwrite(STDOUT, $printPrefix.'child bucket: '.$msgOut."\n");
 						$bucket->nodeEnclose($node, $sortNodes, $level + 1);
 					}
 					/*else{
@@ -567,7 +529,6 @@ class Bucket extends YamlStorage{
 						#$msgOut .= 'l='.$level.' ';
 						#$msgOut .= 'd='.intToBin($distance[$maskByte]).' ';
 						#$msgOut .= 'm='.intToBin($maskBitValue).' n='.$node->getIdHexStr().'';
-						#fwrite(STDOUT, $printPrefix.$msgOut."\n");
 						
 						#throw new RuntimeException($msgOut);
 						# NOT_IMPLEMENTED: what happens when a bucket is not found?
@@ -575,7 +536,6 @@ class Bucket extends YamlStorage{
 				}
 			}
 			else{
-				#fwrite(STDOUT, $printPrefix.'update existing node'."\n");
 				#usleep(1000000);
 				#timeStop('onode update start');
 				$onode->update($node);

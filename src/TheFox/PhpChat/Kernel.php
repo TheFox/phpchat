@@ -30,10 +30,6 @@ class Kernel extends Thread{
 	private $ipcSmtpServerConnection = null;
 	private $ipcInfoConnection = null;
 	
-	public function __construct(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-	}
-	
 	public function setLog($log){
 		$this->log = $log;
 	}
@@ -47,31 +43,24 @@ class Kernel extends Thread{
 	}
 	
 	public function getSettings(){
-		#ve($this->settings);
 		return $this->settings;
 	}
 	
 	public function getSettingsUserNickname(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		#ve($this->settings);
-		
 		return $this->getSettings()->data['user']['nickname'];
 	}
 	
 	public function setSettingsUserNickname($userNickname){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		$this->getSettings()->data['user']['nickname'] = $userNickname;
 		$this->getSettings()->setDataChanged(true);
 	}
 	
 	public function incSettingsTrafficIn($inc){
-		#fwrite(STDOUT, 'traffic in: '.$inc.PHP_EOL);
 		$this->settings->data['node']['traffic']['in'] = bcadd($this->settings->data['node']['traffic']['in'], $inc);
 		$this->settings->setDataChanged(true);
 	}
 	
 	public function incSettingsTrafficOut($inc){
-		#fwrite(STDOUT, 'traffic out: '.$inc.PHP_EOL);
 		#$this->settings->data['node']['traffic']['out'] += $inc;
 		$this->settings->data['node']['traffic']['out'] = bcadd($this->settings->data['node']['traffic']['out'], $inc);
 		$this->settings->setDataChanged(true);
@@ -153,7 +142,6 @@ class Kernel extends Thread{
 			$this->getLog()->info('setup server: done');
 		}
 		else{
-			#print __CLASS__.'->'.__FUNCTION__.': failed'."\n";
 			$this->getLog()->emergency('setup server: failed');
 			$this->setExit(1);
 		}
@@ -306,11 +294,9 @@ class Kernel extends Thread{
 			$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
 			$action->setName('msgs_send_msgs');
 			$action->functionSet(function($action, $client){
-				#print __CLASS__.'->'.__FUNCTION__.': send msgs'."\n";
 				
 				$msgs = $action->getVar('msgs');
 				foreach($msgs as $msgId => $msg){
-					#print __CLASS__.'->'.__FUNCTION__.': send msg '.$msg->getId()."\n";
 					$client->sendMsg($msg);
 				}
 			}, array('msgs' => $msgs));
@@ -321,7 +307,6 @@ class Kernel extends Thread{
 				$action = new ClientAction(ClientAction::CRITERION_AFTER_MSG_RESPONSE);
 				$action->setName('msgs_response_for_msg'.$msgId);
 				$action->functionSet(function($action, $client){
-					#print __CLASS__.'->'.__FUNCTION__.': CRITERION_AFTER_MSG_RESPONSE'."\n";
 				});
 				$clientActions[] = $action;
 			}
@@ -329,7 +314,6 @@ class Kernel extends Thread{
 			$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
 			$action->setName('msgs_after_previous_actions_send_quit');
 			$action->functionSet(function($action, $client){
-				#print __CLASS__.'->'.__FUNCTION__.': shutdown'."\n";
 				
 				$client->sendQuit();
 				$client->shutdown();
@@ -344,15 +328,12 @@ class Kernel extends Thread{
 	}
 	
 	public function serverTalkResponseSend(Client $client, $rid, $status, $userNickname = ''){
-		#print __CLASS__.'->'.__FUNCTION__.': '.$rid.', '.$status.', '.$userNickname.''."\n";
-		
 		if($this->getServer()){
 			$this->getServer()->clientTalkResponseSend($client, $rid, $status, $userNickname);
 		}
 	}
 	
 	public function serverTalkMsgSend(Client $client, $rid, $userNickname, $text, $ignore = false){
-		#print __CLASS__.'->'.__FUNCTION__.': '.$rid.', '.$userNickname.', '.$text.', '.(int)$ignore."\n";
 		
 		if($this->getServer()){
 			$this->getServer()->clientTalkMsgSend($client, $rid, $userNickname, $text, $ignore);
@@ -366,16 +347,12 @@ class Kernel extends Thread{
 	}
 	
 	public function serverTalkCloseSend(Client $client, $rid, $userNickname){
-		#print __CLASS__.'->'.__FUNCTION__.': '.$rid.', '.$userNickname."\n";
-		
 		if($this->getServer()){
 			$this->getServer()->clientTalkCloseSend($client, $rid, $userNickname);
 		}
 	}
 	
 	public function serverNodeFind($nodeId){
-		#fwrite(STDOUT, 'serverNodeFind: '.$nodeId.''."\n");
-		
 		if($this->getServer()){
 			$this->getServer()->nodeFind($nodeId);
 		}
@@ -390,7 +367,6 @@ class Kernel extends Thread{
 	}
 	
 	public function getTable(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		return $this->table;
 	}
 	
@@ -572,7 +548,6 @@ class Kernel extends Thread{
 	}
 	
 	public function ipcConsoleShutdown(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		$this->setExit(1);
 		$this->ipcConsoleShutdown = true;
 	}

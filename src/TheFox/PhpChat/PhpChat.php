@@ -5,7 +5,7 @@ namespace TheFox\PhpChat;
 /**
  * Basic variables.
  *
- * @author Christian Mayer <http://fox21.at>
+ * @author Christian Mayer <https://fox21.at>
  */
 class PhpChat{
 	

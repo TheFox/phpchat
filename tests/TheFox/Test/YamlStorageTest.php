@@ -4,7 +4,6 @@ namespace TheFox\Test;
 
 use PHPUnit_Framework_TestCase;
 use Symfony\Component\Finder\Finder;
-
 use TheFox\Storage\YamlStorage;
 
 class YamlStorageTest extends PHPUnit_Framework_TestCase{

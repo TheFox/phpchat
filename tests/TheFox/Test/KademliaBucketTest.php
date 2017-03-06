@@ -3,7 +3,6 @@
 namespace TheFox\Test;
 
 use PHPUnit_Framework_TestCase;
-
 use TheFox\Dht\Kademlia\Bucket;
 
 class KademliaBucketTest extends PHPUnit_Framework_TestCase{

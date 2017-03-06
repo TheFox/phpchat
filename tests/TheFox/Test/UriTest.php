@@ -4,7 +4,6 @@ namespace TheFox\Test;
 
 use PHPUnit_Framework_TestCase;
 use Zend\Uri\UriFactory;
-
 use TheFox\PhpChat\TcpUri;
 
 class UriTest extends PHPUnit_Framework_TestCase{
@@ -17,8 +16,6 @@ class UriTest extends PHPUnit_Framework_TestCase{
 		$uri5 = UriFactory::factory('192.168.241.22');
 		$uri6 = UriFactory::factory('//192.168.241.22');
 		$uri7 = UriFactory::factory('192.168.241.22:25000');
-		
-		#ve($uri7);
 		
 		$this->assertEquals($uri1, $uri2);
 		$this->assertEquals('tcp://192.168.241.21:25000', $uri1);

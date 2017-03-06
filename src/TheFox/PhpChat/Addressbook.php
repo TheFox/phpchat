@@ -11,7 +11,6 @@ class Addressbook extends YamlStorage{
 	private $contactsByNodeId = array();
 	
 	public function __construct($filePath = null){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		parent::__construct($filePath);
 		
 		$this->data['timeCreated'] = time();
@@ -22,8 +21,6 @@ class Addressbook extends YamlStorage{
 	}
 	
 	public function save(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		$this->data['contacts'] = array();
 		foreach($this->contacts as $contactId => $contact){
 			
@@ -42,15 +39,12 @@ class Addressbook extends YamlStorage{
 	}
 	
 	public function load(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		if(parent::load()){
 			
 			if(isset($this->data['contacts']) && $this->data['contacts']){
 				foreach($this->data['contacts'] as $contactId => $contactAr){
 					#$this->contactsId++;
 					$this->contactsId = (int)$contactId;
-					#print __CLASS__.'->'.__FUNCTION__.': '.$this->contactsId."\n";
 					
 					$contact = new Contact();
 					$contact->setId($this->contactsId);
@@ -71,8 +65,6 @@ class Addressbook extends YamlStorage{
 	}
 	
 	public function contactAdd(Contact $contact){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		$ocontact = $this->contactGetByNodeId($contact->getNodeId());
 		if(!$ocontact){
 			$this->contactsId++;

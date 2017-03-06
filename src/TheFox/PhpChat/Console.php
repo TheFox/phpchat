@@ -6,11 +6,9 @@ use Exception;
 use RuntimeException;
 use DateTime;
 use DateTimeZone;
-
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
 use Zend\Uri\UriFactory;
-
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler as LoggerStreamHandler;
 use TheFox\Ipc\ClientConnection;
@@ -56,8 +54,6 @@ class Console extends Thread{
 	private $charBackspace;
 	
 	public function __construct(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		if(!posix_isatty(STDIN)){
 			throw new RuntimeException('STDIN: Invalid TTY.', 1);
 		}
@@ -118,7 +114,6 @@ class Console extends Thread{
 		if($printBuffer){
 			$output .= $this->buffer;
 		}
-		#print $output;
 		
 		if(!TEST){
 			fwrite(STDOUT, $output);
@@ -195,7 +190,6 @@ class Console extends Thread{
 	public static function lineClearRight(){
 		#$this->log->debug('line clear');
 		if(!TEST){
-			#print static::CHAR_ESCAPE.'[J';
 			print static::CHAR_ESCAPE.'[0K';
 		}
 	}
@@ -231,7 +225,6 @@ class Console extends Thread{
 	
 	private function linePrint($text){
 		#$this->log->debug('line print "'.$text.'"');
-		#print $text.PHP_EOL;
 		if(!TEST){
 			fwrite(STDOUT, $text.PHP_EOL);
 		}
@@ -384,11 +377,8 @@ class Console extends Thread{
 		if($lines && is_array($lines)){
 			foreach($lines as $line){
 				if($line[0] == "\t"){
-					#print "line '".substr($line, 1)."'\n";
-					#ve(\TheFox\Utilities\Hex::dataEncode($line));
 					$items = preg_split('/, ?/', substr($line, 1));
 					foreach($items as $item){
-						#print "item '$item'\n";
 						$pos = strpos($item, '=');
 						if($pos !== false){
 							$keys[substr($item, 0, $pos)] = substr($item, $pos + 1);
@@ -427,8 +417,6 @@ class Console extends Thread{
 	}
 	
 	public function loop(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		if(!$this->ipcKernelConnection){
 			throw new RuntimeException('You must first run init().');
 		}
@@ -447,8 +435,6 @@ class Console extends Thread{
 		$except = array();
 		$streamsChanged = stream_select($read, $write, $except, 0);
 		if($streamsChanged){
-			
-			#print "fgets\n";
 			#$this->log->debug('fgets');
 			$buffer = fgets(STDIN, 1024);
 			if($buffer === false){
@@ -698,7 +684,6 @@ class Console extends Thread{
 				$commandFound = true;
 				
 				if($line == 'help'){
-					#print PHP_EOL;
 					$this->handleCommandHelp();
 				}
 				elseif(substr($line, 0, 8) == 'connect '){
@@ -987,19 +972,13 @@ class Console extends Thread{
 	}
 	
 	private function handleCommandMsg($line){
-		#print __CLASS__.'->'.__FUNCTION__.': "'.$line.'"'."\n";
 		$line = substr($line, 3);
 		
-		#print __CLASS__.'->'.__FUNCTION__.': get table'."\n";
 		$table = $this->ipcKernelConnection->execSync('getTable');
 		
-		#print __CLASS__.'->'.__FUNCTION__.': get msgDb'."\n";
 		#$msgDb = $this->ipcKernelConnection->execSync('getMsgDb');
 		$msgs = $this->ipcKernelConnection->execSync('msgDbMsgGetMsgsForDst');
 		$msgsByIndex = array_keys($msgs);
-		#ve($msgDb);
-		#ve($msgs);
-		#ve($msgsByIndex);
 		
 		/*
 		if(!$msgDb){
@@ -1010,9 +989,6 @@ class Console extends Thread{
 		if($line){
 			$line = substr($line, 1);
 			$args = preg_split('/ /', $line);
-			#ve($args);
-			
-			#print __CLASS__.'->'.__FUNCTION__.': rest "'.$line.'"'."\n";
 			
 			#$this->printPs1(true, 'handleCommandMsg A');
 			
@@ -1028,7 +1004,6 @@ class Console extends Thread{
 						if(!$subject){
 							$subject = 'No Subject';
 						}
-						#print "Subject: '".$subject."'\n\n";
 						
 						print PHP_EOL.'Enter the text to send.'.PHP_EOL;
 						print 'NOTE: end text with  <RETURN>.<RETURN>'.PHP_EOL;
@@ -1037,7 +1012,6 @@ class Console extends Thread{
 						while(!$this->getExit()){
 							$line = fgets(STDIN, 1024);
 							
-							#print "line: '".substr($line, 0, -1)."'\n";
 							if(substr($line, 0, -1) == '.') break;
 							$text .= $line;
 							
@@ -1053,7 +1027,6 @@ class Console extends Thread{
 								$answer = 'y';
 							}
 							print "Answer: '".$answer."'".PHP_EOL;
-							#print "Text: '".$text."'\n";
 							
 							stream_set_blocking(STDIN, 0);
 							$this->sttyEnterIcanonMode();
@@ -1078,7 +1051,6 @@ class Console extends Thread{
 								
 								$msg->setDstNodeId($dstNode->getIdHexStr());
 								if($oDstNode = $table->nodeFind($dstNode)){
-									#print 'found node in table'.PHP_EOL;
 									$msg->setDstSslPubKey($oDstNode->getSslKeyPub());
 								}
 								#else{ print 'node not found'.PHP_EOL; }
@@ -1090,16 +1062,13 @@ class Console extends Thread{
 								$msg->setStatus('O');
 								
 								$encrypted = false;
-								#print 'DstSslPubKey: '.strlen($msg->getDstSslPubKey()).PHP_EOL;
 								if($msg->getDstSslPubKey()){
-									#print 'use dst key'.PHP_EOL;
 									
 									$msg->setEncryptionMode('D');
 								}
 								else{
 									// Encrypt with own public key
 									// while destination public key is not available.
-									#print 'use local key'.PHP_EOL;
 									
 									$msg->setEncryptionMode('S');
 									$msg->setDstSslPubKey($table->getLocalNode()->getSslKeyPub());
@@ -1161,14 +1130,12 @@ class Console extends Thread{
 						$sslKeyPrvPass = $this->settings->data['node']['sslKeyPrvPass'];
 						$msg->setSslKeyPrvPath($sslKeyPrvPath, $sslKeyPrvPass);
 						
-						#ve($msg);
 						$text = null;
 						try{
 							$text = $msg->decrypt();
 						}
 						catch(Exception $e){
 							$text = null;
-							#print 'ERROR: decrypt: '.$e->getMessage().PHP_EOL;
 						}
 						
 						$dateCreated = new DateTime();
@@ -1301,7 +1268,6 @@ class Console extends Thread{
 	}
 	
 	public function shutdown(){
-		#print __CLASS__.'->'.__FUNCTION__.': '.(int)$this->ipcKernelShutdown."\n";
 		if(!TEST){
 			fwrite(STDOUT, PHP_EOL);
 		}
@@ -1338,8 +1304,6 @@ class Console extends Thread{
 	}
 	
 	public function ipcKernelShutdown(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		#$this->log->info('Connection to kernel process closed.');
 		#$this->msgAdd('Connection to kernel process closed.', true, true);
 		
@@ -1350,9 +1314,6 @@ class Console extends Thread{
 	}
 	
 	public function connect($uri){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		#ve($uri);
-		
 		$this->msgAdd();
 		$this->msgAdd('Connecting to '.$uri.' ...', true, false);
 		
@@ -1389,8 +1350,6 @@ class Console extends Thread{
 	}
 	
 	private function talkResponseSend(TalkRequest $talkRequest){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		$userNickname = '';
 		if($talkRequest->getStatus() == 1){
 			$userNickname = $this->userNickname;
@@ -1407,7 +1366,6 @@ class Console extends Thread{
 	}
 	
 	private function talkMsgSend($text, $ignore = false){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		$this->log->debug('send msg: i='.(int)($ignore));
 		
 		$rid = (string)Uuid::uuid4();
@@ -1423,8 +1381,6 @@ class Console extends Thread{
 	}
 	
 	public function talkMsgAdd($rid = '', $userNickname, $text){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		$this->msgAdd('<'.$userNickname.'> '.$text, true, true, true);
 	}
 	
@@ -1447,7 +1403,6 @@ class Console extends Thread{
 	private function sendRandomMsg(){
 		if($this->getModeChannel() && $this->getModeChannelClient() && $this->nextRandomMsg <= time()){
 			$this->log->debug('send random msg begin');
-			#print __CLASS__.'->'.__FUNCTION__.''."\n";
 			
 			$this->randomMsgSetNextTime();
 			

@@ -7,7 +7,6 @@ use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
 use Zend\Uri\UriFactory;
 use Zend\Uri\Http;
-
 use TheFox\Dht\Kademlia\Node;
 use TheFox\Dht\Kademlia\Bucket;
 use TheFox\PhpChat\TcpUri;

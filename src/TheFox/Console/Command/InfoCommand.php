@@ -3,14 +3,12 @@
 namespace TheFox\Console\Command;
 
 use RuntimeException;
-
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Colors\Color;
 #use Rych\ByteSize\Formatter\Binary;
 use Rych\ByteSize\ByteSize;
-
 use TheFox\PhpChat\PhpChat;
 use TheFox\PhpChat\Console;
 use TheFox\Dht\Kademlia\Node;

@@ -6,7 +6,6 @@ use PHPUnit_Framework_TestCase;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Filesystem\Filesystem;
 use Rhumsaa\Uuid\Uuid;
-
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler as LoggerStreamHandler;
 use TheFox\PhpChat\Settings;

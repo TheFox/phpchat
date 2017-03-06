@@ -3,7 +3,6 @@
 namespace TheFox\Test;
 
 use PHPUnit_Framework_TestCase;
-
 use TheFox\PhpChat\TalkRequest;
 use TheFox\PhpChat\Client;
 
@@ -35,8 +34,6 @@ class TalkRequestTest extends PHPUnit_Framework_TestCase{
 		
 		$request->setClient($client);
 		$this->assertEquals($client, $request->getClient());
-		
-		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': end'."\n");
 	}
 	
 	public function testSetUserNickname(){

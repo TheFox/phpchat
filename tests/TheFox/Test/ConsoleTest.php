@@ -4,7 +4,6 @@ namespace TheFox\Test;
 
 use PHPUnit_Framework_TestCase;
 use Symfony\Component\Finder\Finder;
-
 use TheFox\PhpChat\Settings;
 use TheFox\PhpChat\Console;
 use TheFox\Logger\Logger;

@@ -4,13 +4,11 @@ namespace TheFox\Console\Command;
 
 use Exception;
 use RuntimeException;
-
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Mail\Message as ZendMailMessage;
 use Zend\Mail\Headers as ZendMailHeaders;
-
 use TheFox\Imap\Storage\DirectoryStorage;
 use TheFox\Imap\Server;
 use TheFox\Imap\Event;

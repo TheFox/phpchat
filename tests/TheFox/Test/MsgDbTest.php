@@ -4,7 +4,6 @@ namespace TheFox\Test;
 
 use PHPUnit_Framework_TestCase;
 use Symfony\Component\Finder\Finder;
-
 use TheFox\PhpChat\MsgDb;
 use TheFox\PhpChat\Msg;
 use TheFox\Dht\Kademlia\Node;

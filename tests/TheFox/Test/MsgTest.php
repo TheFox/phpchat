@@ -5,7 +5,6 @@ namespace TheFox\Test;
 use PHPUnit_Framework_TestCase;
 use Symfony\Component\Finder\Finder;
 use Rhumsaa\Uuid\Uuid;
-
 use TheFox\PhpChat\Msg;
 use TheFox\PhpChat\MsgDb;
 

@@ -36,8 +36,6 @@ abstract class AbstractHandler{
 	abstract public function handleDataRecv($handle);
 	
 	public function send($data, $clientId = null){
-		#print __CLASS__.'->'.__FUNCTION__.': all='.(int)($clientId === null).', "'.$data.'"'."\n";
-		
 		if($this->isListening()){ // is Server
 			if($clientId !== null && isset($this->clients[$clientId])){
 				// Send to a certain client.
@@ -46,9 +44,7 @@ abstract class AbstractHandler{
 			}
 			else{
 				// Send to all clients.
-				#print __CLASS__.'->'.__FUNCTION__.': send to all ('.count($this->clients).'), "'.$data.'"'."\n";
 				foreach($this->clients as $clientId => $client){
-					#print __CLASS__.'->'.__FUNCTION__.': send to '.$client['id'].', "'.$data.'"'."\n";
 					$this->handleDataSend($client['handle'], base64_encode($data).$this->getSendSeparator());
 				}
 			}
@@ -94,8 +90,6 @@ abstract class AbstractHandler{
 	
 	public function recv($handle, $data){
 		$dataLen = strlen($data);
-		#print __CLASS__.'->'.__FUNCTION__.': '.$dataLen.', '.(int)($handle === null)."\n";
-		
 		if($this->isListening()){ // is Server
 			$client = $this->clientGetByHandle($handle);
 			$this->clientHandleRevcData($client, $data);
@@ -106,7 +100,6 @@ abstract class AbstractHandler{
 			do{
 				$separatorPos = strpos($data, $this->getSendSeparator());
 				if($separatorPos === false){
-					#print "data1.1: '$data'\n";
 					#$this->recvBuffer[$this->recvBufferId] .= $data;
 					$this->recvBufferTmp .= $data;
 					$data = '';
@@ -114,7 +107,6 @@ abstract class AbstractHandler{
 				else{
 					$msg = $this->recvBufferTmp.substr($data, 0, $separatorPos);
 					$this->recvBufferTmp = '';
-					#print "data1.2: '$msg'\n";
 					
 					$this->recvBufferId++;
 					$this->recvBuffer[$this->recvBufferId] = base64_decode($msg);
@@ -197,7 +189,6 @@ abstract class AbstractHandler{
 		if($hasData !== null){
 			$this->hasData = $hasData;
 		}
-		#print __CLASS__.'->'.__FUNCTION__.': '.(int)$this->hasData."\n";
 		return $this->hasData;
 	}
 	
@@ -214,8 +205,6 @@ abstract class AbstractHandler{
 	}
 	
 	public function clientAdd($handle){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		$this->clientsId++;
 		$this->clients[$this->clientsId] = array(
 			'id' => $this->clientsId,
@@ -240,7 +229,6 @@ abstract class AbstractHandler{
 				
 				$separatorPos = strpos($data, $this->getSendSeparator());
 				if($separatorPos === false){
-					#print "data2.1: ".$clientId.", '$data'\n";
 					
 					$this->clients[$clientId]['recvBufferTmp'] .= $data;
 					$data = '';
@@ -248,7 +236,6 @@ abstract class AbstractHandler{
 				else{
 					$msg = $this->clients[$clientId]['recvBufferTmp'].substr($data, 0, $separatorPos);
 					$this->clients[$clientId]['recvBufferTmp'] = '';
-					#print "data2.2: ".$clientId.", '$msg'\n";
 					
 					$this->clients[$clientId]['recvBufferId']++;
 					$this->clients[$clientId]['recvBuffer'][$this->clients[$clientId]['recvBufferId']] = base64_decode($msg);
@@ -276,8 +263,6 @@ abstract class AbstractHandler{
 	}
 	
 	public function setOnClientConnectFunction(Closure $onClientConnectFunction){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		$this->onClientConnectFunction = $onClientConnectFunction;
 	}
 	

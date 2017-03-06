@@ -18,8 +18,6 @@ class HttpClient extends Client{
 	}
 	
 	public function run(){
-		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.$this->getUri()."\n");
-		
 		$this->checkTimeout();
 	}
 	

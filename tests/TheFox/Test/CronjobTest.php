@@ -3,7 +3,6 @@
 namespace TheFox\Test;
 
 use PHPUnit_Framework_TestCase;
-
 use TheFox\PhpChat\Cronjob;
 use TheFox\PhpChat\MsgDb;
 use TheFox\PhpChat\Msg;

@@ -73,8 +73,6 @@ class TestTest extends PHPUnit_Framework_TestCase{
 	}*/
 	
 	/*public function testOne(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		#$this->assertTrue(false);
 		$this->assertTrue(true);
 	}*/
@@ -90,14 +88,10 @@ class TestTest extends PHPUnit_Framework_TestCase{
 	* @dataProvider provider
 	*/
 	/*public function testAdd($a, $b, $c){
-		#print __CLASS__.'->'.__FUNCTION__.': '.$a.', '.$b.', '.$c.''."\n";
-		
 		#$this->assertEquals($c, $a + $b);
 	}
 
 	public function provider(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		return array(
 			array(0, 0, 0),
 			array(0, 1, 1),
