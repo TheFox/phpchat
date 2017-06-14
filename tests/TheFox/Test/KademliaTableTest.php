@@ -9,9 +9,9 @@ use TheFox\Dht\Kademlia\Table;
 use TheFox\Dht\Kademlia\Bucket;
 use TheFox\Dht\Kademlia\Node;
 
-class KademliaTableTest extends PHPUnit_Framework_TestCase{
-	
-	const NODE_PUB1 = '-----BEGIN PUBLIC KEY-----
+class KademliaTableTest extends PHPUnit_Framework_TestCase
+{
+    const NODE_PUB1 = '-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAvAyZWe+VL1AfzK8ciwBQ
 Pq2JCzDxFWz7DhicP3ukaY3q5R3fxS46pfZRNTgCRUuQJ0UHsExo35cLK3EhcgCb
 2apoz+ZmMYbIABJymKhaKNMWSPNkpcCiEYizf9ee5CxKW+Cls/53jGMwOxLRxahs
@@ -26,8 +26,7 @@ mS9G8S/HSmd2F2SMyI8tdijophvw0g0pZcWj4KSwRmH9bQ9oYMRViO6dhn0LaFgz
 eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
 -----END PUBLIC KEY-----
 ';
-	
-	const NODE_PUB2 = '-----BEGIN PUBLIC KEY-----
+    const NODE_PUB2 = '-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAxDKXwrrDMT5vTWwdwsjv
 wZ45BxKs85QGeRL3ZtwnpqLH7iPNXmIe9YD7/NpancDnqKsxSE85RZWCdazWwWtK
 Y4mXgCCPx4LUomixp47DO3FltU++L52kPUFB6B7vXOAG6OnCpNRUKk4ZHXkcb4B7
@@ -42,8 +41,7 @@ UruU45tOsyDv/NyxlaaUu/OAu5bx6MxLzKB88CBCTMy2TAxz4AoFa73On5uUcIAN
 /okytY8F9ZXwo6LuIet1xl8CAwEAAQ==
 -----END PUBLIC KEY-----
 ';
-	
-	const NODE_PUB3 = '-----BEGIN PUBLIC KEY-----
+    const NODE_PUB3 = '-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAyRIx6t6y6v5Z7e40ve2S
 8y2897UEz9OPMcs14V0Ld9XsW19R7Kabbb7GSZ08yQ3+FQbasY675YttWjGTj5yz
 Chyw7bRtOp13IsWce79lsVGDa54bXf6InDMB1A05YFeGILdF4KqMs/sN5aosFl9W
@@ -58,8 +56,7 @@ b5xK7OKDkSG1TXPKMOPiQa4ao+ztOa2qDIc9avt4yZWLPg8JpgtHezX2CAvMjFa1
 axD+8TC4hYpjW6ZnMRKF39kCAwEAAQ==
 -----END PUBLIC KEY-----
 ';
-	
-	const NODE_PUB4 = '-----BEGIN PUBLIC KEY-----
+    const NODE_PUB4 = '-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA4BCs7V3rNckr8fjfLGb4
 iWvnRptQ2BW3ZP/ffGxRUE30F9NUlR2SnIahR9CBXaJ6ZI27dI0u3B1p5el8FBGT
 tLGvLnjqsYS/fF8Nbrj2A9t480PH87uDj06uh8Kl6HIIZITwp314lg8nrMoe24X0
@@ -74,372 +71,374 @@ MC2gNfNm+ZqfjI8/emAO7JIcwoZSVcgT2yA8M4B0V++I3t9ZXnaeBouc+Gh7TUnI
 ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 -----END PUBLIC KEY-----
 ';
-	
-	public function testSerialize(){
-		$localNode = new Node();
-		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
-		$localNode->setTimeCreated(1408371221);
-		$table = new Table();
-		$table->setLocalNode($localNode);
-		
-		$node_a = new Node();
-		$node_a->setIdHexStr('10000001-2002-4004-8008-010000000002');
-		$node_a->setTimeCreated(1408371221);
-		
-		$node_b = new Node();
-		$node_b->setIdHexStr('10000001-2002-4004-8008-010000000004');
-		$node_b->setTimeCreated(1408371221);
-		
-		$node_c = new Node();
-		$node_c->setIdHexStr('10000001-2002-4004-8008-010000000008');
-		$node_c->setTimeCreated(1408371221);
-		
-		$node_d = new Node();
-		$node_d->setIdHexStr('10000001-2002-4004-8008-010000000010');
-		$node_d->setTimeCreated(1408371221);
-		
-		$node_e = new Node();
-		$node_e->setIdHexStr('10000001-2002-4004-8008-020000000008');
-		$node_e->setTimeCreated(1408371221);
-		
-		$table->nodeEnclose($node_a);
-		$table->nodeEnclose($node_b);
-		$table->nodeEnclose($node_c);
-		$table->nodeEnclose($node_d);
-		$table->nodeEnclose($node_e);
-		
-		$table = unserialize(serialize($table));
-		
-		$node_a = new Node();
-		$node_a->setIdHexStr('10000001-2002-4004-8008-010000000002');
-		$node_a->setTimeCreated(1408371221);
-		
-		$node_b = new Node();
-		$node_b->setIdHexStr('10000001-2002-4004-8008-010000000004');
-		$node_b->setTimeCreated(1408371221);
-		
-		$node_c = new Node();
-		$node_c->setIdHexStr('10000001-2002-4004-8008-010000000008');
-		$node_c->setTimeCreated(1408371221);
-		
-		$node_d = new Node();
-		$node_d->setIdHexStr('10000001-2002-4004-8008-010000000010');
-		$node_d->setTimeCreated(1408371221);
-		
-		$node_e = new Node();
-		$node_e->setIdHexStr('10000001-2002-4004-8008-020000000008');
-		$node_e->setTimeCreated(1408371221);
-		
-		
-		$this->assertEquals($localNode, $table->getLocalNode());
-		
-		$nodes = $table->getNodes();
-		$this->assertEquals(5, count($nodes));
-	}
-	
-	public function testNodeFindInBuckets1(){
-		$localNode = new Node();
-		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
-		$table = new Table();
-		$table->setLocalNode($localNode);
-		
-		$node_a = new Node();
-		$node_a->setIdHexStr('10000001-2002-4004-8008-100000000002');
-		$node_a->setUri('tcp://192.168.241.1');
-		$table->nodeEnclose($node_a);
-		
-		$node_b = new Node();
-		$node_b->setIdHexStr('10000001-2002-4004-8008-100000000002');
-		
-		$onode = $table->nodeFindInBuckets($node_b);
-		
-		$this->assertEquals('192.168.241.1', $onode->getUri()->getHost());
-	}
-	
-	public function testNodeFindInBuckets2(){
-		$localNode = new Node();
-		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
-		$table = new Table();
-		$table->setLocalNode($localNode);
-		
-		$node_a = new Node();
-		$node_a->setIdHexStr('10000001-2002-4004-8008-100000000002');
-		$node_a->setUri('tcp://192.168.241.1');
-		$table->nodeEnclose($node_a);
-		
-		$node_b = new Node();
-		$node_b->setIdHexStr('10000001-2002-4004-8008-100000000003');
-		$node_b->setUri('tcp://192.168.241.2');
-		
-		$onode = $table->nodeFindInBuckets($node_b);
-		$this->assertEquals(null, $onode);
-	}
-	
-	public function testNodeFindInBucketsByUri(){
-		$localNode = new Node();
-		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
-		$table = new Table();
-		$table->setLocalNode($localNode);
-		
-		$node_a = new Node();
-		$node_a->setIdHexStr('10000001-2002-4004-8008-100000000002');
-		$node_a->setUri('tcp://192.168.241.1');
-		$table->nodeEnclose($node_a);
-		
-		$node_b = new Node();
-		$node_b->setIdHexStr('10000001-2002-4004-8008-100000000003');
-		$node_b->setUri('tcp://192.168.241.2');
-		$table->nodeEnclose($node_b);
-		
-		$onode = $table->nodeFindInBucketsByUri('tcp://192.168.241.3');
-		$this->assertEquals(null, $onode);
-		
-		$onode = $table->nodeFindInBucketsByUri('tcp://192.168.241.2');
-		$this->assertEquals($node_b, $onode);
-	}
-	
-	public function testNodeFindClosest(){
-		$localNode = new Node();
-		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
-		$table = new Table();
-		$table->setLocalNode($localNode);
-		
-		
-		$node_a = new Node();
-		$node_a->setIdHexStr('10000001-2002-4004-8008-010000000002');
-		$table->nodeEnclose($node_a);
-		
-		$node_b = new Node();
-		$node_b->setIdHexStr('10000001-2002-4004-8008-010000000004');
-		$table->nodeEnclose($node_b);
-		
-		$node_c = new Node();
-		$node_c->setIdHexStr('10000001-2002-4004-8008-010000000008');
-		$table->nodeEnclose($node_c);
-		
-		$node_d = new Node();
-		$node_d->setIdHexStr('10000001-2002-4004-8008-010000000010');
-		$table->nodeEnclose($node_d);
-		
-		
-		$node_e = new Node();
-		$node_e->setIdHexStr('10000001-2002-4004-8008-020000000008');
-		
-		$nodes = $table->nodeFindClosest($node_e);
-		
-		$this->assertEquals(4, count($nodes));
-		$this->assertEquals(array($node_c, $node_a, $node_b, $node_d), $nodes);
-	}
-	
-	public function testNodeFindByKeyPubFingerprint(){
-		$localNode = new Node();
-		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
-		$table = new Table();
-		$table->setLocalNode($localNode);
-		
-		
-		$node_a = new Node();
-		$node_a->setIdHexStr('10000001-2002-4004-8008-010000000002');
-		$node_a->setSslKeyPub(static::NODE_PUB1);
-		$table->nodeEnclose($node_a);
-		
-		$node_b = new Node();
-		$node_b->setIdHexStr('10000001-2002-4004-8008-010000000004');
-		$node_b->setSslKeyPub(static::NODE_PUB2);
-		$table->nodeEnclose($node_b);
-		
-		$node_c = new Node();
-		$node_c->setIdHexStr('10000001-2002-4004-8008-010000000008');
-		$node_c->setSslKeyPub(static::NODE_PUB3);
-		$table->nodeEnclose($node_c);
-		
-		$node_d = new Node();
-		$node_d->setIdHexStr('10000001-2002-4004-8008-010000000010');
-		$node_d->setSslKeyPub(static::NODE_PUB4);
-		$table->nodeEnclose($node_d);
-		
-		
-		$this->assertEquals('FC_SxeHaAyWhC5k3u5Dt7asUcTXHpqtKBGPaAAW1unQu7iBdD75EhhrKb9DjWJFSTNCRM5s6wBW7ntA1C1', $node_a->getSslKeyPubFingerprint());
-		$this->assertEquals('FC_U2SazcAsbeRFz7zUXLZsdKvR28XNRk9C7CBNhi2vFe9fbi9QjBUy1Wqb3LK6MHBmNmvMUr69ChaqZe1', $node_b->getSslKeyPubFingerprint());
-		$this->assertEquals('FC_V5XQ3ReRPSWeakGv8o48cMXycnqTfK4kfRa9LGSxbxE6ee9s4zz5ucWcfwEUTmBFcHtZBLK2dpY1DHH', $node_c->getSslKeyPubFingerprint());
-		$this->assertEquals('FC_U25pDTHoiEEpop6PLggboYRiGjMszhRp4cstJE6aUJXLn79YjnQYfDLgbppw4FzR455Fr5nUCbvdiuw', $node_d->getSslKeyPubFingerprint());
-		
-		$this->assertEquals($node_b, $table->nodeFindByKeyPubFingerprint('FC_U2SazcAsbeRFz7zUXLZsdKvR28XNRk9C7CBNhi2vFe9fbi9QjBUy1Wqb3LK6MHBmNmvMUr69ChaqZe1'));
-		$this->assertEquals($node_c, $table->nodeFindByKeyPubFingerprint('FC_V5XQ3ReRPSWeakGv8o48cMXycnqTfK4kfRa9LGSxbxE6ee9s4zz5ucWcfwEUTmBFcHtZBLK2dpY1DHH'));
-	}
-	
-	public function testNodeEnclose1(){
-		$localNode = new Node();
-		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
-		$table = new Table();
-		$table->setLocalNode($localNode);
-		
-		$node = new Node();
-		$node->setIdHexStr('10000001-2002-4004-8008-100000000002');
-		
-		$onode = $table->nodeEnclose($node);
-		
-		$this->assertEquals($node, $onode);
-	}
-	
-	public function testNodeEnclose2(){
-		$localNode = new Node();
-		$localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
-		$table = new Table();
-		$table->setLocalNode($localNode);
-		
-		$node_a = new Node();
-		$node_a->setIdHexStr('10000001-2002-4004-8008-100000000002');
-		$node_a->setUri('tcp://192.168.241.1');
-		$table->nodeEnclose($node_a);
-		
-		$node_b = new Node();
-		$node_b->setIdHexStr('10000001-2002-4004-8008-100000000002');
-		$node_b->setUri('tcp://192.168.241.2');
-		
-		$onode = $table->nodeEnclose($node_b);
-		
-		$this->assertFalse($node_a === $node_b);
-		$this->assertTrue($node_a === $onode);
-		
-		$this->assertEquals('192.168.241.1', $onode->getUri()->getHost());
-	}
-	
-	public function testNodeEnclose3(){
-		fwrite(STDOUT, 'testNodeEnclose3'.PHP_EOL);
-		
-		$runName = uniqid('', true);
-		$fileName = 'testfile_table_table_'.date('Ymd_His').'_'.$runName.'.yml';
-		
-		$this->assertEquals(20, Bucket::$SIZE_MAX);
-		
-		#Bucket::$SIZE_MAX = 4;
-		#$this->assertEquals(4, Bucket::$SIZE_MAX);
-		
-		$localNode = new Node();
-		$localNode->setIdHexStr('11000001-2002-4004-8008-100000000006');
-		
-		$table = new Table('test_data/'.$fileName);
-		$table->setDatadirBasePath('test_data');
-		$table->setLocalNode($localNode);
-		
-		timeStop('table load start');
-		$table->load();
-		timeStop('table load end');
-		
-		$node0 = new Node();
-		$node0->setIdHexStr('11000001-2002-4004-8008-100000000000');
-		
-		$node1 = new Node();
-		$node1->setIdHexStr('11000001-2002-4004-8008-100000000001');
-		
-		$node2 = new Node();
-		$node2->setIdHexStr('11000001-2002-4004-8008-100000000002');
-		
-		$node3 = new Node();
-		$node3->setIdHexStr('11000001-2002-4004-8008-100000000003');
-		
-		$node4 = new Node();
-		$node4->setIdHexStr('11000001-2002-4004-8008-100000000004');
-		
-		$node5 = new Node();
-		$node5->setIdHexStr('11000001-2002-4004-8008-100000000005');
-		
-		$node7 = new Node();
-		$node7->setIdHexStr('11000001-2002-4004-8008-100000000007');
-		
-		$node20 = new Node();
-		$node20->setIdHexStr('11000001-2002-4004-8008-100000000020');
-		
-		
-		$baseBitStr = str_repeat('0', 125);
-		#$this->assertEquals($baseBitStr.'110', $localNode->distanceBitStr($node0));
-		#$this->assertEquals($baseBitStr.'111', $localNode->distanceBitStr($node1));
-		#$this->assertEquals($baseBitStr.'100', $localNode->distanceBitStr($node2));
-		##$this->assertEquals($baseBitStr.'101', $localNode->distanceBitStr($node3));
-		#$this->assertEquals($baseBitStr.'010', $localNode->distanceBitStr($node4));
-		#$this->assertEquals($baseBitStr.'011', $localNode->distanceBitStr($node5));
-		#$this->assertEquals($baseBitStr.'001', $localNode->distanceBitStr($node7));
-		
-		
-		$table->nodeEnclose($node0);
-		$table->nodeEnclose($node1);
-		$table->nodeEnclose($node2);
-		$table->nodeEnclose($node4);
-		$table->nodeEnclose($node5);
-		$table->nodeEnclose($node7);
-		#$table->nodeEnclose($node20);
-		
-		$table->save();
-		
-		
-		$this->clean();
-	}
-	
-	/**
-	 * @group large
-	 */
-	public function testNodeEnclose4(){
-		#fwrite(STDOUT, 'testNodeEnclose4'.PHP_EOL);
-		
-		$runName = uniqid('', true);
-		$fileName = 'testfile_table_table_'.date('Ymd_His').'_'.$runName.'.yml';
-		
-		$NODES = 100;
-		Bucket::$SIZE_MAX = 20;
-		
-		$localNode = new Node();
-		$localNode->setIdHexStr('12000001-2002-4004-8008-100000000001');
-		$table = new Table('test_data/'.$fileName);
-		$table->setDatadirBasePath('test_data');
-		$table->setLocalNode($localNode);
-		$table->load();
-		
-		$nodeNoBegin = 100000000002;
-		$nodeNoEnd = $nodeNoBegin + $NODES;
-		for($nodeNo = $nodeNoBegin; $nodeNo < $nodeNoEnd; $nodeNo++){
-			#fwrite(STDOUT, __METHOD__.' node setup: '.$nodeNo.''.PHP_EOL);
-			timeStop('node setup '.$nodeNo);
-			
-			$node = new Node();
-			$node->setIdHexStr('12000001-2002-4004-8008-'.$nodeNo);
-			
-			$table->nodeEnclose($node);
-		}
-		
-		fwrite(STDOUT, 'save'.PHP_EOL);
-		$table->save();
-		
-		$nodeNum = $table->getNodesNum();
-		fwrite(STDOUT, 'nodes: '.$nodeNum.''.PHP_EOL);
-		#$this->assertEquals(160, $nodeNum);
-		
-		$this->assertTrue(true);
-		
-		$finder = new Finder();
-		$files = $finder->in('test_data')->depth(0)->name('node_*.yml')->files();
-		#$this->assertEquals(160, count($files));
-		
-		$this->clean();
-	}
-	
-	private function clean(){
-		@unlink('test_data/testfile_table_table.yml');
-		@unlink('test_data/bucket_root.yml');
-		
-		$finder = new Finder();
-		$files = $finder->in('test_data')->depth(0)->name('bucket_*.yml')->files();
-		$filesystem = new Filesystem();
-		foreach($files as $fileId => $file){
-			$filesystem->remove($file->getRealPath());
-		}
-		
-		$finder = new Finder();
-		$files = $finder->in('test_data')->depth(0)->name('node_*.yml')->files();
-		$filesystem = new Filesystem();
-		foreach($files as $fileId => $file){
-			$filesystem->remove($file->getRealPath());
-		}
-	}
-	
+
+    public function testSerialize()
+    {
+        $localNode = new Node();
+        $localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
+        $localNode->setTimeCreated(1408371221);
+        $table = new Table();
+        $table->setLocalNode($localNode);
+
+        $node_a = new Node();
+        $node_a->setIdHexStr('10000001-2002-4004-8008-010000000002');
+        $node_a->setTimeCreated(1408371221);
+
+        $node_b = new Node();
+        $node_b->setIdHexStr('10000001-2002-4004-8008-010000000004');
+        $node_b->setTimeCreated(1408371221);
+
+        $node_c = new Node();
+        $node_c->setIdHexStr('10000001-2002-4004-8008-010000000008');
+        $node_c->setTimeCreated(1408371221);
+
+        $node_d = new Node();
+        $node_d->setIdHexStr('10000001-2002-4004-8008-010000000010');
+        $node_d->setTimeCreated(1408371221);
+
+        $node_e = new Node();
+        $node_e->setIdHexStr('10000001-2002-4004-8008-020000000008');
+        $node_e->setTimeCreated(1408371221);
+
+        $table->nodeEnclose($node_a);
+        $table->nodeEnclose($node_b);
+        $table->nodeEnclose($node_c);
+        $table->nodeEnclose($node_d);
+        $table->nodeEnclose($node_e);
+
+        $table = unserialize(serialize($table));
+
+        $node_a = new Node();
+        $node_a->setIdHexStr('10000001-2002-4004-8008-010000000002');
+        $node_a->setTimeCreated(1408371221);
+
+        $node_b = new Node();
+        $node_b->setIdHexStr('10000001-2002-4004-8008-010000000004');
+        $node_b->setTimeCreated(1408371221);
+
+        $node_c = new Node();
+        $node_c->setIdHexStr('10000001-2002-4004-8008-010000000008');
+        $node_c->setTimeCreated(1408371221);
+
+        $node_d = new Node();
+        $node_d->setIdHexStr('10000001-2002-4004-8008-010000000010');
+        $node_d->setTimeCreated(1408371221);
+
+        $node_e = new Node();
+        $node_e->setIdHexStr('10000001-2002-4004-8008-020000000008');
+        $node_e->setTimeCreated(1408371221);
+
+        $this->assertEquals($localNode, $table->getLocalNode());
+
+        $nodes = $table->getNodes();
+        $this->assertEquals(5, count($nodes));
+    }
+
+    public function testNodeFindInBuckets1()
+    {
+        $localNode = new Node();
+        $localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
+        $table = new Table();
+        $table->setLocalNode($localNode);
+
+        $node_a = new Node();
+        $node_a->setIdHexStr('10000001-2002-4004-8008-100000000002');
+        $node_a->setUri('tcp://192.168.241.1');
+        $table->nodeEnclose($node_a);
+
+        $node_b = new Node();
+        $node_b->setIdHexStr('10000001-2002-4004-8008-100000000002');
+
+        $onode = $table->nodeFindInBuckets($node_b);
+
+        $this->assertEquals('192.168.241.1', $onode->getUri()->getHost());
+    }
+
+    public function testNodeFindInBuckets2()
+    {
+        $localNode = new Node();
+        $localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
+        $table = new Table();
+        $table->setLocalNode($localNode);
+
+        $node_a = new Node();
+        $node_a->setIdHexStr('10000001-2002-4004-8008-100000000002');
+        $node_a->setUri('tcp://192.168.241.1');
+        $table->nodeEnclose($node_a);
+
+        $node_b = new Node();
+        $node_b->setIdHexStr('10000001-2002-4004-8008-100000000003');
+        $node_b->setUri('tcp://192.168.241.2');
+
+        $onode = $table->nodeFindInBuckets($node_b);
+        $this->assertEquals(null, $onode);
+    }
+
+    public function testNodeFindInBucketsByUri()
+    {
+        $localNode = new Node();
+        $localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
+        $table = new Table();
+        $table->setLocalNode($localNode);
+
+        $node_a = new Node();
+        $node_a->setIdHexStr('10000001-2002-4004-8008-100000000002');
+        $node_a->setUri('tcp://192.168.241.1');
+        $table->nodeEnclose($node_a);
+
+        $node_b = new Node();
+        $node_b->setIdHexStr('10000001-2002-4004-8008-100000000003');
+        $node_b->setUri('tcp://192.168.241.2');
+        $table->nodeEnclose($node_b);
+
+        $onode = $table->nodeFindInBucketsByUri('tcp://192.168.241.3');
+        $this->assertEquals(null, $onode);
+
+        $onode = $table->nodeFindInBucketsByUri('tcp://192.168.241.2');
+        $this->assertEquals($node_b, $onode);
+    }
+
+    public function testNodeFindClosest()
+    {
+        $localNode = new Node();
+        $localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
+        $table = new Table();
+        $table->setLocalNode($localNode);
+
+        $node_a = new Node();
+        $node_a->setIdHexStr('10000001-2002-4004-8008-010000000002');
+        $table->nodeEnclose($node_a);
+
+        $node_b = new Node();
+        $node_b->setIdHexStr('10000001-2002-4004-8008-010000000004');
+        $table->nodeEnclose($node_b);
+
+        $node_c = new Node();
+        $node_c->setIdHexStr('10000001-2002-4004-8008-010000000008');
+        $table->nodeEnclose($node_c);
+
+        $node_d = new Node();
+        $node_d->setIdHexStr('10000001-2002-4004-8008-010000000010');
+        $table->nodeEnclose($node_d);
+
+        $node_e = new Node();
+        $node_e->setIdHexStr('10000001-2002-4004-8008-020000000008');
+
+        $nodes = $table->nodeFindClosest($node_e);
+
+        $this->assertEquals(4, count($nodes));
+        $this->assertEquals([$node_c, $node_a, $node_b, $node_d], $nodes);
+    }
+
+    public function testNodeFindByKeyPubFingerprint()
+    {
+        $localNode = new Node();
+        $localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
+        $table = new Table();
+        $table->setLocalNode($localNode);
+
+        $node_a = new Node();
+        $node_a->setIdHexStr('10000001-2002-4004-8008-010000000002');
+        $node_a->setSslKeyPub(static::NODE_PUB1);
+        $table->nodeEnclose($node_a);
+
+        $node_b = new Node();
+        $node_b->setIdHexStr('10000001-2002-4004-8008-010000000004');
+        $node_b->setSslKeyPub(static::NODE_PUB2);
+        $table->nodeEnclose($node_b);
+
+        $node_c = new Node();
+        $node_c->setIdHexStr('10000001-2002-4004-8008-010000000008');
+        $node_c->setSslKeyPub(static::NODE_PUB3);
+        $table->nodeEnclose($node_c);
+
+        $node_d = new Node();
+        $node_d->setIdHexStr('10000001-2002-4004-8008-010000000010');
+        $node_d->setSslKeyPub(static::NODE_PUB4);
+        $table->nodeEnclose($node_d);
+
+        $this->assertEquals('FC_SxeHaAyWhC5k3u5Dt7asUcTXHpqtKBGPaAAW1unQu7iBdD75EhhrKb9DjWJFSTNCRM5s6wBW7ntA1C1', $node_a->getSslKeyPubFingerprint());
+        $this->assertEquals('FC_U2SazcAsbeRFz7zUXLZsdKvR28XNRk9C7CBNhi2vFe9fbi9QjBUy1Wqb3LK6MHBmNmvMUr69ChaqZe1', $node_b->getSslKeyPubFingerprint());
+        $this->assertEquals('FC_V5XQ3ReRPSWeakGv8o48cMXycnqTfK4kfRa9LGSxbxE6ee9s4zz5ucWcfwEUTmBFcHtZBLK2dpY1DHH', $node_c->getSslKeyPubFingerprint());
+        $this->assertEquals('FC_U25pDTHoiEEpop6PLggboYRiGjMszhRp4cstJE6aUJXLn79YjnQYfDLgbppw4FzR455Fr5nUCbvdiuw', $node_d->getSslKeyPubFingerprint());
+
+        $this->assertEquals($node_b, $table->nodeFindByKeyPubFingerprint('FC_U2SazcAsbeRFz7zUXLZsdKvR28XNRk9C7CBNhi2vFe9fbi9QjBUy1Wqb3LK6MHBmNmvMUr69ChaqZe1'));
+        $this->assertEquals($node_c, $table->nodeFindByKeyPubFingerprint('FC_V5XQ3ReRPSWeakGv8o48cMXycnqTfK4kfRa9LGSxbxE6ee9s4zz5ucWcfwEUTmBFcHtZBLK2dpY1DHH'));
+    }
+
+    public function testNodeEnclose1()
+    {
+        $localNode = new Node();
+        $localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
+        $table = new Table();
+        $table->setLocalNode($localNode);
+
+        $node = new Node();
+        $node->setIdHexStr('10000001-2002-4004-8008-100000000002');
+
+        $onode = $table->nodeEnclose($node);
+
+        $this->assertEquals($node, $onode);
+    }
+
+    public function testNodeEnclose2()
+    {
+        $localNode = new Node();
+        $localNode->setIdHexStr('10000001-2002-4004-8008-100000000001');
+        $table = new Table();
+        $table->setLocalNode($localNode);
+
+        $node_a = new Node();
+        $node_a->setIdHexStr('10000001-2002-4004-8008-100000000002');
+        $node_a->setUri('tcp://192.168.241.1');
+        $table->nodeEnclose($node_a);
+
+        $node_b = new Node();
+        $node_b->setIdHexStr('10000001-2002-4004-8008-100000000002');
+        $node_b->setUri('tcp://192.168.241.2');
+
+        $onode = $table->nodeEnclose($node_b);
+
+        $this->assertFalse($node_a === $node_b);
+        $this->assertTrue($node_a === $onode);
+
+        $this->assertEquals('192.168.241.1', $onode->getUri()->getHost());
+    }
+
+    public function testNodeEnclose3()
+    {
+        fwrite(STDOUT, 'testNodeEnclose3' . PHP_EOL);
+
+        $runName = uniqid('', true);
+        $fileName = 'testfile_table_table_' . date('Ymd_His') . '_' . $runName . '.yml';
+
+        $this->assertEquals(20, Bucket::$SIZE_MAX);
+
+        #Bucket::$SIZE_MAX = 4;
+        #$this->assertEquals(4, Bucket::$SIZE_MAX);
+
+        $localNode = new Node();
+        $localNode->setIdHexStr('11000001-2002-4004-8008-100000000006');
+
+        $table = new Table('test_data/' . $fileName);
+        $table->setDatadirBasePath('test_data');
+        $table->setLocalNode($localNode);
+
+        timeStop('table load start');
+        $table->load();
+        timeStop('table load end');
+
+        $node0 = new Node();
+        $node0->setIdHexStr('11000001-2002-4004-8008-100000000000');
+
+        $node1 = new Node();
+        $node1->setIdHexStr('11000001-2002-4004-8008-100000000001');
+
+        $node2 = new Node();
+        $node2->setIdHexStr('11000001-2002-4004-8008-100000000002');
+
+        $node3 = new Node();
+        $node3->setIdHexStr('11000001-2002-4004-8008-100000000003');
+
+        $node4 = new Node();
+        $node4->setIdHexStr('11000001-2002-4004-8008-100000000004');
+
+        $node5 = new Node();
+        $node5->setIdHexStr('11000001-2002-4004-8008-100000000005');
+
+        $node7 = new Node();
+        $node7->setIdHexStr('11000001-2002-4004-8008-100000000007');
+
+        $node20 = new Node();
+        $node20->setIdHexStr('11000001-2002-4004-8008-100000000020');
+
+        $baseBitStr = str_repeat('0', 125);
+        #$this->assertEquals($baseBitStr.'110', $localNode->distanceBitStr($node0));
+        #$this->assertEquals($baseBitStr.'111', $localNode->distanceBitStr($node1));
+        #$this->assertEquals($baseBitStr.'100', $localNode->distanceBitStr($node2));
+        ##$this->assertEquals($baseBitStr.'101', $localNode->distanceBitStr($node3));
+        #$this->assertEquals($baseBitStr.'010', $localNode->distanceBitStr($node4));
+        #$this->assertEquals($baseBitStr.'011', $localNode->distanceBitStr($node5));
+        #$this->assertEquals($baseBitStr.'001', $localNode->distanceBitStr($node7));
+
+        $table->nodeEnclose($node0);
+        $table->nodeEnclose($node1);
+        $table->nodeEnclose($node2);
+        $table->nodeEnclose($node4);
+        $table->nodeEnclose($node5);
+        $table->nodeEnclose($node7);
+        #$table->nodeEnclose($node20);
+
+        $table->save();
+
+        $this->clean();
+    }
+
+    /**
+     * @group large
+     */
+    public function testNodeEnclose4()
+    {
+        #fwrite(STDOUT, 'testNodeEnclose4'.PHP_EOL);
+
+        $runName = uniqid('', true);
+        $fileName = 'testfile_table_table_' . date('Ymd_His') . '_' . $runName . '.yml';
+
+        $NODES = 100;
+        Bucket::$SIZE_MAX = 20;
+
+        $localNode = new Node();
+        $localNode->setIdHexStr('12000001-2002-4004-8008-100000000001');
+        $table = new Table('test_data/' . $fileName);
+        $table->setDatadirBasePath('test_data');
+        $table->setLocalNode($localNode);
+        $table->load();
+
+        $nodeNoBegin = 100000000002;
+        $nodeNoEnd = $nodeNoBegin + $NODES;
+        for ($nodeNo = $nodeNoBegin; $nodeNo < $nodeNoEnd; $nodeNo++) {
+            #fwrite(STDOUT, __METHOD__.' node setup: '.$nodeNo.''.PHP_EOL);
+            timeStop('node setup ' . $nodeNo);
+
+            $node = new Node();
+            $node->setIdHexStr('12000001-2002-4004-8008-' . $nodeNo);
+
+            $table->nodeEnclose($node);
+        }
+
+        fwrite(STDOUT, 'save' . PHP_EOL);
+        $table->save();
+
+        $nodeNum = $table->getNodesNum();
+        fwrite(STDOUT, 'nodes: ' . $nodeNum . '' . PHP_EOL);
+        #$this->assertEquals(160, $nodeNum);
+
+        $this->assertTrue(true);
+
+        $finder = new Finder();
+        $files = $finder->in('test_data')->depth(0)->name('node_*.yml')->files();
+        #$this->assertEquals(160, count($files));
+
+        $this->clean();
+    }
+
+    private function clean()
+    {
+        @unlink('test_data/testfile_table_table.yml');
+        @unlink('test_data/bucket_root.yml');
+
+        $finder = new Finder();
+        $files = $finder->in('test_data')->depth(0)->name('bucket_*.yml')->files();
+        $filesystem = new Filesystem();
+        foreach ($files as $fileId => $file) {
+            $filesystem->remove($file->getRealPath());
+        }
+
+        $finder = new Finder();
+        $files = $finder->in('test_data')->depth(0)->name('node_*.yml')->files();
+        $filesystem = new Filesystem();
+        foreach ($files as $fileId => $file) {
+            $filesystem->remove($file->getRealPath());
+        }
+    }
 }

@@ -1,12 +1,6 @@
-vendor
+/.idea/
 composer.lock
 composer.phar
-test_data
-log
-*.log
-pid
-data
 id_rsa*
 settings.yml
-releases
-build
+/vendor/

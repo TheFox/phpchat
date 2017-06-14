@@ -9,9 +9,9 @@ use Rhumsaa\Uuid\Uuid;
 use TheFox\PhpChat\Msg;
 use TheFox\PhpChat\MsgDb;
 
-class MsgTest extends PHPUnit_Framework_TestCase{
-	
-	const SRC1_SSL_KEY_PUB = '-----BEGIN PUBLIC KEY-----
+class MsgTest extends PHPUnit_Framework_TestCase
+{
+    const SRC1_SSL_KEY_PUB = '-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAxImO5o0WGuT2lqwArw4M
 7MfTNeT242+ca94dFuM1JFHOvrFr5iJsauiK8HyUMzL+fFI54IDXjqpXAWK8dmoC
 C6EF6iAq7X6Drq8WEosUOgWRnRh0UOHAXlFTRn+P1Epm1CItBOxliZOEHelhJCLt
@@ -25,7 +25,7 @@ szn7uyYNc2pBpXgzZgB7KUN/d8GHejp9b+7rlnH7zWKCoEfjxEumnGkhOgNUjE2V
 Qh67NDbSMJHUjW+jSgZWZQpWqyQgju5Z8Oav0RdbyDnWF4Erz22ieNEL5i12zHNw
 /lGLPjHk/lF9CcbeIXl8/UsCAwEAAQ==
 -----END PUBLIC KEY-----';
-	const SRC1_SSL_KEY_PRV = '-----BEGIN RSA PRIVATE KEY-----
+    const SRC1_SSL_KEY_PRV = '-----BEGIN RSA PRIVATE KEY-----
 Proc-Type: 4,ENCRYPTED
 DEK-Info: DES-EDE3-CBC,D00A0FCDFC91ACF4
 
@@ -79,8 +79,7 @@ czGsGkTrpsJmyLadf1c9jHyzs7JS3+soYwlq+GdTmLKgfHtxYzohzqpK/SGM079l
 aOEteHvZ5/nNwCHcDff1buh9akMl5R8T4LmegQiyKduxMfXZGwlAdRo7J8jVnvC+
 avQLo9/UPhfV87P+nSLbei8yrGvVWCbjGqiVybq9nsbmwhB+g5FqVDH0v6QoMm4O
 -----END RSA PRIVATE KEY-----';
-	
-	const DST1_SSL_KEY_PUB = '-----BEGIN PUBLIC KEY-----
+    const DST1_SSL_KEY_PUB = '-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtIIiZm70ZPEIOd+FIqr7
 E7qav8+jNvI08LVhMSmOHE1s9WymLTChv2a10J8fhYY9ipIyc8WnCzN5Amtth9hK
 LcZXi11Oi6n6+fBGyREoc9KQamu6ZQ9bVkJ1s4yVLzVF9k3JHyMO4GgdlJ7lZTlf
@@ -94,7 +93,7 @@ CoEHq/SeWAUt4rxD/HW6gRf/cdY0GhbLgqwTIs8keft7BHQokwOvTI/o1sNFEGh1
 cL7QNOI5Cv1SHZ0j85N1XmuHuIldXrjYkFRDJXifqgofMzM8M6J+0f74iupQLNwx
 X7E/kioxMTLuoxs1R1+aatsCAwEAAQ==
 -----END PUBLIC KEY-----';
-	const DST1_SSL_KEY_PRV = '-----BEGIN RSA PRIVATE KEY-----
+    const DST1_SSL_KEY_PRV = '-----BEGIN RSA PRIVATE KEY-----
 Proc-Type: 4,ENCRYPTED
 DEK-Info: DES-EDE3-CBC,4A9A531726EA796C
 
@@ -148,8 +147,7 @@ uu2SFwUAHesHQKLlkOTkRQwT1ABVTGm+Vyad+Sgb5lJQdAhyJx0c+7luBPGCSGE2
 bESmU8o20Q5IXihXqdRgecH/D8Y3kILDb1Lqkge/TfszEdxOxMKMe0c7GjssBuiG
 BSZAWTvT3QsvobqBMpbfzZkzjE74Lda6ymw3HkTnba96HhTjGv4LfqdGqaT05aPN
 -----END RSA PRIVATE KEY-----';
-	
-	const DST2_SSL_KEY_PUB = '-----BEGIN PUBLIC KEY-----
+    const DST2_SSL_KEY_PUB = '-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAqlKjbOBP9v01t7MnXSwU
 siJ1Lo0nw9O9pAEiz1/ZMXpMdaDBL98eWMQ0yf8sgcW+LGCfKM2D5E4ZrFsS06B2
 hR7gr9jbeV1zlMPmy03dnwZfR6wRsgfgtrZEMunojui/4T/UkUlQGCHG6h2R4gs8
@@ -163,7 +161,7 @@ yQVCnIjpfitNKSwyKb9McxlrtMRr/QBjsG3HTnnZVfywoqgTv6eP1ZztDL6HatJ+
 jm8XLC+SivcAVH0FtuJW17mWFhvp4I1NFUy0Xt+w1vZISEREgqKmKkagHrQkwYF/
 JVDruFuvYBk+YUAlWkQ3+VcCAwEAAQ==
 -----END PUBLIC KEY-----';
-	const DST2_SSL_KEY_PRV = '-----BEGIN RSA PRIVATE KEY-----
+    const DST2_SSL_KEY_PRV = '-----BEGIN RSA PRIVATE KEY-----
 Proc-Type: 4,ENCRYPTED
 DEK-Info: DES-EDE3-CBC,1601B57F6C552B56
 
@@ -217,819 +215,825 @@ cJyt0cfxTer+Cjl9n6BdRziYjYrJTiJEf+CiB/ujIQT0/Ih3Wjwcm+XZsMjYo9XS
 lhWqvvjEbtUJPGHdMn1amIRCb0XoxlkbpZ0ZCG2n463jPjHYwKqP0k714vVc9mrL
 TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 -----END RSA PRIVATE KEY-----';
-	
-	const SSL_KEY_PRV_PASS = 'test';
-	
-	public function testSerialize(){
-		$msg1 = new Msg();
-		$msg1->setId('3d939e1c-9ac6-473c-a00d-4e96014821f9');
-		
-		$msg2 = unserialize(serialize($msg1));
-		
-		$this->assertEquals('3d939e1c-9ac6-473c-a00d-4e96014821f9', $msg2->getId());
-	}
-	
-	public function testToString(){
-		$msg = new Msg();
-		$msg->setId('3d939e1c-9ac6-473c-a00d-4e96014821f9');
-		$this->assertEquals('TheFox\PhpChat\Msg->{3d939e1c-9ac6-473c-a00d-4e96014821f9}', (string)$msg);
-	}
-	
-	public function testSaveLoad(){
-		$runName = uniqid('', true);
-		$fileName = 'testfile_msg_'.date('Ymd_His').'_'.$runName.'.yml';
-		
-		$msg = new Msg('test_data/'.$fileName);
-		$msg->setDatadirBasePath('test_data');
-		$msg->setDataChanged(true);
-		
-		$msg->setVersion(21);
-		$this->assertEquals(21, $msg->getVersion());
-		
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $msg->getId());
-		
-		$msg->setRelayNodeId('cafed00d-2231-4159-8e11-0b4dbadb1738');
-		$this->assertEquals('cafed00d-2231-4159-8e11-0b4dbadb1738', $msg->getRelayNodeId());
-		
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$this->assertEquals('cafed00d-2331-4159-8e11-0b4dbadb1738', $msg->getSrcNodeId());
-		
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$this->assertEquals(static::SRC1_SSL_KEY_PUB, $msg->getSrcSslKeyPub());
-		
-		$msg->setSrcUserNickname('thefox');
-		$this->assertEquals('thefox', $msg->getSrcUserNickname());
-		
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$this->assertEquals('cafed00d-2431-4159-8e11-0b4dbadb1738', $msg->getDstNodeId());
-		
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$this->assertEquals(static::DST1_SSL_KEY_PUB, $msg->getDstSslPubKey());
-		
-		$msg->setSubject('my first subject');
-		$this->assertEquals('my first subject', $msg->getSubject());
-		
-		$msg->setText('hello world! this is a test');
-		$this->assertEquals('hello world! this is a test', $msg->getText());
-		
-		$msg->setPassword('my_password01');
-		$this->assertEquals('my_password01', $msg->getPassword());
-		
-		$msg->setChecksum('checksuuuum_sum');
-		$this->assertEquals('checksuuuum_sum', $msg->getChecksum());
-		
-		$msg->setSentNodes(array(21, 2, 1987));
-		$msg->addSentNode(42);
-		$this->assertEquals(array(21, 2, 1987, 42), $msg->getSentNodes());
-		
-		$msg->setRelayCount(22);
-		$this->assertEquals(22, $msg->getRelayCount());
-		
-		$msg->setForwardCycles(23);
-		$msg->incForwardCycles();
-		$this->assertEquals(24, $msg->getForwardCycles());
-		
-		$msg->setEncryptionMode('D');
-		$this->assertEquals('D', $msg->getEncryptionMode());
-		
-		$msg->setStatus('O');
-		$this->assertEquals('O', $msg->getStatus());
-		
-		$msg->setTimeCreated(679874400);
-		$this->assertEquals(679874400, $msg->getTimeCreated());
-		
-		
-		$msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$this->assertTrue( $msg->encrypt() );
-		
-		$this->assertTrue( (bool)$msg->save() );
-		
-		$finder = new Finder();
-		$files = $finder->in('test_data')->depth(0)->name($fileName)->files();
-		$this->assertEquals(1, count($files));
-		
-		
-		$msg = new Msg('test_data/'.$fileName);
-		$msg->setDatadirBasePath('test_data');
-		
-		$this->assertTrue($msg->load());
-		
-		$this->assertEquals(21, $msg->getVersion());
-		$this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $msg->getId());
-		$this->assertEquals('cafed00d-2231-4159-8e11-0b4dbadb1738', $msg->getRelayNodeId());
-		$this->assertEquals('cafed00d-2331-4159-8e11-0b4dbadb1738', $msg->getSrcNodeId());
-		$this->assertEquals(static::SRC1_SSL_KEY_PUB, $msg->getSrcSslKeyPub());
-		$this->assertEquals('cafed00d-2431-4159-8e11-0b4dbadb1738', $msg->getDstNodeId());
-		$this->assertEquals(array(21, 2, 1987, 42), $msg->getSentNodes());
-		$this->assertEquals(22, $msg->getRelayCount());
-		$this->assertEquals(24, $msg->getForwardCycles());
-		$this->assertEquals('D', $msg->getEncryptionMode());
-		$this->assertEquals('O', $msg->getStatus());
-		$this->assertEquals(679874400, $msg->getTimeCreated());
-		
-		
-		$msg = new Msg('test_data/'.$fileName);
-		$msg->setDatadirBasePath('test_data');
-		
-		$this->assertTrue($msg->load());
-		
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		
-		$subject = 'N/A';
-		$text = 'N/A';
-		try{
-			$text = $msg->decrypt();
-			$subject = $msg->getSubject();
-		}
-		catch(Exception $e){
-			$text = $e->getMessage();
-		}
-		
-		$this->assertEquals('my first subject', $subject);
-		$this->assertEquals('hello world! this is a test', $text);
-		$this->assertEquals('thefox', $msg->getSrcUserNickname());
-		
-		
-		$msg = new Msg('test_data/'.$fileName);
-		$msg->setDatadirBasePath('test_data');
-		
-		$this->assertTrue($msg->load());
-		
-		$msg->setDstSslPubKey(static::DST2_SSL_KEY_PUB);
-		$msg->setSslKeyPrv(static::DST2_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		
-		$subject = 'N/A';
-		$text = 'N/A';
-		try{
-			$text = $msg->decrypt();
-			$subject = $msg->getSubject();
-		}
-		catch(Exception $e){
-			$text = 'FAILED OK';
-		}
-		
-		$this->assertEquals('N/A', $subject);
-		$this->assertEquals('FAILED OK', $text);
-		$this->assertEquals('', $msg->getSrcUserNickname());
-		
-		
-		$msg = new Msg('test_data/not_existing.yml');
-		$this->assertFalse($msg->load());
-	}
-	
-	public function testId(){
-		$msg = new Msg();
-		
-		$this->assertTrue(Uuid::isValid($msg->getId()));
-	}
-	
-	public function testStatus(){
-		$msg = new Msg();
-		
-		$msg->setStatus('R');
-		$this->assertEquals('R', $msg->getStatus());
-		
-		$msg->setStatus('D');
-		$msg->setStatus('U');
-		$this->assertEquals('D', $msg->getStatus());
-	}
-	
-	public function testStatusText(){
-		$msg = new Msg();
-		
-		$msg->setStatus('R');
-		$this->assertEquals(Msg::$STATUS_TEXT['R'], $msg->getStatusText());
-		
-		$msg->setStatus('D');
-		$msg->setStatus('U');
-		$this->assertEquals(Msg::$STATUS_TEXT['D'], $msg->getStatusText());
-	}
-	
-	public function testSetTimeReceived(){
-		$msg = new Msg();
-		$msg->setTimeReceived(24);
-		
-		$this->assertEquals(24, $msg->getTimeReceived());
-	}
-	
-	public function testSetSslKeyPrvPath(){
-		$runName = uniqid('', true);
-		$fileName = 'test_data/testfile_key_'.date('Ymd_His').'_'.$runName.'.prv';
-		
-		file_put_contents($fileName, static::SRC1_SSL_KEY_PRV);
-		
-		$msg = new Msg();
-		$msg->setSslKeyPrvPath($fileName, static::SSL_KEY_PRV_PASS);
-		
-		$this->assertTrue(true);
-	}
-	
-	/**
-	 * @expectedException RuntimeException
-	 * @expectedExceptionCode 1
-	 */
-	public function testSetSslKeyPrv(){
-		$this->assertTrue(true);
-		
-		$msg = new Msg();
-		$msg->setSslKeyPrv('x', 'y');
-	}
-	
-	public function testSetMsgDb(){
-		$this->assertTrue(true);
-		$db1 = new MsgDb();
-		
-		$msg = new Msg();
-		$msg->setMsgDb($db1);
-		
-		$db2 = $msg->getMsgDb();
-		
-		$this->assertEquals($db1, $db2);
-	}
-	
-	public function providerEncryption(){
-		$rv = array();
-		
-		$rv[] = array('thefox', 'another subject', 'hello world! this is a test', false);
-		$rv[] = array('thefox21', 'hello again', 'hello world! this is a test2', true);
-		
-		return $rv;
-	}
-	
-	/**
+    const SSL_KEY_PRV_PASS = 'test';
+
+    public function testSerialize()
+    {
+        $msg1 = new Msg();
+        $msg1->setId('3d939e1c-9ac6-473c-a00d-4e96014821f9');
+
+        $msg2 = unserialize(serialize($msg1));
+
+        $this->assertEquals('3d939e1c-9ac6-473c-a00d-4e96014821f9', $msg2->getId());
+    }
+
+    public function testToString()
+    {
+        $msg = new Msg();
+        $msg->setId('3d939e1c-9ac6-473c-a00d-4e96014821f9');
+        $this->assertEquals('TheFox\PhpChat\Msg->{3d939e1c-9ac6-473c-a00d-4e96014821f9}', (string)$msg);
+    }
+
+    public function testSaveLoad()
+    {
+        $runName = uniqid('', true);
+        $fileName = 'testfile_msg_' . date('Ymd_His') . '_' . $runName . '.yml';
+
+        $msg = new Msg('test_data/' . $fileName);
+        $msg->setDatadirBasePath('test_data');
+        $msg->setDataChanged(true);
+
+        $msg->setVersion(21);
+        $this->assertEquals(21, $msg->getVersion());
+
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $msg->getId());
+
+        $msg->setRelayNodeId('cafed00d-2231-4159-8e11-0b4dbadb1738');
+        $this->assertEquals('cafed00d-2231-4159-8e11-0b4dbadb1738', $msg->getRelayNodeId());
+
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $this->assertEquals('cafed00d-2331-4159-8e11-0b4dbadb1738', $msg->getSrcNodeId());
+
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $this->assertEquals(static::SRC1_SSL_KEY_PUB, $msg->getSrcSslKeyPub());
+
+        $msg->setSrcUserNickname('thefox');
+        $this->assertEquals('thefox', $msg->getSrcUserNickname());
+
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $this->assertEquals('cafed00d-2431-4159-8e11-0b4dbadb1738', $msg->getDstNodeId());
+
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $this->assertEquals(static::DST1_SSL_KEY_PUB, $msg->getDstSslPubKey());
+
+        $msg->setSubject('my first subject');
+        $this->assertEquals('my first subject', $msg->getSubject());
+
+        $msg->setText('hello world! this is a test');
+        $this->assertEquals('hello world! this is a test', $msg->getText());
+
+        $msg->setPassword('my_password01');
+        $this->assertEquals('my_password01', $msg->getPassword());
+
+        $msg->setChecksum('checksuuuum_sum');
+        $this->assertEquals('checksuuuum_sum', $msg->getChecksum());
+
+        $msg->setSentNodes([21, 2, 1987]);
+        $msg->addSentNode(42);
+        $this->assertEquals([21, 2, 1987, 42], $msg->getSentNodes());
+
+        $msg->setRelayCount(22);
+        $this->assertEquals(22, $msg->getRelayCount());
+
+        $msg->setForwardCycles(23);
+        $msg->incForwardCycles();
+        $this->assertEquals(24, $msg->getForwardCycles());
+
+        $msg->setEncryptionMode('D');
+        $this->assertEquals('D', $msg->getEncryptionMode());
+
+        $msg->setStatus('O');
+        $this->assertEquals('O', $msg->getStatus());
+
+        $msg->setTimeCreated(679874400);
+        $this->assertEquals(679874400, $msg->getTimeCreated());
+
+        $msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $this->assertTrue($msg->encrypt());
+
+        $this->assertTrue((bool)$msg->save());
+
+        $finder = new Finder();
+        $files = $finder->in('test_data')->depth(0)->name($fileName)->files();
+        $this->assertEquals(1, count($files));
+
+        $msg = new Msg('test_data/' . $fileName);
+        $msg->setDatadirBasePath('test_data');
+
+        $this->assertTrue($msg->load());
+
+        $this->assertEquals(21, $msg->getVersion());
+        $this->assertEquals('cafed00d-2131-4159-8e11-0b4dbadb1738', $msg->getId());
+        $this->assertEquals('cafed00d-2231-4159-8e11-0b4dbadb1738', $msg->getRelayNodeId());
+        $this->assertEquals('cafed00d-2331-4159-8e11-0b4dbadb1738', $msg->getSrcNodeId());
+        $this->assertEquals(static::SRC1_SSL_KEY_PUB, $msg->getSrcSslKeyPub());
+        $this->assertEquals('cafed00d-2431-4159-8e11-0b4dbadb1738', $msg->getDstNodeId());
+        $this->assertEquals([21, 2, 1987, 42], $msg->getSentNodes());
+        $this->assertEquals(22, $msg->getRelayCount());
+        $this->assertEquals(24, $msg->getForwardCycles());
+        $this->assertEquals('D', $msg->getEncryptionMode());
+        $this->assertEquals('O', $msg->getStatus());
+        $this->assertEquals(679874400, $msg->getTimeCreated());
+
+        $msg = new Msg('test_data/' . $fileName);
+        $msg->setDatadirBasePath('test_data');
+
+        $this->assertTrue($msg->load());
+
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+
+        $subject = 'N/A';
+        $text = 'N/A';
+        try {
+            $text = $msg->decrypt();
+            $subject = $msg->getSubject();
+        } catch (Exception $e) {
+            $text = $e->getMessage();
+        }
+
+        $this->assertEquals('my first subject', $subject);
+        $this->assertEquals('hello world! this is a test', $text);
+        $this->assertEquals('thefox', $msg->getSrcUserNickname());
+
+        $msg = new Msg('test_data/' . $fileName);
+        $msg->setDatadirBasePath('test_data');
+
+        $this->assertTrue($msg->load());
+
+        $msg->setDstSslPubKey(static::DST2_SSL_KEY_PUB);
+        $msg->setSslKeyPrv(static::DST2_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+
+        $subject = 'N/A';
+        $text = 'N/A';
+        try {
+            $text = $msg->decrypt();
+            $subject = $msg->getSubject();
+        } catch (Exception $e) {
+            $text = 'FAILED OK';
+        }
+
+        $this->assertEquals('N/A', $subject);
+        $this->assertEquals('FAILED OK', $text);
+        $this->assertEquals('', $msg->getSrcUserNickname());
+
+        $msg = new Msg('test_data/not_existing.yml');
+        $this->assertFalse($msg->load());
+    }
+
+    public function testId()
+    {
+        $msg = new Msg();
+
+        $this->assertTrue(Uuid::isValid($msg->getId()));
+    }
+
+    public function testStatus()
+    {
+        $msg = new Msg();
+
+        $msg->setStatus('R');
+        $this->assertEquals('R', $msg->getStatus());
+
+        $msg->setStatus('D');
+        $msg->setStatus('U');
+        $this->assertEquals('D', $msg->getStatus());
+    }
+
+    public function testStatusText()
+    {
+        $msg = new Msg();
+
+        $msg->setStatus('R');
+        $this->assertEquals(Msg::$STATUS_TEXT['R'], $msg->getStatusText());
+
+        $msg->setStatus('D');
+        $msg->setStatus('U');
+        $this->assertEquals(Msg::$STATUS_TEXT['D'], $msg->getStatusText());
+    }
+
+    public function testSetTimeReceived()
+    {
+        $msg = new Msg();
+        $msg->setTimeReceived(24);
+
+        $this->assertEquals(24, $msg->getTimeReceived());
+    }
+
+    public function testSetSslKeyPrvPath()
+    {
+        $runName = uniqid('', true);
+        $fileName = 'test_data/testfile_key_' . date('Ymd_His') . '_' . $runName . '.prv';
+
+        file_put_contents($fileName, static::SRC1_SSL_KEY_PRV);
+
+        $msg = new Msg();
+        $msg->setSslKeyPrvPath($fileName, static::SSL_KEY_PRV_PASS);
+
+        $this->assertTrue(true);
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionCode 1
+     */
+    public function testSetSslKeyPrv()
+    {
+        $this->assertTrue(true);
+
+        $msg = new Msg();
+        $msg->setSslKeyPrv('x', 'y');
+    }
+
+    public function testSetMsgDb()
+    {
+        $this->assertTrue(true);
+        $db1 = new MsgDb();
+
+        $msg = new Msg();
+        $msg->setMsgDb($db1);
+
+        $db2 = $msg->getMsgDb();
+
+        $this->assertEquals($db1, $db2);
+    }
+
+    public function providerEncryption()
+    {
+        $rv = [];
+
+        $rv[] = ['thefox', 'another subject', 'hello world! this is a test', false];
+        $rv[] = ['thefox21', 'hello again', 'hello world! this is a test2', true];
+
+        return $rv;
+    }
+
+    /**
      * @dataProvider providerEncryption
      */
-	public function testEncryption($srcUserNickname, $subject, $text, $ignore){
-		$msg = new Msg();
-		
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setSrcUserNickname($srcUserNickname);
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSubject($subject);
-		$msg->setText($text);
-		$msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setIgnore($ignore);
-		
-		$this->assertTrue( $msg->encrypt() );
-		$body = $msg->getBody();
-		$timeCreated = $msg->getTimeCreated();
-		$password = $msg->getPassword();
-		$checksum = $msg->getChecksum();
-		
-		
-		$msg = new Msg();
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setBody($body);
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setTimeCreated($timeCreated);
-		$msg->setPassword($password);
-		$msg->setChecksum($checksum);
-		
-		$textDecrypted = $msg->decrypt();
-		$this->assertEquals($subject, $msg->getSubject());
-		$this->assertEquals($text, $textDecrypted);
-		$this->assertEquals($text, $msg->getText());
-		$this->assertEquals($srcUserNickname, $msg->getSrcUserNickname());
-		$this->assertEquals($ignore, $msg->getIgnore());
-	}
-	
-	/**
-	 * @expectedException RuntimeException
-	 * @expectedExceptionCode 1
-	 */
-	public function testEncryptionRuntimeException1(){
-		$msg = new Msg();
-		
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setSrcUserNickname('username1');
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSubject('subj1');
-		$msg->setText('text1');
-		#$msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setIgnore(false);
-		
-		$msg->encrypt();
-	}
-	
-	/**
-	 * @expectedException RuntimeException
-	 * @expectedExceptionCode 2
-	 */
-	public function testEncryptionRuntimeException2(){
-		$msg = new Msg();
-		
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setSrcUserNickname('username1');
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		#$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSubject('subj1');
-		$msg->setText('text1');
-		$msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setIgnore(false);
-		
-		$msg->encrypt();
-	}
-	
-	/**
-	 * @expectedException RuntimeException
-	 * @expectedExceptionCode 10
-	 */
-	public function testDecryptionRuntimeException10(){
-		$msg = new Msg();
-		
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setSrcUserNickname('username1');
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSubject('subj1');
-		$msg->setText('text1');
-		$msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setIgnore(false);
-		
-		$this->assertTrue( $msg->encrypt() );
-		$body = $msg->getBody();
-		$timeCreated = $msg->getTimeCreated();
-		$password = $msg->getPassword();
-		$checksum = $msg->getChecksum();
-		
-		
-		$msg = new Msg();
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setBody($body);
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		#$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setTimeCreated($timeCreated);
-		$msg->setPassword($password);
-		$msg->setChecksum($checksum);
-		
-		$msg->decrypt();
-	}
-	
-	/**
-	 * @expectedException RuntimeException
-	 * @expectedExceptionCode 20
-	 */
-	public function testDecryptionRuntimeException20(){
-		$msg = new Msg();
-		
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setSrcUserNickname('username1');
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSubject('subj1');
-		$msg->setText('text1');
-		$msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setIgnore(false);
-		
-		$this->assertTrue( $msg->encrypt() );
-		$body = $msg->getBody();
-		$timeCreated = $msg->getTimeCreated();
-		$password = $msg->getPassword();
-		$checksum = $msg->getChecksum();
-		
-		
-		$msg = new Msg();
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setBody($body);
-		#$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setTimeCreated($timeCreated);
-		$msg->setPassword($password);
-		$msg->setChecksum($checksum);
-		
-		$msg->decrypt();
-	}
-	
-	/**
-	 * @expectedException RuntimeException
-	 * @expectedExceptionCode 30
-	 */
-	public function testDecryptionRuntimeException30(){
-		$msg = new Msg();
-		
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setSrcUserNickname('username1');
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSubject('subj1');
-		$msg->setText('text1');
-		$msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setIgnore(false);
-		
-		$this->assertTrue( $msg->encrypt() );
-		$body = $msg->getBody();
-		$timeCreated = $msg->getTimeCreated();
-		$password = $msg->getPassword();
-		$checksum = $msg->getChecksum();
-		
-		
-		$msg = new Msg();
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setBody($body);
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		#$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setTimeCreated($timeCreated);
-		$msg->setPassword($password);
-		$msg->setChecksum($checksum);
-		
-		$msg->decrypt();
-	}
-	
-	/**
-	 * @expectedException RuntimeException
-	 * @expectedExceptionCode 40
-	 */
-	public function testDecryptionRuntimeException40(){
-		$msg = new Msg();
-		
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setSrcUserNickname('username1');
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSubject('subj1');
-		$msg->setText('text1');
-		$msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setIgnore(false);
-		
-		$this->assertTrue( $msg->encrypt() );
-		$body = $msg->getBody();
-		$timeCreated = $msg->getTimeCreated();
-		$password = $msg->getPassword();
-		$checksum = $msg->getChecksum();
-		
-		
-		$msg = new Msg();
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setBody($body);
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		#$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setTimeCreated($timeCreated);
-		$msg->setPassword($password);
-		$msg->setChecksum($checksum);
-		
-		$msg->decrypt();
-	}
-	
-	/**
-	 * @expectedException RuntimeException
-	 * @expectedExceptionCode 50
-	 */
-	public function testDecryptionRuntimeException50(){
-		$msg = new Msg();
-		
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setSrcUserNickname('username1');
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSubject('subj1');
-		$msg->setText('text1');
-		$msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setIgnore(false);
-		
-		$this->assertTrue( $msg->encrypt() );
-		$body = $msg->getBody();
-		$timeCreated = $msg->getTimeCreated();
-		#$password = $msg->getPassword();
-		$checksum = $msg->getChecksum();
-		
-		
-		$msg = new Msg();
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setBody($body);
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setTimeCreated($timeCreated);
-		#$msg->setPassword($password);
-		$msg->setChecksum($checksum);
-		
-		$msg->decrypt();
-	}
-	
-	/**
-	 * @expectedException RuntimeException
-	 * @expectedExceptionCode 60
-	 */
-	public function testDecryptionRuntimeException60(){
-		$msg = new Msg();
-		
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setSrcUserNickname('username1');
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSubject('subj1');
-		$msg->setText('text1');
-		$msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setIgnore(false);
-		
-		$this->assertTrue( $msg->encrypt() );
-		$body = $msg->getBody();
-		$timeCreated = $msg->getTimeCreated();
-		$password = $msg->getPassword();
-		#$checksum = $msg->getChecksum();
-		
-		
-		$msg = new Msg();
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setBody($body);
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setTimeCreated($timeCreated);
-		$msg->setPassword($password);
-		#$msg->setChecksum($checksum);
-		
-		$msg->decrypt();
-	}
-	
-	/**
-	 * @expectedException RuntimeException
-	 * @expectedExceptionCode 101
-	 */
-	public function testDecryptionRuntimeException101(){
-		$msg = new Msg();
-		
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setSrcUserNickname('username1');
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSubject('subj1');
-		$msg->setText('text1');
-		$msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setIgnore(false);
-		
-		$this->assertTrue( $msg->encrypt() );
-		$body = $msg->getBody();
-		$timeCreated = $msg->getTimeCreated();
-		$checksum = $msg->getChecksum();
-		
-		$password = array(
-			#'password' => base64_encode('xyz'),
-			'sign' => base64_encode('invalid'),
-			'signAlgo' => 1,
-		);
-		$password = json_encode($password);
-		$password = gzencode($password, 9);
-		$password = base64_encode($password);
-		
-		
-		$msg = new Msg();
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setBody($body);
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setTimeCreated($timeCreated);
-		$msg->setPassword($password);
-		$msg->setChecksum($checksum);
-		
-		$msg->decrypt();
-	}
-	
-	/**
-	 * @expectedException RuntimeException
-	 * @expectedExceptionCode 103
-	 */
-	public function testDecryptionRuntimeException103(){
-		$msg = new Msg();
-		
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setSrcUserNickname('username1');
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSubject('subj1');
-		$msg->setText('text1');
-		$msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setIgnore(false);
-		
-		$this->assertTrue( $msg->encrypt() );
-		$body = $msg->getBody();
-		$timeCreated = $msg->getTimeCreated();
-		$password = $msg->getPassword();
-		$checksum = $msg->getChecksum();
-		
-		$password = base64_decode($password);
-		$password = gzdecode($password);
-		$password = json_decode($password, true);
-		$password['sign'] = 'invalid';
-		$password = json_encode($password);
-		$password = gzencode($password, 9);
-		$password = base64_encode($password);
-		
-		
-		$msg = new Msg();
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setBody($body);
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setTimeCreated($timeCreated);
-		$msg->setPassword($password);
-		$msg->setChecksum($checksum);
-		
-		$msg->decrypt();
-	}
-	
-	/**
-	 * @expectedException RuntimeException
-	 * @expectedExceptionCode 202
-	 */
-	public function testDecryptionRuntimeException202(){
-		$msg = new Msg();
-		
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setSrcUserNickname('username1');
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSubject('subj1');
-		$msg->setText('text1');
-		$msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setIgnore(false);
-		
-		$this->assertTrue( $msg->encrypt() );
-		$body = $msg->getBody();
-		$timeCreated = $msg->getTimeCreated();
-		$password = $msg->getPassword();
-		$checksum = $msg->getChecksum();
-		
-		$body = base64_decode($body);
-		$body = gzdecode($body);
-		$body = json_decode($body, true);
-		unset($body['iv']);
-		$body = json_encode($body);
-		$body = gzencode($body, 9);
-		$body = base64_encode($body);
-		
-		
-		$msg = new Msg();
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setBody($body);
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setTimeCreated($timeCreated);
-		$msg->setPassword($password);
-		$msg->setChecksum($checksum);
-		
-		$msg->decrypt();
-	}
-	
-	/**
-	 * @expectedException RuntimeException
-	 * @expectedExceptionCode 203
-	 */
-	public function testDecryptionRuntimeException203(){
-		$msg = new Msg();
-		
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setSrcUserNickname('username1');
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSubject('subj1');
-		$msg->setText('text1');
-		$msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setIgnore(false);
-		
-		$this->assertTrue( $msg->encrypt() );
-		$body = $msg->getBody();
-		$timeCreated = $msg->getTimeCreated();
-		$password = $msg->getPassword();
-		$checksum = $msg->getChecksum();
-		
-		$body = base64_decode($body);
-		$body = gzdecode($body);
-		$body = json_decode($body, true);
-		$body['data'] = 'invalid';
-		$body = json_encode($body);
-		$body = gzencode($body, 9);
-		$body = base64_encode($body);
-		
-		
-		$msg = new Msg();
-		$msg->setVersion(1);
-		$msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
-		$msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
-		$msg->setBody($body);
-		$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
-		$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
-		$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
-		$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
-		$msg->setTimeCreated($timeCreated);
-		$msg->setPassword($password);
-		$msg->setChecksum($checksum);
-		
-		$msg->decrypt();
-	}
-	
-	public function testCreateCheckSum1(){
-		$version = 1;
-		$id = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
-		$srcNodeId = 'cafed00d-2331-4159-8e11-0b4dbadb1738';
-		$dstNodeId = 'cafed00d-2431-4159-8e11-0b4dbadb1738';
-		$dstSslPubKey = static::DST1_SSL_KEY_PUB;
-		$text = 'hello world! this is a test';
-		$timeCreated = '1407137420';
-		$password = 'tt9M/WdvXyChAWthKDFaP/tUAG6bZsdalTOxrFNsYX+4NgTNQ7iNCUng0jDPNzoMOYVu';
-		$password .= 'DdV/ZVnja5pamipawuw71wyIa6vDGoJKJ1yOUbVkH9YO34gZTRVz6MfZu2BQ680YIJo';
-		$password .= 'u5J3aPMTcet5jYU2b2ffJSPkYqaEmV2DzLQr/M0bGn3rHml4OovKgX9m1vN7XlTQL+E';
-		$password .= 'wW5MCLqPYsethgoKahKh2O17oZ6VDGVa/b2P4KzM3d41NzUXz/s31Bce+blR2o6oM+n';
-		$password .= 'KIbXNoxs9dZbbCSqDzLk8AZ1+dGI2ZX7hovL+XSv0Ta7S0lgEf44zwDttGvdWpIaFvW+uL70w==';
-		$checksum = Msg::createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey, $text, $timeCreated, $password);
-		
-		$this->assertEquals('7c4459a9bc0ec4b19ebae6d9ded536aa6ee55ba13552dc81', $checksum);
-	}
-	
-	public function testCreateCheckSum2(){
-		$version = 1;
-		$id = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
-		$srcNodeId = 'cafed00d-2331-4159-8e11-0b4dbadb1738';
-		$dstNodeId = 'cafed00d-2531-4159-8e11-0b4dbadb1738';
-		$dstSslPubKey = static::DST1_SSL_KEY_PUB;
-		$text = 'hello world!';
-		$timeCreated = '540892800';
-		$password = 'password1';
-		$checksum = Msg::createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey, $text, $timeCreated, $password);
-		
-		$this->assertEquals('1c870e54257e6eb594724508a0a9c616b1905c2aed25de8a', $checksum);
-	}
-	
+    public function testEncryption($srcUserNickname, $subject, $text, $ignore)
+    {
+        $msg = new Msg();
+
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setSrcUserNickname($srcUserNickname);
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSubject($subject);
+        $msg->setText($text);
+        $msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setIgnore($ignore);
+
+        $this->assertTrue($msg->encrypt());
+        $body = $msg->getBody();
+        $timeCreated = $msg->getTimeCreated();
+        $password = $msg->getPassword();
+        $checksum = $msg->getChecksum();
+
+        $msg = new Msg();
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setBody($body);
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setTimeCreated($timeCreated);
+        $msg->setPassword($password);
+        $msg->setChecksum($checksum);
+
+        $textDecrypted = $msg->decrypt();
+        $this->assertEquals($subject, $msg->getSubject());
+        $this->assertEquals($text, $textDecrypted);
+        $this->assertEquals($text, $msg->getText());
+        $this->assertEquals($srcUserNickname, $msg->getSrcUserNickname());
+        $this->assertEquals($ignore, $msg->getIgnore());
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionCode 1
+     */
+    public function testEncryptionRuntimeException1()
+    {
+        $msg = new Msg();
+
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setSrcUserNickname('username1');
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSubject('subj1');
+        $msg->setText('text1');
+        #$msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setIgnore(false);
+
+        $msg->encrypt();
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionCode 2
+     */
+    public function testEncryptionRuntimeException2()
+    {
+        $msg = new Msg();
+
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setSrcUserNickname('username1');
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        #$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSubject('subj1');
+        $msg->setText('text1');
+        $msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setIgnore(false);
+
+        $msg->encrypt();
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionCode 10
+     */
+    public function testDecryptionRuntimeException10()
+    {
+        $msg = new Msg();
+
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setSrcUserNickname('username1');
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSubject('subj1');
+        $msg->setText('text1');
+        $msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setIgnore(false);
+
+        $this->assertTrue($msg->encrypt());
+        $body = $msg->getBody();
+        $timeCreated = $msg->getTimeCreated();
+        $password = $msg->getPassword();
+        $checksum = $msg->getChecksum();
+
+        $msg = new Msg();
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setBody($body);
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        #$msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setTimeCreated($timeCreated);
+        $msg->setPassword($password);
+        $msg->setChecksum($checksum);
+
+        $msg->decrypt();
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionCode 20
+     */
+    public function testDecryptionRuntimeException20()
+    {
+        $msg = new Msg();
+
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setSrcUserNickname('username1');
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSubject('subj1');
+        $msg->setText('text1');
+        $msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setIgnore(false);
+
+        $this->assertTrue($msg->encrypt());
+        $body = $msg->getBody();
+        $timeCreated = $msg->getTimeCreated();
+        $password = $msg->getPassword();
+        $checksum = $msg->getChecksum();
+
+        $msg = new Msg();
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setBody($body);
+        #$msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setTimeCreated($timeCreated);
+        $msg->setPassword($password);
+        $msg->setChecksum($checksum);
+
+        $msg->decrypt();
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionCode 30
+     */
+    public function testDecryptionRuntimeException30()
+    {
+        $msg = new Msg();
+
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setSrcUserNickname('username1');
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSubject('subj1');
+        $msg->setText('text1');
+        $msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setIgnore(false);
+
+        $this->assertTrue($msg->encrypt());
+        $body = $msg->getBody();
+        $timeCreated = $msg->getTimeCreated();
+        $password = $msg->getPassword();
+        $checksum = $msg->getChecksum();
+
+        $msg = new Msg();
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setBody($body);
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        #$msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setTimeCreated($timeCreated);
+        $msg->setPassword($password);
+        $msg->setChecksum($checksum);
+
+        $msg->decrypt();
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionCode 40
+     */
+    public function testDecryptionRuntimeException40()
+    {
+        $msg = new Msg();
+
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setSrcUserNickname('username1');
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSubject('subj1');
+        $msg->setText('text1');
+        $msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setIgnore(false);
+
+        $this->assertTrue($msg->encrypt());
+        $body = $msg->getBody();
+        $timeCreated = $msg->getTimeCreated();
+        $password = $msg->getPassword();
+        $checksum = $msg->getChecksum();
+
+        $msg = new Msg();
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setBody($body);
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        #$msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setTimeCreated($timeCreated);
+        $msg->setPassword($password);
+        $msg->setChecksum($checksum);
+
+        $msg->decrypt();
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionCode 50
+     */
+    public function testDecryptionRuntimeException50()
+    {
+        $msg = new Msg();
+
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setSrcUserNickname('username1');
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSubject('subj1');
+        $msg->setText('text1');
+        $msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setIgnore(false);
+
+        $this->assertTrue($msg->encrypt());
+        $body = $msg->getBody();
+        $timeCreated = $msg->getTimeCreated();
+        #$password = $msg->getPassword();
+        $checksum = $msg->getChecksum();
+
+        $msg = new Msg();
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setBody($body);
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setTimeCreated($timeCreated);
+        #$msg->setPassword($password);
+        $msg->setChecksum($checksum);
+
+        $msg->decrypt();
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionCode 60
+     */
+    public function testDecryptionRuntimeException60()
+    {
+        $msg = new Msg();
+
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setSrcUserNickname('username1');
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSubject('subj1');
+        $msg->setText('text1');
+        $msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setIgnore(false);
+
+        $this->assertTrue($msg->encrypt());
+        $body = $msg->getBody();
+        $timeCreated = $msg->getTimeCreated();
+        $password = $msg->getPassword();
+        #$checksum = $msg->getChecksum();
+
+        $msg = new Msg();
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setBody($body);
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setTimeCreated($timeCreated);
+        $msg->setPassword($password);
+        #$msg->setChecksum($checksum);
+
+        $msg->decrypt();
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionCode 101
+     */
+    public function testDecryptionRuntimeException101()
+    {
+        $msg = new Msg();
+
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setSrcUserNickname('username1');
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSubject('subj1');
+        $msg->setText('text1');
+        $msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setIgnore(false);
+
+        $this->assertTrue($msg->encrypt());
+        $body = $msg->getBody();
+        $timeCreated = $msg->getTimeCreated();
+        $checksum = $msg->getChecksum();
+
+        $password = [
+            #'password' => base64_encode('xyz'),
+            'sign' => base64_encode('invalid'),
+            'signAlgo' => 1,
+        ];
+        $password = json_encode($password);
+        $password = gzencode($password, 9);
+        $password = base64_encode($password);
+
+        $msg = new Msg();
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setBody($body);
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setTimeCreated($timeCreated);
+        $msg->setPassword($password);
+        $msg->setChecksum($checksum);
+
+        $msg->decrypt();
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionCode 103
+     */
+    public function testDecryptionRuntimeException103()
+    {
+        $msg = new Msg();
+
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setSrcUserNickname('username1');
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSubject('subj1');
+        $msg->setText('text1');
+        $msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setIgnore(false);
+
+        $this->assertTrue($msg->encrypt());
+        $body = $msg->getBody();
+        $timeCreated = $msg->getTimeCreated();
+        $password = $msg->getPassword();
+        $checksum = $msg->getChecksum();
+
+        $password = base64_decode($password);
+        $password = gzdecode($password);
+        $password = json_decode($password, true);
+        $password['sign'] = 'invalid';
+        $password = json_encode($password);
+        $password = gzencode($password, 9);
+        $password = base64_encode($password);
+
+        $msg = new Msg();
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setBody($body);
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setTimeCreated($timeCreated);
+        $msg->setPassword($password);
+        $msg->setChecksum($checksum);
+
+        $msg->decrypt();
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionCode 202
+     */
+    public function testDecryptionRuntimeException202()
+    {
+        $msg = new Msg();
+
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setSrcUserNickname('username1');
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSubject('subj1');
+        $msg->setText('text1');
+        $msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setIgnore(false);
+
+        $this->assertTrue($msg->encrypt());
+        $body = $msg->getBody();
+        $timeCreated = $msg->getTimeCreated();
+        $password = $msg->getPassword();
+        $checksum = $msg->getChecksum();
+
+        $body = base64_decode($body);
+        $body = gzdecode($body);
+        $body = json_decode($body, true);
+        unset($body['iv']);
+        $body = json_encode($body);
+        $body = gzencode($body, 9);
+        $body = base64_encode($body);
+
+        $msg = new Msg();
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setBody($body);
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setTimeCreated($timeCreated);
+        $msg->setPassword($password);
+        $msg->setChecksum($checksum);
+
+        $msg->decrypt();
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionCode 203
+     */
+    public function testDecryptionRuntimeException203()
+    {
+        $msg = new Msg();
+
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setSrcUserNickname('username1');
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSubject('subj1');
+        $msg->setText('text1');
+        $msg->setSslKeyPrv(static::SRC1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setIgnore(false);
+
+        $this->assertTrue($msg->encrypt());
+        $body = $msg->getBody();
+        $timeCreated = $msg->getTimeCreated();
+        $password = $msg->getPassword();
+        $checksum = $msg->getChecksum();
+
+        $body = base64_decode($body);
+        $body = gzdecode($body);
+        $body = json_decode($body, true);
+        $body['data'] = 'invalid';
+        $body = json_encode($body);
+        $body = gzencode($body, 9);
+        $body = base64_encode($body);
+
+        $msg = new Msg();
+        $msg->setVersion(1);
+        $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
+        $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
+        $msg->setBody($body);
+        $msg->setSrcSslKeyPub(static::SRC1_SSL_KEY_PUB);
+        $msg->setDstSslPubKey(static::DST1_SSL_KEY_PUB);
+        $msg->setSslKeyPrv(static::DST1_SSL_KEY_PRV, static::SSL_KEY_PRV_PASS);
+        $msg->setDstNodeId('cafed00d-2431-4159-8e11-0b4dbadb1738');
+        $msg->setTimeCreated($timeCreated);
+        $msg->setPassword($password);
+        $msg->setChecksum($checksum);
+
+        $msg->decrypt();
+    }
+
+    public function testCreateCheckSum1()
+    {
+        $version = 1;
+        $id = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
+        $srcNodeId = 'cafed00d-2331-4159-8e11-0b4dbadb1738';
+        $dstNodeId = 'cafed00d-2431-4159-8e11-0b4dbadb1738';
+        $dstSslPubKey = static::DST1_SSL_KEY_PUB;
+        $text = 'hello world! this is a test';
+        $timeCreated = '1407137420';
+        $password = 'tt9M/WdvXyChAWthKDFaP/tUAG6bZsdalTOxrFNsYX+4NgTNQ7iNCUng0jDPNzoMOYVu';
+        $password .= 'DdV/ZVnja5pamipawuw71wyIa6vDGoJKJ1yOUbVkH9YO34gZTRVz6MfZu2BQ680YIJo';
+        $password .= 'u5J3aPMTcet5jYU2b2ffJSPkYqaEmV2DzLQr/M0bGn3rHml4OovKgX9m1vN7XlTQL+E';
+        $password .= 'wW5MCLqPYsethgoKahKh2O17oZ6VDGVa/b2P4KzM3d41NzUXz/s31Bce+blR2o6oM+n';
+        $password .= 'KIbXNoxs9dZbbCSqDzLk8AZ1+dGI2ZX7hovL+XSv0Ta7S0lgEf44zwDttGvdWpIaFvW+uL70w==';
+        $checksum = Msg::createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey, $text, $timeCreated, $password);
+
+        $this->assertEquals('7c4459a9bc0ec4b19ebae6d9ded536aa6ee55ba13552dc81', $checksum);
+    }
+
+    public function testCreateCheckSum2()
+    {
+        $version = 1;
+        $id = 'cafed00d-2131-4159-8e11-0b4dbadb1738';
+        $srcNodeId = 'cafed00d-2331-4159-8e11-0b4dbadb1738';
+        $dstNodeId = 'cafed00d-2531-4159-8e11-0b4dbadb1738';
+        $dstSslPubKey = static::DST1_SSL_KEY_PUB;
+        $text = 'hello world!';
+        $timeCreated = '540892800';
+        $password = 'password1';
+        $checksum = Msg::createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey, $text, $timeCreated, $password);
+
+        $this->assertEquals('1c870e54257e6eb594724508a0a9c616b1905c2aed25de8a', $checksum);
+    }
 }
