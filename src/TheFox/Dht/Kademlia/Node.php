@@ -3,12 +3,10 @@
 namespace TheFox\Dht\Kademlia;
 
 use RuntimeException;
-
 use Zend\Uri\UriFactory;
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
 use StephenHill\Base58;
-
 use TheFox\Storage\YamlStorage;
 use TheFox\Utilities\Hex;
 
@@ -27,7 +25,6 @@ class Node extends YamlStorage{
 		parent::__construct($filePath);
 		
 		$this->uri = UriFactory::factory('tcp://');
-		#ve($this->uri);
 		
 		$this->data['id'] = '00000000-0000-4000-8000-000000000000';
 		$this->data['uri'] = '';
@@ -38,6 +35,10 @@ class Node extends YamlStorage{
 		$this->data['connectionsOutboundAttempts'] = 0;
 		$this->data['connectionsInboundSucceed'] = 0;
 		#$this->data['connectionsInboundAttempts'] = 0;
+		$this->data['bridgeServer'] = false;
+		$this->data['bridgeClient'] = false;
+		$this->data['bridgeDst'] = array();
+		$this->data['bridgeSubscribed'] = false;
 		$this->data['timeCreated'] = time();
 		$this->data['timeLastSeen'] = 0;
 		
@@ -45,7 +46,7 @@ class Node extends YamlStorage{
 	}
 	
 	public function __sleep(){
-		return array('data', 'id', 'uri', 'sslKeyPub');
+		return array('data', 'dataChanged', 'id', 'uri', 'sslKeyPub');
 	}
 	
 	public function __toString(){
@@ -55,20 +56,17 @@ class Node extends YamlStorage{
 		if((string)$this->getUri()){
 			return __CLASS__.'->{URI:'.$this->getUri().'}';
 		}
+		
+		return __CLASS__;
 	}
 	
 	public function save(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		$this->data['uri'] = (string)$this->uri;
 		$this->data['sslKeyPub'] = base64_encode($this->sslKeyPub);
 		return parent::save();
 	}
 	
 	public function load(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		#fwrite(STDOUT, 'load node'."\n");
-		
 		if(parent::load()){
 			$this->setIdHexStr($this->data['id']);
 			
@@ -81,7 +79,6 @@ class Node extends YamlStorage{
 				}
 				
 				if(array_key_exists('uri', $this->data)){
-					#fwrite(STDOUT, 'load node: uri /'.$this->data['uri'].'/'."\n");
 					if($this->data['uri']){
 						$this->setUri($this->data['uri']);
 					}
@@ -99,16 +96,11 @@ class Node extends YamlStorage{
 	}
 	
 	public function setIdHexStr($id){
-		#fwrite(STDOUT, __FUNCTION__.''."\n");
-		#fwrite(STDOUT, __FUNCTION__.': '.$id."\n");
-		#ve(isset($id) ? $id : null);
-		
 		if($id){
 			$id = strtolower($id);
 			$this->id = array_fill(0, static::ID_LEN_BYTE, 0);
 			
 			if(Uuid::isValid($id)){
-				#print __CLASS__.'->'.__FUNCTION__.': check valid UUID'."\n";
 				$this->data['id'] = $id;
 				
 				$id = str_replace('-', '', $id);
@@ -118,12 +110,26 @@ class Node extends YamlStorage{
 				}
 			}
 		}
-		#ve($this->id);
-		#else{ print __CLASS__.'->'.__FUNCTION__.': check valid UUID FAILED: '.$id."\n"; }
 	}
 	
 	public function getIdHexStr(){
 		return $this->data['id'];
+	}
+	
+	public static function genIdHexStr($key){
+		$key = sslKeyPubClean($key);
+		
+		$keyBin = base64_decode($key);
+		
+		try{
+			$id = (string)Uuid::uuid5(Uuid::NAMESPACE_X500, $keyBin);
+			return $id;
+		}
+		// @codeCoverageIgnoreStart
+		catch(UnsatisfiedDependencyException $e){
+			return null;
+		}
+		// @codeCoverageIgnoreEnd
 	}
 	
 	public function getIdBitStr(){
@@ -132,9 +138,21 @@ class Node extends YamlStorage{
 			for($bits = 7; $bits >= 0; $bits--){
 				$rv .= $this->id[$idPos] & (1 << $bits) ? '1' : '0';
 			}
-			#$rv .= ' ';
 		}
 		return $rv;
+	}
+	
+	public static function idMinHexStr($hex_a, $hex_b){
+		if($hex_a == $hex_b){
+			return $hex_a;
+		}
+		
+		$ar = array();
+		$ar[] = $hex_a;
+		$ar[] = $hex_b;
+		sort($ar, SORT_STRING);
+		
+		return array_shift($ar);
 	}
 	
 	public function setUri($uri){
@@ -154,6 +172,8 @@ class Node extends YamlStorage{
 	}
 	
 	public function setSslKeyPub($strKeyPub, $force = false){
+		$rv = false;
+		
 		if(!$this->sslKeyPub || $force){
 			$sslPubKey = openssl_pkey_get_public($strKeyPub);
 			if($sslPubKey !== false){
@@ -163,7 +183,7 @@ class Node extends YamlStorage{
 					$this->sslKeyPub = $sslPubKeyDetails['key'];
 					$this->setSslKeyPubFingerprint(static::genSslKeyFingerprint($strKeyPub));
 					
-					return true;
+					$rv = true;
 				}
 			}
 			else{
@@ -171,7 +191,7 @@ class Node extends YamlStorage{
 			}
 		}
 		
-		return false;
+		return $rv;
 	}
 	
 	public function getSslKeyPub(){
@@ -213,7 +233,10 @@ class Node extends YamlStorage{
 		$checksumHex = substr($checksumHex, 0, 8); // 4 Bytes
 		
 		$num = Hex::decode($fingerprintHex.$checksumHex);
+		#$numBase58 = Base58::encode($num);
+		$base58 = new Base58();
 		$numBase58 = $base58->encode((string)$num);
+		#$numBase58 = $base58->encode($num);
 		
 		$rv = 'FC_'.$numBase58;
 		
@@ -226,7 +249,9 @@ class Node extends YamlStorage{
 			
 			$fingerprint = substr($fingerprint, 3);
 			
-			$fingerprintNum = $base58->decode($fingerprint);
+			#$fingerprintNum = Base58::decode($fingerprint);
+			$base58 = new Base58();
+			$fingerprintNum = $base58->decode((string)$fingerprint);
 			
 			$fingerprintHex = Hex::encode($fingerprintNum);
 			$fingerprintHex = str_repeat('0', strlen($fingerprintHex) % 2).$fingerprintHex;
@@ -244,20 +269,6 @@ class Node extends YamlStorage{
 		return false;
 	}
 	
-	public static function genIdHexStr($key){
-		$key = sslKeyPubClean($key);
-		
-		$keyBin = base64_decode($key);
-		
-		try{
-			$id = (string)Uuid::uuid5(Uuid::NAMESPACE_X500, $keyBin);
-			return $id;
-		}
-		catch(UnsatisfiedDependencyException $e){
-			return null;
-		}
-	}
-	
 	public function setDistance($distance){
 		$this->data['distance'] = $distance;
 		#$this->distance = $distance;
@@ -265,7 +276,43 @@ class Node extends YamlStorage{
 	
 	public function getDistance(){
 		return $this->data['distance'];
-		#return $this->distance;
+	}
+	
+	public function distance(Node $node){
+		$rv = array_fill(0, static::ID_LEN_BYTE, 0);
+		
+		if($node && $this !== $node){
+			$thisId = $this->getId();
+			$nodeId = $node->getId();
+			
+			for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
+				$rv[$idPos] = $thisId[$idPos] ^ $nodeId[$idPos];
+			}
+		}
+		
+		return $rv;
+	}
+	
+	public function distanceBitStr(Node $node){
+		$distance = $this->distance($node);
+		
+		$rv = '';
+		for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
+			for($bits = 7; $bits >= 0; $bits--){
+				$rv .= $distance[$idPos] & (1 << $bits) ? '1' : '0';
+			}
+		}
+		return $rv;
+	}
+	
+	public function distanceHexStr(Node $node){
+		$distance = $this->distance($node);
+		
+		return sprintf('%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x',
+			$distance[0], $distance[1], $distance[2], $distance[3],
+			$distance[4], $distance[5], $distance[6], $distance[7],
+			$distance[8], $distance[9], $distance[10], $distance[11],
+			$distance[12], $distance[13], $distance[14], $distance[15]);
 	}
 	
 	public function setConnectionsOutboundSucceed($connectionsOutboundSucceed){
@@ -320,6 +367,48 @@ class Node extends YamlStorage{
 		$this->setDataChanged(true);
 	}*/
 	
+	public function setBridgeServer($bridgeServer){
+		$this->data['bridgeServer'] = (bool)$bridgeServer;
+		$this->setDataChanged(true);
+	}
+	
+	public function getBridgeServer(){
+		return (bool)$this->data['bridgeServer'];
+	}
+	
+	public function setBridgeClient($bridgeClient){
+		$this->data['bridgeClient'] = (bool)$bridgeClient;
+		$this->setDataChanged(true);
+	}
+	
+	public function getBridgeClient(){
+		return (bool)$this->data['bridgeClient'];
+	}
+	
+	public function addBridgeDst($bridgeDst){
+		if(is_array($bridgeDst)){
+			$this->data['bridgeDst'] = array_merge($this->data['bridgeDst'], $bridgeDst);
+		}
+		else{
+			$this->data['bridgeDst'][] = $bridgeDst;
+		}
+		$this->data['bridgeDst'] = array_unique($this->data['bridgeDst']);
+		$this->setDataChanged(true);
+	}
+	
+	public function getBridgeDst(){
+		return $this->data['bridgeDst'];
+	}
+	
+	/*public function setBridgeSubscribed($bridgeSubscribed){
+		$this->data['bridgeSubscribed'] = (bool)$bridgeSubscribed;
+		$this->setDataChanged(true);
+	}
+	
+	public function getBridgeSubscribed(){
+		return (bool)$this->data['bridgeSubscribed'];
+	}*/
+	
 	public function setTimeCreated($timeCreated){
 		$this->data['timeCreated'] = $timeCreated;
 	}
@@ -344,69 +433,10 @@ class Node extends YamlStorage{
 		return $this->bucket;
 	}
 	
-	public function distance(Node $node){
-		#fwrite(STDOUT, __FUNCTION__.''."\n");
-		$rv = array_fill(0, static::ID_LEN_BYTE, 0);
-		#ve($rv);
-		
-		if($node && $this !== $node){
-			$thisId = $this->getId();
-			$nodeId = $node->getId();
-			
-			#ve($thisId);
-			#ve($nodeId);
-			
-			for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
-				$rv[$idPos] = $thisId[$idPos] ^ $nodeId[$idPos];
-				#fwrite(STDOUT, __FUNCTION__.'     pos: '.$idPos.' -> '.$rv[$idPos]."\n");
-			}
-		}
-		
-		return $rv;
-	}
-	
-	public function distanceBitStr(Node $node){
-		$distance = $this->distance($node);
-		
-		$rv = '';
-		for($idPos = 0; $idPos < static::ID_LEN_BYTE; $idPos++){
-			#fwrite(STDOUT, __FUNCTION__.' pos: '.$idPos."\n");
-			for($bits = 7; $bits >= 0; $bits--){
-				#fwrite(STDOUT, __FUNCTION__.'     bit: '.$bits.' -> '.(1 << $bits)."\n");
-				$rv .= $distance[$idPos] & (1 << $bits) ? '1' : '0';
-			}
-			#$rv .= ' ';
-		}
-		return $rv;
-	}
-	
-	public function distanceHexStr(Node $node){
-		$distance = $this->distance($node);
-		
-		return sprintf('%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x',
-			$distance[0], $distance[1], $distance[2], $distance[3],
-			$distance[4], $distance[5], $distance[6], $distance[7],
-			$distance[8], $distance[9], $distance[10], $distance[11],
-			$distance[12], $distance[13], $distance[14], $distance[15]);
-	}
-	
 	public function isEqual(Node $node){
 		return $this->getIdHexStr() == $node->getIdHexStr();
 	}
-	
-	public static function idMinHexStr($hex_a, $hex_b){
-		if($hex_a == $hex_b){
-			return $hex_a;
-		}
 		
-		$ar = array();
-		$ar[] = $hex_a;
-		$ar[] = $hex_b;
-		sort($ar, SORT_STRING);
-		
-		return array_shift($ar);
-	}
-	
 	public function update(Node $node){
 		if($node->getTimeLastSeen() > $this->getTimeLastSeen()){
 			$this->setUri($node->getUri());
@@ -414,6 +444,12 @@ class Node extends YamlStorage{
 			#$this->setConnectionsOutboundAttempts($node->getConnectionsOutboundAttempts());
 			#$this->setConnectionsInboundSucceed($node->getConnectionsInboundSucceed());
 			#$this->setConnectionsInboundAttempts($node->getConnectionsInboundAttempts());
+			
+			$this->setBridgeServer($node->getBridgeServer());
+			$this->setBridgeClient($node->getBridgeClient());
+			#$this->addBridgeDst($node->getBridgeDst()); # TODO
+			#$this->setBridgeSubscribed($node->getBridgeSubscribed());
+			
 			$this->setTimeLastSeen($node->getTimeLastSeen());
 			$this->setDataChanged(true);
 		}

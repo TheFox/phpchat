@@ -2,6 +2,11 @@
 
 namespace TheFox\PhpChat;
 
+/**
+ * Basic variables.
+ *
+ * @author Christian Mayer <https://fox21.at>
+ */
 class PhpChat{
 	
 	const NAME = 'PHPChat';

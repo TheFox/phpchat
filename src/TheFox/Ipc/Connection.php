@@ -7,6 +7,9 @@ use RuntimeException;
 use OutOfBoundsException;
 use Closure;
 
+/**
+ * @codeCoverageIgnore
+ */
 class Connection{
 	
 	const LOOP_USLEEP = 100000;
@@ -20,10 +23,6 @@ class Connection{
 	private $execsId = 0;
 	private $execs = array();
 	
-	public function __construct(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-	}
-	
 	public function isServer($isServer = null){
 		if($isServer !== null){
 			$this->isServer = $isServer;
@@ -33,8 +32,6 @@ class Connection{
 	}
 	
 	public function setHandler(AbstractHandler $handler){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		$this->handler = $handler;
 	}
 	
@@ -43,8 +40,6 @@ class Connection{
 	}
 	
 	public function setOnClientConnectFunction(Closure $onClientConnectFunction){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		if($this->handler === null){
 			throw new RuntimeException('Handler not set. Use setHandler().');
 		}
@@ -200,8 +195,6 @@ class Connection{
 	}
 	
 	private function msgHandle($msg, $clientId = null){
-		#print __CLASS__.'->'.__FUNCTION__.': '.(int)$clientId.' "'.$msg.'"'."\n";
-		
 		if($msg == 'ID'){
 			$this->handler->sendIdOk($clientId);
 		}
@@ -220,16 +213,13 @@ class Connection{
 				$this->handler->sendFunctionRetn($value, $json['rid'], $clientId);
 			}
 			catch(Exception $e){
-				#print __CLASS__.'->'.__FUNCTION__.': '.$e->getMessage().''."\n";
 			}
 		}
 		elseif(substr($msg, 0, 14) == 'FUNCTION_RETN '){
 			$data = substr($msg, 14);
 			$json = json_decode($data, true);
 			
-			#print "value: '". $json['value'] ."'\n";
 			$value = unserialize($json['value']);
-			#print "value: '". \TheFox\Utilities\Hex::dataEncode($value) ."'\n";
 			$rid = (int)$json['rid'];
 			
 			if(array_key_exists($rid, $this->execs)){
@@ -243,7 +233,6 @@ class Connection{
 				}
 				
 				if($this->execs[$rid]['type'] == 'a'){
-					#print "remove A $rid\n";
 					unset($this->execs[$rid]);
 				}
 			}
@@ -251,7 +240,6 @@ class Connection{
 	}
 	
 	public function run(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		if($this->handler === null){
 			throw new Exception('Handler not set. Use setHandler().');
 		}
@@ -260,7 +248,6 @@ class Connection{
 		
 		if($this->isServer()){
 			foreach($this->handler->recvBuffer() as $client){
-				#print __CLASS__.'->'.__FUNCTION__.': client '.$client['id']."\n";
 				foreach($client['recvBuffer'] as $msg){
 					$this->msgHandle($msg, $client['id']);
 				}
@@ -278,8 +265,6 @@ class Connection{
 	}
 	
 	public function loop(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		while(true){
 			$this->run();
 			usleep(static::LOOP_USLEEP);

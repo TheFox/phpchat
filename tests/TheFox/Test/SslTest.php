@@ -1,5 +1,9 @@
 <?php
 
+namespace TheFox\Test;
+
+use PHPUnit_Framework_TestCase;
+
 class SslTest extends PHPUnit_Framework_TestCase{
 	
 	const SSL_KEY_PUB1 = '-----BEGIN PUBLIC KEY-----
@@ -52,6 +56,8 @@ O5mYMzSLyuOXR5xhBhG7fjsCAwEAAQ==
 	}
 	
 	public function testKeyGen(){
+		$fileName = 'testfile_ssl_id_rsa_'.date('Ymd_His').'_'.uniqid('', true);
+		
 		$sslConfig = array(
 			'digest_alg' => 'sha512',
 			'private_key_bits' => 4096,
@@ -61,20 +67,15 @@ O5mYMzSLyuOXR5xhBhG7fjsCAwEAAQ==
 		$ssl = openssl_pkey_new($sslConfig);
 		$this->assertTrue($ssl ? true : false);
 		
-		openssl_pkey_export_to_file($ssl, 'tests/testfile_ssl_id_rsa.prv');
-		#fwrite(STDOUT, 'SSL ERROR: '.openssl_error_string()."\n");
-		openssl_pkey_export_to_file($ssl, 'tests/testfile_ssl_id_rsa_pass.prv', 'my_password');
-		#fwrite(STDOUT, 'SSL ERROR: '.openssl_error_string()."\n");
+		openssl_pkey_export_to_file($ssl, 'test_data/'.$fileName.'.prv');
+		openssl_pkey_export_to_file($ssl, 'test_data/'.$fileName.'_pass.prv', 'my_password');
 		
 		$keyPub = openssl_pkey_get_details($ssl);
-		#ve($keyPub);
 		$keyPub = $keyPub['key'];
-		file_put_contents('tests/testfile_ssl_id_rsa.pub', $keyPub);
+		file_put_contents('test_data/'.$fileName.'.pub', $keyPub);
 		
 		openssl_public_encrypt('test my keys', $encrypted, $keyPub);
-		#fwrite(STDOUT, 'SSL ERROR: '.openssl_error_string()."\n");
 		openssl_private_decrypt($encrypted, $decrypted, $ssl);
-		#fwrite(STDOUT, 'SSL ERROR: '.openssl_error_string()."\n");
 		$this->assertEquals('test my keys', $decrypted);
 		
 		openssl_pkey_free($ssl);

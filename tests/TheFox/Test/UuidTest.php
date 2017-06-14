@@ -1,10 +1,12 @@
 <?php
 
+namespace TheFox\Test;
+
+use PHPUnit_Framework_TestCase;
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
 use Zend\Uri\UriFactory;
 use Zend\Uri\Http;
-
 use TheFox\Dht\Kademlia\Node;
 use TheFox\PhpChat\TcpUri;
 use TheFox\PhpChat\HttpUri;

@@ -9,7 +9,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Liip\ProcessManager\ProcessManager;
 use Liip\ProcessManager\PidFile;
-
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler;
 
@@ -150,16 +149,16 @@ class BasicCommand extends Command{
 	}
 	
 	private function stdStreamsSetup(){
-		global $STDIN, $STDOUT, $STDERR;
+		// global $STDIN, $STDOUT, $STDERR;
 		
 		#$this->log->info('stdStreamsSetup');
 		
 		fclose(STDIN);
 		fclose(STDOUT);
 		fclose(STDERR);
-		$STDIN = fopen('/dev/null', 'r');
-		$STDOUT = fopen('/dev/null', 'wb');
-		$STDERR = fopen('/dev/null', 'wb');
+		// $STDIN = fopen('/dev/null', 'r');
+		// $STDOUT = fopen('/dev/null', 'wb');
+		// $STDERR = fopen('/dev/null', 'wb');
 		
 		#$this->log->info('stdStreamsSetup done');
 	}

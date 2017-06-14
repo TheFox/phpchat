@@ -2,15 +2,19 @@
 
 namespace TheFox\Console\Command;
 
+use Exception;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
 use TheFox\PhpChat\Cronjob;
 
 class CronjobCommand extends BasicCommand{
 	
 	private $cronjob;
+	
+	public function getLogfilePath(){
+		return 'log/cronjob.log';
+	}
 	
 	public function getPidfilePath(){
 		return 'pid/cronjob.pid';
@@ -21,9 +25,10 @@ class CronjobCommand extends BasicCommand{
 		$this->setDescription('Run the Cronjob.');
 		$this->addOption('daemon', 'd', InputOption::VALUE_NONE, 'Run in daemon mode.');
 		$this->addOption('cycle', 'c', InputOption::VALUE_NONE, 'Run only one cycle.');
+		$this->addOption('ping', 'p', InputOption::VALUE_NONE, 'Run only one ping nodes cycle.');
 		$this->addOption('msg', 'm', InputOption::VALUE_NONE, 'Run only one cycle with Msgs.');
-		$this->addOption('nodes', null, InputOption::VALUE_NONE, 'Run only one cycle with Nodes New DB.');
-		$this->addOption('bootstrap', null, InputOption::VALUE_NONE, 'Run only one cycle with Boostrap Nodes.');
+		$this->addOption('nodes', 'o', InputOption::VALUE_NONE, 'Run only one cycle with Nodes New DB.');
+		$this->addOption('bootstrap', 'b', InputOption::VALUE_NONE, 'Run only one cycle with Boostrap Nodes.');
 		$this->addOption('shutdown', 's', InputOption::VALUE_NONE, 'Shutdown.');
 	}
 	
@@ -32,12 +37,13 @@ class CronjobCommand extends BasicCommand{
 		
 		$this->log->info('cronjob start');
 		$this->cronjob = new Cronjob();
+		$this->cronjob->setLog($this->log);
 
 		try{
 			$this->cronjob->init();
 		}
 		catch(Exception $e){
-			$log->error('init: '.$e->getMessage());
+			$this->log->error('init: '.$e->getMessage());
 			exit(1);
 		}
 		
@@ -46,6 +52,9 @@ class CronjobCommand extends BasicCommand{
 		}
 		elseif($input->hasOption('msg') && $input->getOption('msg')){
 			$this->cronjob->cycleMsg();
+		}
+		elseif($input->hasOption('ping') && $input->getOption('ping')){
+			$this->cronjob->cyclePingNodes();
 		}
 		elseif($input->hasOption('nodes') && $input->getOption('nodes')){
 			$this->cronjob->cycleNodesNew();
@@ -58,7 +67,7 @@ class CronjobCommand extends BasicCommand{
 				$this->cronjob->loop();
 			}
 			catch(Exception $e){
-				$log->error('loop: '.$e->getMessage());
+				$this->log->error('loop: '.$e->getMessage());
 				exit(1);
 			}
 		}

@@ -1,7 +1,9 @@
 <?php
 
-use Symfony\Component\Filesystem\Filesystem;
+namespace TheFox\Test;
 
+use PHPUnit_Framework_TestCase;
+use Symfony\Component\Filesystem\Filesystem;
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler;
 
@@ -43,13 +45,16 @@ class LogTest extends PHPUnit_Framework_TestCase{
      * @dataProvider providerLog
      */
 	public function testLog($level, $expected){
-		if(file_exists('tests/testfile_log.log')){
+		$runName = uniqid('', true);
+		$fileName = 'testfile_log_'.date('Ymd_His').'_'.$runName.'.log';
+		
+		if(file_exists('test_data/'.$fileName)){
 			$filesystem = new Filesystem();
-			$filesystem->remove('tests/testfile_log.log');
+			$filesystem->remove('test_data/'.$fileName);
 		}
 		
 		$log = new Logger('tester');
-		$log->pushHandler(new StreamHandler('tests/testfile_log.log', $level));
+		$log->pushHandler(new StreamHandler('test_data/'.$fileName, $level));
 		
 		$log->debug('test1');
 		$log->info('test2');
@@ -60,7 +65,7 @@ class LogTest extends PHPUnit_Framework_TestCase{
 		$log->alert('test7');
 		$log->emergency('test8');
 		
-		$this->assertRegExp('/^'.$expected.'/s', file_get_contents('tests/testfile_log.log'));
+		$this->assertRegExp('/^'.$expected.'/s', file_get_contents('test_data/'.$fileName));
 	}
 	
 	public function providerLevel(){

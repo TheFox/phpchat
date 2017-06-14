@@ -3,14 +3,21 @@
 namespace TheFox\PhpChat;
 
 use RuntimeException;
-
 use Rhumsaa\Uuid\Uuid;
 use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
-
 use TheFox\Storage\YamlStorage;
 use TheFox\Utilities\Rand;
 
 class Msg extends YamlStorage{
+	
+	public static $STATUS_TEXT = array(
+		'U' => 'unread, got msg from another node',
+		'O' => 'origin, local node created the msg',
+		'S' => 'sent at least to one node',
+		'D' => 'delivered to destination node',
+		'R' => 'read',
+		'X' => 'reached MSG_FORWARD_TO_NODES_MIN or MSG_FORWARD_TO_NODES_MAX',
+	);
 	
 	private $srcSslKeyPub = '';
 	private $srcUserNickname = '';
@@ -57,15 +64,11 @@ class Msg extends YamlStorage{
 	}
 	
 	public function save(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		$this->data['srcSslKeyPub'] = base64_encode($this->srcSslKeyPub);
 		return parent::save();
 	}
 	
 	public function load(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		if(parent::load()){
 			$this->setSrcSslKeyPub(base64_decode($this->data['srcSslKeyPub']));
 			unset($this->data['srcSslKeyPub']);
@@ -88,17 +91,15 @@ class Msg extends YamlStorage{
 	}
 	
 	public function getId(){
-		#print __CLASS__.'->'.__FUNCTION__.': "'.$this->data['id'].'"'."\n";
-		
 		if(!isset($this->data['id']) || !$this->data['id']){
-			#print __CLASS__.'->'.__FUNCTION__.': no set'."\n";
 			try{
 				$this->data['id'] = (string)Uuid::uuid4();
-				#print __CLASS__.'->'.__FUNCTION__.': new id: '.$this->data['id']."\n";
 			}
+			// @codeCoverageIgnoreStart
 			catch(UnsatisfiedDependencyException $e){
 				throw $e;
 			}
+			// @codeCoverageIgnoreEnd
 		}
 		return $this->data['id'];
 	}
@@ -144,8 +145,6 @@ class Msg extends YamlStorage{
 	}
 	
 	public function setDstSslPubKey($dstSslPubKey){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		$this->dstSslPubKey = $dstSslPubKey;
 	}
 	
@@ -230,7 +229,6 @@ class Msg extends YamlStorage{
 		// S = encrypted with source node public key
 		// D = encrypted with destination node public key
 		
-		#print __CLASS__.'->'.__FUNCTION__.': '.$encryptionMode."\n";
 		$this->data['encryptionMode'] = $encryptionMode;
 		$this->setDataChanged(true);
 	}
@@ -240,7 +238,6 @@ class Msg extends YamlStorage{
 	}
 	
 	public function setStatus($status){
-		#print __CLASS__.'->'.__FUNCTION__.': '.$status."\n";
 		if($this->data['status'] != 'D'){
 			$this->data['status'] = $status;
 			$this->setDataChanged(true);
@@ -252,16 +249,7 @@ class Msg extends YamlStorage{
 	}
 	
 	public function getStatusText(){
-		$text = array(
-			'U' => 'unread, got msg from another node',
-			'O' => 'origin, local node created the msg',
-			'S' => 'sent at least to one node',
-			'D' => 'delivered to destination node',
-			'R' => 'read',
-			'X' => 'reached MSG_FORWARD_TO_NODES_MIN or MSG_FORWARD_TO_NODES_MAX',
-		);
-		
-		return $text[$this->getStatus()];
+		return static::$STATUS_TEXT[$this->getStatus()];
 	}
 	
 	public function setIgnore($ignore){
@@ -301,7 +289,6 @@ class Msg extends YamlStorage{
 	}
 	
 	public function setSslKeyPrv($sslKeyPrv, $sslKeyPrvPass){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		$ssl = openssl_pkey_get_private($sslKeyPrv, $sslKeyPrvPass);
 		if($ssl){
 			$this->setSsl($ssl);
@@ -320,8 +307,6 @@ class Msg extends YamlStorage{
 	}
 	
 	public function encrypt(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		#print __CLASS__.'->'.__FUNCTION__.': "'.$this->getPassword().'"'."\n";
 		$rv = false;
 		
 		if(!$this->getSsl()){
@@ -356,6 +341,7 @@ class Msg extends YamlStorage{
 				
 				$this->setPassword($passwordEncrypted);
 			}
+		// @codeCoverageIgnoreStart
 			else{
 				throw new RuntimeException('openssl_public_encrypt failed: "'.openssl_error_string().'"', 101);
 			}
@@ -363,6 +349,7 @@ class Msg extends YamlStorage{
 		else{
 			throw new RuntimeException('openssl_sign failed.', 102);
 		}
+		// @codeCoverageIgnoreEnd
 		
 		if($passwordEncrypted){
 			$signRv = openssl_sign($text, $sign, $this->getSsl(), $signAlgo);
@@ -425,14 +412,15 @@ class Msg extends YamlStorage{
 			}
 		}
 		else{
+			// @codeCoverageIgnoreStart
 			throw new RuntimeException('Can\'t create password.', 103);
+			// @codeCoverageIgnoreEnd
 		}
 		
 		return $rv;
 	}
 	
 	public function decrypt(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		$rv = '';
 		
 		if(!$this->getSsl()){
@@ -481,85 +469,80 @@ class Msg extends YamlStorage{
 			throw new RuntimeException('password json_decode failed.', 101);
 		}
 		
-		if($password){
-			$data = $this->getBody();
-			$data = base64_decode($data);
-			$data = gzdecode($data);
+		$data = $this->getBody();
+		$data = base64_decode($data);
+		$data = gzdecode($data);
+		
+		$json = json_decode($data, true);
+		if($json && isset($json['data']) && isset($json['iv'])){
+			$iv = base64_decode($json['iv']);
+			$data = $json['data'];
 			
-			$json = json_decode($data, true);
-			if($json && isset($json['data']) && isset($json['iv'])){
-				$iv = base64_decode($json['iv']);
-				$data = $json['data'];
+			$data = openssl_decrypt($data, 'AES-256-CBC', $password, 0, $iv);
+			if($data !== false){
+				$data = gzdecode($data);
 				
-				$data = openssl_decrypt($data, 'AES-256-CBC', $password, 0, $iv);
-				if($data !== false){
-					$data = gzdecode($data);
+				$body = json_decode($data, true);
+				if($body && isset($body['subject']) && isset($body['text']) && isset($body['sign'])
+					&& isset($body['signAlgo']) && isset($body['srcUserNickname'])){
+					$subject = base64_decode($body['subject']);
+					$text = base64_decode($body['text']);
+					$sign = base64_decode($body['sign']);
+					$signAlgo = (int)$body['signAlgo'];
+					$srcUserNickname = base64_decode($body['srcUserNickname']);
+					$ignore = (bool)$body['ignore'];
 					
-					$body = json_decode($data, true);
-					if($body && isset($body['subject']) && isset($body['text']) && isset($body['sign'])
-						&& isset($body['signAlgo']) && isset($body['srcUserNickname'])){
-						$subject = base64_decode($body['subject']);
-						$text = base64_decode($body['text']);
-						$sign = base64_decode($body['sign']);
-						$signAlgo = (int)$body['signAlgo'];
-						$srcUserNickname = base64_decode($body['srcUserNickname']);
-						$ignore = (bool)$body['ignore'];
+					if(openssl_verify($text, $sign, $this->getSrcSslKeyPub(), $signAlgo)){
+						$checksum = $this->createCheckSum(
+							$this->getVersion(),
+							$this->getId(),
+							$this->getSrcNodeId(),
+							$this->getDstNodeId(),
+							$this->getDstSslPubKey(),
+							$text,
+							$this->getTimeCreated(),
+							$password);
 						
-						if(openssl_verify($text, $sign, $this->getSrcSslKeyPub(), $signAlgo)){
-							$checksum = $this->createCheckSum(
-								$this->getVersion(),
-								$this->getId(),
-								$this->getSrcNodeId(),
-								$this->getDstNodeId(),
-								$this->getDstSslPubKey(),
-								$text,
-								$this->getTimeCreated(),
-								$password);
+						#fwrite(STDOUT, 'checksum: '.$checksum."\n");
+						
+						if($checksum == $this->getChecksum()){
+							$this->setSubject($subject);
+							$this->setSrcUserNickname($srcUserNickname);
+							$this->setIgnore($ignore);
 							
-							#fwrite(STDOUT, 'checksum: '.$checksum."\n");
-							
-							if($checksum == $this->getChecksum()){
-								$this->setSubject($subject);
-								$this->setSrcUserNickname($srcUserNickname);
-								$this->setIgnore($ignore);
-								
-								$rv = $text;
-							}
-							else{
-								$errorMsg = 'msg checksum does not match.';
-								$errorMsg .= "\n".'    checksum: /'.$checksum.'/ != /'.$this->getChecksum().'/';
-								$errorMsg .= "\n".'    version: /'.$this->getVersion().'/';
-								$errorMsg .= "\n".'    id: /'.$this->getId().'/';
-								$errorMsg .= "\n".'    src node id: /'.$this->getSrcNodeId().'/';
-								$errorMsg .= "\n".'    dst node id: /'.$this->getDstNodeId().'/';
-								$errorMsg .= "\n".'    dst ssl pub key: /'.$this->getDstSslPubKey().'/';
-								$errorMsg .= "\n".'    subject: /'.$subject.'/';
-								$errorMsg .= "\n".'    text: /'.$text.'/';
-								$errorMsg .= "\n".'    time created: /'.$this->getTimeCreated().'/';
-								$errorMsg .= "\n".'    password: /'.$password.'/';
-								throw new RuntimeException($errorMsg, 206);
-							}
+							$rv = $text;
 						}
 						else{
-							throw new RuntimeException('msg openssl_verify failed.', 205);
+				// @codeCoverageIgnoreStart
+							$errorMsg = 'msg checksum does not match.';
+							$errorMsg .= "\n".'    checksum: /'.$checksum.'/ != /'.$this->getChecksum().'/';
+							$errorMsg .= "\n".'    version: /'.$this->getVersion().'/';
+							$errorMsg .= "\n".'    id: /'.$this->getId().'/';
+							$errorMsg .= "\n".'    src node id: /'.$this->getSrcNodeId().'/';
+							$errorMsg .= "\n".'    dst node id: /'.$this->getDstNodeId().'/';
+							$errorMsg .= "\n".'    dst ssl pub key: /'.$this->getDstSslPubKey().'/';
+							$errorMsg .= "\n".'    subject: /'.$subject.'/';
+							$errorMsg .= "\n".'    text: /'.$text.'/';
+							$errorMsg .= "\n".'    time created: /'.$this->getTimeCreated().'/';
+							$errorMsg .= "\n".'    password: /'.$password.'/';
+							throw new RuntimeException($errorMsg, 206);
 						}
 					}
 					else{
-						throw new RuntimeException('msg json_decode B failed.', 204);
+						throw new RuntimeException('msg openssl_verify failed.', 205);
 					}
 				}
 				else{
-					throw new RuntimeException('msg openssl_decrypt failed: "'.openssl_error_string().'"', 203);
+					throw new RuntimeException('msg json_decode B failed.', 204);
 				}
-				
-				
+				// @codeCoverageIgnoreEnd
 			}
 			else{
-				throw new RuntimeException('msg json_decode A failed.', 202);
+				throw new RuntimeException('msg openssl_decrypt failed: "'.openssl_error_string().'"', 203);
 			}
 		}
 		else{
-			throw new RuntimeException('no password set.', 201);
+			throw new RuntimeException('msg json_decode A failed.', 202);
 		}
 		
 		$this->setText($rv);

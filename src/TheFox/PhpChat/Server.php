@@ -3,7 +3,7 @@
 namespace TheFox\PhpChat;
 
 use Exception;
-
+use Colors\Color;
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler;
 use TheFox\Network\Socket;
@@ -26,16 +26,17 @@ class Server{
 	private $socket = null;
 	private $hasDhtNetworkBootstrapped = false;
 	
-	public function __construct(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-	}
-	
 	public function setLog($log){
 		$this->log = $log;
 	}
 	
 	public function getLog(){
 		return $this->log;
+	}
+	
+	public function logColor($level, $msg, $colorBg = 'green', $colorFg = 'black'){
+		$color = new Color();
+		$this->log->$level($color($msg)->bg($colorBg)->fg($colorFg));
 	}
 	
 	public function setKernel($kernel){
@@ -155,9 +156,6 @@ class Server{
 	}
 	
 	public function run(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		#print __CLASS__.'->'.__FUNCTION__.': client '.count($this->clients)."\n";
-		
 		$readHandles = array();
 		$writeHandles = null;
 		$exceptHandles = null;
@@ -179,7 +177,6 @@ class Server{
 				}
 				
 				// Run client.
-				#print __CLASS__.'->'.__FUNCTION__.': client run'."\n";
 				$client->run();
 				$this->getKernel()->incSettingsTrafficIn($client->resetTrafficIn());
 				$this->getKernel()->incSettingsTrafficOut($client->resetTrafficOut());
@@ -237,7 +234,6 @@ class Server{
 	
 	private function clientNewTcp($socket){
 		$this->clientsId++;
-		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.$this->clientsId."\n");
 		#$this->log->debug('new tcp client: '.$this->clientsId);
 		
 		$client = new TcpClient();
@@ -252,7 +248,6 @@ class Server{
 	
 	private function clientNewHttp($uri){
 		$this->clientsId++;
-		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.$this->clientsId."\n");
 		$this->log->debug('new http client: '.$this->clientsId);
 		
 		$client = new HttpClient();
@@ -266,7 +261,8 @@ class Server{
 		$client->setServer($this);
 		
 		$this->clients[$this->clientsId] = $client;
-		#fwrite(STDOUT, __CLASS__.'->'.__FUNCTION__.': '.count($this->clients)."\n");
+		
+		$this->logColor('debug', 'client start', 'white', 'black');
 		
 		$this->networkBootstrap($client);
 		
@@ -355,7 +351,15 @@ class Server{
 				'isChannelLocal' => $client->getStatus('isChannelLocal'),
 				'isOutbound' => $client->getStatus('isOutbound'),
 				'isInbound' => $client->getStatus('isInbound'),
+				
+				'isBridgeServer' => false,
+				'isBridgeClient' => false,
 			);
+			
+			if($node = $client->getNode()){
+				$rv['clients'][$clientId]['isBridgeServer'] = $node->getBridgeServer();
+				$rv['clients'][$clientId]['isBridgeClient'] = $node->getBridgeClient();
+			}
 		}
 		
 		$rv['clientsId'] = $this->clientsId;
@@ -366,53 +370,92 @@ class Server{
 	public function connect($uri, $clientActions = array()){
 		$this->log->debug('connect: '.$uri);
 		
-		/*foreach($clientActions as $clientActionId => $clientAction){
-			$this->log->debug('connect action: '.join(', ', $clientAction->getCriteria()));
-		}*/
+		$isBridgeChannel = false;
+		$onode = null;
+		$uriConnect = null;
+		$bridgeTargetUri = null;
 		
-		$onode = $this->getTable()->nodeFindByUri($uri);
+		if($this->getSettings()->data['node']['bridge']['client']['enabled']){
+			if($this->getTable()->getNodesNum()){
+				$onodes = $this->getTable()->getNodesClosestBridgeServer(1);
+				if(count($onodes)){
+					$onode = array_shift($onodes);
+					$this->logColor('debug', 'connect found bridge server: '.$onode->getIdHexStr(), 'yellow');
+					$isBridgeChannel = true;
+					$bridgeTargetUri = $uri;
+				}
+				else{
+					$this->logColor('debug', 'connect: no bridge server found', 'yellow');
+				}
+			}
+			else{
+				$this->logColor('debug', 'connect: no nodes available', 'yellow');
+			}
+		}
+		
+		if(!$onode){
+			$this->log->debug('connect find by uri: '.$uri);
+			$onode = $this->getTable()->nodeFindByUri($uri);
+		}
+		
 		if($onode){
-			$this->log->debug('connect '.$uri.': '.$onode->getIdHexStr());
+			$this->log->debug('connect onode: '.$onode->getIdHexStr().' '.$onode->getUri());
 			$onode->incConnectionsOutboundAttempts();
+			$uriConnect = $onode->getUri();
+		}
+		else{
+			$this->log->debug('connect: old node not found');
+			$uriConnect = $uri;
 		}
 		
 		try{
-			if(is_object($uri)){
-				if($uri->getScheme() == 'tcp'){
-					$connected = false;
-					if($uri->getHost() && $uri->getPort()){
+			if(is_object($uriConnect)){
+				if($uriConnect->getScheme() == 'tcp'){
+					if($uriConnect->getHost() && $uriConnect->getPort()){
 						$socket = new Socket();
-						$connected = $socket->connect($uri->getHost(), $uri->getPort());
+						$connected = false;
+						$connected = $socket->connect($uriConnect->getHost(), $uriConnect->getPort());
+						
+						$client = null;
 						$client = $this->clientNewTcp($socket);
 						$client->setStatus('isOutbound', true);
-					}
-					if($connected){
-						$client->actionsAdd($clientActions);
-						$client->sendHello();
 						
-						return true;
+						if($isBridgeChannel){
+							$client->setStatus('bridgeServerUri', $uriConnect);
+							$client->setStatus('bridgeTargetUri', $bridgeTargetUri);
+							$client->bridgeActionsAdd($clientActions);
+							
+							$this->logColor('debug', 'bridge actions: '.count($clientActions), 'yellow');
+						}
+						else{
+							$client->setStatus('isOutbound', true);
+							$client->actionsAdd($clientActions);
+						}
+						if($client && $connected){
+							$client->sendHello();
+							
+							return $client;
+						}
 					}
 				}
 				else{
-					$this->log->warning('connection to '.$uri.' failed: invalid uri scheme ('.$uri->getScheme().')');
+					$this->log->warning('connection to /'.$uriConnect.'/ failed: invalid uri scheme ('.$uriConnect->getScheme().')');
 				}
-				
-				/*elseif($uri->getScheme() == 'http'){
-					$client = $this->clientNewHttp($uri);
+				/*elseif($uriConnect->getScheme() == 'http'){
+					$client = $this->clientNewHttp($uriConnect);
 					$client->actionsAdd($clientActions);
 					return true;
 				}*/
-				
 			}
 			else{
-				$this->log->warning('connection to '.$uri.' failed: uri is no object');
+				$this->log->warning('connection to /'.$uriConnect.'/ failed: uri is no object');
 			}
 		}
 		catch(Exception $e){
-			$this->log->warning('connection to '.$uri.' failed: '.$e->getMessage());
+			$this->log->warning('connection to '.$uriConnect.' failed: '.$e->getMessage());
 		}
 		
-		return false;
+		return null;
 	}
 	
 	public function consoleMsgAdd($msgText = '', $showDate = false, $printPs1 = false, $clearLine = false){
@@ -471,21 +514,41 @@ class Server{
 	}
 	
 	public function nodeFind($nodeIdToFind){
-		#fwrite(STDOUT, 'nodeFind: '.$nodeIdToFind.''."\n");
+		$settingsBridgeClient = $this->getSettings()->data['node']['bridge']['client']['enabled'];
 		
 		if($this->getTable()){
 			foreach($this->getTable()->getNodesClosest() as $nodeId => $node){
-				#fwrite(STDOUT, 'send nodeFind to '.$node->getIdHexStr().''."\n");
+				$connect = $node->getBridgeServer() && $settingsBridgeClient
+					|| !$settingsBridgeClient;
+				#$logTmp = '/'.(int)$node->getBridgeServer().'/ /'.(int)$connect.'/';
 				
-				$clientActions = array();
-				$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
-				$action->functionSet(function($action, $client) use($nodeIdToFind) {
-					#fwrite(STDOUT, 'action function: '.$nodeIdToFind.''."\n");
-					$client->sendNodeFind($nodeIdToFind);
-				});
-				$clientActions[] = $action;
-				
-				$this->connect($node->getUri(), $clientActions);
+				if($connect){
+					$clientActions = array();
+					$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
+					$action->setName('node_find_after_id');
+					$action->functionSet(function($action, $client) use($nodeIdToFind) {
+						$client->sendNodeFind($nodeIdToFind);
+					});
+					$clientActions[] = $action;
+					
+					// Wait to get response. Don't disconnect instantly after sending.
+					$action = new ClientAction(ClientAction::CRITERION_AFTER_NODE_FOUND);
+					$action->setName('node_find_node_found');
+					$action->functionSet(function($action, $client){
+					});
+					$clientActions[] = $action;
+					
+					$action = new ClientAction(ClientAction::CRITERION_AFTER_PREVIOUS_ACTIONS);
+					$action->setName('node_find_after_previous_actions_send_quit');
+					$action->functionSet(function($action, $client){
+						
+						$client->sendQuit();
+						$client->shutdown();
+					});
+					$clientActions[] = $action;
+					
+					$this->connect($node->getUri(), $clientActions);
+				}
 			}
 		}
 	}
@@ -498,6 +561,7 @@ class Server{
 			$this->log->debug('dht network bootstrap');
 			
 			$action = new ClientAction(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
+			$action->setName('network_bootstrap_node_find');
 			$action->functionSet(function($action, $client){
 				$client->sendNodeFind($client->getLocalNode()->getIdHexStr());
 			});

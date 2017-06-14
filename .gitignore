@@ -1,10 +1,7 @@
 vendor
 composer.lock
 composer.phar
-test
-tests/testdir_*
-tests/testfile_*
-tests/*.yml
+test_data
 log
 *.log
 pid
@@ -12,3 +9,4 @@ data
 id_rsa*
 settings.yml
 releases
+build

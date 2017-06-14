@@ -4,6 +4,9 @@ namespace TheFox\Network;
 
 use RuntimeException;
 
+/**
+ * @codeCoverageIgnore
+ */
 class StreamSocket extends AbstractSocket{
 	
 	private $ip = '';
@@ -27,8 +30,6 @@ class StreamSocket extends AbstractSocket{
 	}
 	
 	public function connect($ip, $port){
-		#print __CLASS__.'->'.__FUNCTION__.': "'.$ip.'", "'.$port.'"'."\n";
-		
 		$handle = @stream_socket_client('tcp://'.$ip.':'.$port, $errno, $errstr, 2);
 		if($handle !== false){
 			$this->setHandle($handle);
@@ -45,8 +46,9 @@ class StreamSocket extends AbstractSocket{
 			$class = __CLASS__;
 			$socket = new $class();
 			$socket->setHandle($handle);
+			return $socket;
 		}
-		return $socket;
+		return null;
 	}
 	
 	public function select(&$readHandles, &$writeHandles, &$exceptHandles){
@@ -65,7 +67,6 @@ class StreamSocket extends AbstractSocket{
 			$ip = substr($name, 0, $pos);
 			$port = substr($name, $pos + 1);
 		}
-		#print __CLASS__.'->'.__FUNCTION__.': '.$name.', "'.$ip.'", "'.$port.'"'."\n";
 	}
 	
 	public function lastError(){
@@ -87,7 +88,6 @@ class StreamSocket extends AbstractSocket{
 	public function write($data){
 		$rv = @stream_socket_sendto($this->getHandle(), $data);
 		
-		#print __CLASS__.'->'.__FUNCTION__.': '.$rv.', "'.substr($data, 0, -1).'"'."\n";
 		return $rv;
 	}
 	

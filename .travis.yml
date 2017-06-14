@@ -1,0 +1,16 @@
+language: php
+php:
+    - 5.3
+    - 5.4
+    - 5.5
+    - 5.6
+install:
+    - make install
+before_script:
+    - phpenv rehash
+script: make test_phpunit
+env:
+    global:
+        - COMPOSER_PREFER_SOURCE=--prefer-source
+        - PHPUNIT_COVERAGE_CLOVER="--coverage-clover build/logs/clover.xml"
+        - PHPCS_REPORT_XML="--report-xml=build/logs/phpcs.xml"

@@ -3,10 +3,16 @@
 		{
 			"path": ".",
 			"name": "PHPChat",
-			"folder_exclude_patterns": [ ],
-			"file_exclude_patterns": [
-				"*.swp", "*.sublime-workspace", "composer.lock"
-			]
+			"folder_exclude_patterns": [ "build", "log", "vendor", "test_data" ],
+			"file_exclude_patterns": [ ]
+		}
+	],
+	"build_systems":[
+		{
+			"name": "Tests",
+			"cmd": [ "make test" ],
+			"working_dir": "${project_path:${folder}}",
+			"shell": true
 		}
 	]
 }

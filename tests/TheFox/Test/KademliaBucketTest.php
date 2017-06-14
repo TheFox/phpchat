@@ -1,12 +1,17 @@
 <?php
 
+namespace TheFox\Test;
+
+use PHPUnit_Framework_TestCase;
 use TheFox\Dht\Kademlia\Bucket;
 
 class KademliaBucketTest extends PHPUnit_Framework_TestCase{
 	
 	public function testSave(){
-		$bucket = new Bucket('tests/testfile_bucket_bucket1.yml');
-		$bucket->setDatadirBasePath('tests');
+		$fileName = 'testfile_bucket_bucket1_'.date('Ymd_His').'_'.uniqid('', true).'.yml';
+		
+		$bucket = new Bucket('test_data/'.$fileName);
+		$bucket->setDatadirBasePath('test_data');
 		$bucket->setDataChanged(true);
 		
 		$bucket->setDistance(21);
@@ -27,7 +32,7 @@ class KademliaBucketTest extends PHPUnit_Framework_TestCase{
 		$this->assertTrue((bool)$bucket->save());
 		
 		
-		$bucket = new Bucket('tests/testfile_bucket_bucket1.yml');
+		$bucket = new Bucket('test_data/'.$fileName);
 		
 		$this->assertTrue($bucket->load());
 		

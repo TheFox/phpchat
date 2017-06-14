@@ -8,7 +8,6 @@ use TheFox\Dht\Kademlia\Node;
 class NodesNewDb extends YamlStorage{
 	
 	public function __construct($filePath = null){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
 		parent::__construct($filePath);
 		
 		$this->data['timeCreated'] = time();
@@ -17,57 +16,63 @@ class NodesNewDb extends YamlStorage{
 	}
 	
 	public function __sleep(){
-		return array('data');
+		return array('data', 'dataChanged');
 	}
 	
-	public function nodeAddUri($uri){
-		#print __CLASS__.'->'.__FUNCTION__.': '.$uri."\n";
-		
-		$oldId = 0;
-		foreach($this->data['nodes'] as $nodeId => $node){
-			if($node['uri'] == $uri){
-				$oldId = $nodeId;
-				break;
+	public function nodeAddConnect($uri, $bridgeServer = false){
+		if((string)$uri){
+			$oldId = 0;
+			foreach($this->data['nodes'] as $nodeId => $node){
+				if($node['uri'] == $uri){
+					$oldId = $nodeId;
+					break;
+				}
 			}
+			if($oldId){
+				$this->data['nodes'][$oldId]['insertAttempts']++;
+			}
+			else{
+				$this->data['nodesId']++;
+				$this->data['nodes'][$this->data['nodesId']] = array(
+					'type' => 'connect',
+					'id' => null,
+					'uri' => $uri,
+					'bridgeServer' => $bridgeServer,
+					'connectAttempts' => 0,
+					'findAttempts' => 0,
+					'insertAttempts' => 0,
+				);
+			}
+			$this->setDataChanged(true);
 		}
-		if($oldId){
-			$this->data['nodes'][$oldId]['insertAttempts']++;
-		}
-		else{
-			$this->data['nodesId']++;
-			$this->data['nodes'][$this->data['nodesId']] = array(
-				'type' => 'connect',
-				'uri' => $uri,
-				'connectAttempts' => 0,
-				'insertAttempts' => 0,
-			);
-		}
-		$this->setDataChanged(true);
 	}
 	
-	public function nodeAddId($id){
-		#print __CLASS__.'->'.__FUNCTION__.': '.$uri."\n";
-		
-		$oldId = false;
-		foreach($this->data['nodes'] as $nodeId => $node){
-			if($node['id'] == $id){
-				$oldId = $nodeId;
-				break;
+	public function nodeAddFind($id, $bridgeServer = false){
+		if($id != '00000000-0000-4000-8000-000000000000'){
+			$oldId = false;
+			foreach($this->data['nodes'] as $nodeId => $node){
+				if($node['id'] == $id){
+					$oldId = $nodeId;
+					break;
+				}
 			}
+			if($oldId){
+				$this->data['nodes'][$oldId]['insertAttempts']++;
+			}
+			else{
+				$this->data['nodesId']++;
+				$this->data['nodes'][$this->data['nodesId']] = array(
+					'type' => 'find',
+					'id' => $id,
+					'uri' => null,
+					'bridgeServer' => $bridgeServer,
+					'connectAttempts' => 0,
+					'findAttempts' => 0,
+					'insertAttempts' => 0,
+				);
+			}
+			$this->setDataChanged(true);
 		}
-		if($oldId){
-			$this->data['nodes'][$oldId]['insertAttempts']++;
-		}
-		else{
-			$this->data['nodesId']++;
-			$this->data['nodes'][$this->data['nodesId']] = array(
-				'type' => 'find',
-				'id' => $id,
-				'findAttempts' => 0,
-				'insertAttempts' => 0,
-			);
-		}
-		$this->setDataChanged(true);
 	}
 	
 	public function nodeIncConnectAttempt($id){

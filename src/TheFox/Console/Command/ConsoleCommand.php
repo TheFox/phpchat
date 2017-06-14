@@ -2,15 +2,19 @@
 
 namespace TheFox\Console\Command;
 
+use Exception;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
 use TheFox\PhpChat\Console;
 
 class ConsoleCommand extends BasicCommand{
 	
 	private $console;
+	
+	public function getLogfilePath(){
+		return 'log/console.log';
+	}
 	
 	public function getPidfilePath(){
 		return 'pid/console.pid';
@@ -28,6 +32,7 @@ class ConsoleCommand extends BasicCommand{
 		try{
 			$this->log->info('console start');
 			$this->console = new Console();
+			$this->console->setLog($this->log);
 		}
 		catch(Exception $e){
 			$this->log->error('console create: '.$e->getMessage());
@@ -38,7 +43,7 @@ class ConsoleCommand extends BasicCommand{
 			$this->console->init();
 		}
 		catch(Exception $e){
-			$log->error('init: '.$e->getMessage());
+			$this->log->error('init: '.$e->getMessage());
 			exit(1);
 		}
 
@@ -46,7 +51,7 @@ class ConsoleCommand extends BasicCommand{
 			$this->console->loop();
 		}
 		catch(Exception $e){
-			$log->error('loop: '.$e->getMessage());
+			$this->log->error('loop: '.$e->getMessage());
 			exit(1);
 		}
 		

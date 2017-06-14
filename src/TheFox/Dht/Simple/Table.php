@@ -4,9 +4,7 @@ namespace TheFox\Dht\Simple;
 
 use Exception;
 use RuntimeException;
-
 use Symfony\Component\Filesystem\Filesystem;
-
 use TheFox\Storage\YamlStorage;
 use TheFox\Dht\Kademlia\Node;
 
@@ -27,7 +25,7 @@ class Table extends YamlStorage{
 	
 	public function __sleep(){
 		return array(
-			'data',
+			'data', 'dataChanged',
 			'localNode',
 			'nodes',
 		);
@@ -50,8 +48,6 @@ class Table extends YamlStorage{
 	}
 	
 	public function load(){
-		#print __CLASS__.'->'.__FUNCTION__.''."\n";
-		
 		if(parent::load()){
 			
 			if($this->data){
@@ -93,17 +89,30 @@ class Table extends YamlStorage{
 		return count($this->getNodes());
 	}
 	
-	public function getNodesClosest($num = 20){
-		if(!$this->getLocalNode()){
-			throw new RuntimeException('localNode not set.');
+	public function getNodesBridgeServer(){
+		$rv = array();
+		foreach($this->nodes as $nodeId => $node){
+			if($node->getBridgeServer()){
+				$rv[] = $node;
+			}
 		}
-		
+		return $rv;
+	}
+	
+	public function getNodesClosest($max = 20){
 		$nodes = $this->nodes;
-		$nodes = array_slice($nodes, 0, $num);
+		$nodes = array_slice($nodes, 0, $max);
 		ksort($nodes, SORT_STRING);
 		
-		$rv = array_values($nodes);
-		return $rv;
+		return $nodes;
+	}
+	
+	public function getNodesClosestBridgeServer($max = 20){
+		$nodes = $this->getNodesBridgeServer();
+		$nodes = array_slice($nodes, 0, $max);
+		ksort($nodes, SORT_STRING);
+		
+		return $nodes;
 	}
 	
 	public function nodeFind(Node $node){
@@ -151,13 +160,26 @@ class Table extends YamlStorage{
 		return null;
 	}
 	
-	public function nodeFindClosest(Node $node, $num = 8){
+	public function nodeFindClosest(Node $node, $max = 8){
 		$nodes = array();
 		foreach($this->nodes as $onodeId => $onode){
 			if(!$onode->isEqual($node)){
 				$nodes[$onode->distanceHexStr($node)] = $onode;
 				ksort($nodes, SORT_STRING);
-				$nodes = array_slice($nodes, 0, $num);
+				$nodes = array_slice($nodes, 0, $max);
+			}
+		}
+		$rv = array_values($nodes);
+		return $rv;
+	}
+	
+	public function nodeFindClosestBridgeServer(Node $node, $max = 8){
+		$nodes = array();
+		foreach($this->nodes as $onodeId => $onode){
+			if($onode->getBridgeServer() && !$onode->isEqual($node)){
+				$nodes[$onode->distanceHexStr($node)] = $onode;
+				ksort($nodes, SORT_STRING);
+				$nodes = array_slice($nodes, 0, $max);
 			}
 		}
 		$rv = array_values($nodes);
@@ -165,10 +187,8 @@ class Table extends YamlStorage{
 	}
 	
 	public function nodeEnclose(Node $node){
-		#fwrite(STDOUT, __FUNCTION__.': '.$node."\n");
-		
 		if(!$this->getLocalNode()){
-			throw new RuntimeException('localNode not set.');
+			throw new RuntimeException('localNode not set.', 1);
 		}
 		
 		$returnNode = $node;
@@ -221,17 +241,33 @@ class Table extends YamlStorage{
 		$this->nodesSort();
 		
 		foreach($this->nodes as $nodeId => $node){
-			#$msgOut = (time() - $node->getTimeCreated()).' '.(time() - $node->getTimeLastSeen()).' ';
-			#fwrite(STDOUT, 'node delete: '.$msgOut.PHP_EOL);
-			if(
-				$node->getTimeCreated() <= time() - static::$NODE_TTL && !$node->getTimeLastSeen()
-				|| $node->getTimeLastSeen() && $node->getTimeLastSeen() <= time() - static::$NODE_TTL
-				|| $node->getConnectionsOutboundAttempts() >= static::$NODE_CONNECTIONS_OUTBOUND_ATTEMPTS_MAX
+			$timeCreatedCond = !$node->getTimeLastSeen() && $node->getTimeCreated() <= time() - static::$NODE_TTL;
+			$timeLastSeenCond = $node->getTimeLastSeen() && $node->getTimeLastSeen() <= time() - static::$NODE_TTL;
+			$connectionsOutboundAttemptsCond =
+					$node->getConnectionsOutboundAttempts() >= static::$NODE_CONNECTIONS_OUTBOUND_ATTEMPTS_MAX
 					&& $node->getConnectionsOutboundSucceed() == 0
-					&& $node->getConnectionsInboundSucceed() == 0
+					&& $node->getConnectionsInboundSucceed() == 0;
+			
+			#$msgOut = (time() - $node->getTimeCreated()).' '.(time() - $node->getTimeLastSeen()).' ';
+			#$msgOut = $node->getTimeCreated().' '.$node->getTimeLastSeen().' '.$node->getConnectionsOutboundAttempts();
+			#$msgOut = $node->getIdHexStr().' '.(int)$timeCreatedCond.' ';
+			#$msgOut .= (int)$timeLastSeenCond.' '.(int)$connectionsOutboundAttemptsCond;
+			#fwrite(STDOUT, 'node delete: '.$msgOut.PHP_EOL);
+			
+			if(
+				$timeCreatedCond
+				|| $timeLastSeenCond
+				|| $connectionsOutboundAttemptsCond
 			){
 				$this->nodeRemove($node);
+				#fwrite(STDOUT, 'node delete: '.$msgOut.PHP_EOL);
 			}
+			/*if($timeLastSeenCond){
+				$msgOut = (time() - $node->getTimeLastSeen()).' ';
+				$msgOut .= $node->getTimeLastSeen().' <= '.(time() - static::$NODE_TTL).' ';
+				$msgOut .= time().' '.static::$NODE_TTL;
+				fwrite(STDOUT, ' -> '.$msgOut.PHP_EOL);
+			}*/
 		}
 		
 		if(count($this->nodes) > static::$NODES_MAX){
@@ -251,17 +287,17 @@ class Table extends YamlStorage{
 			unset($this->nodes[$nodeId]);
 		}
 		
-		#fwrite(STDOUT, 'node delete: '.$nodeId.' /'.$node->getFilePath().'/'.PHP_EOL);
 		$filesystem->remove($node->getFilePath());
 	}
 	
 	public function nodesSort(){
-		uasort($this->nodes, function($node_a, $node_b){
-			$dist_a = $this->getLocalNode()->distance($node_a);
-			$dist_b = $this->getLocalNode()->distance($node_b);
+		$table = $this;
+		uasort($this->nodes, function($node_a, $node_b) use($table) {
+			$dist_a = $table->getLocalNode()->distance($node_a);
+			$dist_b = $table->getLocalNode()->distance($node_b);
 			
 			if($dist_a == $dist_b){
-				return 0;
+				return 0; // @codeCoverageIgnore
 			}
 			return $dist_a < $dist_b ? -1 : 1;
 		});

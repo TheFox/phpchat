@@ -1,8 +1,10 @@
 <?php
 
+namespace TheFox\Test;
+
+use PHPUnit_Framework_TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
-
 use TheFox\Dht\Kademlia\Table;
 use TheFox\Dht\Kademlia\Bucket;
 use TheFox\Dht\Kademlia\Node;
@@ -227,9 +229,6 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		
 		$this->assertEquals(4, count($nodes));
 		$this->assertEquals(array($node_c, $node_a, $node_b, $node_d), $nodes);
-		/*foreach($nodes as $nodeId => $node){
-			fwrite(STDOUT, 'node: /'.$nodeId.'/ '.$node->getIdHexStr()."\n");
-		}*/
 	}
 	
 	public function testNodeFindByKeyPubFingerprint(){
@@ -309,8 +308,8 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 	public function testNodeEnclose3(){
 		fwrite(STDOUT, 'testNodeEnclose3'.PHP_EOL);
 		
-		#@unlink('tests/testfile_table_table.yml');
-		#@unlink('tests/bucket_root.yml');
+		$runName = uniqid('', true);
+		$fileName = 'testfile_table_table_'.date('Ymd_His').'_'.$runName.'.yml';
 		
 		$this->assertEquals(20, Bucket::$SIZE_MAX);
 		
@@ -320,8 +319,8 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$localNode = new Node();
 		$localNode->setIdHexStr('11000001-2002-4004-8008-100000000006');
 		
-		$table = new Table('tests/testfile_table_table.yml');
-		$table->setDatadirBasePath('tests');
+		$table = new Table('test_data/'.$fileName);
+		$table->setDatadirBasePath('test_data');
 		$table->setLocalNode($localNode);
 		
 		timeStop('table load start');
@@ -381,15 +380,18 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 	 * @group large
 	 */
 	public function testNodeEnclose4(){
-		fwrite(STDOUT, 'testNodeEnclose4'.PHP_EOL);
+		#fwrite(STDOUT, 'testNodeEnclose4'.PHP_EOL);
+		
+		$runName = uniqid('', true);
+		$fileName = 'testfile_table_table_'.date('Ymd_His').'_'.$runName.'.yml';
 		
 		$NODES = 100;
 		Bucket::$SIZE_MAX = 20;
 		
 		$localNode = new Node();
 		$localNode->setIdHexStr('12000001-2002-4004-8008-100000000001');
-		$table = new Table('tests/testfile_table_table.yml');
-		$table->setDatadirBasePath('tests');
+		$table = new Table('test_data/'.$fileName);
+		$table->setDatadirBasePath('test_data');
 		$table->setLocalNode($localNode);
 		$table->load();
 		
@@ -415,25 +417,25 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$this->assertTrue(true);
 		
 		$finder = new Finder();
-		$files = $finder->in('tests')->depth(0)->name('node_*.yml');
+		$files = $finder->in('test_data')->depth(0)->name('node_*.yml')->files();
 		#$this->assertEquals(160, count($files));
 		
 		$this->clean();
 	}
 	
 	private function clean(){
-		@unlink('tests/testfile_table_table.yml');
-		@unlink('tests/bucket_root.yml');
+		@unlink('test_data/testfile_table_table.yml');
+		@unlink('test_data/bucket_root.yml');
 		
 		$finder = new Finder();
-		$files = $finder->in('tests')->depth(0)->name('bucket_*.yml');
+		$files = $finder->in('test_data')->depth(0)->name('bucket_*.yml')->files();
 		$filesystem = new Filesystem();
 		foreach($files as $fileId => $file){
 			$filesystem->remove($file->getRealPath());
 		}
 		
 		$finder = new Finder();
-		$files = $finder->in('tests')->depth(0)->name('node_*.yml');
+		$files = $finder->in('test_data')->depth(0)->name('node_*.yml')->files();
 		$filesystem = new Filesystem();
 		foreach($files as $fileId => $file){
 			$filesystem->remove($file->getRealPath());

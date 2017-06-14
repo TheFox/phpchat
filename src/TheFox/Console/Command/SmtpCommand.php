@@ -2,14 +2,13 @@
 
 namespace TheFox\Console\Command;
 
+use Exception;
 use RuntimeException;
-
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 #use Zend\Mail\Message;
 #use Zend\Mail\Headers;
-
 use TheFox\Smtp\Server;
 use TheFox\Smtp\Event;
 use TheFox\Ipc\ClientConnection;
@@ -66,8 +65,9 @@ class SmtpCommand extends BasicCommand{
 		$this->executePre($input, $output);
 		$this->initIpcKernelConnection();
 		
-		$this->settings = $this->ipcKernelConnection->execSync('getSettings');
-		$this->log->debug('settings: '.(is_object($this->settings) ? 'OK' : 'failed'));
+		$settings = $this->ipcKernelConnection->execSync('getSettings');
+		$this->log->debug('settings: '.(is_object($settings) ? 'OK' : 'failed'));
+		$this->setSettings($settings);
 		
 		$address = '127.0.0.1';
 		if($input->getOption('address')){
@@ -179,8 +179,8 @@ class SmtpCommand extends BasicCommand{
 	}
 	
 	public function mailNew($event, $from, $rcpt, $mail){
-		#fwrite(STDOUT, 'mail new: /'.$from.'/ a/'.join('/ /', $rcpt).'/'."\n");
 		#$this->log->debug('mailNew: '.$event->getTrigger().' /'.$from.'/');
+		$settings = $this->getSettings();
 		
 		$table = $this->ipcKernelConnection->execSync('getTable');
 		$text = $mail->getBody();
@@ -188,40 +188,33 @@ class SmtpCommand extends BasicCommand{
 		foreach($rcpt as $dstNodeId){
 			$dstNodeId = substr($dstNodeId, 0, strpos($dstNodeId, '@'));
 			
-			#fwrite(STDOUT, 'to: /'.$dstNodeId.'/'."\n");
-			
 			$msg = new Msg();
-			$msg->setSrcNodeId($this->settings->data['node']['id']);
+			$msg->setSrcNodeId($settings->data['node']['id']);
 			$msg->setSrcSslKeyPub($table->getLocalNode()->getSslKeyPub());
-			$msg->setSrcUserNickname($this->settings->data['user']['nickname']);
+			$msg->setSrcUserNickname($settings->data['user']['nickname']);
 			
 			$dstNode = new Node();
 			$dstNode->setIdHexStr($dstNodeId);
 			
 			$msg->setDstNodeId($dstNode->getIdHexStr());
 			if($oDstNode = $table->nodeFind($dstNode)){
-				#print 'found node in table'.PHP_EOL;
 				$msg->setDstSslPubKey($oDstNode->getSslKeyPub());
 			}
-			#else{ print 'node not found'.PHP_EOL; }
 			
 			$msg->setSubject($mail->getSubject());
 			$msg->setText($text);
-			$msg->setSslKeyPrvPath($this->settings->data['node']['sslKeyPrvPath'],
-				$this->settings->data['node']['sslKeyPrvPass']);
+			$msg->setSslKeyPrvPath($settings->data['node']['sslKeyPrvPath'],
+				$settings->data['node']['sslKeyPrvPass']);
 			$msg->setStatus('O');
 			
 			$encrypted = false;
-			#print 'DstSslPubKey: '.strlen($msg->getDstSslPubKey()).PHP_EOL;
 			if($msg->getDstSslPubKey()){
-				#print 'use dst key'.PHP_EOL;
 				
 				$msg->setEncryptionMode('D');
 			}
 			else{
 				// Encrypt with own public key
 				// while destination public key is not available.
-				#print 'use local key'.PHP_EOL;
 				
 				$msg->setEncryptionMode('S');
 				$msg->setDstSslPubKey($table->getLocalNode()->getSslKeyPub());

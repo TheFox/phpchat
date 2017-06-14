@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 while true; do
 	pids=$(ps -eo pid,command | grep php | grep -v grep | grep -v listthreads.sh | grep -v listports.sh | awk '{ print $1 }')
