@@ -27,7 +27,7 @@
 		"kevinlebrun/colors.php": "~0.4",
 		"rych/bytesize": "1.0.0",
 		"stephenhill/base58": "~1.1",
-		"thefox/utilities": "~1.2",
+		"thefox/utilities": "<1.2",
 		"thefox/hashcash": "~1.5",
 		"thefox/imapd": "~0.1",
 		"thefox/smtpd": "<0.1.2"

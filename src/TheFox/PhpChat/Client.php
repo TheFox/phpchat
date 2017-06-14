@@ -106,7 +106,11 @@ class Client{
 		$this->status['hasSslTest'] = false;
 		$this->status['hasSslVerify'] = false;
 		$this->status['hasSslPasswortPut'] = false;
+		$this->status['hasReSslPasswortPutInit'] = false;
+		$this->status['hasReSslPasswortPut'] = false;
 		$this->status['hasSslPasswortTest'] = false;
+		$this->status['hasReSslPasswortTest'] = false;
+		$this->status['hasSslPasswortVerify'] = false;
 		$this->status['hasSsl'] = false;
 		
 		$this->status['hasSendReSslPasswortPut'] = false;
@@ -1487,6 +1491,8 @@ class Client{
 						$token = $msgData['token'];
 					}
 					
+					#print __CLASS__.'->'.__FUNCTION__.': '.$msgName.' SSL: password token: '.$token."\n";
+					
 					if($token){
 						$testToken = hash('sha512',
 							$this->sslPasswordToken.'_'.$this->getNode()->getIdHexStr());
@@ -1563,6 +1569,10 @@ class Client{
 						$msgHandleReturnValue .= $this->sendError(2070, $msgName);
 						$this->logColor('warning', $msgName.' re-SSL: decryption failed', 'green');
 					}
+				}
+				else{
+					$msgHandleReturnValue .= $this->sendError(2070, $msgName);
+					$this->log('warning', $msgName.' re-SSL: decryption failed');
 				}
 			}
 			else{
@@ -2004,10 +2014,12 @@ class Client{
 							if($status == 1){
 								$this->logColor('debug', 'bridge connection ok', 'yellow');
 								
-								$this->bridgeActionsExecute(ClientAction::CRITERION_AFTER_HELLO);
-								$this->bridgeActionsExecute(ClientAction::CRITERION_AFTER_HAS_SSL);
+								# TODO
+								#$this->bridgeActionRemoveByCriterion(ClientAction::CRITERION_AFTER_HELLO);
+								#$this->bridgeActionRemoveByCriterion(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
+								#$this->bridgeActionsExecute(ClientAction::CRITERION_AFTER_HAS_SSL);
 								
-								/*foreach($this->bridgeActions as $bridgeActionId => $bridgeAction){
+								$msgHandleReturnValue .= $this->sendBridgeMsg('my_data');
 									$name = $bridgeAction->getName();
 									$criteria = join(',', $bridgeAction->getCriteria());
 									$this->logColor('debug', 'bridgeAction: /'.$name.'/ /'.$criteria.'/', 'yellow');
@@ -2333,6 +2345,7 @@ class Client{
 		}
 		else{
 			$this->setStatus('hasSendSslInit', true);
+			$this->log('debug', 'send SSL init: create data');
 			
 			$rid = (string)Uuid::uuid4();
 			
@@ -2419,6 +2432,8 @@ class Client{
 			throw new RuntimeException('ssl not set.');
 		}
 		
+		$this->sslPasswordLocalNew = $this->genSslPassword();
+		$this->sslPasswordTime = time();
 		$this->logColor('debug', 'send SSL password test', 'green');
 		
 		$this->sslPasswordToken = (string)Uuid::uuid4();
@@ -2433,6 +2448,7 @@ class Client{
 		if(!$this->getSsl()){
 			throw new RuntimeException('ssl not set.');
 		}
+		$this->sslPasswordToken = (string)Uuid::uuid4();
 		
 		$this->logColor('debug', 'send SSL password verify', 'green');
 		
@@ -2515,7 +2531,16 @@ class Client{
 			'hashcash' => $this->hashcashMint(static::HASHCASH_BITS_MAX),
 		);
 		
+		#if($this->getSettings()->data['node']['bridge']['client']['enabled'] && $this->getNode()->getBridgeServer()){
+		/*if($this->getBridgeClient()){
+			$this->logColor('debug', 'bridge server connection: send talk request', 'yellow');
+			$rv = $this->sendBridgeMsg('talk_request', $data);
+			ve($rv);
+			return $rv;
+		}*/
+		
 		#$this->logColor('debug', 'bridge server: '.$this->getStatus('bridgeServerUri'), 'yellow');
+		$this->logColor('debug', 'send talk request');
 		#$this->logColor('debug', 'bridge target: '.$this->getStatus('bridgeTargetUri'), 'yellow');
 		#$this->logColor('debug', 'bridge client: '.(int)($this->bridgeClient !== null), 'yellow');
 		if($this->getStatus('bridgeServerUri')){

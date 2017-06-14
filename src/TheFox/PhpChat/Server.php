@@ -26,6 +26,10 @@ class Server{
 	private $socket = null;
 	private $hasDhtNetworkBootstrapped = false;
 	
+	public function __construct(){
+		#print __CLASS__.'->'.__FUNCTION__.''."\n";
+	}
+	
 	public function setLog($log){
 		$this->log = $log;
 	}
@@ -421,7 +425,8 @@ class Server{
 						$client->setStatus('isOutbound', true);
 						
 						if($isBridgeChannel){
-							$client->setStatus('bridgeServerUri', $uriConnect);
+							#$client->setStatus('bridgeServerUri', $uriConnect);
+							$client->setStatus('bridgeChannelUri', $uri);
 							$client->setStatus('bridgeTargetUri', $bridgeTargetUri);
 							$client->bridgeActionsAdd($clientActions);
 							
@@ -521,6 +526,11 @@ class Server{
 				$connect = $node->getBridgeServer() && $settingsBridgeClient
 					|| !$settingsBridgeClient;
 				#$logTmp = '/'.(int)$node->getBridgeServer().'/ /'.(int)$connect.'/';
+				$action->functionSet(function($action, $client) use($nodeIdToFind) {
+					#fwrite(STDOUT, 'action function: '.$nodeIdToFind.''."\n");
+					$client->sendNodeFind($nodeIdToFind);
+				});
+				$clientActions[] = $action;
 				
 				if($connect){
 					$clientActions = array();

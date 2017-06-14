@@ -1,5 +1,9 @@
 
 RM = rm -rf
+MKDIR = mkdir -p
+GZIP = gzip
+MV = mv -i
+CP = cp -rp
 CHMOD = chmod
 MKDIR = mkdir -p
 VENDOR = vendor
@@ -22,13 +26,18 @@ SECURITY_CHECKER = vendor/bin/security-checker
 all: install test_phpunit
 
 install: $(VENDOR)
+	$(CHMOD) 700 ./application.php
 
 install_release: $(COMPOSER)
+	./composer.phar selfupdate
 	$(MAKE) install COMPOSER_DEV=--no-dev
+	php bootstrap.php
 
-update: $(COMPOSER)
-	$(COMPOSER) selfupdate
-	$(COMPOSER) update
+composer.phar:
+	curl -sS https://getcomposer.org/installer | php
+	$(CHMOD) 700 ./composer.phar
+	./composer.phar install
+	php bootstrap.php
 
 release: release.sh
 	./release.sh
@@ -45,8 +54,10 @@ test_phpunit: $(PHPUNIT) phpunit.xml test_data
 test_phpunit_cc: build
 	$(MAKE) test_phpunit PHPUNIT_COVERAGE_HTML="--coverage-html build/report"
 
-test_security: $(SECURITY_CHECKER)
-	$(SECURITY_CHECKER) security:check composer.lock
+test_clean:
+	$(RM) tests/testdir_*
+	$(RM) tests/testfile_*
+	$(RM) tests/*.yml
 
 test_phpmd:
 	$(PHPMD) src,tests text phpmd.xml
