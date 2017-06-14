@@ -220,6 +220,8 @@ class Node extends YamlStorage{
 	}
 	
 	public static function genSslKeyFingerprint($key){
+		$base58 = new Base58();
+		
 		$key = sslKeyPubClean($key);
 		
 		$keyBin = base64_decode($key);
@@ -243,6 +245,8 @@ class Node extends YamlStorage{
 	
 	public static function sslKeyPubFingerprintVerify($fingerprint){
 		if(substr($fingerprint, 0, 3) == 'FC_'){
+			$base58 = new Base58();
+			
 			$fingerprint = substr($fingerprint, 3);
 			
 			#$fingerprintNum = Base58::decode($fingerprint);

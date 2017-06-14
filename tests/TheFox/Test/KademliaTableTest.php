@@ -259,13 +259,13 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$table->nodeEnclose($node_d);
 		
 		
-		$this->assertEquals('FC_6JtmjHgZjZmgc3Q5mts5C2wmiuMa1TWyR', $node_a->getSslKeyPubFingerprint());
-		$this->assertEquals('FC_FeYW3XyyaF8cHJXaRT1QJMdQRGsCiiz69', $node_b->getSslKeyPubFingerprint());
-		$this->assertEquals('FC_NtKjyedUakTj3MPuckWjF4aY23JvGmm8w', $node_c->getSslKeyPubFingerprint());
-		$this->assertEquals('FC_EYj4eSzaxkwMfQkmtdTSBLrx5CZqdXPMq', $node_d->getSslKeyPubFingerprint());
+		$this->assertEquals('FC_SxeHaAyWhC5k3u5Dt7asUcTXHpqtKBGPaAAW1unQu7iBdD75EhhrKb9DjWJFSTNCRM5s6wBW7ntA1C1', $node_a->getSslKeyPubFingerprint());
+		$this->assertEquals('FC_U2SazcAsbeRFz7zUXLZsdKvR28XNRk9C7CBNhi2vFe9fbi9QjBUy1Wqb3LK6MHBmNmvMUr69ChaqZe1', $node_b->getSslKeyPubFingerprint());
+		$this->assertEquals('FC_V5XQ3ReRPSWeakGv8o48cMXycnqTfK4kfRa9LGSxbxE6ee9s4zz5ucWcfwEUTmBFcHtZBLK2dpY1DHH', $node_c->getSslKeyPubFingerprint());
+		$this->assertEquals('FC_U25pDTHoiEEpop6PLggboYRiGjMszhRp4cstJE6aUJXLn79YjnQYfDLgbppw4FzR455Fr5nUCbvdiuw', $node_d->getSslKeyPubFingerprint());
 		
-		$this->assertEquals($node_b, $table->nodeFindByKeyPubFingerprint('FC_FeYW3XyyaF8cHJXaRT1QJMdQRGsCiiz69'));
-		$this->assertEquals($node_c, $table->nodeFindByKeyPubFingerprint('FC_NtKjyedUakTj3MPuckWjF4aY23JvGmm8w'));
+		$this->assertEquals($node_b, $table->nodeFindByKeyPubFingerprint('FC_U2SazcAsbeRFz7zUXLZsdKvR28XNRk9C7CBNhi2vFe9fbi9QjBUy1Wqb3LK6MHBmNmvMUr69ChaqZe1'));
+		$this->assertEquals($node_c, $table->nodeFindByKeyPubFingerprint('FC_V5XQ3ReRPSWeakGv8o48cMXycnqTfK4kfRa9LGSxbxE6ee9s4zz5ucWcfwEUTmBFcHtZBLK2dpY1DHH'));
 	}
 	
 	public function testNodeEnclose1(){

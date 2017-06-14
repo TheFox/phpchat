@@ -357,8 +357,7 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$node_d = new Node();
 		$node_d->setIdHexStr('10000001-2002-4004-8008-010000000010');
 		$table->nodeEnclose($node_d);
-		
-		
+
 		$node_e = new Node();
 		$node_e->setIdHexStr('10000001-2002-4004-8008-020000000008');
 		
@@ -374,6 +373,17 @@ ACgdCZcyA+B3xL8UMtVKz4sCAwEAAQ==
 		$node_d->setBridgeServer(true);
 		$nodes = $table->nodeFindClosestBridgeServer($node_e);
 		$this->assertEquals(array($node_a, $node_b, $node_d), $nodes);
+		
+		
+		$this->assertEquals('FC_SxeHaAyWhC5k3u5Dt7asUcTXHpqtKBGPaAAW1unQu7iBdD75EhhrKb9DjWJFSTNCRM5s6wBW7ntA1C1', $node_a->getSslKeyPubFingerprint());
+		$this->assertEquals('FC_U2SazcAsbeRFz7zUXLZsdKvR28XNRk9C7CBNhi2vFe9fbi9QjBUy1Wqb3LK6MHBmNmvMUr69ChaqZe1', $node_b->getSslKeyPubFingerprint());
+		$this->assertEquals('FC_V5XQ3ReRPSWeakGv8o48cMXycnqTfK4kfRa9LGSxbxE6ee9s4zz5ucWcfwEUTmBFcHtZBLK2dpY1DHH', $node_c->getSslKeyPubFingerprint());
+		$this->assertEquals('FC_U25pDTHoiEEpop6PLggboYRiGjMszhRp4cstJE6aUJXLn79YjnQYfDLgbppw4FzR455Fr5nUCbvdiuw', $node_d->getSslKeyPubFingerprint());
+		
+		$this->assertEquals($node_a, $table->nodeFindByKeyPubFingerprint('FC_SxeHaAyWhC5k3u5Dt7asUcTXHpqtKBGPaAAW1unQu7iBdD75EhhrKb9DjWJFSTNCRM5s6wBW7ntA1C1'));
+		$this->assertEquals($node_b, $table->nodeFindByKeyPubFingerprint('FC_U2SazcAsbeRFz7zUXLZsdKvR28XNRk9C7CBNhi2vFe9fbi9QjBUy1Wqb3LK6MHBmNmvMUr69ChaqZe1'));
+		$this->assertEquals($node_c, $table->nodeFindByKeyPubFingerprint('FC_V5XQ3ReRPSWeakGv8o48cMXycnqTfK4kfRa9LGSxbxE6ee9s4zz5ucWcfwEUTmBFcHtZBLK2dpY1DHH'));
+		$this->assertEquals($node_d, $table->nodeFindByKeyPubFingerprint('FC_U25pDTHoiEEpop6PLggboYRiGjMszhRp4cstJE6aUJXLn79YjnQYfDLgbppw4FzR455Fr5nUCbvdiuw'));
 	}
 	
 	public function testNodeEnclose1a(){
