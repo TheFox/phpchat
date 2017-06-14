@@ -2018,7 +2018,7 @@ class Client{
 								#$this->bridgeActionRemoveByCriterion(ClientAction::CRITERION_AFTER_HELLO);
 								#$this->bridgeActionRemoveByCriterion(ClientAction::CRITERION_AFTER_ID_SUCCESSFULL);
 								#$this->bridgeActionsExecute(ClientAction::CRITERION_AFTER_HAS_SSL);
-								
+								/*
 								$msgHandleReturnValue .= $this->sendBridgeMsg('my_data');
 									$name = $bridgeAction->getName();
 									$criteria = join(',', $bridgeAction->getCriteria());
