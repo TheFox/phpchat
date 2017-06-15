@@ -3,7 +3,9 @@
 namespace TheFox\Logger;
 
 /**
- * @codeCoverageIgnore
+ * Class StreamHandler
+ * @package TheFox\Logger
+ * @deprecated
  */
 class StreamHandler
 {

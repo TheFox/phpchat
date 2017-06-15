@@ -8,7 +8,7 @@ use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
 use TheFox\Storage\YamlStorage;
 use TheFox\Utilities\Rand;
 
-class Msg extends YamlStorage
+class Message extends YamlStorage
 {
     public static $STATUS_TEXT = [
         'U' => 'unread, got msg from another node',
@@ -355,7 +355,7 @@ class Msg extends YamlStorage
         }
     }
 
-    public function setMsgDb(MsgDb $msgDb)
+    public function setMsgDb(MessageDatabase $msgDb)
     {
         $this->msgDb = $msgDb;
     }

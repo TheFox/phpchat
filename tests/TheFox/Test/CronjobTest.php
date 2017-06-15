@@ -5,12 +5,12 @@ namespace TheFox\Test;
 use Exception;
 use PHPUnit_Framework_TestCase;
 use TheFox\PhpChat\Cronjob;
-use TheFox\PhpChat\MsgDb;
-use TheFox\PhpChat\Msg;
+use TheFox\PhpChat\MessageDatabase;
+use TheFox\PhpChat\Message;
 use TheFox\PhpChat\Settings;
 use TheFox\Dht\Simple\Table;
 use TheFox\Dht\Kademlia\Node;
-use TheFox\PhpChat\NodesNewDb;
+use TheFox\PhpChat\NewNodesDatabase;
 use TheFox\Logger\Logger;
 use TheFox\Logger\StreamHandler as LoggerStreamHandler;
 
@@ -255,7 +255,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 
         $msgs = [];
         for ($nodeNo = 1000; $nodeNo <= 1011; $nodeNo++) {
-            $msg = new Msg();
+            $msg = new Message();
 
             $msg->setId($uuid2 . $nodeNo);
             $this->assertEquals($uuid2 . $nodeNo, $msg->getId());
@@ -316,7 +316,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
         $msgs[1011]->setDstNodeId($nodes[5]->getIdHexStr());
         $msgs[1011]->setStatus('U');
 
-        $msgDb = new MsgDb();
+        $msgDb = new MessageDatabase();
         $msgDb->setDatadirBasePath($settings->data['datadir']);
 
         $cronjobLog = new Logger('cronjob');
@@ -516,7 +516,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
 
         $msgs = [];
         for ($nodeNo = 2001; $nodeNo <= 2004; $nodeNo++) {
-            $msg = new Msg();
+            $msg = new Message();
 
             $msg->setId($uuid2 . $nodeNo);
             $msg->setSrcNodeId($settings->data['node']['id']);
@@ -548,7 +548,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
         $msgs[2004]->setDstSslPubKey($nodes[5]->getSslKeyPub());
         $msgs[2004]->setStatus('U');
 
-        $msgDb = new MsgDb();
+        $msgDb = new MessageDatabase();
         $msgDb->setDatadirBasePath($settings->data['datadir']);
 
         $cronjobLog = new Logger('cronjob');
@@ -811,7 +811,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
         $table->setDatadirBasePath($settings->data['datadir']);
         $table->setLocalNode($localNode);
 
-        $nodesNewDb = new NodesNewDb('test_data/testfile_cronjob_nodesnewdb1.yml');
+        $nodesNewDb = new NewNodesDatabase('test_data/testfile_cronjob_nodesnewdb1.yml');
         $nodesNewDb->nodeAddConnect('tcp://192.168.241.21', false);
         $nodesNewDb->nodeAddConnect('tcp://192.168.241.22', true);
         $nodesNewDb->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1742', false);
@@ -878,7 +878,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
         $table->setDatadirBasePath($settings->data['datadir']);
         $table->setLocalNode($localNode);
 
-        $nodesNewDb = new NodesNewDb('test_data/testfile_cronjob_nodesnewdb2.yml');
+        $nodesNewDb = new NewNodesDatabase('test_data/testfile_cronjob_nodesnewdb2.yml');
         $nodesNewDb->nodeAddConnect('tcp://192.168.241.21', false);
         $nodesNewDb->nodeAddConnect('tcp://192.168.241.22', true);
         $nodesNewDb->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1742', false);
@@ -945,7 +945,7 @@ nx+hUJnDdYkHKNZibhlsXNECAwEAAQ==
         $table->setDatadirBasePath($settings->data['datadir']);
         $table->setLocalNode($localNode);
 
-        $nodesNewDb = new NodesNewDb('test_data/testfile_cronjob_nodesnewdb2.yml');
+        $nodesNewDb = new NewNodesDatabase('test_data/testfile_cronjob_nodesnewdb2.yml');
         $nodesNewDb->nodeAddConnect('tcp://192.168.241.21', false);
         $nodesNewDb->nodeAddConnect('tcp://192.168.241.22', true);
         $nodesNewDb->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1742', false);

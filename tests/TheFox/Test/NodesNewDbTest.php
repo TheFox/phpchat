@@ -3,13 +3,13 @@
 namespace TheFox\Test;
 
 use PHPUnit_Framework_TestCase;
-use TheFox\PhpChat\NodesNewDb;
+use TheFox\PhpChat\NewNodesDatabase;
 
 class NodesNewDbTest extends PHPUnit_Framework_TestCase
 {
     public function testSerialize()
     {
-        $db1 = new NodesNewDb();
+        $db1 = new NewNodesDatabase();
         $db1->nodeAddConnect('tcp://192.168.241.24:25000');
 
         $db2 = unserialize(serialize($db1));
@@ -19,7 +19,7 @@ class NodesNewDbTest extends PHPUnit_Framework_TestCase
 
     public function testNodeAddConnect()
     {
-        $db = new NodesNewDb();
+        $db = new NewNodesDatabase();
 
         $db->nodeAddConnect('tcp://192.168.241.24:25000', false);
         $this->assertTrue(is_array($db->data['nodes']));
@@ -65,7 +65,7 @@ class NodesNewDbTest extends PHPUnit_Framework_TestCase
 
     public function testNodeAddFind()
     {
-        $db = new NodesNewDb();
+        $db = new NewNodesDatabase();
 
         $db->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1738', false);
         $this->assertTrue(is_array($db->data['nodes']));
@@ -101,7 +101,7 @@ class NodesNewDbTest extends PHPUnit_Framework_TestCase
 
     public function testNodeIncConnectAttempt()
     {
-        $db = new NodesNewDb();
+        $db = new NewNodesDatabase();
 
         $db->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1738');
         $db->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1739');
@@ -116,7 +116,7 @@ class NodesNewDbTest extends PHPUnit_Framework_TestCase
 
     public function testNodeIncFindAttempt()
     {
-        $db = new NodesNewDb();
+        $db = new NewNodesDatabase();
 
         $db->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1738');
         $db->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1739');
@@ -131,7 +131,7 @@ class NodesNewDbTest extends PHPUnit_Framework_TestCase
 
     public function testNodeRemove()
     {
-        $db = new NodesNewDb();
+        $db = new NewNodesDatabase();
 
         $db->nodeAddFind('cafed00d-2131-4159-8e11-0b4dbadb1738');
         $this->assertEquals(1, count($db->data['nodes']));
@@ -154,7 +154,7 @@ class NodesNewDbTest extends PHPUnit_Framework_TestCase
 
     public function testGetNodes()
     {
-        $db = new NodesNewDb();
+        $db = new NewNodesDatabase();
         $this->assertEquals([], $db->getNodes());
         $this->assertEquals(0, count($db->getNodes()));
 

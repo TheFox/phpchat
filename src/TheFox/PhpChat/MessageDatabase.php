@@ -3,9 +3,9 @@
 namespace TheFox\PhpChat;
 
 use TheFox\Storage\YamlStorage;
-use TheFox\Dht\Kademlia\Node;
+use TheFox\Dht\Simple\Node;
 
-class MsgDb extends YamlStorage
+class MessageDatabase extends YamlStorage
 {
     private $msgs = [];
 
@@ -44,7 +44,7 @@ class MsgDb extends YamlStorage
             if (array_key_exists('msgs', $this->data) && $this->data['msgs']) {
                 foreach ($this->data['msgs'] as $msgId => $msgAr) {
                     if (file_exists($msgAr['path'])) {
-                        $msg = new Msg($msgAr['path']);
+                        $msg = new Message($msgAr['path']);
                         $msg->setDatadirBasePath($this->getDatadirBasePath());
                         if ($msg->load()) {
                             $this->msgs[$msg->getId()] = $msg;
@@ -60,7 +60,7 @@ class MsgDb extends YamlStorage
         return false;
     }
 
-    public function msgAdd(Msg $msg)
+    public function msgAdd(Message $msg)
     {
         $filePath = $msg->getFilePath();
         if ($this->getDatadirBasePath() && !$filePath) {
@@ -75,7 +75,7 @@ class MsgDb extends YamlStorage
         $this->setDataChanged(true);
     }
 
-    public function msgUpdate(Msg $msgNew)
+    public function msgUpdate(Message $msgNew)
     {
         $rv = false;
 

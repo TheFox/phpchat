@@ -5,7 +5,7 @@ namespace TheFox\PhpChat;
 use TheFox\Storage\YamlStorage;
 use TheFox\Dht\Kademlia\Node;
 
-class NodesNewDb extends YamlStorage
+class NewNodesDatabase extends YamlStorage
 {
     public function __construct($filePath = null)
     {

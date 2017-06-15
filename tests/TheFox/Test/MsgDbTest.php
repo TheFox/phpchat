@@ -4,8 +4,8 @@ namespace TheFox\Test;
 
 use PHPUnit_Framework_TestCase;
 use Symfony\Component\Finder\Finder;
-use TheFox\PhpChat\MsgDb;
-use TheFox\PhpChat\Msg;
+use TheFox\PhpChat\MessageDatabase;
+use TheFox\PhpChat\Message;
 use TheFox\Dht\Kademlia\Node;
 
 class MsgDbTest extends PHPUnit_Framework_TestCase
@@ -43,17 +43,17 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 
     public function testSerialize()
     {
-        $db1 = new MsgDb();
+        $db1 = new MessageDatabase();
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2940');
         $db1->msgAdd($msg);
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2941');
         $db1->msgAdd($msg);
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2942');
         $db1->msgAdd($msg);
 
@@ -71,22 +71,22 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
         $runName = uniqid('', true);
         $dbFileName = 'testfile_msgdb_' . date('Ymd_His') . '_' . $runName . '.yml';
 
-        $db = new MsgDb('test_data/' . $dbFileName);
+        $db = new MessageDatabase('test_data/' . $dbFileName);
 
         $fileName = 'testfile_msg1_' . date('Ymd_His') . '_' . $runName . '.yml';
-        $msg = new Msg('test_data/' . $fileName);
+        $msg = new Message('test_data/' . $fileName);
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2940');
         $msg->setDataChanged(true);
         $db->msgAdd($msg);
 
         $fileName = 'testfile_msg2_' . date('Ymd_His') . '_' . $runName . '.yml';
-        $msg = new Msg('test_data/' . $fileName);
+        $msg = new Message('test_data/' . $fileName);
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2941');
         $msg->setDataChanged(true);
         $db->msgAdd($msg);
 
         $fileName = 'testfile_msg3_' . date('Ymd_His') . '_' . $runName . '.yml';
-        $msg = new Msg('test_data/' . $fileName);
+        $msg = new Message('test_data/' . $fileName);
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2942');
         $msg->setDataChanged(true);
         $db->msgAdd($msg);
@@ -97,27 +97,27 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
         $files = $finder->in('test_data')->depth(0)->name($dbFileName)->files();
         $this->assertEquals(1, count($files));
 
-        $book = new MsgDb('test_data/' . $dbFileName);
+        $book = new MessageDatabase('test_data/' . $dbFileName);
         $this->assertTrue($book->load());
 
-        $book = new MsgDb('test_data/not_existing.yml');
+        $book = new MessageDatabase('test_data/not_existing.yml');
         $this->assertFalse($book->load());
     }
 
     public function testMsgAdd()
     {
-        $db = new MsgDb();
+        $db = new MessageDatabase();
         $db->setDatadirBasePath('test_data');
 
         $runName = uniqid('', true);
         $fileName = 'testfile_msg_' . date('Ymd_His') . '_' . $runName . '.yml';
 
-        $msg = new Msg('test_data/' . $fileName);
+        $msg = new Message('test_data/' . $fileName);
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2943');
         $msg->setDataChanged(true);
         $db->msgAdd($msg);
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2944');
         $msg->setDataChanged(true);
         $db->msgAdd($msg);
@@ -128,19 +128,19 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 
     public function testMsgUpdate()
     {
-        $db = new MsgDb();
+        $db = new MessageDatabase();
 
-        $msg1 = new Msg();
+        $msg1 = new Message();
         $msg1->setId('76cabb4d-e729-4a50-a792-e223704c2944');
         $msg1->setSentNodes(['76cabb4d-e729-4a50-a792-e223704c2948']);
         $msg1->setDataChanged(true);
         $db->msgAdd($msg1);
 
-        $msg2 = new Msg();
+        $msg2 = new Message();
         $msg2->setId('76cabb4d-e729-4a50-a792-e223704c2945');
         $this->assertFalse($db->msgUpdate($msg2));
 
-        $msg2 = new Msg();
+        $msg2 = new Message();
         $msg2->setId('76cabb4d-e729-4a50-a792-e223704c2944');
         $this->assertFalse($db->msgUpdate($msg2));
 
@@ -170,18 +170,18 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 
     public function testGetMsgWithNoDstNodeId()
     {
-        $db = new MsgDb();
+        $db = new MessageDatabase();
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2943');
         $db->msgAdd($msg);
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2944');
         $msg->setDstNodeId('76cabb4d-e729-4a50-a792-e223704c2947');
         $db->msgAdd($msg);
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2945');
         $db->msgAdd($msg);
 
@@ -195,18 +195,18 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 
     public function testGetUnsentMsgs()
     {
-        $db = new MsgDb();
+        $db = new MessageDatabase();
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2943');
         $db->msgAdd($msg);
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2944');
         $msg->setSentNodes(['76cabb4d-e729-4a50-a792-e223704c2947']);
         $db->msgAdd($msg);
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2945');
         $db->msgAdd($msg);
 
@@ -217,22 +217,22 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 
     public function testGetMsgsForDst()
     {
-        $db = new MsgDb();
+        $db = new MessageDatabase();
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2943');
         $db->msgAdd($msg);
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2944');
         $msg->setDstNodeId('76cabb4d-e729-4a50-a792-e223704c2947');
         $db->msgAdd($msg);
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2945');
         $db->msgAdd($msg);
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2946');
         $msg->setDstNodeId('76cabb4d-e729-4a50-a792-e223704c2947');
         $db->msgAdd($msg);
@@ -248,17 +248,17 @@ kWcl2BJ8IxSMYUeTbb8UmS2Qr8wWzEVqd/SQ4olC3gcPReEohMpJ+X0mp7CmjQUS
 
     public function testGetMsgById()
     {
-        $db = new MsgDb();
+        $db = new MessageDatabase();
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2943');
         $db->msgAdd($msg);
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2944');
         $db->msgAdd($msg);
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setId('76cabb4d-e729-4a50-a792-e223704c2945');
         $db->msgAdd($msg);
 

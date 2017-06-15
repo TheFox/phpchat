@@ -126,7 +126,7 @@ class HttpClient extends Client
         return '';
     }
 
-    public function sendMsg(Msg $msg)
+    public function sendMsg(Message $msg)
     {
         $rid = Uuid::uuid4()->toString();
 

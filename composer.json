@@ -21,32 +21,27 @@
         }
     ],
     "require": {
-        "php": ">=5.3",
-        "lib-curl": "~7.0",
-        "lib-openssl": ">=0.9.8",
-        "symfony/yaml": "~2.5",
-        "symfony/console": "~2.5",
-        "symfony/filesystem": "~2.5",
-        "symfony/finder": "~2.5",
-        "rhumsaa/uuid": "~2.7",
-        "liip/process-manager": "~1.0",
-        "zendframework/zend-uri": "~2.3",
-        "guzzlehttp/guzzle": "~3.0",
-        "kevinlebrun/colors.php": "~0.4",
-        "rych/bytesize": "1.0.0",
-        "stephenhill/base58": "~1.1",
-        "thefox/utilities": "<1.2",
-        "thefox/hashcash": "~1.5",
-        "thefox/imapd": "~0.1",
-        "thefox/smtpd": "<0.1.2"
+        "php": "^7.0",
+        "ext-curl": "^7.0",
+        "ext-openssl": ">=0.9.8",
+        "symfony/console": "^2.5",
+        "symfony/filesystem": "^2.5",
+        "symfony/finder": "^3.3",
+        "ramsey/uuid": "^3.1",
+        "liip/process-manager": "^1.0",
+        "zendframework/zend-uri": "^2.5",
+        "guzzlehttp/guzzle": "^6.2",
+        "kevinlebrun/colors.php": "^1.0",
+        "rych/bytesize": "^1.0",
+        "stephenhill/base58": "^1.1",
+        "thefox/utilities": "^1.11",
+        "thefox/hashcash": "^1.8",
+        "thefox/imapd": "^0.5",
+        "thefox/smtpd": "^0.6",
+        "thefox/storage": "^0.1"
     },
     "require-dev": {
-        "phpunit/phpunit": "~4.1",
-        "doctrine/common": "~2.4",
-        "theseer/phpdox": "~0.7",
-        "phploc/phploc": "~2.0",
-        "phpmd/phpmd": "~2.1",
-        "thefox/phpcsrs": "~1.0"
+        "phpunit/phpunit": "^6.2"
     },
     "autoload": {
         "psr-0": {
@@ -65,16 +60,5 @@
         "branch-alias": {
             "dev-master": "1.x.x-dev"
         }
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "echo post-install-cmd",
-            "chmod a+rx-w,u+rwx application.php",
-            "php bootstrap.php"
-        ],
-        "post-update-cmd": [
-            "echo post-update-cmd",
-            "php bootstrap.php"
-        ]
     }
 }

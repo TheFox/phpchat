@@ -1065,7 +1065,7 @@ class Console extends Thread
 
                                 $table = $this->ipcKernelConnection->execSync('getTable');
 
-                                $msg = new Msg();
+                                $msg = new Message();
                                 $msg->setSrcNodeId($this->settings->data['node']['id']);
                                 $msg->setSrcSslKeyPub($table->getLocalNode()->getSslKeyPub());
                                 $msg->setSrcUserNickname($this->userNickname);

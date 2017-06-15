@@ -1,6 +1,6 @@
 <?php
 
-namespace TheFox\Dht\Kademlia;
+namespace TheFox\Dht\Simple;
 
 use RuntimeException;
 use Zend\Uri\UriFactory;

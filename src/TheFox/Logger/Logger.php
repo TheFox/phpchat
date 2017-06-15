@@ -5,7 +5,9 @@ namespace TheFox\Logger;
 use DateTime;
 
 /**
- * @codeCoverageIgnore
+ * Class Logger
+ * @package TheFox\Logger
+ * @deprecated
  */
 class Logger
 {

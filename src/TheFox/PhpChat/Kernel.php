@@ -136,7 +136,7 @@ class Kernel extends Thread
         $this->getLog()->info('setup addressbook: done (' . (int)$load . ')');
 
         $this->getLog()->info('setup msgDb');
-        $this->msgDb = new MsgDb($this->settings->data['datadir'] . '/msgdb.yml');
+        $this->msgDb = new MessageDatabase($this->settings->data['datadir'] . '/msgdb.yml');
         $this->msgDb->setDatadirBasePath($this->settings->data['datadir']);
         $load = $this->msgDb->load();
         $this->getLog()->info('setup msgDb: done (' . (int)$load . ')');
@@ -148,7 +148,7 @@ class Kernel extends Thread
         $this->getLog()->info('setup hashcashDb: done (' . (int)$load . ')');
 
         $this->getLog()->info('setup nodesNewDb');
-        $this->nodesNewDb = new NodesNewDb($this->settings->data['datadir'] . '/nodesnewdb.yml');
+        $this->nodesNewDb = new NewNodesDatabase($this->settings->data['datadir'] . '/nodesnewdb.yml');
         $this->nodesNewDb->setDatadirBasePath($this->settings->data['datadir']);
         $load = $this->nodesNewDb->load();
         $this->getLog()->info('setup nodesNewDb: done (' . (int)$load . ')');
@@ -440,13 +440,13 @@ class Kernel extends Thread
         return $this->msgDb;
     }
 
-    public function msgDbMsgAdd(Msg $msg)
+    public function msgDbMsgAdd(Message $msg)
     {
         $this->getMsgDb()->msgAdd($msg);
         $this->ipcCronjobConnection->execAsync('msgDbInit');
     }
 
-    public function msgDbMsgUpdate(Msg $msg)
+    public function msgDbMsgUpdate(Message $msg)
     {
         $this->getMsgDb()->msgUpdate($msg);
     }

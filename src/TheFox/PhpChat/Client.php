@@ -9,8 +9,7 @@ use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
 use Zend\Uri\Uri;
 use Zend\Uri\UriFactory;
 use Colors\Color;
-use TheFox\Utilities\Hex;
-use TheFox\Dht\Kademlia\Node;
+use TheFox\Dht\Simple\Node;
 use TheFox\Pow\Hashcash;
 
 class Client
@@ -1223,7 +1222,7 @@ class Client
                         $msgHandleReturnValue .= $this->sendMsgResponse($rid, $status);
 
                         if ($status == 1) {
-                            $msg = new Msg();
+                            $msg = new Message();
                             $msg->setVersion($version);
                             $msg->setId($id);
                             $msg->setRelayNodeId($this->getNode()->getIdHexStr());
@@ -2257,7 +2256,7 @@ class Client
         return $this->dataSend($this->msgCreate('node_found', $data));
     }
 
-    public function sendMsg(Msg $msg)
+    public function sendMsg(Message $msg)
     {
         $rid = (string)Uuid::uuid4();
 

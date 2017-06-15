@@ -6,10 +6,10 @@ use Exception;
 use PHPUnit_Framework_TestCase;
 use Symfony\Component\Finder\Finder;
 use Rhumsaa\Uuid\Uuid;
-use TheFox\PhpChat\Msg;
-use TheFox\PhpChat\MsgDb;
+use TheFox\PhpChat\Message;
+use TheFox\PhpChat\MessageDatabase;
 
-class MsgTest extends PHPUnit_Framework_TestCase
+class MessageTest extends PHPUnit_Framework_TestCase
 {
     const SRC1_SSL_KEY_PUB = '-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAxImO5o0WGuT2lqwArw4M
@@ -219,7 +219,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 
     public function testSerialize()
     {
-        $msg1 = new Msg();
+        $msg1 = new Message();
         $msg1->setId('3d939e1c-9ac6-473c-a00d-4e96014821f9');
 
         $msg2 = unserialize(serialize($msg1));
@@ -229,7 +229,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 
     public function testToString()
     {
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setId('3d939e1c-9ac6-473c-a00d-4e96014821f9');
         $this->assertEquals('TheFox\PhpChat\Msg->{3d939e1c-9ac6-473c-a00d-4e96014821f9}', (string)$msg);
     }
@@ -239,7 +239,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
         $runName = uniqid('', true);
         $fileName = 'testfile_msg_' . date('Ymd_His') . '_' . $runName . '.yml';
 
-        $msg = new Msg('test_data/' . $fileName);
+        $msg = new Message('test_data/' . $fileName);
         $msg->setDatadirBasePath('test_data');
         $msg->setDataChanged(true);
 
@@ -308,7 +308,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
         $files = $finder->in('test_data')->depth(0)->name($fileName)->files();
         $this->assertEquals(1, count($files));
 
-        $msg = new Msg('test_data/' . $fileName);
+        $msg = new Message('test_data/' . $fileName);
         $msg->setDatadirBasePath('test_data');
 
         $this->assertTrue($msg->load());
@@ -326,7 +326,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
         $this->assertEquals('O', $msg->getStatus());
         $this->assertEquals(679874400, $msg->getTimeCreated());
 
-        $msg = new Msg('test_data/' . $fileName);
+        $msg = new Message('test_data/' . $fileName);
         $msg->setDatadirBasePath('test_data');
 
         $this->assertTrue($msg->load());
@@ -347,7 +347,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
         $this->assertEquals('hello world! this is a test', $text);
         $this->assertEquals('thefox', $msg->getSrcUserNickname());
 
-        $msg = new Msg('test_data/' . $fileName);
+        $msg = new Message('test_data/' . $fileName);
         $msg->setDatadirBasePath('test_data');
 
         $this->assertTrue($msg->load());
@@ -368,20 +368,20 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
         $this->assertEquals('FAILED OK', $text);
         $this->assertEquals('', $msg->getSrcUserNickname());
 
-        $msg = new Msg('test_data/not_existing.yml');
+        $msg = new Message('test_data/not_existing.yml');
         $this->assertFalse($msg->load());
     }
 
     public function testId()
     {
-        $msg = new Msg();
+        $msg = new Message();
 
         $this->assertTrue(Uuid::isValid($msg->getId()));
     }
 
     public function testStatus()
     {
-        $msg = new Msg();
+        $msg = new Message();
 
         $msg->setStatus('R');
         $this->assertEquals('R', $msg->getStatus());
@@ -393,19 +393,19 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 
     public function testStatusText()
     {
-        $msg = new Msg();
+        $msg = new Message();
 
         $msg->setStatus('R');
-        $this->assertEquals(Msg::$STATUS_TEXT['R'], $msg->getStatusText());
+        $this->assertEquals(Message::$STATUS_TEXT['R'], $msg->getStatusText());
 
         $msg->setStatus('D');
         $msg->setStatus('U');
-        $this->assertEquals(Msg::$STATUS_TEXT['D'], $msg->getStatusText());
+        $this->assertEquals(Message::$STATUS_TEXT['D'], $msg->getStatusText());
     }
 
     public function testSetTimeReceived()
     {
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setTimeReceived(24);
 
         $this->assertEquals(24, $msg->getTimeReceived());
@@ -418,7 +418,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
 
         file_put_contents($fileName, static::SRC1_SSL_KEY_PRV);
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setSslKeyPrvPath($fileName, static::SSL_KEY_PRV_PASS);
 
         $this->assertTrue(true);
@@ -432,16 +432,16 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
     {
         $this->assertTrue(true);
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setSslKeyPrv('x', 'y');
     }
 
     public function testSetMsgDb()
     {
         $this->assertTrue(true);
-        $db1 = new MsgDb();
+        $db1 = new MessageDatabase();
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setMsgDb($db1);
 
         $db2 = $msg->getMsgDb();
@@ -464,7 +464,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
      */
     public function testEncryption($srcUserNickname, $subject, $text, $ignore)
     {
-        $msg = new Msg();
+        $msg = new Message();
 
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
@@ -484,7 +484,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
         $password = $msg->getPassword();
         $checksum = $msg->getChecksum();
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
         $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
@@ -511,7 +511,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
      */
     public function testEncryptionRuntimeException1()
     {
-        $msg = new Msg();
+        $msg = new Message();
 
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
@@ -534,7 +534,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
      */
     public function testEncryptionRuntimeException2()
     {
-        $msg = new Msg();
+        $msg = new Message();
 
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
@@ -557,7 +557,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
      */
     public function testDecryptionRuntimeException10()
     {
-        $msg = new Msg();
+        $msg = new Message();
 
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
@@ -577,7 +577,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
         $password = $msg->getPassword();
         $checksum = $msg->getChecksum();
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
         $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
@@ -599,7 +599,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
      */
     public function testDecryptionRuntimeException20()
     {
-        $msg = new Msg();
+        $msg = new Message();
 
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
@@ -619,7 +619,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
         $password = $msg->getPassword();
         $checksum = $msg->getChecksum();
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
         $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
@@ -641,7 +641,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
      */
     public function testDecryptionRuntimeException30()
     {
-        $msg = new Msg();
+        $msg = new Message();
 
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
@@ -661,7 +661,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
         $password = $msg->getPassword();
         $checksum = $msg->getChecksum();
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
         $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
@@ -683,7 +683,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
      */
     public function testDecryptionRuntimeException40()
     {
-        $msg = new Msg();
+        $msg = new Message();
 
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
@@ -703,7 +703,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
         $password = $msg->getPassword();
         $checksum = $msg->getChecksum();
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
         $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
@@ -725,7 +725,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
      */
     public function testDecryptionRuntimeException50()
     {
-        $msg = new Msg();
+        $msg = new Message();
 
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
@@ -745,7 +745,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
         #$password = $msg->getPassword();
         $checksum = $msg->getChecksum();
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
         $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
@@ -767,7 +767,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
      */
     public function testDecryptionRuntimeException60()
     {
-        $msg = new Msg();
+        $msg = new Message();
 
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
@@ -787,7 +787,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
         $password = $msg->getPassword();
         #$checksum = $msg->getChecksum();
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
         $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
@@ -809,7 +809,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
      */
     public function testDecryptionRuntimeException101()
     {
-        $msg = new Msg();
+        $msg = new Message();
 
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
@@ -837,7 +837,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
         $password = gzencode($password, 9);
         $password = base64_encode($password);
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
         $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
@@ -859,7 +859,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
      */
     public function testDecryptionRuntimeException103()
     {
-        $msg = new Msg();
+        $msg = new Message();
 
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
@@ -887,7 +887,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
         $password = gzencode($password, 9);
         $password = base64_encode($password);
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
         $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
@@ -909,7 +909,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
      */
     public function testDecryptionRuntimeException202()
     {
-        $msg = new Msg();
+        $msg = new Message();
 
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
@@ -937,7 +937,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
         $body = gzencode($body, 9);
         $body = base64_encode($body);
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
         $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
@@ -959,7 +959,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
      */
     public function testDecryptionRuntimeException203()
     {
-        $msg = new Msg();
+        $msg = new Message();
 
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
@@ -987,7 +987,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
         $body = gzencode($body, 9);
         $body = base64_encode($body);
 
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setVersion(1);
         $msg->setId('cafed00d-2131-4159-8e11-0b4dbadb1738');
         $msg->setSrcNodeId('cafed00d-2331-4159-8e11-0b4dbadb1738');
@@ -1017,7 +1017,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
         $password .= 'u5J3aPMTcet5jYU2b2ffJSPkYqaEmV2DzLQr/M0bGn3rHml4OovKgX9m1vN7XlTQL+E';
         $password .= 'wW5MCLqPYsethgoKahKh2O17oZ6VDGVa/b2P4KzM3d41NzUXz/s31Bce+blR2o6oM+n';
         $password .= 'KIbXNoxs9dZbbCSqDzLk8AZ1+dGI2ZX7hovL+XSv0Ta7S0lgEf44zwDttGvdWpIaFvW+uL70w==';
-        $checksum = Msg::createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey, $text, $timeCreated, $password);
+        $checksum = Message::createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey, $text, $timeCreated, $password);
 
         $this->assertEquals('7c4459a9bc0ec4b19ebae6d9ded536aa6ee55ba13552dc81', $checksum);
     }
@@ -1032,7 +1032,7 @@ TYk/nVN2144OCsyOmkCf/NBFE3BYmpb+cC51wJF1I4BTaOTxTyNy03JNQlqj/tKk
         $text = 'hello world!';
         $timeCreated = '540892800';
         $password = 'password1';
-        $checksum = Msg::createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey, $text, $timeCreated, $password);
+        $checksum = Message::createCheckSum($version, $id, $srcNodeId, $dstNodeId, $dstSslPubKey, $text, $timeCreated, $password);
 
         $this->assertEquals('1c870e54257e6eb594724508a0a9c616b1905c2aed25de8a', $checksum);
     }

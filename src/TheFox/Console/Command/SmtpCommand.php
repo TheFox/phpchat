@@ -14,7 +14,7 @@ use TheFox\Smtp\Server;
 use TheFox\Smtp\Event;
 use TheFox\Ipc\ClientConnection;
 use TheFox\Ipc\StreamHandler as IpcStreamHandler;
-use TheFox\PhpChat\Msg;
+use TheFox\PhpChat\Message;
 use TheFox\Dht\Kademlia\Node;
 
 class SmtpCommand extends BasicCommand
@@ -197,7 +197,7 @@ class SmtpCommand extends BasicCommand
         foreach ($rcpt as $dstNodeId) {
             $dstNodeId = substr($dstNodeId, 0, strpos($dstNodeId, '@'));
 
-            $msg = new Msg();
+            $msg = new Message();
             $msg->setSrcNodeId($settings->data['node']['id']);
             $msg->setSrcSslKeyPub($table->getLocalNode()->getSslKeyPub());
             $msg->setSrcUserNickname($settings->data['user']['nickname']);

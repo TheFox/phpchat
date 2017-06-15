@@ -19,13 +19,13 @@ class BasicTest extends PHPUnit_Framework_TestCase
 
     public function testFunctions()
     {
-        $this->assertTrue(function_exists('gzdecode'), 'gzdecode function not found.');
-        $this->assertTrue(function_exists('gzcompress'), 'gzcompress function not found.');
+        //$this->assertTrue(function_exists('gzdecode'), 'gzdecode function not found.');
+        //$this->assertTrue(function_exists('gzcompress'), 'gzcompress function not found.');
         $this->assertTrue(function_exists('mt_rand'), 'mt_rand function not found.');
-        $this->assertTrue(function_exists('strIsIp'), 'strIsIp function not found.');
-        $this->assertTrue(function_exists('sslKeyPubClean'), 'sslKeyPubClean function not found.');
-        $this->assertTrue(function_exists('intToBin'), 'intToBin function not found.');
-        $this->assertTrue(function_exists('timeStop'), 'timeStop function not found.');
+        //$this->assertTrue(function_exists('strIsIp'), 'strIsIp function not found.');
+        //$this->assertTrue(function_exists('sslKeyPubClean'), 'sslKeyPubClean function not found.');
+        //$this->assertTrue(function_exists('intToBin'), 'intToBin function not found.');
+        //$this->assertTrue(function_exists('timeStop'), 'timeStop function not found.');
     }
 
     public function testExtensions()

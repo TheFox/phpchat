@@ -11,7 +11,7 @@ use TheFox\PhpChat\Kernel;
 use TheFox\PhpChat\Client;
 use TheFox\PhpChat\TcpClient;
 use TheFox\PhpChat\ClientAction;
-use TheFox\PhpChat\Msg;
+use TheFox\PhpChat\Message;
 use TheFox\Dht\Simple\Table;
 #use TheFox\Dht\Kademlia\Bucket;
 use TheFox\Dht\Kademlia\Node;
@@ -510,7 +510,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
         list($client1, $client2) = $this->sendGenTestData();
 
         // Send Msg before ID should cause an error.
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setVersion(1);
         $msg->setSrcNodeId($client1->getSettings()->data['node']['id']);
         $msg->setSrcSslKeyPub(static::NODE_LOCAL_SSL_KEY_PUB1);
@@ -534,7 +534,7 @@ eruZB1Vdgq1HiHqmuF/cP0ECAwEAAQ==
         $this->sendClientsId($client1, $client2);
 
         // Send Msg
-        $msg = new Msg();
+        $msg = new Message();
         $msg->setVersion(1);
         #$msg->setId('200b9758-2d34-4152-8ada-fc09fc9c9da0');
         $msg->setSrcNodeId('cafed00d-2131-4159-8e11-0b4dbadb1738');

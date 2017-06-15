@@ -2,9 +2,6 @@
 
 namespace TheFox\PhpChat;
 
-use TheFox\Ipc\Connection;
-use TheFox\Ipc\StreamHandler;
-
 class Thread
 {
     private $exit = 0;

@@ -512,7 +512,7 @@ class Server
         }
     }
 
-    public function imapMailAdd(Msg $msg)
+    public function imapMailAdd(Message $msg)
     {
         if ($this->getKernel() && $this->getKernel()->getIpcImapConnection()) {
 
