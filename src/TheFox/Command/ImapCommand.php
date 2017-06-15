@@ -1,6 +1,6 @@
 <?php
 
-namespace TheFox\Console\Command;
+namespace TheFox\Command;
 
 use Exception;
 use RuntimeException;

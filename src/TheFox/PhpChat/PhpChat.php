@@ -10,6 +10,5 @@ namespace TheFox\PhpChat;
 class PhpChat
 {
     const NAME = 'PHPChat';
-    const VERSION = '0.4.x-dev';
-    const RELEASE = 5;
+    const VERSION = '0.4.0-dev.1';
 }

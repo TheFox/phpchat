@@ -1,6 +1,6 @@
 <?php
 
-namespace TheFox\PhpChat;
+namespace TheFox\PhpChat\Entity;
 
 use RuntimeException;
 use Rhumsaa\Uuid\Uuid;

@@ -1,6 +1,6 @@
 <?php
 
-namespace TheFox\Console\Command;
+namespace TheFox\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;

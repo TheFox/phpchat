@@ -1,6 +1,6 @@
 <?php
 
-namespace TheFox\PhpChat;
+namespace TheFox\PhpChat\Entity;
 
 use TheFox\Storage\YamlStorage;
 use TheFox\Dht\Simple\Node;

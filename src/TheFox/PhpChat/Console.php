@@ -339,20 +339,16 @@ class Console extends Thread
 
     public function init()
     {
-        // @codeCoverageIgnoreStart
         if (!TEST) {
             $this->initIpcKernelConnection();
             $this->sttySetup();
         }
-        // @codeCoverageIgnoreEnd
 
         $this->keybindingsSetup();
 
-        // @codeCoverageIgnoreStart
         if ($this->ipcKernelConnection) {
             $this->settings = $this->ipcKernelConnection->execSync('getSettings');
         }
-        // @codeCoverageIgnoreEnd
 
         $this->userNickname = $this->settings->data['user']['nickname'];
 
@@ -373,20 +369,15 @@ class Console extends Thread
             }
         }
 
-        // @codeCoverageIgnoreStart
         if (!TEST) {
             fwrite(STDOUT, PHP_EOL . "Type '/help' for help." . PHP_EOL);
         }
-        // @codeCoverageIgnoreEnd
 
         $this->msgAdd('start', true, true);
 
         return true;
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
     private function sttySetup()
     {
         $this->log->debug('stty setup');
@@ -404,9 +395,6 @@ class Console extends Thread
         $this->sttyEchoOff();
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
     private function sttyReset()
     {
         $this->log->debug('tty restore');

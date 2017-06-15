@@ -1,15 +1,12 @@
 <?php
 
-namespace TheFox\Console\Command;
+namespace TheFox\Command;
 
 use Exception;
 use RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-#use Zend\Mail\Message;
-#use Zend\Mail\Headers;
 use TheFox\Smtp\Server;
 use TheFox\Smtp\Event;
 use TheFox\Ipc\ClientConnection;
