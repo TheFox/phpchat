@@ -1,5 +1,8 @@
 <?php
 
+// @todo 1. replace function calls with newer
+// @todo 2. remove this file
+
 /** @deprecated */
 function sslKeyPubClean(){}
 

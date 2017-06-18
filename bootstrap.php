@@ -1,95 +1,10 @@
 <?php
 
-// This command cost me a whole day. Use it even in signalHandlerSetup().
-declare(ticks = 1);
-
-error_reporting(E_ALL | E_STRICT);
-
-ini_set('display_errors', 'On');
-ini_set('memory_limit', '128M');
-
-if(@date_default_timezone_get() == 'UTC') date_default_timezone_set('UTC');
-
-chdir(__DIR__);
-
-#define('DEBUG', true, true);
-define('PHP_EOL_LEN', strlen(PHP_EOL), true);
-
-if(getenv('TEST')){
-	define('TEST', true, true);
-}
-else{
-	define('TEST', false, true);
-}
-
-
-if(PHP_SAPI != 'cli'){
-	print 'FATAL ERROR: you need to run this in your shell'."\n";
-	exit(1);
-}
-
-if(version_compare(PHP_VERSION, '5.3.0', '<')){
-	print 'FATAL ERROR: you need at least PHP 5.3. Your version: '.PHP_VERSION."\n";
-	exit(1);
-}
-
-// Check modules installed.
-if(!extension_loaded('openssl')){
-	print 'FATAL ERROR: you must first install "openssl" extension.'."\n";
-	exit(1);
-}
-if(!extension_loaded('sockets')){
-	print 'FATAL ERROR: you must first install "sockets" extension.'."\n";
-	exit(1);
-}
-if(!extension_loaded('curl')){
-	print 'FATAL ERROR: you must first install "curl" extension.'."\n";
-	exit(1);
-}
-if(!extension_loaded('bcmath')){
-	print 'FATAL ERROR: you must first install "bcmath" extension.'."\n";
-	exit(1);
-}
-if(!function_exists('gzcompress')){
-	print 'FATAL ERROR: you need the PHP gzip functions.'."\n";
-	exit(1);
-}
-if(!function_exists('mt_rand')){
-	print 'FATAL ERROR: you need the PHP mt_rand function.'."\n";
-	exit(1);
-}
-
-// Check algorythms.
-if(!in_array('sha512', hash_algos())){
-	print 'FATAL ERROR: sha512 is not available.'."\n";
-	exit(1);
-}
-if(!in_array('ripemd160', hash_algos())){
-	print 'FATAL ERROR: ripemd160 is not available.'."\n";
-	exit(1);
-}
-
-if(!file_exists('vendor')){
-	print "FATAL ERROR: you must first run 'composer install'.\nVisit https://getcomposer.org\n";
-	exit(1);
-}
-
-require_once __DIR__.'/vendor/autoload.php';
-
-use Rhumsaa\Uuid\Uuid;
-use Rhumsaa\Uuid\Exception\UnsatisfiedDependencyException;
-use Symfony\Component\Filesystem\Filesystem;
-use Zend\Uri\UriFactory;
-
-use TheFox\Logger\Logger;
-use TheFox\Logger\StreamHandler;
-use TheFox\PhpChat\Settings;
-use TheFox\Dht\Kademlia\Node;
-
+// @todo 1. move functions into services
+// @todo 2. remove this file
 
 $filesystem = new Filesystem();
-$filesystem->mkdir('log', 0700);
-$filesystem->mkdir('pid', 0700);
+
 
 $log = new Logger('main');
 $log->pushHandler(new StreamHandler('php://stdout', Logger::INFO));
